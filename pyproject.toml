@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "werp-toolkit"
+version = "0.1.0"
+description = ""
+authors = ["Galen Holt <53928785+galenholt@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "werp_toolkit"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+py-ewr = "^0.9.3"
+gitpython = "^3.1.29"
+geopandas = "^0.12.1"
+plotnine = "^0.10.1"
+rtree = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

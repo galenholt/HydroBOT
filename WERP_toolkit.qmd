@@ -1,0 +1,9 @@
+---
+title: "WERP_toolkit"
+---
+
+## Project overview documentation
+
+This file is currently just a placeholder for top-level quarto documentation associated with this project. I'm not sure it will persist, it may make more sense to spin off the documentation into its own repo/project.
+
+Most individual docs will be developed in their respective sections, and output to `_quarto_output/`.
