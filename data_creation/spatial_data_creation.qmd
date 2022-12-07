@@ -16,8 +16,6 @@ library(tidyverse)
 library(sf)
 library(patchwork)
 
-# Not needed yet, but could be really useful later if the data has more dimensions.
-# library(stars)
 ```
 
 I want the `vertcount` function. This is crude, will be easier once packaged.
@@ -36,11 +34,11 @@ First, do we actually want to rebuild the `data/` directory, or just use this to
 REBUILD_DATA <- FALSE
 ```
 
-Get a list of what exists, don't create if it does.
+Set the data dir to make that easy to change.
 
 ```{r}
 datarawdir <- 'data-raw'
-# existing_dirs <- list.files(datarawdir)
+dataoutdir <- 'data'
 ```
 
 Define a dataload function for download and unzip of shapefiles- doing this here rather than in R/ because this is not really part of the package, but the initial dev building. And it can know about existing dirs
@@ -270,19 +268,19 @@ I *could* save these objects as the sf objects in `.rda` files, as would be typi
 
 if (REBUILD_DATA) {
   st_write(basin, 
-           file.path('data', 'basin.shp'), 
+           file.path(dataoutdir, 'basin.shp'), 
            append = FALSE)
   st_write(rpa_simple, 
-           file.path('data', 'resource_plan.shp'), 
+           file.path(dataoutdir, 'resource_plan.shp'), 
            append = FALSE)
   st_write(sdls_simple, 
-           file.path('data', 'sdl_units.shp'), 
+           file.path(dataoutdir, 'sdl_units.shp'), 
            append = FALSE)
   st_write(bombasin, 
-           file.path('data', 'bom_gauges.shp'), 
+           file.path(dataoutdir, 'bom_gauges.shp'), 
            append = FALSE)
   st_write(cewo_Valleys, 
-           file.path('data', 'cewo_valleys.shp'), 
+           file.path(dataoutdir, 'cewo_valleys.shp'), 
            append = FALSE)
 }
 

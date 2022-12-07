@@ -12,7 +12,7 @@ The exception to the R code is the Scenario Controller and some initial test dat
 
 This is not currently a package, though we are moving that way.
 
-The data in `data/` is test data, and so is included in the repo, but will hopefully change little. It can be rebuilt with notebooks in `data_creation/`, which also adds data to `data-raw/`, which is not tracked in the repo.
+The data in `data/` is test data, and so will be included in the repo, but will hopefully change little. This is not currently tracked during the migration, as it might change more frequently. It can be rebuilt with notebooks in `data_creation/`, which also adds data to `data-raw/`, which is not tracked in the repo.
 
 ### Current status
 Migrating from a prototype repo, currently developing cleaner structure and environment/data/file management.
