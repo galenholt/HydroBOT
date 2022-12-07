@@ -4,3 +4,17 @@
 .Ruserdata
 
 /.quarto/
+
+/_*.local
+
+data-raw/
+
+# test data- ignoring because should be constructed. If becomes a released package, will need to be included.
+data/
+
+# Quarto-related outputs. Might want some of this back to publish
+_quarto_output/
+
+*_cache/
+*_files/
+

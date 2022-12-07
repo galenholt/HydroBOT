@@ -6,9 +6,13 @@ Next run `renv::restore()` which will use the local `renv.lock` file to build a 
 
 ### How do I get set up? ###
 
-Most of the work here is in R scripts, and expects to be run through the Rproject for now or the paths will break. The path dependencies should go away soon.
+Most of the work here is in R scripts, with the Rproject providing relative paths to the project directory (repo). *Please* do not setwd()- all paths should be relative to the project dir, unless (*maybe*) they are hardcoded to fixed shared data resources.
 
 The exception to the R code is the Scenario Controller and some initial test data creation, which are written in python/quarto and link closely with the [EWR tool](https://github.com/MDBAuth/EWR_tool).
+
+This is not currently a package, though we are moving that way.
+
+The data in `data/` is test data, and so is included in the repo, but will hopefully change little. It can be rebuilt with notebooks in `data_creation/`, which also adds data to `data-raw/`, which is not tracked in the repo.
 
 ### Current status
 Migrating from a prototype repo, currently developing cleaner structure and environment/data/file management.

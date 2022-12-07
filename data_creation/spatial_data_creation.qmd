@@ -1,0 +1,289 @@
+---
+title: "Spatial data creation"
+author: "Galen Holt"
+format: html
+editor: visual
+---
+
+```{r setup}
+#| warning: false
+#| message: false
+
+# knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+
+library(tidyverse)
+library(sf)
+library(patchwork)
+
+# Not needed yet, but could be really useful later if the data has more dimensions.
+# library(stars)
+```
+
+I want the `vertcount` function. This is crude, will be easier once packaged.
+
+```{r}
+source(file.path('R', 'spatial_helpers.R'))
+```
+
+## File purpose
+
+Create some clean(er) spatial data for aggregation testing demonstrations. I'm going to get as many files as possible online, and put others files in `data-raw` for now, and output clean versions to `data`, following R package data conventions. But set a 'datadir', so we can change that easily to somewhere else if desired.
+
+First, do we actually want to rebuild the `data/` directory, or just use this to investigate and document what happened?
+
+```{r}
+REBUILD_DATA <- FALSE
+```
+
+Get a list of what exists, don't create if it does.
+
+```{r}
+datarawdir <- 'data-raw'
+# existing_dirs <- list.files(datarawdir)
+```
+
+Define a dataload function for download and unzip of shapefiles- doing this here rather than in R/ because this is not really part of the package, but the initial dev building. And it can know about existing dirs
+
+```{r}
+data_load <- function(dirname, datadir, sourceurl,  
+                      existing_dirs = list.files(datadir)) {
+  print(existing_dirs)
+  if (!(dirname %in% existing_dirs)) {
+    
+    zippath <- file.path(datadir, paste0(dirname, '.zip'))
+    download.file(sourceurl, destfile = zippath)
+    
+    unzip(zippath, exdir = file.path(datadir, dirname))
+    
+    file.remove(zippath)
+  }
+}
+```
+
+## Basin
+
+First, read in the basin. This file straight from MDBA. Currently a download link to get data into data-raw, but can later just point to an internal location to avoid putting the data in the package.
+
+File from
+
+```{r}
+
+data_load('mdb_boundary', datarawdir, "https://data.gov.au/data/dataset/4ede9aed-5620-47db-a72b-0b3aa0a3ced0/resource/8a6d889d-723b-492d-8c12-b8b0d1ba4b5a/download/sworkingadhocjobsj4430dataoutputsmdb_boundarymdb_boundary.zip")
+
+```
+
+```{r}
+basin <- read_sf(file.path(datarawdir, 'mdb_boundary',
+                           'mdb_boundary.shp'))
+```
+
+## Resource planning areas
+
+Also from MDBA- do this with a link too
+
+```{r}
+data_load('sw_rpa', datarawdir, "https://data.gov.au/data/dataset/7b0c274f-7f12-4062-9e54-5b8227ca20c4/resource/8369c483-975c-4f54-8eda-a6fbd0ea89ad/download/sworkingadhocjobsp3827dataoutputsupdate-april-2019sw-wrpasurface-water-water-resource-plan-areas.zip")
+
+```
+
+```{r}
+rpa <- read_sf(file.path(datarawdir, 
+                         'sw_rpa', 
+                         'Surface Water Water Resource Plan Areas.shp')) %>% 
+  st_make_valid()
+```
+
+After a bunch of speed testing, it became apparent `rpa` is a monster (1.4 million + vertices).
+
+```{r}
+print(vertcount(rpa))
+```
+
+Simplify it. The obvious route `sf::st_simplify` is easiest, but doesn't preserve touchingness of adjoining polygons. That may not actually matter if we then scale up more, but it will if this is the final level. So use `rmapshaper::ms_simplify()` (https://github.com/r-spatial/sf/issues/1011) to set up a default polygon set and keep adjoining topology. For now, just pick a level crudely. `sf::st_simplify` does the simplification in meters, but `ms_simplify` is in proportion. A bit harder to judge. Maybe 0.01? The default of 0.05?
+
+```{r}
+rpa_simple <- rpa %>% 
+  rmapshaper::ms_simplify(keep = 0.01)
+
+print(vertcount(rpa_simple))
+```
+
+That's not obviously oversmoothed, so should be fine for testing. If this becomes canonical, we should think more about it.
+
+```{r}
+ggplot(rpa_simple) +
+  geom_sf(aes(fill = SWWRPANAME), show.legend = FALSE) +
+  geom_sf_label(aes(label = SWWRPANAME), size = 3, label.padding = unit(0.1, 'lines')) + 
+  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+```
+
+## SDL units
+
+Also from MDBA- do this with a link too
+
+```{r}
+data_load('sw_sdl', datarawdir, "https://data.gov.au/data/dataset/4afa3227-8557-4bb6-944a-6494b28ae160/resource/988ae947-f4dc-4f75-9773-536df71b03ad/download/sworkingadhocjobsp3827dataoutputsupdate-january-2019surface-water-sdl-resource-units.zip")
+
+```
+
+```{r}
+sdls <- read_sf(file.path(datarawdir, 
+                         'sw_sdl', 
+                         'Surface Water SDL Resource Units.shp')) %>% 
+  st_make_valid()
+```
+
+The `sdl` polygons are also monsters (1.4 million + vertices).
+
+```{r}
+print(vertcount(sdls))
+```
+
+again, too many vertices
+
+```{r}
+sdls_simple <- sdls %>% 
+  rmapshaper::ms_simplify(keep = 0.01)
+
+print(vertcount(sdls_simple))
+```
+
+And a plot. Too many units to name so kill the legend
+
+```{r}
+ggplot(sdls_simple) +
+  geom_sf(aes(fill = SWSDLName), show.legend = FALSE) +
+  geom_sf_label(aes(label = SWSDLName), size = 3, label.padding = unit(0.1, 'lines')) + 
+  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+```
+
+The 'Macquarie' file I got from David R. is the Macquarie-Castlereagh there, so just use this to avoid having even more files to lug around.
+
+## Gauges
+
+There are gauge locations from the MDBA gis zip (HydrologicIndicatorSites) and BOM (included in EWR tool- bom_gauge_data). I can get the hydrologic indicator sites online, but the only source I can find for the BOM locations is a manual link at <http://www.bom.gov.au/waterdata/>. It's a csv (I got from old version of EWR), so I'm just going to include it for now.
+
+```{r}
+data_load('hyd_ind_sites', datarawdir, "https://data.gov.au/data/dataset/2fbf1d73-712d-4ddb-9d2a-8b4119697525/resource/e507d6a8-bcf1-496a-bfb4-79769c02eced/download/sworkingadhocjobsj4068dataoutputshydrologicindicatorsites_point.zip")
+
+```
+
+```{r}
+hydind <- read_sf(file.path(datarawdir,
+                            "hyd_ind_sites",
+                            "HydrologicIndicatorSites_Point.shp"))
+
+bomg <- read_csv(file.path(datarawdir, 'bom_gauge_locations', 'bom_gauge_data.csv'))
+```
+
+Make BOM geographic
+
+```{r}
+bomg <- bomg %>% 
+    rename(site = 'site name', gauge = 'gauge number') %>%
+    # lat an long come in as chr because there is a line for 'undefined'
+    filter(site != 'undefined') %>%
+    mutate(lat = as.numeric(lat),
+           lon = as.numeric(lon)) %>% 
+  st_as_sf(coords = c('lon', 'lat'), crs = 4326) %>% 
+  st_transform(crs = st_crs(basin))
+```
+
+How do they compare?
+
+MDBA locations
+
+```{r}
+ggplot() + 
+  geom_sf(data = basin) +
+  geom_sf(data = hydind)
+```
+
+BOM are all of Australia
+
+```{r}
+
+ggplot() + 
+  geom_sf(data = basin) +
+  geom_sf(data = bomg)
+```
+
+are the boms in the basin the same as the mdbas?
+
+```{r}
+inbasin <- st_intersects(basin, bomg)
+# That's a sparse matrix of polygon-point pairs, but since we only have one polygon, can unlist
+bombasin <- bomg[unlist(inbasin), ]
+nrow(hydind)
+nrow(bombasin)
+```
+
+Quite clearly more in bom, but plot
+
+```{r}
+ggplot() +
+  geom_sf(data = basin) +
+  geom_sf(data = bombasin, color = 'dodgerblue') + 
+  geom_sf(data = hydind, color = 'firebrick', alpha = 0.5)
+```
+
+Worth thinking about which to use by default, but let's allow feeding it a path to whatever and using it. I'm going to move that bom dataset into `data` too, and probably use it by default since it seems to be what the EWR is using. Easy to change later.
+
+## Catchments
+
+Get these from CEWO, there are other sources but I've used a version of this before.
+
+```{r}
+data_load('cewo_valleys', datarawdir, "https://data.gov.au/data/dataset/75910bc5-6c3e-40e8-9c8a-1e895274badb/resource/a7053ee7-8e20-4f2c-b594-cb88c6ed9406/download/cewo_mdb_valleys.shp.zip")
+```
+
+A bit of cleanup to match crs to the MDBA data, and discard unused cols.
+
+```{r}
+cewo_Valleys <- read_sf(dsn = file.path(datarawdir,
+                                        'cewo_valleys',
+                                        'CEWO_MDB_Valleys.shp')) %>%
+  st_transform(st_crs(rpa)) %>%
+  st_make_valid() %>%
+  select(ValleyName, ValleyID, ValleyCode) %>%
+  filter(ValleyName != 'Northern Unregulated')
+
+```
+
+Plot that, make sure it worked
+
+```{r}
+ggplot(cewo_Valleys) +
+  geom_sf(aes(fill = ValleyName))
+```
+
+# Save clean files
+
+No changes to basin, simplified rpa, bom gauges in the basin, and ltim valleys extracted from anae.
+
+I *could* save these objects as the sf objects in `.rda` files, as would be typical for an R package. But `.shp` is going to be easier for other programs to read if we want to share them (and we do).
+
+*Only do this if we want to rebuild*- the `data/` directory is tracked, so don't do this willy-nilly.
+
+```{r}
+
+if (REBUILD_DATA) {
+  st_write(basin, 
+           file.path('data', 'basin.shp'), 
+           append = FALSE)
+  st_write(rpa_simple, 
+           file.path('data', 'resource_plan.shp'), 
+           append = FALSE)
+  st_write(sdls_simple, 
+           file.path('data', 'sdl_units.shp'), 
+           append = FALSE)
+  st_write(bombasin, 
+           file.path('data', 'bom_gauges.shp'), 
+           append = FALSE)
+  st_write(cewo_Valleys, 
+           file.path('data', 'cewo_valleys.shp'), 
+           append = FALSE)
+}
+
+```
