@@ -18,3 +18,5 @@ _quarto_output/
 *_cache/
 *_files/
 
+
+/.luarc.json
