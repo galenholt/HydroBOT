@@ -127,7 +127,7 @@ How many are we talking?
 ```{python}
 demo_gauges.info()
 ```
-291  rows is a lot, but unlikely they'll all be in the EWR.
+295  rows is a lot, but unlikely they'll all be in the EWR.
 
 ### Extract their names
 To feed to the gauge extractor, we need their gauge numbers. 
