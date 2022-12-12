@@ -738,7 +738,7 @@ traitlets = "*"
 
 [[package]]
 name = "mdba-gauge-getter"
-version = "0.3.4"
+version = "0.4.2"
 description = "Facilitates waterflow gauge data ingest from several endpoints. Dependency to several other projects."
 category = "main"
 optional = false
@@ -1153,7 +1153,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "py-ewr"
-version = "0.9.4"
+version = "1.0.1"
 description = "Environmental Water Requirement calculator"
 category = "main"
 optional = false
@@ -1163,7 +1163,7 @@ python-versions = "*"
 cachetools = "5.2.0"
 ipython = "8.3.0"
 ipywidgets = "7.7.0"
-mdba-gauge-getter = "0.3.4"
+mdba-gauge-getter = "0.4.2"
 pandas = "1.4.2"
 requests = "2.25.1"
 tqdm = "4.64.0"
@@ -1651,7 +1651,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.11"
-content-hash = "a59f2d026f93078e11215a3e1b29cdeca35ab082d83de8b24b6c40e1fc0fbe81"
+content-hash = "956423ab4e5ff2a2199f05fe66ca854d3d46fa8ca57d09c5168224873f662a85"
 
 [metadata.files]
 anyio = [
@@ -2253,8 +2253,8 @@ matplotlib-inline = [
     {file = "matplotlib_inline-0.1.6-py3-none-any.whl", hash = "sha256:f1f41aab5328aa5aaea9b16d083b128102f8712542f819fe7e6a420ff581b311"},
 ]
 mdba-gauge-getter = [
-    {file = "mdba_gauge_getter-0.3.4-py3-none-any.whl", hash = "sha256:10fd2bc7f87af70e38bc2d5f9aad42b4e870aa3d6c92a4a4d781c4271f1261f3"},
-    {file = "mdba_gauge_getter-0.3.4.tar.gz", hash = "sha256:15ed7613339296a39c3c5da40a52774840c497b2b22229a17158423258431ecd"},
+    {file = "mdba_gauge_getter-0.4.2-py3-none-any.whl", hash = "sha256:89b525cf9f63128f3492e7c69cb0aa18d22a0ca4aa6044da0a3c4b0eb05570a7"},
+    {file = "mdba_gauge_getter-0.4.2.tar.gz", hash = "sha256:2bad14616b5e6c1677c27c2c901ff489d955da76be0e45e291ea1bfa74f77a92"},
 ]
 mistune = [
     {file = "mistune-2.0.4-py2.py3-none-any.whl", hash = "sha256:182cc5ee6f8ed1b807de6b7bb50155df7b66495412836b9a74c8fbdfc75fe36d"},
@@ -2485,8 +2485,8 @@ py = [
     {file = "py-1.11.0.tar.gz", hash = "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719"},
 ]
 py-ewr = [
-    {file = "py_ewr-0.9.4-py3-none-any.whl", hash = "sha256:f8a378695a4cde9b3a1ed40bfc33e86e38031f9821bd222d6c76cf797e41b9dd"},
-    {file = "py_ewr-0.9.4.tar.gz", hash = "sha256:80519141a68d01f6b5ec978ce7569b617c2491d6b03c679e578f1dd4d1eda325"},
+    {file = "py_ewr-1.0.1-py3-none-any.whl", hash = "sha256:7b896a633be3494b91f041d667a814c6bd571430c205374a80826dfd454582a6"},
+    {file = "py_ewr-1.0.1.tar.gz", hash = "sha256:f887fefa29f85e212e210e09486faa13b866b4ba22183dc28307a7cb3a5fac56"},
 ]
 pycparser = [
     {file = "pycparser-2.21-py2.py3-none-any.whl", hash = "sha256:8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9"},
