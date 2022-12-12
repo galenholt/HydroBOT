@@ -104,7 +104,7 @@ clean_obj_target <- function(ewrobjs,
   if (saveout == 'r') {
     
     # Rdata for package structure. enforce naming here
-    save(obj2target, file = file.path(outdir, 'obj2target.rdata'))
+    saveRDS(obj2target, file = file.path(outdir, 'obj2target.rds'))
     
   } else if (saveout == 'csv') {
     

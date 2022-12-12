@@ -133,7 +133,7 @@ clean_ewr_obj <- function(ewrpath = 'https://az3mdbastg001.blob.core.windows.net
   if (saveout == 'r') {
     
     # Rdata for package structure
-    save(ewr2obj, file = file.path(outdir, 'ewr2obj.rdata'))
+    saveRDS(ewr2obj, file = file.path(outdir, 'ewr2obj.rds'))
     
   } else if (saveout == 'csv') {
     

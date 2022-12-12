@@ -39,7 +39,10 @@ First, do we actually want to rebuild the `data/` directory, or just use this to
 ```{r}
 REBUILD_DATA <- TRUE
 
-if (REBUILD_DATA) {saver <- 'r'} else {saver <- FALSE}
+# if (REBUILD_DATA) {saver <- 'r'} else {saver <- FALSE}
+
+# actually, just save the list at the end. `saver` is for individual functions.
+saver <- FALSE
 ```
 
 ## Data linking theme scales

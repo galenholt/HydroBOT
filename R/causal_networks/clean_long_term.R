@@ -42,7 +42,7 @@ clean_long_term <- function(yrpath,
   if (saveout == 'r') {
     
     # Rdata for package structure
-    save(obj2yrtargets, file = file.path(outdir, 'obj2yrtargets.rdata'))
+    saveRDS(obj2yrtargets, file = file.path(outdir, 'obj2yrtargets.rds'))
   } else if (saveout == 'csv') {
     
     # csv for other
