@@ -30,12 +30,23 @@ clean_ewr_obj <- function(ewrpath = 'https://az3mdbastg001.blob.core.windows.net
   # Only read in some cols and not the whole csv. we actually only need watreqid
   # and code here and could get the rest with joins later, but let's at least be
   # clear about the location
+  
+  # The names keep changing. Figure out the current name of WatReqID
+  wri <- readr::read_csv(ewrpath, n_max = 0)
+  wriname <- names(wri)[grepl('^WatReq', names(wri))]
+  
+  # Now we need to build a list. This is stupidly complicated
+  collist <- list(wri = 'c', 
+                  PlanningUnitID = 'c',
+                  LTWPShortName = 'c',
+                  gauge = 'c', 
+                  code = 'c')
+  
+  names(collist)[1] <- wriname
+  
   inputewr <- readr::read_csv(ewrpath, 
-                              col_types = cols_only(WatReqID_STRM = 'c', 
-                                                    PlanningUnitID = 'c',
-                                                    LTWPShortName = 'c',
-                                                    Gauge = 'c', 
-                                                    Code = 'c')) %>%
+                              col_types = collist) %>%
+    dplyr::select(all_of(names(collist))) %>% 
     dplyr::rename(ewr_code = code) %>% 
     dplyr::rename_with(~'WatReqID', contains("WatReqID")) %>%
     dplyr::rename_with(~str_remove_all(., pattern = "/"), everything()) %>%
