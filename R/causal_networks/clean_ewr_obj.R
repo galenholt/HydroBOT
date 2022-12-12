@@ -173,11 +173,11 @@ dash2comma <- function(x) {
   
   # NA cause problems, and most things that have no entries just are
   # character(0), not NA. Can't check for NA if length 0 though
-  if (length(x) > 0 && is.na(x)) {
+  if ((length(x) > 0) & all(is.na(x))) {
     return(character(0))
   }
   
-  if(length(x) == 0 || !str_detect(x, pattern = '-')) {
+  if((length(x) == 0) | any(!str_detect(x, pattern = '-'))) {
     return(x)
   }
   
