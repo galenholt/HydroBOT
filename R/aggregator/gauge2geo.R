@@ -13,13 +13,21 @@
 gauge2geo <- function(gaugedf, gaugelocfile, whichcrs = 4283) {
   # assume since lat/long this is wgs84 but could be some other geodetic datum
   # the parsing failure warnings are because of the undefineds that i then remove
-  gaugelocs <- read_csv(gaugelocfile) %>% 
-    rename(site = 'site name', gauge = 'gauge number') %>%
-    # lat an long come in as chr because there is a line for 'undefined'
-    filter(site != 'undefined') %>%
-    mutate(lat = as.numeric(lat),
-           lon = as.numeric(lon)) %>% 
-    st_as_sf(coords = c('lon', 'lat'), crs = 4326)
+  
+  if (grepl('*.csv', gaugelocfile)) {
+    gaugelocs <- read_csv(gaugelocfile) %>% 
+      rename(site = 'site name', gauge = 'gauge number') %>%
+      # lat an long come in as chr because there is a line for 'undefined'
+      filter(site != 'undefined') %>%
+      mutate(lat = as.numeric(lat),
+             lon = as.numeric(lon)) %>% 
+      st_as_sf(coords = c('lon', 'lat'), crs = 4326)
+  }
+  
+  if (grepl('*.shp', gaugelocfile)) {
+    gaugelocs <- sf::read_sf(gaugelocfile)
+  }
+
   
   gaugedf <- left_join(gaugedf, gaugelocs, by = 'gauge') %>% 
     st_as_sf() %>% 
