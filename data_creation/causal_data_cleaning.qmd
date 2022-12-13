@@ -89,8 +89,8 @@ Known file sources- the ewr definitions and the ltwp table.
 **UPDATE** 12/12/22: The data stream from MDBA has changed format and no longer can be matched against the table. Reverting to an old version. No guarantees about completeness.
 
 ```{r}
-# Get ewr defs from MDBA
-ewrs <- file.path(datadir, 'OLD_NSWEWR_ECOLOGICAL_OBJECTIVES.csv')
+# Get ewr defs from MDBA- This is a cached version, since WatReqID has gone
+ewrs <- file.path(datadir, 'NSWEWR_LIVE.csv')
   
 # ewrs <- 'https://az3mdbastg001.blob.core.windows.net/mdba-public-data/NSWEWR_LIVE.csv'
 
