@@ -4,6 +4,8 @@ Configure git username and email. In bash, `git config --global user.name "User 
 Clone the repo.
 
 ### R global setup
+The R version that comes on the machines is 4.0, and the usual `apt-get` isn't finding anything newer, but currently (late December 2022) R is at 4.2.2 and that's what I've been developing on. We can use [rig](https://github.com/r-lib/rig) to manage R versions (and this is likely better anyway, because we can swap around). It does seem to run with the old version, but it will be good to be able to choose. At the bash terminal, type `curl -Ls https://github.com/r-lib/rig/releases/download/latest/rig-linux-latest.tar.z | sudo tar xz -C /usr/local` to install rig. Then, `rig list` to see available R versions (likely none- it doesn't store its versions with the system). Then `rig add 4.2.2` (or whatever the current version is). There are ways to use Rstudio with the version in the `renv.lock`, and likely ways to do the same with VS, but for now, easiest is to make sure `renv default` matches the version in `renv.lock`.
+
 The R environment stuff within the project is managed by `renv`, but there are some packages we want to install globally because they make R work in VScode, help development, etc. So, *outside the repo* (or before cloning it), do these things. 
 
 To use R in VScode, there are a few things to do, mostly listed at the [VScode docs](https://code.visualstudio.com/docs/languages/r). The essential ones are to install `languageserver` (`install.packages('languageserver')`) and then the R extension in VScode. However, I sometimes have to install it inside the repo. I think `.libPaths` doesn't retain some global paths on Azure that it retains elsewhere. VScode will prompt to install if it can't find it.
