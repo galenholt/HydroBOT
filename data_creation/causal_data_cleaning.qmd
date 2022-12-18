@@ -37,7 +37,7 @@ This is used to go from the raw spreadsheets in `data-raw/` and online to clean 
 First, do we actually want to rebuild the `data/` directory, or just use this to investigate and document what happened? All the functions here have a `saveout` argument that can be `FALSE`, so just set that conditionally.
 
 ```{r}
-REBUILD_DATA <- TRUE
+REBUILD_DATA <- FALSE
 
 # if (REBUILD_DATA) {saver <- 'r'} else {saver <- FALSE}
 

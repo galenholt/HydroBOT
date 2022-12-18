@@ -7,18 +7,27 @@
 #' aggregation level.
 #'
 #' @param aggdf aggregated dataframe or tibble
-#' @param aggsequence a list of the names of the aggregation. works best if the list passed to the calling function is named, and those names are passed in here.Typically it will be the second value in each theme aggregation step (the to-theme), or the name of the spatial polygons. But extracting those when unnamed isn't well tested.
-#' @param funsequence a list of functions (as characters or lists of names and arguments) to apply to do the aggregation at each step defined in `aggsequence`. Can be multiple funs per aggregation step.
+#' @param aggsequence a list of the names of the aggregation. works best if the
+#'   list passed to the calling function is named, and those names are passed in
+#'   here.Typically it will be the second value in each theme aggregation step
+#'   (the to-theme), or the name of the spatial polygons. But extracting those
+#'   when unnamed isn't well tested.
+#' @param funsequence a list of functions (as characters or lists of names and
+#'   arguments) to apply to do the aggregation at each step defined in
+#'   `aggsequence`. Can be multiple funs per aggregation step.
 #' @param aggCols the name(s) of the original columns that were aggregated.
 #'
-#' @return a tibble with a column named as the original input data at the start of aggregation, and columns for every aggregation step giving the level aggregated into and the function used for the aggregation. if multiple functions are used, the rows are stacked (long format).
+#' @return a tibble with a column named as the original input data at the start
+#'   of aggregation, and columns for every aggregation step giving the level
+#'   aggregated into and the function used for the aggregation. if multiple
+#'   functions are used, the rows are stacked (long format).
 #' @export
 #'
 #' @examples
 #' 
 agg_names_to_cols <- function(aggdf, aggsequence, funsequence, aggCols) {
   
-  # suppressWarnings probably a bad idea, but there's a lot of really pointless warnings that get thrown
+  # suppressWarnings probably a bad idea, but there's a lot of really pointless warnings that get thrown # nolint
   suppressWarnings(
   aggincols <- aggdf %>% 
     pivot_longer(ends_with(aggCols)) %>% 
