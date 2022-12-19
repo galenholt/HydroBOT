@@ -297,8 +297,8 @@ pn.scale_fill_brewer(type = 'qual', palette = 8))
 if REBUILD_DATA:
     start15 = datetime.date(2015, 1, 1)
 
-    base.query('Date > @start15').filter(items = minigauges).to_csv(os.path.join(repo, dataoutdir, 'testsmall', 'base', 'base.csv'))
-    down4.query('Date > @start15').filter(items = minigauges).to_csv(os.path.join(repo, dataoutdir, 'testsmall', 'down4', 'down4.csv'))
-    up4.query('Date > @start15').filter(items = minigauges).to_csv(os.path.join(repo, dataoutdir, 'testsmall', 'up4', 'up4.csv'))
+    base.query('Date > @start15').dplyr::filter(items = minigauges).to_csv(os.path.join(repo, dataoutdir, 'testsmall', 'base', 'base.csv'))
+    down4.query('Date > @start15').dplyr::filter(items = minigauges).to_csv(os.path.join(repo, dataoutdir, 'testsmall', 'down4', 'down4.csv'))
+    up4.query('Date > @start15').dplyr::filter(items = minigauges).to_csv(os.path.join(repo, dataoutdir, 'testsmall', 'up4', 'up4.csv'))
 
 ```

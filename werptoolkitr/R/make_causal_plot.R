@@ -83,15 +83,15 @@ make_causal_plot <- function(nodes, edges,
   relevantnodes <- find_related_nodes(edges, focalnodes)
   
   nodes <- nodes %>% 
-    filter(Name %in% relevantnodes)
+    dplyr::filter(Name %in% relevantnodes)
   
   edges <- edges %>% 
-    filter(from %in% relevantnodes | to %in% relevantnodes)
+    dplyr::filter(from %in% relevantnodes | to %in% relevantnodes)
   
   # drop nodes with no edges?
   if (drop_unused_nodes) {
     nodes <- nodes %>% 
-      filter(Name %in% edges$from | Name %in% edges$to)
+      dplyr::filter(Name %in% edges$from | Name %in% edges$to)
   }
   
   # colors

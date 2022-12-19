@@ -13,7 +13,14 @@ RoxygenNote: 7.2.3
 Imports: 
     colorspace,
     dplyr,
+    ggplot2,
     paletteer,
+    patchwork,
+    readr,
     sf,
     stringr,
     tidyr
+Suggests: 
+    rmapshaper (>= 0.4.6),
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

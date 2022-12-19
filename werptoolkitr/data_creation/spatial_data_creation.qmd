@@ -5,23 +5,28 @@ format: html
 editor: visual
 ---
 
+If we comment out the knitr statement, this will build to the Quarto project directory, NOT the R project directory. And since this is nested in the repo, that's not the same place, and its not what we want.
+
 ```{r setup}
 #| warning: false
 #| message: false
 
-# knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 
 
-library(tidyverse)
+# library(tidyverse)
 library(sf)
 library(patchwork)
+library(ggplot2)
+devtools::load_all()
+# library(werptoolkitr)
 
 ```
 
 I want the `vertcount` function. This is crude, will be easier once packaged.
 
 ```{r}
-source(file.path('R', 'spatial_helpers.R'))
+# source(file.path('R', 'spatial_helpers.R'))
 ```
 
 ## File purpose
@@ -31,14 +36,18 @@ Create some clean(er) spatial data for aggregation testing demonstrations. I'm g
 First, do we actually want to rebuild the `data/` directory, or just use this to investigate and document what happened?
 
 ```{r}
-REBUILD_DATA <- FALSE
+REBUILD_DATA <- TRUE
 ```
 
-Set the data dir to make that easy to change.
+Set the data dir to make that easy to change. This uses the *Quarto* project directory, *not* the *R* project directory, and so
 
 ```{r}
 datarawdir <- 'data-raw'
 dataoutdir <- 'data'
+
+if (!dir.exists(datarawdir)) {dir.create(datarawdir, recursive = TRUE)} 
+if (!dir.exists(dataoutdir)) {dir.create(dataoutdir, recursive = TRUE)} 
+
 ```
 
 Define a dataload function for download and unzip of shapefiles- doing this here rather than in R/ because this is not really part of the package, but the initial dev building. And it can know about existing dirs
@@ -46,7 +55,6 @@ Define a dataload function for download and unzip of shapefiles- doing this here
 ```{r}
 data_load <- function(dirname, datadir, sourceurl,  
                       existing_dirs = list.files(datadir)) {
-  print(existing_dirs)
   if (!(dirname %in% existing_dirs)) {
     
     zippath <- file.path(datadir, paste0(dirname, '.zip'))
@@ -172,7 +180,7 @@ hydind <- read_sf(file.path(datarawdir,
                             "hyd_ind_sites",
                             "HydrologicIndicatorSites_Point.shp"))
 
-bomg <- read_csv(file.path(datarawdir, 'bom_gauge_locations', 'bom_gauge_data.csv'))
+bomg <- readr::read_csv(file.path(datarawdir, 'bom_gauge_locations', 'bom_gauge_data.csv'))
 ```
 
 Make BOM geographic
@@ -181,7 +189,7 @@ Make BOM geographic
 bomg <- bomg %>% 
     dplyr::rename(site = 'site name', gauge = 'gauge number') %>%
     # lat an long come in as chr because there is a line for 'undefined'
-    filter(site != 'undefined') %>%
+    dplyr::filter(site != 'undefined') %>%
     dplyr::mutate(lat = as.numeric(lat),
            lon = as.numeric(lon)) %>% 
   st_as_sf(coords = c('lon', 'lat'), crs = 4326) %>% 
@@ -245,7 +253,7 @@ cewo_Valleys <- read_sf(dsn = file.path(datarawdir,
   st_transform(st_crs(rpa)) %>%
   st_make_valid() %>%
   dplyr::select(ValleyName, ValleyID, ValleyCode) %>%
-  filter(ValleyName != 'Northern Unregulated')
+  dplyr::filter(ValleyName != 'Northern Unregulated')
 
 ```
 

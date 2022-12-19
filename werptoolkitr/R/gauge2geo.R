@@ -18,7 +18,7 @@ gauge2geo <- function(gaugedf, gaugelocfile, whichcrs = 4283) {
     gaugelocs <- read_csv(gaugelocfile) %>% 
       dplyr::rename(site = 'site name', gauge = 'gauge number') %>%
       # lat an long come in as chr because there is a line for 'undefined'
-      filter(site != 'undefined') %>%
+      dplyr::filter(site != 'undefined') %>%
       dplyr::mutate(lat = as.numeric(lat),
              lon = as.numeric(lon)) %>% 
       st_as_sf(coords = c('lon', 'lat'), crs = 4326)

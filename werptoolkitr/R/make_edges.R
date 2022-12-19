@@ -93,18 +93,18 @@ make_edges <- function(dflist,
     # the columns exist
     if (dfgauge[dfindex]) {
       thisdf <- thisdf %>% 
-        filter(gauge %in% filterlist$gaugefilter)
+        dplyr::filter(gauge %in% filterlist$gaugefilter)
     }
     
     if (dfpu[dfindex]) {
       thisdf <- thisdf %>% 
-        filter(PlanningUnitID %in% filterlist$pufilter)
+        dplyr::filter(PlanningUnitID %in% filterlist$pufilter)
     }
     
     # we can assume the fromto exist
     thisdf <- thisdf %>% 
-      filter(.data[[p[1]]] %in% filterlist$fromfilter) %>% 
-      filter(.data[[p[2]]] %in% filterlist$tofilter) %>% 
+      dplyr::filter(.data[[p[1]]] %in% filterlist$fromfilter) %>% 
+      dplyr::filter(.data[[p[2]]] %in% filterlist$tofilter) %>% 
       dplyr::rename(from = p[1], to = p[2]) %>% 
       dplyr::select(any_of(c('gauge', 'PlanningUnitID', extrasave, 'from', 'to', 'color'))) %>% 
       dplyr::mutate(fromtype = p[1],
@@ -143,7 +143,7 @@ filtergroups <- function(edgedf,
   # Get matching values if a matching df is passed in as an argument
   if (!is.null(gaugefilter) & !is.null(gaugeplanmatch)) {
     pfromg <- gaugeplanmatch %>%
-      filter(gauge %in% gaugefilter) %>%
+      dplyr::filter(gauge %in% gaugefilter) %>%
       dplyr::select(PlanningUnitID) %>%
       dplyr::distinct() %>%
       pull()
@@ -151,7 +151,7 @@ filtergroups <- function(edgedf,
   
   if (!is.null(pufilter) & !is.null(gaugeplanmatch)) {
     gfromp <- gaugeplanmatch %>% 
-      filter(PlanningUnitID %in% pufilter) %>%
+      dplyr::filter(PlanningUnitID %in% pufilter) %>%
       dplyr::select(gauge) %>%
       dplyr::distinct() %>%
       pull()

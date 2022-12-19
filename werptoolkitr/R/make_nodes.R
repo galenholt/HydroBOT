@@ -62,7 +62,7 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
   # deal with missing levels- using tibble not vectors because need to join
   # based on nodetype
   realisedorders <- nodetib %>% 
-    filter(NodeType %in% unique(allnodes$NodeType)) %>% 
+    dplyr::filter(NodeType %in% unique(allnodes$NodeType)) %>% 
     dplyr::mutate(shiftorders = (nodeorder - min(nodeorder)) + 1,
            ordersteps = cumsum(c(0, (diff(shiftorders)-1))),
            neworders = shiftorders - ordersteps) %>% 
@@ -73,7 +73,7 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
   
   # Remove nodes with NA names- that's not usable
   allnodes <- allnodes %>% 
-    filter(!is.na(Name))
+    dplyr::filter(!is.na(Name))
   
   return(allnodes)
 

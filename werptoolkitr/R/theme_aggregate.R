@@ -73,7 +73,7 @@ theme_aggregate <- function(dat,
   g2p <- gauge_pu(causal_edges)
   # clean up the edges to only relevant
   causal_edges <- causal_edges %>% 
-    filter(fromtype == from_theme & totype == to_theme) %>%
+    dplyr::filter(fromtype == from_theme & totype == to_theme) %>%
     dplyr::select(where(~!all(is.na(.))))
   
   # check and dplyr::rename

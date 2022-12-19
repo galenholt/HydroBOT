@@ -52,9 +52,9 @@ clean_obj_target <- function(ewrobjs,
   # to do the QC adjustment.
 
   obj2target <- obj2target %>% 
-    filter(!LTWPShortName == "Murray Lower Darling")%>% #REmove the Murray to add in the data that Renee has already checked
-    filter(!(LTWPShortName == "Macquarie-Castlereagh" & Macquarie_Castlereagh == 0))%>%
-    filter(!(LTWPShortName == "Murrumbidgee" & Murrumbidgee == 0)) %>%
+    dplyr::filter(!LTWPShortName == "Murray Lower Darling")%>% #REmove the Murray to add in the data that Renee has already checked
+    dplyr::filter(!(LTWPShortName == "Macquarie-Castlereagh" & Macquarie_Castlereagh == 0))%>%
+    dplyr::filter(!(LTWPShortName == "Murrumbidgee" & Murrumbidgee == 0)) %>%
     dplyr::select(-c(Murray_Lower_Darling,	Macquarie_Castlereagh,	Murrumbidgee))
   
   #add in the data that Renee has already checked these have already been
@@ -82,7 +82,7 @@ clean_obj_target <- function(ewrobjs,
   qc_fix <- dplyr::left_join(qc_fix, pu2ltwp, by = 'LTWPShortName')
   
   qc_fix <- qc_fix %>%
-    filter(link != 0) %>% #watch out for the 2s = Renee changes
+    dplyr::filter(link != 0) %>% #watch out for the 2s = Renee changes
     dplyr::select(-c(link, PU, PlanningUnitName)) # get rid of extra cols not in the main data
   
   obj2target <- bind_rows(obj2target, qc_fix)

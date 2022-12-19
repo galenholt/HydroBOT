@@ -10,7 +10,7 @@ format:
 #| warning: false
 #| message: false
 
-library(tidyverse)
+# library(tidyverse)
 library(sf)
 library(reticulate) # Not strictly necessary but allows easier referencing of objects
 ```
@@ -118,7 +118,7 @@ The Macquarie shapefile from David is the Macquarie-Castlereagh from `rps`. I wa
 
 ```{r}
 catch_demo = rps %>% 
-  filter(SWWRPANAME %in% c('Macquarie-Castlereagh', 'Lachlan', 'Namoi'))
+  dplyr::filter(SWWRPANAME %in% c('Macquarie-Castlereagh', 'Lachlan', 'Namoi'))
 ```
 
 ```{r}
@@ -236,7 +236,7 @@ demo_levs <- dplyr::select(demo_levs, -DATETIME) %>%
 ```{r}
 # gaugegeo <- gaugegeo %>% 
 #   dplyr::rename(gauge = `gauge number`)
-demo_geo = gaugegeo %>% filter(gauge %in% py$demo_ids)
+demo_geo = gaugegeo %>% dplyr::filter(gauge %in% py$demo_ids)
 ```
 
 Looks reasonable. Probably overkill for testing, but can do a cut down version too.
@@ -333,9 +333,9 @@ Which gauges?
 
 ```{r}
 mac = rps %>% 
-  filter(SWWRPANAME %in% c('Macquarie-Castlereagh'))
+  dplyr::filter(SWWRPANAME %in% c('Macquarie-Castlereagh'))
 lach = rps %>% 
-  filter(SWWRPANAME %in% 'Lachlan')
+  dplyr::filter(SWWRPANAME %in% 'Lachlan')
 
 macgauge = st_intersection(demo_geo, mac)
 lachgauge = st_intersection(demo_geo, lach)
@@ -345,9 +345,9 @@ I'll just choose three of each
 
 ```{r}
 macsub = macgauge %>% 
-  filter(gauge %in% c('421004', '421001', '421011'))
+  dplyr::filter(gauge %in% c('421004', '421001', '421011'))
 lachsub = lachgauge %>% 
-  filter(gauge %in% c('412005', '412002', '412038'))
+  dplyr::filter(gauge %in% c('412005', '412002', '412038'))
 
 minigauge = bind_rows(macsub, lachsub)
 
@@ -367,17 +367,17 @@ if (REBUILD_DATA) {
   start15 = lubridate::ymd(20150101)
 
     base %>% 
-      filter(Date > start15) %>% 
+      dplyr::filter(Date > start15) %>% 
       dplyr::select(Date, all_of(minigauges)) %>% 
       write_csv(file.path(dataoutdir, 'testsmall', 'base', 'base.csv'))
     
     down4 %>% 
-      filter(Date > start15) %>% 
+      dplyr::filter(Date > start15) %>% 
       dplyr::select(Date, all_of(minigauges)) %>%  
       write_csv(file.path(dataoutdir, 'testsmall', 'down4', 'down4.csv'))
     
     up4 %>% 
-      filter(Date > start15) %>% 
+      dplyr::filter(Date > start15) %>% 
       dplyr::select(Date, all_of(minigauges)) %>%  
       write_csv(file.path(dataoutdir, 'testsmall', 'up4', 'up4.csv'))
 }

@@ -694,7 +694,7 @@ local({
   renv_bootstrap_load <- function(project, libpath, version) {
   
     # try to load renv from the project library
-    if (!requirenamespace("renv", lib.loc = libpath, quietly = TRUE))
+    if (!requireNamespace("renv", lib.loc = libpath, quietly = TRUE))
       return(FALSE)
   
     # warn if the version of renv loaded does not match
@@ -978,7 +978,7 @@ local({
     return(TRUE)
 
   # try again to load
-  if (requirenamespace("renv", lib.loc = libpath, quietly = TRUE)) {
+  if (requireNamespace("renv", lib.loc = libpath, quietly = TRUE)) {
     message("* Successfully installed and loaded renv ", version, ".")
     return(renv::load())
   }
