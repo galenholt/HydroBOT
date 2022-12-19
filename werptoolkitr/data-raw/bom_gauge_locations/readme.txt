@@ -1,0 +1,1 @@
+file here from the old version of the EWR tool. Can get manually from BOM http://www.bom.gov.au/waterdata/ as a table, need to sort out how to get programatically.

@@ -7,7 +7,7 @@
 
 /_*.local
 
-data-raw/
+*.xlsx
 
 # test data- ignoring because should be constructed. If becomes a released package, will need to be included.
 data/

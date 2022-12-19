@@ -1,0 +1,2 @@
+this data connected EWR codes to environmental objective codes was obtained 19/12/2022 from Carmen Amos via Lara Palmer. It is a very early version, with more QA/QC intended in January by NSW.
+I have saved it as csv from excel for tracking.
