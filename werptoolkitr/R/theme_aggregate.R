@@ -42,10 +42,10 @@ theme_aggregate <- function(dat,
                             geonames = NULL,
                             failmissing = TRUE,
                             ...) {
-  
+
   # including geometry in non-geometric
   # aggregates takes forever, drop and re-pair if present
-  
+
   # this is now getting even closer to spatial with the drop/add of geometry.
   # can they be the same function? probably.
   spatialflag <- FALSE
@@ -53,29 +53,29 @@ theme_aggregate <- function(dat,
   if ('sf' %in% class(dat)) {
     spatialflag <- TRUE
     if (!all(st_is(dat, 'POINT'))) {polyflag <- TRUE}
-    
+
     if (!('polyID' %in% names(dat))) {
-      dat <- dat %>% 
+      dat <- dat %>%
         add_polyID(failduplicate = FALSE)
     }
-    
-    geodat <- dat %>% 
-      dplyr::select(polyID, all_of(geonames)) %>% 
-      dplyr::group_by(polyID) %>% 
+
+    geodat <- dat %>%
+      dplyr::select(polyID, tidyselect::all_of(geonames)) %>%
+      dplyr::group_by(polyID) %>%
       slice(1) %>% # usual use of dplyr::distinct() checks the polys factorially. slice just indexes.
       dplyr::ungroup()
-    
+
     dat <- st_drop_geometry(dat)
     groupers <- c(groupers, 'polyID')
   }
-  
+
   # may not need this, but too many conditionals
   g2p <- gauge_pu(causal_edges)
   # clean up the edges to only relevant
-  causal_edges <- causal_edges %>% 
+  causal_edges <- causal_edges %>%
     dplyr::filter(fromtype == from_theme & totype == to_theme) %>%
-    dplyr::select(where(~!all(is.na(.))))
-  
+    dplyr::select(tidyselect::where(~!all(is.na(.))))
+
   # check and dplyr::rename
   if (length(unique(causal_edges$fromtype)) > 1 | length(unique(causal_edges$totype)) > 1) {
     stop("trying to aggregate into multiple groupings")
@@ -83,22 +83,22 @@ theme_aggregate <- function(dat,
     names(causal_edges)[names(causal_edges) == 'to'] <- causal_edges$totype[1]
     names(causal_edges)[names(causal_edges) == 'from'] <- causal_edges$fromtype[1]
   }
-  
-  
+
+
   # the theme-level outcomes are defined at gauges. we want to map back to that
   # until we've done spatial aggregation into something larger. this conditional
   # is really ugly though
-  
+
   if (spatialflag && polyflag) {
-    pairdat <- dat %>% 
+    pairdat <- dat %>%
       dplyr::left_join(causal_edges)
   } else {
-    pairdat <- dat %>% 
+    pairdat <- dat %>%
       dplyr::left_join(g2p) %>%
       dplyr::left_join(causal_edges)
   }
 
-  
+
   # The core aggregation function. the !! needs to happen here
   # because aggCols needs to be evaluated to a character vector, not passed in
   # as an object name. Annoying.
@@ -108,15 +108,15 @@ theme_aggregate <- function(dat,
                            funlist = funlist,
                            prefix = paste0(to_theme, '_'),# replace the general 'theme' prefix with the specific theme level being aggregated to
                            failmissing = failmissing,
-                           ...) 
-  
+                           ...)
+
   if (spatialflag) {
     dat <- dplyr::left_join(agged, geodat, by = 'polyID') %>%
       st_as_sf()
   } else {
     dat <- agged
   }
-  
+
   return(dat)
-  
+
 }

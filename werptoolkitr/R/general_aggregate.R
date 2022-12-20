@@ -19,7 +19,7 @@
 #'   calling function to give it the type of aggregation
 #' @param failmissing logical, default `TRUE`: fail if the requested grouping or
 #'   aggregation columns not exist. If `FALSE`, proceed with those that do exist
-#'   and silently drop those that don't. Similar to `all_of()` vs `any_of()` in
+#'   and silently drop those that don't. Similar to `tidyselect::all_of()` vs `tidyselect::any_of()` in
 #'   `tidyselect`
 #' @param ... arguments passed to the aggregation functions. Almost always better to specify
 #'   explicitly when building `funlist`, but works OK with simple functions
@@ -58,8 +58,8 @@ general_aggregate <- function(data, groupers,
   aggCols <- selectcreator(enquo(aggCols), data, failmissing)
   
   data_agg <- data %>%
-    dplyr::group_by(across({{groupers}})) %>%
-    summarise(across({{aggCols}}, funlist, ...,
+    dplyr::group_by(dplyr::across({{groupers}})) %>%
+    summarise(dplyr::across({{aggCols}}, funlist, ...,
                      .names = nameparser)) %>%
     dplyr::ungroup()
 }

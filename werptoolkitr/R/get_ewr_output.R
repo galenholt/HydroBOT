@@ -17,37 +17,37 @@
 get_ewr_output <- function(dir, type,
                            gaugefilter = NULL, scenariofilter = NULL) {
 
-  # assumes files are csvs. 
-  gaugefiles <- list.files(dir, pattern = '.csv', 
+  # assumes files are csvs.
+  gaugefiles <- list.files(dir, pattern = '.csv',
                            full.names = TRUE, recursive = TRUE)
-  
+
   # separate into annual and summary files
   relevantfiles <- gaugefiles[stringr::str_which(gaugefiles, pattern = type)]
-  
+
   # cut to requested gauges or scenarios
   if (!is.null(gaugefilter)) {
-    relevantfiles <- relevantfiles[stringr::str_which(relevantfiles, 
+    relevantfiles <- relevantfiles[stringr::str_which(relevantfiles,
                                              pattern = stringr::str_flatten(gaugefilter, collapse = '|'))]
   }
-  
+
   if (!is.null(scenariofilter)) {
-    relevantfiles <- relevantfiles[stringr::str_which(relevantfiles, 
+    relevantfiles <- relevantfiles[stringr::str_which(relevantfiles,
                                              pattern = stringr::str_flatten(scenariofilter, collapse = '|'))]
   }
-  
+
   # read into one df
   ewrdata <- foreach(i = relevantfiles,
                     .combine = bind_rows) %do% {
-                      
-                      temp <- read_csv(i, col_types = cols())
+
+                      temp <- readr::read_csv(i, col_types = readr::cols())
                     }
-  
+
   # There are sometimes wholly-blank columns that are read as NA, but should be
   # numeric. We can't pre-set them with readr because they may be in different
   # places for different gauges
   ewrdata <- ewrdata %>%
-    dplyr::mutate(across(where(is.logical), as.numeric))
-  
+    dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric))
+
   # cleanup names and structure
   if (type == 'annual') {
     ewrdata <- suppressWarnings(cleanewrs(ewrdata))
@@ -60,10 +60,10 @@ get_ewr_output <- function(dir, type,
   } else {
     stop('unsupported `type` argument')
   }
-  
-  
+
+
   return(ewrdata)
-  
+
 }
 
 
@@ -74,7 +74,7 @@ get_ewr_output <- function(dir, type,
 #'
 #' The new format of the EWR output makes this much lighter than previously.
 #'
-#' @param ewrdf 
+#' @param ewrdf
 #'
 #' @return a tibble of EWR outputs with cleaned up names, separated ewr_code_timing, and gauges as characters
 #' @export
@@ -83,19 +83,19 @@ get_ewr_output <- function(dir, type,
 cleanewrs <- function(ewrdf) {
   # Gauges should be characters
   ewrdf$gauge <- as.character(ewrdf$gauge)
-  
+
   names(ewrdf) <- nameclean(names(ewrdf))
-  
-  ewrdf <- ewrdf %>% 
+
+  ewrdf <- ewrdf %>%
     tidyr::separate(ewr_code, into = c("ewr_code", "ewr_code_timing"), sep = "_", remove = FALSE)
-  
+
   return(ewrdf)
 }
 
 
 
 #' Clean the incoming summary EWRs
-#' 
+#'
 #' There is some data organisation that happens for the toolkit in the scenario
 #' controller, but this does a bit more cleaning of data format for further
 #' analysis
@@ -107,11 +107,11 @@ cleanewrs <- function(ewrdf) {
 #'
 #' @examples
 cleanSummary <- function(summarydf) {
-  
+
   summarydf <- cleanewrs(summarydf)
-  
+
   summarydf <- summarydf %>%
-    dplyr::mutate(ewr_achieved = target_frequency <= frequency) 
+    dplyr::mutate(ewr_achieved = target_frequency <= frequency)
 }
 
 
@@ -119,11 +119,11 @@ cleanSummary <- function(summarydf) {
 # Helper to sort the names
 nameclean <- function(charvec) {
   cleannames <- charvec %>%
-    stringr::str_replace_all('([A-Z])', '_\\1') %>% 
+    stringr::str_replace_all('([A-Z])', '_\\1') %>%
     tolower() %>%
     stringr::str_replace_all(pattern = ' ', replacement = '_') %>%
     stringr::str_replace_all(pattern = '-', replacement = '')
-  
+
 
 }
 
@@ -142,7 +142,7 @@ nameclean <- function(charvec) {
 #'
 #' @examples
 cleanYrEWRs <- function(ewrdf) {
-  
+
   # Brackets are in some cols (daysBetweenEvents) from Pandas. This is because
   # they are lists of length n (often 0). That's not ideal, but it's unclear
   # what the best way to proceed is when there may be more than one value. For
@@ -150,51 +150,51 @@ cleanYrEWRs <- function(ewrdf) {
   # separately and re-joining. List-cols would work here as well, but not sure we need it yet,
   # and we'd have to make everything a list-col if we wanted to avoid the
   # separate pivots.
-  
+
   # Gauges should be characters
   ewrdf$gauge <- as.character(ewrdf$gauge)
-  
+
   # The way to do this really is to have character vs numeric cols. But the
   # list-cols are screwing that up. It's not entirely clear how they should be dealt with.
   # we do end up splitting the stats out. So, I can do it two ways, it's just annoying and repetitive
-  # wrapping these in names(ewrdf) gives the names, rather than indices. 
+  # wrapping these in names(ewrdf) gives the names, rather than indices.
   codecols <- stringr::str_which(names(ewrdf), '([0-9])|([A-Z])')
   daysbetweencols <- stringr::str_which(names(ewrdf), 'daysBetweenEvents')
   refcols <- which(!(names(ewrdf) %in% names(ewrdf)[codecols]))
-  
+
   # Split and stack the columns
-  gaugelong <- ewrdf %>% 
-    dplyr::select(-all_of(daysbetweencols)) %>%
+  gaugelong <- ewrdf %>%
+    dplyr::select(-tidyselect::all_of(daysbetweencols)) %>%
     # The cols would be nice to be a more general spec.
     tidyr::pivot_longer(cols = matches('([0-9])|([A-Z])', ignore.case = FALSE), # matches('([0-9])|([A-Z])')
-                 names_to = 'EWR_stat', 
+                 names_to = 'EWR_stat',
                  values_to = 'value') %>%
     tidyr::separate(EWR_stat, into = c('ewr_code', 'stat'), sep = '(_)(?!.*_)')
-  
+
   # Do that again for the daysBetweenEvents
-  gaugelongdays <- ewrdf %>% 
-    dplyr::select(all_of(c(refcols, daysbetweencols))) %>%
+  gaugelongdays <- ewrdf %>%
+    dplyr::select(tidyselect::all_of(c(refcols, daysbetweencols))) %>%
     # The cols would be nice to be a more general spec.
     tidyr::pivot_longer(cols = matches('([0-9])|([A-Z])', ignore.case = FALSE), # matches('([0-9])|([A-Z])')
-                 names_to = 'EWR_stat', 
+                 names_to = 'EWR_stat',
                  values_to = 'value') %>%
     tidyr::separate(EWR_stat, into = c('ewr_code', 'stat'), sep = '(_)(?!.*_)')
-  
+
   # I think give the stats their own columns, since they have different meanings
   # own cols? I think probably?
   gaugestats <- gaugelong %>%
     tidyr::pivot_wider(names_from = stat, values_from = value)
-  
+
   gaugestatsdays <- gaugelongdays %>%
     tidyr::pivot_wider(names_from = stat, values_from = value)
-  
+
   allgaugestats <- dplyr::left_join(gaugestats, gaugestatsdays, by = c(names(ewrdf)[refcols], 'ewr_code'))
-  
+
   allgaugestats <- allgaugestats %>%
     tidyr::separate(ewr_code, into = c("ewr_code", "ewr_code_timing"), sep = "_", remove = FALSE)
-  
+
   return(allgaugestats)
-  
-  
+
+
 }
 

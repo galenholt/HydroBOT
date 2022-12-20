@@ -35,110 +35,110 @@
 #' @export
 #'
 #' @examples
-#' 
+#'
 make_edges <- function(dflist,
                 fromtos,
                 fromfilter = NULL,
                 tofilter = NULL,
-                gaugefilter = NULL, 
+                gaugefilter = NULL,
                 pufilter = NULL,
                 gaugeplanmatch = NULL,
                 extrasave = NULL) {
-  
+
   # Ideally gaugeplanmatch will be passed a canonical list. Otherwise this tries
   # to find one
-  
+
   # Read in a list from a file if just have a path
   if (is.character(dflist)) {
     dflist <- readRDS(dflist)
   }
-  
+
   # Get names
   dfnames <- purrr::map(dflist, names)
   # Get whether each df has a gauge or planning unit column
   dfgauge <- unlist(map(dfnames, ~'gauge' %in% .))
   dfpu <- unlist(map(dfnames, ~'PlanningUnitID' %in% .))
-  
+
   # We can use that to try to generate a matching gauge-pu if there wasn't one passed
   if (is.null(gaugeplanmatch) & any(dfgauge & dfpu)) {
     gaugeplanmatch <- dflist[[which(dfgauge & dfpu)[1]]] %>%
       dplyr::select(gauge, PlanningUnitID) %>%
       dplyr::distinct()
   }
-  
 
-  
+
+
   # Go over each fromto pair, find their df and filter and bind
   # them all together
-  
-  
+
+
   # I think iter() would let us send only the matching df (i.e.
   # do the thisdf bit right in the call). Deal with that later if it's an issue.
   alledges <- foreach (p = fromtos, i = iterators::icount(), .combine = bind_rows) %do% {
     dfindex <- which(unlist(map(dfnames, ~all(p %in% .))))
-    
+
     thisdf <- dflist[[dfindex]]
-    
+
     # Get the filtering values- this is its own function because it has
     # error-catching and cross-checks
-    filterlist <- filtergroups(thisdf, 
+    filterlist <- filtergroups(thisdf,
                                fromcol = p[1], tocol = p[2],
-                               fromfilter = fromfilter, tofilter = tofilter, 
-                               gaugefilter = gaugefilter, pufilter = pufilter, 
+                               fromfilter = fromfilter, tofilter = tofilter,
+                               gaugefilter = gaugefilter, pufilter = pufilter,
                                gaugeplanmatch = gaugeplanmatch)
-    
-    
-    
+
+
+
     # these ifs are annoying, needed to filter to the gauge and planning unit only if
     # the columns exist
     if (dfgauge[dfindex]) {
-      thisdf <- thisdf %>% 
+      thisdf <- thisdf %>%
         dplyr::filter(gauge %in% filterlist$gaugefilter)
     }
-    
+
     if (dfpu[dfindex]) {
-      thisdf <- thisdf %>% 
+      thisdf <- thisdf %>%
         dplyr::filter(PlanningUnitID %in% filterlist$pufilter)
     }
-    
+
     # we can assume the fromto exist
-    thisdf <- thisdf %>% 
-      dplyr::filter(.data[[p[1]]] %in% filterlist$fromfilter) %>% 
-      dplyr::filter(.data[[p[2]]] %in% filterlist$tofilter) %>% 
-      dplyr::rename(from = p[1], to = p[2]) %>% 
-      dplyr::select(any_of(c('gauge', 'PlanningUnitID', extrasave, 'from', 'to', 'color'))) %>% 
+    thisdf <- thisdf %>%
+      dplyr::filter(.data[[p[1]]] %in% filterlist$fromfilter) %>%
+      dplyr::filter(.data[[p[2]]] %in% filterlist$tofilter) %>%
+      dplyr::rename(from = p[1], to = p[2]) %>%
+      dplyr::select(tidyselect::any_of(c('gauge', 'PlanningUnitID', extrasave, 'from', 'to', 'color'))) %>%
       dplyr::mutate(fromtype = p[1],
              totype = p[2],
              edgeorder = i) %>% # I was using this to set the nodeorder, but dropping that.
       dplyr::distinct() # kill duplicates
-    
-  
+
+
   }
-  
+
   return(alledges)
-  
+
 }
-  
+
 
 # helper function to filter edge dfs. Primarily deals with nulls and cross-checking and error-catching in the from-tos
 
-filtergroups <- function(edgedf, 
+filtergroups <- function(edgedf,
                          fromcol, tocol,
                          fromfilter = NULL,
                          tofilter = NULL,
                          gaugefilter = NULL,
                          pufilter = NULL,
                          gaugeplanmatch = NULL) {
-  
+
   # These don't enforce column names, so use select to allow accepting a character
   if (is.null(fromfilter)) {
-    fromfilter <- edgedf %>% dplyr::select(all_of(fromcol)) %>% dplyr::distinct() %>% pull()
+    fromfilter <- edgedf %>% dplyr::select(tidyselect::all_of(fromcol)) %>% dplyr::distinct() %>% pull()
   }
-  
+
   if (is.null(tofilter)) {
-    tofilter <- edgedf %>% dplyr::select(all_of(tocol)) %>% dplyr::distinct() %>% pull()
+    tofilter <- edgedf %>% dplyr::select(tidyselect::all_of(tocol)) %>% dplyr::distinct() %>% pull()
   }
-  
+
   # Gauges and planning units
   # Get matching values if a matching df is passed in as an argument
   if (!is.null(gaugefilter) & !is.null(gaugeplanmatch)) {
@@ -148,24 +148,24 @@ filtergroups <- function(edgedf,
       dplyr::distinct() %>%
       pull()
   }
-  
+
   if (!is.null(pufilter) & !is.null(gaugeplanmatch)) {
-    gfromp <- gaugeplanmatch %>% 
+    gfromp <- gaugeplanmatch %>%
       dplyr::filter(PlanningUnitID %in% pufilter) %>%
       dplyr::select(gauge) %>%
       dplyr::distinct() %>%
       pull()
   }
-  
+
   # doesn't need to be nested
   if (is.null(gaugefilter) | is.null(pufilter)) {
     if (is.null(gaugeplanmatch)) {
       warning("Unable to cross-check gauges and planning units, trusting the user they work together")
     }
   }
-  
+
   # Now build and check
-  
+
   # If planning unit passed, but not gauge, use the gauges from the planning unit
   if (is.null(gaugefilter) & !is.null(pufilter)) {
     gaugefilter <- gfromp
@@ -176,7 +176,7 @@ filtergroups <- function(edgedf,
     # check compliance, but let run through with a warning
     gtop <- all(gaugefilter %in% gfromp)
     ptog <- all(pufilter %in% pfromg)
-    
+
     # Could get fancier here and let us know which way things are failing- e.g.
     # "you have chosen x out of y gauges within planning unit a, and gauge z
     # falls outside the selected planning units
@@ -191,13 +191,13 @@ filtergroups <- function(edgedf,
     if ('PlanningUnitID' %in% names(edgedf)) {
       pufilter <- unique(edgedf$PlanningUnitID)
     }
-    
-    
+
+
   }
-  
-  return(tibble::lst(fromfilter = fromfilter, 
-                     tofilter = tofilter, 
-                     gaugefilter = gaugefilter, 
+
+  return(tibble::lst(fromfilter = fromfilter,
+                     tofilter = tofilter,
+                     gaugefilter = gaugefilter,
                      pufilter = pufilter))
 }
 

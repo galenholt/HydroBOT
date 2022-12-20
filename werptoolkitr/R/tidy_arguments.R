@@ -17,7 +17,7 @@
 #'   aggregation columns not exist. If `FALSE`, proceed with those that do exist
 #'   and silently drop those that don't
 #' @return a character vector of column names. The intention is to use them in
-#'   `dplyr::group_by` or `select` with `dplyr::select(across({{output}}))`. The underlying
+#'   `dplyr::group_by` or `select` with `dplyr::select(dplyr::across({{output}}))`. The underlying
 #'   `eval_select` returns a named integer vector giving column indices, but we
 #'   return only the names because in use the indices may not be stable
 #'   throughout the calling function(s)
@@ -27,9 +27,9 @@
 selectcreator <- function(selectvals, data, failmissing = TRUE) {
   if (is.character(selectvals)) {
     if (failmissing) {
-      s1g <- expr(all_of(selectvals))
+      s1g <- expr(tidyselect::all_of(selectvals))
     } else {
-      s1g <- expr(any_of(selectvals))
+      s1g <- expr(tidyselect::any_of(selectvals))
     }
   } else if (is.language(selectvals)) {
     s1g <- selectvals
@@ -39,7 +39,7 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
 
   # Returning names instead of the indices is safer in case cols get reshuffled
   # at some point
-  # as of R 4.2, this throws a warning when s1g evals to a character vector, and needs all_of or any_of wrapping
+  # as of R 4.2, this throws a warning when s1g evals to a character vector, and needs tidyselect::all_of( or tidyselect::any_of( wrapping
   s1g <- s1g %>%
     tidyselect::eval_select(data, strict = failmissing) %>%
     names()
