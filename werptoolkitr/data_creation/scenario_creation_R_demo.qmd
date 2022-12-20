@@ -190,6 +190,15 @@ How many are actually in the EWR tool? I could go get the table myself, but the 
 
 \*Access the python objects with `py$objname`.
 
+**TODO** THIS FAILS AS OF 1.0.4. Get the table some other way, I guess. I have rolled back to 1.0.1, since the necessary file just doesn't exist in 1.0.4 (and in about half the branches on github). Is it being phased out? Does that mean they're all 'good' now, and I can use all of them and not filter good/bad?
+
+Error messages:
+
+    FileNotFoundError: [Errno 2] No such file or directory: 'py_ewr/parameter_metadata/NSWEWR.csv'
+
+    Error in py_get_attr_impl(x, name, silent) : 
+      AttributeError: module '__main__' has no attribute 'ewrs'
+
 ```{python}
 from py_ewr.data_inputs import get_EWR_table
 ewrs, badewrs = get_EWR_table()
@@ -239,14 +248,11 @@ demo_levs$VALUE = as.numeric(demo_levs$VALUE)
 
 # # In python, we just need to change the name of the date column. Here, we need to change the python datetime.date objects to R dates
 # 
-# # Would this be faster if we made them numeric in pandas, sent them over that way, and then re-dated them? Almost certainly
-# demodates <- demo_levs$DATETIME
-# 
-# # Really slow... I'm sure could speed up with furrr or something.
+# # Really slow. furrr is actually slower.
+# # MUCH faster to just make the dates characters in python, and back to dates here.
 # rdates <- purrr::map(demodates, py_to_r) %>% 
 #   tibble(.name_repair = ~'Date') %>%  
 #   unnest(cols = Date)
-# 
 # 
 # demo_levs <- bind_cols(rdates, demo_levs)
 demo_levs <- dplyr::select(demo_levs, -DATETIME) %>% 
