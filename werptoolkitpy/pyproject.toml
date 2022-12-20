@@ -1,16 +1,15 @@
 [tool.poetry]
-name = "werp-toolkit"
+name = "werptoolkitpy"
 version = "0.1.0"
 description = ""
 authors = ["Galen Holt <53928785+galenholt@users.noreply.github.com>"]
 readme = "README.md"
-packages = [{include = "werp_toolkit"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-py-ewr = "^1.0.1"
+py-ewr = "1.0.1"
 gitpython = "^3.1.29"
-geopandas = "^0.12.1"
+geopandas = "^0.12.2"
 plotnine = "^0.10.1"
 rtree = "^1.0.1"
 jupyter-cache = "^0.5.0"
