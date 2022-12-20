@@ -12,20 +12,19 @@ editor: visual
 #| message: false
 #| echo: false
 
-# knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 
-
-library(dplyr)
 ```
 
 ```{r}
-#| echo: false
+library(dplyr)
 
-# source everything in the functions folder. need to get this into a library
-funfiles <- list.files(file.path('R', 'causal_networks'))
-for (s in 1:length(funfiles)) {
-  source(file.path('R', 'causal_networks', funfiles[s])) 
-}
+# library(werptoolkitr) works when running interactively, but not when quarto
+# rendering. Just use load_all for now.
+# Also have to turn off caching and delete _cache directories or it gets really
+# upset.
+devtools::load_all()
+# library(werptoolkitr)
 ```
 
 ## Purpose
@@ -74,39 +73,37 @@ The code here currently reads the EWR definitions table from the MDBA, the table
 These will need to be set whether used as a notebook or be passed in as arguments to a wrapper function. They just set the location of the relevant input files and creates a directory for the outputs. Once on the MDBA system, this might be able to be hardcoded, or at least given default values. *I'm setting it up currently as is standard practice for an R package*.
 
 ```{r}
-datout <- file.path('data', 'causal_networks')
-if (!dir.exists(datout)) {dir.create(datout, recursive = TRUE)}
-```
+datarawdir <- 'data-raw/causal_networks'
+dataoutdir <- 'data'
 
-And the directory with the input data
-
-```{r}
-datadir <- file.path('data-raw', 'causal_networks')
+if (!dir.exists(dataoutdir)) {dir.create(dataoutdir, recursive = TRUE)} 
 ```
 
 Known file sources- the ewr definitions and the ltwp table.
 
 **UPDATE** 12/12/22: The data stream from MDBA has changed format and no longer can be matched against the table. Reverting to an old version. No guarantees about completeness.
 
+**UPDATE** 20/12/22: A better solution is the NSW version that Lara has just sent. Get that included soon.
+
 ```{r}
 # Get ewr defs from MDBA- This is a cached version, since WatReqID has gone
-ewrs <- file.path(datadir, 'NSWEWR_LIVE.csv')
+ewrs <- file.path(datarawdir, 'ewr_cache', 'NSWEWR_LIVE.csv')
   
 # ewrs <- 'https://az3mdbastg001.blob.core.windows.net/mdba-public-data/NSWEWR_LIVE.csv'
 
 # The links to objectives come from here (as do the ewrs themselves)
-objtable <- file.path(datadir, "tbl10a_WatRequirements5.4.csv")
+objtable <- file.path(datarawdir, 'tbl10', "tbl10a_WatRequirements5.4.csv")
 ```
 
 Unknown file sources- these give nearly all links above environmental objectives (Theme group, Species, yearly targets). Some incorporate manual QC by Renee, but it's still not clear where the originals came from either sometimes.
 
 ```{r}
-tarpath <- file.path(datadir, "Env_objectives_Target_species_nodes.csv")
+tarpath <- file.path(datarawdir, 'unknown', "Env_objectives_Target_species_nodes.csv")
 
-qcs <- c(file.path(datadir, "Target_species_per_PU_Murray.csv"),
-         file.path(datadir, "PUs.csv"))
+qcs <- c(file.path(datarawdir, 'unknown', "Target_species_per_PU_Murray.csv"),
+         file.path(datarawdir, 'unknown', "PUs.csv"))
 
-timepath <- file.path(datadir, "Env_objectives_5_10_20_year_targets_nodes Murray Lower Darling.csv")
+timepath <- file.path(datarawdir, 'unknown', "Env_objectives_5_10_20_year_targets_nodes Murray Lower Darling.csv")
 ```
 
 Do we want to look at those? They're pretty ugly. Easy enough to throw a cell in here if so.
@@ -156,12 +153,15 @@ yrtarget <- clean_long_term(timepath,
 
 Looking forward to having more than just the EWRs, it's likely we'll want to be able to have each set of causal relationships packaged up into a single file, likely as a list. `saveRDS` allows reading in with a different name.
 
+In analysis code, we should use saveRDS, but in the package the standard is rda with object of canonical name.
+
 ```{r}
 causal_ewr <- list(ewr2obj = ewr2obj, obj2target = obj2target, obj2yrtarget = yrtarget)
 
 if (REBUILD_DATA) {
-  saveRDS(causal_ewr,
-     file = file.path(datout, 'causal_ewr.rds'))
+  usethis::use_data(causal_ewr)
+  # saveRDS(causal_ewr,
+  #    file = file.path(datout, 'causal_ewr.rds'))
 }
 
 ```
