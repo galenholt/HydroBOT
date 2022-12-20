@@ -1,9 +1,10 @@
 ---
-title: "Test gauge data"
+title: "Test Gauge Data"
 author: "Galen Holt"
 format:
   html:
     df-print: paged
+editor: visual
 ---
 
 ```{python}

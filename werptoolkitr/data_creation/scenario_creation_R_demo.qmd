@@ -1,9 +1,10 @@
 ---
-title: "Test gauge data"
+title: "Test Gauge Data Mostly R"
 author: "Galen Holt"
 format:
   html:
     df-print: paged
+editor: visual
 ---
 
 ```{r setup}
@@ -55,7 +56,7 @@ I output clean test data to `inst/extdata`, following R package data conventions
 First, do we actually want to rebuild the `data/` directory, or just use this to investigate and document what happened?
 
 ```{r}
-REBUILD_DATA = TRUE
+REBUILD_DATA = FALSE
 ```
 
 Set the data dir to make that easy to change.
