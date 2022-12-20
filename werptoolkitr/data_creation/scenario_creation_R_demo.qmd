@@ -6,21 +6,43 @@ format:
     df-print: paged
 ---
 
+```{r setup}
+#| warning: false
+#| message: false
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+```
+
 ```{r}
 #| warning: false
 #| message: false
 
 # library(tidyverse)
+library(ggplot2)
 library(sf)
 library(reticulate) # Not strictly necessary but allows easier referencing of objects
+
+# library(werptoolkitr) works when running interactively, but not when quarto
+# rendering. Just use load_all for now.
+# Also have to turn off caching and delete _cache directories or it gets really
+# upset.
+devtools::load_all()
+# library(werptoolkitr)
 ```
 
+## Dev note
+
+In general, we'll have to be careful about mixing R and Python in the package to ensure users have the right environments. Here, though, we assume that this file is only run by devs to create package data, and that these devs have access to the full git repo with the Python env, and so we can be a bit more in control about python envs and locations.
 
 I originally built this in Python ([scenario_creation.qmd](data_creation/scenario_creation.qmd)), but the only bit that *needs* to be in python is the gauge puller code. I'm adding this version as an example of how to mix R and python code chunks in similar situations where we only need a bit of code from the other language.
 
-As long as the venv is in the base project directory, {reticulate} seems to find it. Otherwise, need to tell it where it is with `reticulate::use_virtualenv`.
+As long as the venv is in the base project directory, {reticulate} seems to find it. Otherwise, need to tell it where it is with `reticulate::use_virtualenv`. *Now that we have nested directories, I set the RETICULATE_PYTHON env variable in* `.Rprofile` .
 
 I'm leaving the `=` alone rather than changing to `<-`.
+
+Because I've now changed the code to save the `sf` objects as `.rda` files in `data/`, I could skip all the shapefile reading below. But to keep consistent with the python version, which will need to read `.shp` files, I'll do that here too.
+
+None of this actually ends up saving to `data/` because the point is to generate test data that looks like the real data we'd use on input, which currently is csv. So we save all the generated data here to `inst/extdata/`.
 
 # Creation of test data
 
@@ -28,19 +50,20 @@ We need to create test data for several scenarios for several gauges. This finds
 
 The shapefiles used to see what we're doing and do the selecting were produced with `data_creation/spatial_data_creation.qmd`.
 
-I output clean test data to `data`, following R package data conventions. But set a 'datadir', so we can change that easily to somewhere else if desired.
+I output clean test data to `inst/extdata`, following R package data conventions. But set a 'datadir', so we can change that easily to somewhere else if desired.
 
 First, do we actually want to rebuild the `data/` directory, or just use this to investigate and document what happened?
 
 ```{r}
-REBUILD_DATA = FALSE
+REBUILD_DATA = TRUE
 ```
 
 Set the data dir to make that easy to change.
 
 ```{r}
-datarawdir = 'data-raw'
-dataoutdir = 'data'
+datarawdir <- 'data-raw'
+dataoutdir <- 'data'
+dataextdir <- 'inst/extdata'
 ```
 
 ## Read in gauges
@@ -48,7 +71,7 @@ dataoutdir = 'data'
 Use the bom gauges, since this is what were contained in the EWR tool.
 
 ```{r}
-gaugegeo = read_sf(file.path(dataoutdir, 'bom_gauges.shp'))
+gaugegeo = read_sf(file.path(dataextdir, 'bom_gauges.shp'))
 ```
 
 ## Read in polygons
@@ -56,10 +79,10 @@ gaugegeo = read_sf(file.path(dataoutdir, 'bom_gauges.shp'))
 I'll read in a few options, and then choose- basin, resource plan areas, sdl areas (which is where David got the Macquarie polygon), and catchments. I have cut out the testing of David's single polygon- it is the Macquarie-Castlereagh in the sdls.
 
 ```{r}
-basin = read_sf(file.path(dataoutdir, 'basin.shp'))
-rps = read_sf(file.path(dataoutdir, 'resource_plan.shp'))
-sdl = read_sf(file.path(dataoutdir, 'sdl_units.shp'))
-ltv = read_sf(file.path(dataoutdir, 'cewo_valleys.shp'))
+basin = read_sf(file.path(dataextdir, 'basin.shp'))
+rps = read_sf(file.path(dataextdir, 'resource_plan.shp'))
+sdl = read_sf(file.path(dataextdir, 'sdl_units.shp'))
+ltv = read_sf(file.path(dataextdir, 'cewo_valleys.shp'))
 ```
 
 crs all match from the creation.
@@ -163,9 +186,9 @@ starttime = lubridate::ymd(20100101)
 endtime = lubridate::ymd(20191231)
 ```
 
-How many are actually in the EWR tool? I could go get the table myself, but the EWR tool has a function, so use that. *This is where we have to use python to access the EWR table*. 
+How many are actually in the EWR tool? I could go get the table myself, but the EWR tool has a function, so use that. *This is where we have to use python to access the EWR table*.
 
-*Access the python objects with `py$objname`. 
+\*Access the python objects with `py$objname`.
 
 ```{python}
 from py_ewr.data_inputs import get_EWR_table
@@ -207,7 +230,7 @@ For some reason `demo_levs['VALUE']` is an object and not numeric. And `'DATETIM
 
 *I'm copying the py obj to R for further manipulation.* A bit dumb from a memory point of view, but it's not big.
 
-Transforming the python dates to R dates is horribly slow. MUCH faster to change to string and back again. 
+Transforming the python dates to R dates is horribly slow. MUCH faster to change to string and back again.
 
 ```{r datatransfer}
 demo_levs <- py$demo_levs
@@ -229,7 +252,6 @@ demo_levs$VALUE = as.numeric(demo_levs$VALUE)
 demo_levs <- dplyr::select(demo_levs, -DATETIME) %>% 
   dplyr::mutate(Date = lubridate::ymd(Date))
 ```
-
 
 ### Map the gauges
 
@@ -275,22 +297,24 @@ Not being too fussed about structure, since the structure is going to change onc
 
 I will still do the dir/file structure even with one file as it allows easier changes and more flexibility.
 
+*I had saved the full suite, but I think since this is now turning into a package, we want to keep things minimal. Move the full set of gauges to the demo project*
+
 ```{r}
 scenenames = c('base', 'up4', 'down4')
 
-# the full scenarios
-for (x in scenenames) {
-      scenedir = file.path(dataoutdir, 'testscenarios', x)
-    if (!dir.exists(scenedir)) {
-      dir.create(scenedir, recursive = TRUE)
-    }
-        
-}
+# # the full scenarios
+# for (x in scenenames) {
+#       scenedir = file.path(dataextdir, 'testscenarios', x)
+#     if (!dir.exists(scenedir)) {
+#       dir.create(scenedir, recursive = TRUE)
+#     }
+#         
+# }
 
 
 # a minimal set
 for (x in scenenames) {
-      scenedirS = file.path(dataoutdir, 'testsmall', x)
+      scenedirS = file.path(dataextdir, 'testsmall', x)
     if (!dir.exists(scenedirS)) {
       dir.create(scenedirS, recursive = TRUE)
     }
@@ -317,11 +341,11 @@ down4 <- down4 %>%
 Save. could do this above easily enough, but getting lots of dots and hard to read.
 
 ```{r}
-if (REBUILD_DATA) {
-      write_csv(base, file.path(dataoutdir, 'testscenarios', 'base', 'base.csv'))
-      write_csv(up4, file.path(dataoutdir, 'testscenarios', 'up4', 'up4.csv'))
-      write_csv(down4, file.path(dataoutdir, 'testscenarios', 'down4', 'down4.csv'))
-}
+# if (REBUILD_DATA) {
+#       readr::write_csv(base, file.path(dataextdir, 'testscenarios', 'base', 'base.csv'))
+#       readr::write_csv(up4, file.path(dataextdir, 'testscenarios', 'up4', 'up4.csv'))
+#       readr::write_csv(down4, file.path(dataextdir, 'testscenarios', 'down4', 'down4.csv'))
+# }
 
 ```
 
@@ -349,7 +373,7 @@ macsub = macgauge %>%
 lachsub = lachgauge %>% 
   dplyr::filter(gauge %in% c('412005', '412002', '412038'))
 
-minigauge = bind_rows(macsub, lachsub)
+minigauge = dplyr::bind_rows(macsub, lachsub)
 
 minigauges = unique(minigauge$gauge)
 ```
@@ -368,21 +392,19 @@ if (REBUILD_DATA) {
 
     base %>% 
       dplyr::filter(Date > start15) %>% 
-      dplyr::select(Date, all_of(minigauges)) %>% 
-      write_csv(file.path(dataoutdir, 'testsmall', 'base', 'base.csv'))
+      dplyr::select(Date, tidyselect::all_of(minigauges)) %>% 
+      readr::write_csv(file.path(dataextdir, 'testsmall', 'base', 'base.csv'))
     
     down4 %>% 
       dplyr::filter(Date > start15) %>% 
-      dplyr::select(Date, all_of(minigauges)) %>%  
-      write_csv(file.path(dataoutdir, 'testsmall', 'down4', 'down4.csv'))
+      dplyr::select(Date, tidyselect::all_of(minigauges)) %>%  
+      readr::write_csv(file.path(dataextdir, 'testsmall', 'down4', 'down4.csv'))
     
     up4 %>% 
       dplyr::filter(Date > start15) %>% 
-      dplyr::select(Date, all_of(minigauges)) %>%  
-      write_csv(file.path(dataoutdir, 'testsmall', 'up4', 'up4.csv'))
+      dplyr::select(Date, tidyselect::all_of(minigauges)) %>%  
+      readr::write_csv(file.path(dataextdir, 'testsmall', 'up4', 'up4.csv'))
 }
     
 
 ```
-
-
