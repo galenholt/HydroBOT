@@ -1,0 +1,102 @@
+NodeType,Env_obj,Env_obj_main,Target,Env_obj_number,Objective,Target species,Murray Lower Darling,Macquarie-Castlereagh,Murrumbidgee
+Environmental objective,NF1,NF,Native fish,1,No loss of native fish species,All recorded fish species,1,1,1
+Environmental objective,NF2,NF,Native fish,2,Increase the distribution & abundance of short to moderate-lived generalist native fish species,Australian smelt,1,1,1
+Environmental objective,NF2,NF,Native fish,2,Increase the distribution & abundance of short to moderate-lived generalist native fish species,carp gudgeon (species complex),1,1,1
+Environmental objective,NF2,NF,Native fish,2,Increase the distribution & abundance of short to moderate-lived generalist native fish species,flat-headed gudgeon,1,1,1
+Environmental objective,NF2,NF,Native fish,2,Increase the distribution & abundance of short to moderate-lived generalist native fish species,dwarf flat-headed gudgeon,1,1,1
+Environmental objective,NF2,NF,Native fish,2,Increase the distribution & abundance of short to moderate-lived generalist native fish species,bony herring,1,1,1
+Environmental objective,NF2,NF,Native fish,2,Increase the distribution & abundance of short to moderate-lived generalist native fish species,Murray–Darling rainbowfish,1,1,1
+Environmental objective,NF2,NF,Native fish,2,Increase the distribution & abundance of short to moderate-lived generalist native fish species,unspecked hardyhead,1,1,1
+Environmental objective,NF2,NF,Native fish,2,Increase the distribution & abundance of short to moderate-lived generalist native fish species,mountain galaxias (species complex),1,1,1
+Environmental objective,NF2,NF,Native fish,2,Increase the distribution & abundance of short to moderate-lived generalist native fish species,climbing galaxias,1,0,0
+Environmental objective,NF3,NF,Native fish,3,Increase the distribution & abundance of short to moderate-lived floodplain specialist native fish species,southern pygmy perch1,1,0,1
+Environmental objective,NF3,NF,Native fish,3,Increase the distribution & abundance of short to moderate-lived floodplain specialist native fish species,Murray hardyhead,1,0,1
+Environmental objective,NF3,NF,Native fish,3,Increase the distribution & abundance of short to moderate-lived floodplain specialist native fish species,olive perchlet,1,1,1
+Environmental objective,NF3,NF,Native fish,3,Increase the distribution & abundance of short to moderate-lived floodplain specialist native fish species,flathead galaxias,1,1,1
+Environmental objective,NF3,NF,Native fish,3,Increase the distribution & abundance of short to moderate-lived floodplain specialist native fish species,purple- spotted gudgeon1,1,0,0
+Environmental objective,NF4,NF,Native fish,4,Improve native fish population structure for moderate to long-lived flow pulse specialist native fish species,golden perch,1,1,1
+Environmental objective,NF4,NF,Native fish,4,Improve native fish population structure for moderate to long-lived flow pulse specialist native fish species,silver perch,1,1,1
+Environmental objective,NF4,NF,Native fish,4,Improve native fish population structure for moderate to long-lived flow pulse specialist native fish species,spangled perch,0,1,0
+Environmental objective,NF4,NF,Native fish,4,Improve native fish population structure for moderate to long-lived flow pulse specialist native fish species,Hyrtl’s tandan,0,1,0
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,Murray cod,1,1,1
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,trout cod,1,0,1
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,Macquarie perch,1,0,1
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,northern river blackfish,0,1,0
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,long-finned eel,0,1,0
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,river blackfish,1,0,1
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,two-spined blackfish,1,0,1
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,freshwater catfish (eel-tailed catfish),1,1,0
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,Murray crayfish,1,0,1
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,southern pygmy perch,1,0,0
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,purple-spotted gudgeon,1,1,0
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,olive perchlet,1,0,1
+Environmental objective,NF6,NF,Native fish,6,A 25% increase in abundance of mature (harvestable sized) golden perch & Murray cod,golden perch,1,1,1
+Environmental objective,NF6,NF,Native fish,6,A 25% increase in abundance of mature (harvestable sized) golden perch & Murray cod,Murray cod,1,1,1
+Environmental objective,NF7,NF,Native fish,7,Increase the prevalence and/or expand the population of key short to moderate-lived floodplain specialist native fish species into new areas (within historical range),flathead galaxias,1,1,1
+Environmental objective,NF7,NF,Native fish,7,Increase the prevalence and/or expand the population of key short to moderate-lived floodplain specialist native fish species into new areas (within historical range),Murray hardyhead,1,0,1
+Environmental objective,NF7,NF,Native fish,7,Increase the prevalence and/or expand the population of key short to moderate-lived floodplain specialist native fish species into new areas (within historical range),southern pygmy perch,1,0,1
+Environmental objective,NF7,NF,Native fish,7,Increase the prevalence and/or expand the population of key short to moderate-lived floodplain specialist native fish species into new areas (within historical range),olive perchlet,1,1,1
+Environmental objective,NF7,NF,Native fish,7,Increase the prevalence and/or expand the population of key short to moderate-lived floodplain specialist native fish species into new areas (within historical range),purple-spotted gudgeon,1,0,1
+Environmental objective,NF8,NF,Native fish,8,Increase the prevalence and/or expand the population of key moderate to long-lived riverine specialist native fish species into new areas (within historical range),trout cod,1,1,1
+Environmental objective,NF8,NF,Native fish,8,Increase the prevalence and/or expand the population of key moderate to long-lived riverine specialist native fish species into new areas (within historical range),Macquarie perch,1,1,1
+Environmental objective,NF8,NF,Native fish,8,Increase the prevalence and/or expand the population of key moderate to long-lived riverine specialist native fish species into new areas (within historical range),freshwater catfish,1,0,1
+Environmental objective,NF8,NF,Native fish,8,Increase the prevalence and/or expand the population of key moderate to long-lived riverine specialist native fish species into new areas (within historical range),two-spined blackfish,1,0,0
+Environmental objective,NF8,NF,Native fish,8,Increase the prevalence and/or expand the population of key moderate to long-lived riverine specialist native fish species into new areas (within historical range),Murray crayfish,1,0,0
+Environmental objective,NF8,NF,Native fish,8,Increase the prevalence and/or expand the population of key moderate to long-lived riverine specialist native fish species into new areas (within historical range),purple-spotted gudgeon,1,1,1
+Environmental objective,NF8,NF,Native fish,8,Increase the prevalence and/or expand the population of key moderate to long-lived riverine specialist native fish species into new areas (within historical range),olive perchlet,1,0,1
+Environmental objective,NF9,NF,Native fish,9,Increase the prevalence and/or expand the population of key moderate to long-lived flow pulse specialists native fish species into new areas (within historical range),silver perch,1,0,1
+Environmental objective,NF10,NF,Native fish,10,Increase the prevalence and/or expand the population of key moderate to long-lived diadromous native fish species into new areas,short-headed lamprey,1,0,1
+Environmental objective,NF10,NF,Native fish,10,Increase the prevalence and/or expand the population of key moderate to long-lived diadromous native fish species into new areas,pouched lamprey,1,0,0
+Environmental objective,NF10,NF,Native fish,10,Increase the prevalence and/or expand the population of key moderate to long-lived diadromous native fish species into new areas,short-finned eel,1,0,0
+Environmental objective,NV1,NV,Native vegetation,1,Maintain the extent & viability of non-woody vegetation communities occurring within or closely fringing river channels,Non-woody vegetation communities,1,1,1
+Environmental objective,NV2a,NV,Native vegetation,2a,Maintain or increase the extent & maintain the viability of non-woody vegetation communities occurring in wetlands & on floodplains,"Non-woody vegetation communities within semi-permanent, intermittent, temporal & ephemeral wetland & floodplain areas",1,1,1
+Environmental objective,NV2b,NV,Native vegetation,2b,Maintain or increase the extent & maintain the viability of non-woody vegetation communities occurring in wetlands & on floodplains,"Ephemeral understorey vegetation within forests, woodland & open floodplain areas",1,1,1
+Environmental objective,NV3,NV,Native vegetation,3,Maintain the extent & improve the condition of river red gum communities closely fringing river channels,River red gum communities,1,1,1
+Environmental objective,NV4a,NV,Native vegetation,4a,Maintain or increase the extent & maintain or improve the condition of native woodland & shrubland communities on floodplains,River red gum forest,1,1,1
+Environmental objective,NV4b,NV,Native vegetation,4b,Maintain or increase the extent & maintain or improve the condition of native woodland & shrubland communities on floodplains,River red gum woodlands,1,1,1
+Environmental objective,NV4c,NV,Native vegetation,4c,Maintain or increase the extent & maintain or improve the condition of native woodland & shrubland communities on floodplains,Black box woodland,1,1,1
+Environmental objective,NV4d,NV,Native vegetation,4d,Maintain or increase the extent & maintain or improve the condition of native woodland & shrubland communities on floodplains,Coolibah woodlands,1,1,0
+Environmental objective,NV4e,NV,Native vegetation,4e,Maintain or increase the extent & maintain or improve the condition of native woodland & shrubland communities on floodplains,Lignum shrublands,1,1,1
+Environmental objective,WB1,WB,Waterbird,1,Maintain the number & type of waterbird species,All waterbird species,1,1,1
+Environmental objective,WB2,WB,Waterbird,2,Increase total waterbird abundance across all functional groups,All waterbird species,1,1,1
+Environmental objective,WB3,WB,Waterbird,3,Increase opportunities for non-colonial waterbird breeding,Waterfoul,1,1,1
+Environmental objective,WB3,WB,Waterbird,3,Increase opportunities for non-colonial waterbird breeding,Grebes,1,1,1
+Environmental objective,WB3,WB,Waterbird,3,Increase opportunities for non-colonial waterbird breeding,Crakes,1,1,1
+Environmental objective,WB3,WB,Waterbird,3,Increase opportunities for non-colonial waterbird breeding,Rails/waterhens,1,1,1
+Environmental objective,WB3,WB,Waterbird,3,Increase opportunities for non-colonial waterbird breeding,Resident Shorebirds,1,1,1
+Environmental objective,WB4,WB,Waterbird,4,Increase opportunities for colonial waterbird breeding*,Pelicans,1,1,1
+Environmental objective,WB4,WB,Waterbird,4,Increase opportunities for colonial waterbird breeding*,Cormorants,1,1,1
+Environmental objective,WB4,WB,Waterbird,4,Increase opportunities for colonial waterbird breeding*,Darters,1,1,1
+Environmental objective,WB4,WB,Waterbird,4,Increase opportunities for colonial waterbird breeding*,Ibis,1,1,1
+Environmental objective,WB4,WB,Waterbird,4,Increase opportunities for colonial waterbird breeding*,Egrets,1,1,1
+Environmental objective,WB4,WB,Waterbird,4,Increase opportunities for colonial waterbird breeding*,Heron,1,1,1
+Environmental objective,WB4,WB,Waterbird,4,Increase opportunities for colonial waterbird breeding*,Spoonbills,1,1,1
+Environmental objective,WB5,WB,Waterbird,5,Maintain the extent & improve condition of waterbird habitats,All waterbird species,1,1,1
+Environmental objective,EF1,EF,Priority ecosystem function,1,Provide & protect a diversity of refugia across the landscape,Refugia,1,1,1
+Environmental objective,EF2,EF,Priority ecosystem function,2,"Create quality instream, floodplain & wetland habitat",Habitat,1,1,1
+Environmental objective,EF3a,EF,Priority ecosystem function,3a,Provide movement and dispersal opportunities for water dependent biota to complete lifecycles and disperse into new habitats within catchments,Dispersal & migration,1,1,1
+Environmental objective,EF3b,EF,Priority ecosystem function,3b,Provide movement and dispersal opportunities for water dependent biota to complete lifecycles and disperse into new habitats between catchments,Connectivity,1,1,1
+Environmental objective,EF4,EF,Priority ecosystem function,4,Support instream & floodplain productivity,Aquatic productivity (Primary & Secondary),1,1,1
+Environmental objective,EF4,EF,Priority ecosystem function,4,Support instream & floodplain productivity,Terrestrial productivity,1,1,1
+Environmental objective,EF4,EF,Priority ecosystem function,4,Support instream & floodplain productivity,Decompsition ,1,1,1
+Environmental objective,EF5,EF,Priority ecosystem function,5,"Support nutrient, carbon & sediment transport along channels, & between channels & floodplains/ wetlands",Abiotic transportation,1,1,1
+Environmental objective,EF6,EF,Priority ecosystem function,6,Support groundwater conditions to sustain groundwater dependent biota,Groundwater,1,1,1
+Environmental objective,EF7,EF,Priority ecosystem function,7,Increase the contribution of flows into the South Australian lower Murray River,Flow regulation,1,1,1
+Environmental objective,EF8,EF,Priority ecosystem function,8,NEED TO UPDATE ,NEED TO UPDATE ,1,0,0
+Environmental objective,OS1,OS,Other species,1,Maintain species richness of flow-dependent frog communities,All flow-dependent frog species,1,1,1
+Environmental objective,OS2,OS,Other species,2,Maintain successful26 breeding opportunities for flow-dependent frog species,All flow-dependent frog species,1,1,1
+Environmental objective,OS3a,OS,Other species,3a,Maintain and increase number of wetland sites occupied by the threatened southern bell frog,southern bell frog,1,0,1
+Environmental objective,OS3b,OS,Other species,3b,Maintain & increase number of wetland sites occupied by the threatened Sloane's froglet,Sloanes froglet,1,0,0
+Environmental objective,OS4,OS,Other species,4,Maintain water-dependent species richness,water-dependent species,1,0,0
+Environmental objective,NFunidentified,NF,Native fish,unidentified,NEED TO UPDATE ,NEED TO UPDATE ,1,,
+Environmental objective,NVunidentified,NV,Native vegetation,unidentified,NEED TO UPDATE ,NEED TO UPDATE ,1,,
+Environmental objective,WBunidentified,WB,Waterbird,unidentified,NEED TO UPDATE ,NEED TO UPDATE ,1,,
+Environmental objective,EFunidentified,EF,Priority ecosystem function,unidentified,NEED TO UPDATE ,NEED TO UPDATE ,1,,
+Environmental objective,OSunidentified,OS,Other species,unidentified,NEED TO UPDATE ,NEED TO UPDATE ,1,,
+Environmental objective,NF8,NF,Native fish,8,Increase the prevalence and/or expand the population of key moderate to long-lived riverine specialist native fish species into new areas (within historical range),freshwater catfish (eel-tailed catfish),0,1,0
+Environmental objective,NF8,NF,Native fish,8,Increase the prevalence and/or expand the population of key moderate to long-lived riverine specialist native fish species into new areas (within historical range),river blackfish,0,1,1
+Environmental objective,NF9,NF,Native fish,9,Increase the prevalence and/or expand the population of key moderate to long-lived flow pulse specialists native fish species into new areas (within historical range),Hyrtl’s tandan,0,1,0
+Environmental objective,NF2,NF,Native fish,2,Increase the distribution & abundance of short to moderate-lived generalist native fish species,Stocky galaxias,0,0,1
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,Southern purple-spotted gudgeon,0,0,1
+Environmental objective,NF3,NF,Native fish,3,Increase the distribution & abundance of short to moderate-lived floodplain specialist native fish species,Southern purple-spotted gudgeon,0,0,1
+Environmental objective,NF5,NF,Native fish,5,Improve native fish population structure for moderate to long-lived riverine specialist native fish species,Southern purple-spotted gudgeon,0,0,1
