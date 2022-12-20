@@ -20,13 +20,13 @@ library(patchwork)
 library(ggplot2)
 # library(werptoolkitr) works when running interactively, but not when quarto
 # rendering. Just use load_all for now.
-# Also have to turn of caching and delete _cache directories or it gets really
+# Also have to turn off caching and delete _cache directories or it gets really
 # upset.
 devtools::load_all()
 # library(werptoolkitr)
 ```
 
-Trying to be as intentional as possible with the data dirs. `data-raw` is for raw data that is used to create package data, and is hidden when building. I'm differentiating downloaded from not to hopefully avoid deletion issues and make it clearer what  `data` is a typical R package data dir, following the conventions of `.rda` files with single objects. And `inst/extdata` is for data that *isn't* in R format (here, shapefiles that we want to share around).
+Trying to be as intentional as possible with the data dirs. `data-raw` is for raw data that is used to create package data, and is hidden when building. I'm differentiating downloaded from not to hopefully avoid deletion issues and make it clearer what `data` is a typical R package data dir, following the conventions of `.rda` files with single objects. And `inst/extdata` is for data that *isn't* in R format (here, shapefiles that we want to share around).
 
 ```{r}
 datarawdir <- 'data-raw'
@@ -45,7 +45,7 @@ Create some clean(er) spatial data for aggregation testing demonstrations. I'm g
 First, do we actually want to rebuild the `data/` directory, or just use this to investigate and document what happened?
 
 ```{r}
-REBUILD_DATA <- TRUE
+REBUILD_DATA <- FALSE
 ```
 
 Define a dataload function for download and unzip of shapefiles- doing this here rather than in R/ because this is not really part of the package, but the initial dev building. And it can know about existing dirs
