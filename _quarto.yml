@@ -1,7 +1,7 @@
 project:
   title: "WERP_toolkit"
   output-dir: _quarto_output
-  execute-dir: project
+  execute-dir: file
 
 
 
