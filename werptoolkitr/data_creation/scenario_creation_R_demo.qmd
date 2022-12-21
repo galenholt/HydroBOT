@@ -1,10 +1,12 @@
 ---
-title: "Test Gauge Data Mostly R"
-author: "Galen Holt"
+title: Test Gauge Data Mostly R
+author: Galen Holt
 format:
   html:
     df-print: paged
 editor: visual
+params:
+  REBUILD_DATA: FALSE
 ---
 
 ```{r setup}
@@ -31,6 +33,12 @@ devtools::load_all()
 # library(werptoolkitr)
 ```
 
+## TO REBUILD
+Rebuilding data is done with params. To rebuild, at the terminal in WERP_toolkit run
+`quarto render data_creation/scenario_creation_R_demo.qmd -P REBUILD_DATA:TRUE`.
+or, to rebuild *everything*, run
+`quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
+
 ## Dev note
 
 In general, we'll have to be careful about mixing R and Python in the package to ensure users have the right environments. Here, though, we assume that this file is only run by devs to create package data, and that these devs have access to the full git repo with the Python env, and so we can be a bit more in control about python envs and locations.
@@ -55,9 +63,16 @@ I output clean test data to `inst/extdata`, following R package data conventions
 
 First, do we actually want to rebuild the `data/` directory, or just use this to investigate and document what happened?
 
+Set with params. But that doesn't work with interactive running, so deal with that.
+
 ```{r}
-REBUILD_DATA = FALSE
+if ("params" %in% ls()) {
+  REBUILD_DATA <- params$REBUILD_DATA
+} else {
+  REBUILD_DATA <- FALSE
+}
 ```
+
 
 Set the data dir to make that easy to change.
 

@@ -40,6 +40,14 @@ Typically, we would next run `renv::restore()` which will use the local `renv.lo
 
 `xml2` seems to be extra touchy to install on Unix, and errors sometimes with a message about `pkg-config` and sometimes about permissions to move things from the `00LOCK` directory. I am working on a smoother fix for this- currently tried `install.packages('xml2', dependencies = TRUE, INSTALL_opts = c('--no-lock'))` inside R, which worked but took *forever* and seems to have messed up my `activate.R` file.
 
+## Notes-edit
+VS seems to sometimes struggle to find the library if started in WERP_toolkit. In that case, start a new workspace in WERP_toolkit/werptoolkitr. 
+
+VS opened in WERP_toolkit or werptoolkitr needs to be told the first time we open a workspace where the python interpreter is (in /werptoolkitpy/.venv/Scripts/python.exe) because it's no longer in the top-level.
+
+### Building data and HTML documentation
+Some of the data needs to be built, at least right now. And we'll always have the option to do that as the data changes. The easiest way to do it is to run `quarto render -P REBUILD_DATA` from WERP_toolkit to rebuild all `.qmd`, `.rmd`, and `.md` files everywhere and rebuild the data. Leaving off the parameter (just `quarto render`) re-renders the project with the default of FALSE if we just want new HTML but not new data. Individual files can also be rendered, either with the CLI or the Render buttons in VS or Rstudio. *Note*- due to a bug that I can't find, the only way to run `scenario_creation.qmd` (the python version) is locally with the button, after re-enabling the `execute` flag in the YAML header. For some reason it kills the gauge-getter when run from the command line. The R equivalent (`scenario_creation_R_demo`) *does* render from CLI, even though it also uses the same code that fails in the other, and so we still rebuild that data on a full rebuild.
+
 
 ### How do I get set up? ###
 

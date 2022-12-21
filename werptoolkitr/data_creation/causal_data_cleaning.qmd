@@ -5,6 +5,8 @@ format:
   html:
     df-print: paged
 editor: visual
+params:
+  REBUILD_DATA: FALSE
 ---
 
 ```{r setup}
@@ -27,6 +29,10 @@ devtools::load_all()
 # library(werptoolkitr)
 ```
 
+## TO REBUILD
+Rebuilding data is done with params. To rebuild, at the terminal run
+`quarto render data_creation/causal_data_cleaning.qmd -P REBUILD_DATA:TRUE`
+
 ## Purpose
 
 This document walks through the data arrangement to get from a number of spreadsheets into usable data relationships. In general, it should *only* be updated if those spreadsheets change or the output needs to be in a different format.
@@ -35,12 +41,16 @@ This is used to go from the raw spreadsheets in `data-raw/` and online to clean 
 
 First, do we actually want to rebuild the `data/` directory, or just use this to investigate and document what happened? All the functions here have a `saveout` argument that can be `FALSE`, so just set that conditionally.
 
+Set with params. But that doesn't work with interactive running, so deal with that.
+
 ```{r}
-REBUILD_DATA <- FALSE
+if ("params" %in% ls()) {
+  REBUILD_DATA <- params$REBUILD_DATA
+} else {
+  REBUILD_DATA <- FALSE
+}
 
-# if (REBUILD_DATA) {saver <- 'r'} else {saver <- FALSE}
-
-# actually, just save the list at the end. `saver` is for individual functions.
+# `saver` is for individual functions. Probably shouldn't use it.
 saver <- FALSE
 ```
 
@@ -159,7 +169,7 @@ In analysis code, we should use saveRDS, but in the package the standard is rda 
 causal_ewr <- list(ewr2obj = ewr2obj, obj2target = obj2target, obj2yrtarget = yrtarget)
 
 if (REBUILD_DATA) {
-  usethis::use_data(causal_ewr)
+  usethis::use_data(causal_ewr, overwrite = TRUE)
   # saveRDS(causal_ewr,
   #    file = file.path(datout, 'causal_ewr.rds'))
 }
