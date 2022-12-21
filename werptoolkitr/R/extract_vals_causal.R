@@ -32,8 +32,8 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
   # Will likely need more work to handle list item names once spatial is involved.
 
   # Could almost certainly be a purrr::map()
-  stackvalues <- foreach (i = 1:length(agglist),
-                          .combine = bind_rows) %do% {
+  stackvalues <- foreach::foreach (i = 1:length(agglist),
+                          .combine = dplyr::bind_rows) %do% {
 
                             # get the name of the nodelevel- the list is named
                             # by which group is aggregated into

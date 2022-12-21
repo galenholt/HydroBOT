@@ -33,7 +33,7 @@ find_related_nodes <- function(edgedf, nodenames) {
   maxcount <- length(unique(c(edgedf$fromtype, edgedf$totype)))
   while(length(tonodes) > 0 && it < maxcount) {
     tonodes <- edgedf[edgedf$from %in% tonodes, 'to'] %>% 
-      unique() %>% pull()
+      unique() %>% dplyr::pull()
     alltos <- c(alltos, tonodes)
     it <- it + 1
   }
@@ -43,7 +43,7 @@ find_related_nodes <- function(edgedf, nodenames) {
   it <- 0
   while(length(fromnodes) > 0 && it < maxcount) {
     fromnodes <- edgedf[edgedf$to %in% fromnodes, 'from'] %>% 
-      unique() %>% pull()
+      unique() %>% dplyr::pull()
     allfroms <- c(allfroms, fromnodes)
     it <- it + 1
   }

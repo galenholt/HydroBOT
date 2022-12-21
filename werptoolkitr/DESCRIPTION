@@ -13,6 +13,7 @@ RoxygenNote: 7.2.3
 Imports: 
     colorspace,
     dplyr,
+    foreach,
     ggplot2,
     paletteer,
     patchwork,

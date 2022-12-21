@@ -56,8 +56,8 @@ make_edges <- function(dflist,
   # Get names
   dfnames <- purrr::map(dflist, names)
   # Get whether each df has a gauge or planning unit column
-  dfgauge <- unlist(map(dfnames, ~'gauge' %in% .))
-  dfpu <- unlist(map(dfnames, ~'PlanningUnitID' %in% .))
+  dfgauge <- unlist(purrr::map(dfnames, ~'gauge' %in% .))
+  dfpu <- unlist(purrr::map(dfnames, ~'PlanningUnitID' %in% .))
 
   # We can use that to try to generate a matching gauge-pu if there wasn't one passed
   if (is.null(gaugeplanmatch) & any(dfgauge & dfpu)) {
@@ -74,8 +74,8 @@ make_edges <- function(dflist,
 
   # I think iter() would let us send only the matching df (i.e.
   # do the thisdf bit right in the call). Deal with that later if it's an issue.
-  alledges <- foreach (p = fromtos, i = iterators::icount(), .combine = bind_rows) %do% {
-    dfindex <- which(unlist(map(dfnames, ~all(p %in% .))))
+  alledges <- foreach::foreach (p = fromtos, i = iterators::icount(), .combine = dplyr::bind_rows) %do% {
+    dfindex <- which(unlist(purrr::map(dfnames, ~all(p %in% .))))
 
     thisdf <- dflist[[dfindex]]
 
@@ -132,11 +132,11 @@ filtergroups <- function(edgedf,
 
   # These don't enforce column names, so use select to allow accepting a character
   if (is.null(fromfilter)) {
-    fromfilter <- edgedf %>% dplyr::select(tidyselect::all_of(fromcol)) %>% dplyr::distinct() %>% pull()
+    fromfilter <- edgedf %>% dplyr::select(tidyselect::all_of(fromcol)) %>% dplyr::distinct() %>% dplyr::pull()
   }
 
   if (is.null(tofilter)) {
-    tofilter <- edgedf %>% dplyr::select(tidyselect::all_of(tocol)) %>% dplyr::distinct() %>% pull()
+    tofilter <- edgedf %>% dplyr::select(tidyselect::all_of(tocol)) %>% dplyr::distinct() %>% dplyr::pull()
   }
 
   # Gauges and planning units
@@ -146,7 +146,7 @@ filtergroups <- function(edgedf,
       dplyr::filter(gauge %in% gaugefilter) %>%
       dplyr::select(PlanningUnitID) %>%
       dplyr::distinct() %>%
-      pull()
+      dplyr::pull()
   }
 
   if (!is.null(pufilter) & !is.null(gaugeplanmatch)) {
@@ -154,7 +154,7 @@ filtergroups <- function(edgedf,
       dplyr::filter(PlanningUnitID %in% pufilter) %>%
       dplyr::select(gauge) %>%
       dplyr::distinct() %>%
-      pull()
+      dplyr::pull()
   }
 
   # doesn't need to be nested

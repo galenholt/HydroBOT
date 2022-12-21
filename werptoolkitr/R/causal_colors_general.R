@@ -41,11 +41,11 @@ causal_colors_general <- function(df, pal_list,
   # need some name references to know what function to use
   cnames <- paletteer::palettes_c_names %>%
     dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) %>%
-    dplyr::select(formatted) %>% pull()
+    dplyr::select(formatted) %>% dplyr::pull()
 
   dnames <- paletteer::palettes_d_names %>%
     dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) %>%
-    dplyr::select(formatted) %>% pull()
+    dplyr::select(formatted) %>% dplyr::pull()
 
 
   # deal with grouping colors.
@@ -70,15 +70,15 @@ causal_colors_general <- function(df, pal_list,
              palindex = round(propor(colordef)*100))
   } else {
     dfcols <- dfcols %>%
-      dplyr::mutate(pallength = n(),
-             palindex = row_number())
+      dplyr::mutate(pallength = dplyr::n(),
+             palindex = dplyr::row_number())
   }
 
 
   # Need to determine `paletteer_c` vs `paletteer_d` dependent on the name. This
   # should be doable with case_when but it won't run in a dplyr::mutate. Loop over
   # rows, getting the correct color index for the correct palette.
-  colmap <- foreach(i = 1:nrow(dfcols)) %do% {
+  colmap <- foreach::foreach(i = 1:nrow(dfcols)) %do% {
     thispal <- dfcols$palname[i]
     if (thispal %in% cnames) {
       thiscol <- paletteer::paletteer_c(thispal, n = dfcols$pallength[i])[dfcols$palindex[i]]
@@ -89,7 +89,7 @@ causal_colors_general <- function(df, pal_list,
 
 
   # column arrangement
-  dfcols <- bind_cols(dfcols, color = as.character(colmap)) %>%
+  dfcols <- dplyr::bind_cols(dfcols, color = as.character(colmap)) %>%
     dplyr::select(-c(palname, pallength, palindex))
 
 

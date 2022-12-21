@@ -85,7 +85,7 @@ clean_obj_target <- function(ewrobjs,
     dplyr::filter(link != 0) %>% #watch out for the 2s = Renee changes
     dplyr::select(-c(link, PU, PlanningUnitName)) # get rid of extra cols not in the main data
 
-  obj2target <- bind_rows(obj2target, qc_fix)
+  obj2target <- dplyr::bind_rows(obj2target, qc_fix)
 
   # cleanup column ordering
   obj2target <- obj2target %>%

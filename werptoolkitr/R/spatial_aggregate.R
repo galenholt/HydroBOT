@@ -102,7 +102,7 @@ spatial_aggregate <- function(dat, to_geo, groupers,
 
   # add the NAs on if we want
   if (keepAllPolys) {
-    aggPoly <- bind_rows(aggPoly, unusedPolys)
+    aggPoly <- dplyr::bind_rows(aggPoly, unusedPolys)
   }
 
 

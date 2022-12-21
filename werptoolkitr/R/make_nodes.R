@@ -34,7 +34,7 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
   # typeorder could be a df or a character vector
   if (is.character(typeorder)) {
     nodetib <- tibble::tibble(NodeType = typeorder) %>%
-      dplyr::mutate(nodeorder = row_number())
+      dplyr::mutate(nodeorder = dplyr::row_number())
   } else if (is.data.frame(typeorder)) {
     nodetib <- typeorder
   } else {
@@ -50,7 +50,7 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
     dplyr::mutate(nodeorder = edgeorder + 1) %>%
     dplyr::select(tidyselect::any_of(groupers), Name = to, NodeType = totype)
 
-  allnodes <- bind_rows(fromnodes, tonodes) %>%
+  allnodes <- dplyr::bind_rows(fromnodes, tonodes) %>%
     dplyr::group_by(Name, NodeType) %>%
     dplyr::ungroup() %>%
     dplyr::group_by(dplyr::across(tidyselect::any_of(groupers))) %>%

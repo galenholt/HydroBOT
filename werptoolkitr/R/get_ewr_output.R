@@ -36,8 +36,8 @@ get_ewr_output <- function(dir, type,
   }
 
   # read into one df
-  ewrdata <- foreach(i = relevantfiles,
-                    .combine = bind_rows) %do% {
+  ewrdata <- foreach::foreach(i = relevantfiles,
+                    .combine = dplyr::bind_rows) %do% {
 
                       temp <- readr::read_csv(i, col_types = readr::cols())
                     }
