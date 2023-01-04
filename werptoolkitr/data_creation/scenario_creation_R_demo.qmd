@@ -34,10 +34,8 @@ devtools::load_all()
 ```
 
 ## TO REBUILD
-Rebuilding data is done with params. To rebuild, at the terminal in WERP_toolkit run
-`quarto render data_creation/scenario_creation_R_demo.qmd -P REBUILD_DATA:TRUE`.
-or, to rebuild *everything*, run
-`quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
+
+Rebuilding data is done with params. To rebuild, at the terminal in WERP_toolkit run `quarto render data_creation/scenario_creation_R_demo.qmd -P REBUILD_DATA:TRUE`. or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
 
 ## Dev note
 
@@ -72,7 +70,6 @@ if ("params" %in% ls()) {
   REBUILD_DATA <- FALSE
 }
 ```
-
 
 Set the data dir to make that easy to change.
 
