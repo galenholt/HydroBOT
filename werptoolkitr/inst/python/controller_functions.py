@@ -1,6 +1,7 @@
 from py_ewr.scenario_handling import ScenarioHandler
 import os
 import copy
+import re
 import time
 import pandas as pd
 
