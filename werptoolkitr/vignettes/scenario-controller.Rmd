@@ -1,0 +1,105 @@
+---
+title: "Scenario Controller"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{scenario-controller}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(werptoolkitr)
+```
+
+The scenario controller is primarily an interface that allows us to point to the input data, run the EWR tool, and save outputs and metadata in a standard format.
+
+## Input hydrographs
+The first task is to point at the hydrographs for the scenarios. I expect the format of those scenarios to change, and so the default methods for handling them will as well. Likewise, they should come in with metadata describing them, but we don't know what that looks like yet.
+
+*At present*, the controller expects hydrographs in csvs with a particular folder structure, and saves the EWR output to the same directory. But that is specific to keeping the package together, and should change in use.
+
+For testing purposes, we use `testsmall`, which is 5 years and 6 gauges (3 in each of two catchments). For a more extended demo, see `WERP_toolkit_demo`.
+
+```{r}
+# 'testsmall' is 5 years and 6 gauges, fast for testing the ewr tool
+
+scenario_dir <- system.file("extdata/testsmall", package = 'werptoolkitr')
+
+output_dir <- system.file("extdata/testsmall", package = 'werptoolkitr')
+```
+
+Format of the hydrographs- the test data is modified hydrographs which match IQQM format.
+
+```{r}
+# Options
+# 'Bigmod - MDBA'
+# 'IQQM - NSW 10,000 years'
+# 'Source - NSW (res.csv)'
+
+model_format <- 'IQQM - NSW 10,000 years'
+```
+
+## Set some climate info
+
+Not sure why this isn't either baked-in or from somewhere.
+
+```{r}
+MINT = (100 - 0)/100
+MAXT = (100 + 0 )/100
+DUR = (100 - 0 )/100
+DRAW = (100 -0 )/100
+
+climate = 'Standard - 1911 to 2018 climate categorisation'
+```
+
+## Control output and return
+To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'annual'`, `'all'`, with more I need to add to reflect new EWR functionality.
+These have to be lists to work right.
+
+```{r}
+outputType <- list('none')
+returnType <- list('summary')
+```
+
+
+## Run and save
+The above is all user parameters. All the formatting, running, and saving is then handled with the wrapper function `prep_run_save_ewrs`.
+See `data_creation/controller_R_demo.qmd` for an expanded version used to run test data and step through each step to make testing/changes more transparent.
+
+We can ask `prep_run_save_ewrs` to return any of the outputs to the current session (e.g. `returnType = list('summary', 'all')` in R or `returnType = ['summary', 'all]` in python) in addition to saving, if we want to play with things interactively.
+
+```{r}
+ewr_summary <- prep_run_save_ewrs(scenario_dir, output_dir, model_format, climate, 
+                              outputType, returnType)
+```
+
+```{r} 
+#| rows.print = 20
+ewr_summary$summary
+```
+
+And if we pass a list to return type, we get a list of different sorts of EWR output back
+
+```{r}
+ewr_out <- prep_run_save_ewrs(scenario_dir, output_dir, model_format, climate, 
+                              outputType, returnType = list('summary', 'all'))
+```
+
+Now we have a `summary` and `all`.
+```{r}
+#| rows.print = 20
+ewr_out$summary
+```
+If we use this in R, the `datetime.date`s are a bit of a pain. I have a way to deal with that, which I can pull over, but the reality is we should be reading these back off disk anyway. 
+
+```{r}
+#| rows.print = 20
+ewr_out$all
+```

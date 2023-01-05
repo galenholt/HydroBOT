@@ -25,3 +25,5 @@ _quarto_output/
 /.luarc.json
 
 controller/__pycache__/
+
+*.pyc

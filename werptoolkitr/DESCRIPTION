@@ -22,7 +22,9 @@ Imports:
     stringr,
     tidyr
 Suggests: 
+    knitr,
     rmapshaper (>= 0.4.6),
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Depends: 
@@ -34,3 +36,4 @@ Config/reticulate:
       list(package = "py-ewr", version = "1.0.1", pip = TRUE)
     )
   )
+VignetteBuilder: knitr
