@@ -8,12 +8,8 @@ params:
 ---
 
 ## TO REBUILD
-Rebuilding data is done with params. To rebuild, at the terminal run
-`quarto render data_creation/spatial_data_creation.qmd -P REBUILD_DATA:TRUE`
-or, to rebuild *everything*, run
-`quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
 
-
+Rebuilding data is done with params. To rebuild, at the terminal run `quarto render data_creation/spatial_data_creation.qmd -P REBUILD_DATA:TRUE` or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
 
 Set the directory. This got convoluted with the Rproject nested inside quarto, but I think this largely keeps the R self-contained while still allowing Quarto to render. I think I will eventually be able to use `library(werptoolkitr)`, but quarto is grumpy about it, so skip for now.
 
@@ -37,6 +33,7 @@ devtools::load_all()
 ```
 
 Set with params. But that doesn't work with interactive running, so deal with that.
+
 ```{r}
 if ("params" %in% ls()) {
   REBUILD_DATA <- params$REBUILD_DATA
@@ -61,7 +58,6 @@ if (!dir.exists(dataextdir)) {dir.create(dataextdir, recursive = TRUE)}
 ## File purpose
 
 Create some clean(er) spatial data for aggregation testing demonstrations. I'm going to get as many files as possible online, and put others files in `data-raw` for now, and output clean versions to `data`, following R package data conventions. But set a 'datadir', so we can change that easily to somewhere else if desired.
-
 
 Define a dataload function for download and unzip of shapefiles- doing this here rather than in R/ because this is not really part of the package, but the initial dev building. And it can know about existing dirs
 

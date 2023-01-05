@@ -9,6 +9,10 @@ params:
   REBUILD_DATA: FALSE
 ---
 
+## TO REBUILD
+
+Rebuilding data is done with params. To rebuild, at the terminal run `quarto render data_creation/THISFILE.qmd -P REBUILD_DATA:TRUE` or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
+
 ```{r setup}
 #| warning: false
 #| message: false
@@ -30,6 +34,8 @@ devtools::load_all()
 
 # Goal
 
+**Use this file, not the vignette, to build new test EWR output data. It provides more fine-grained access to the functions if we need to change things and test.**
+
 We want a notebook that points at a directory of scenario hydrographs, runs the EWR tool (and in future any others), processes outputs into standard format(s), puts them in standard places, and writes any metadata. Will likely point to a config file with all arguments for the run, once I sort that out.
 
 ## Point at directory
@@ -39,6 +45,7 @@ Use the `testsmall/` directory for development. 6 gauges in 2 catchments.
 *Normally* `output_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.
 
 ### Set directories
+
 ```{r}
 # 'testsmall' is 5 years and two gauges, fast for testing the ewr tool
 # 'testscenarios' is 10 years and 40+ gauges, slower but better for testing whole toolkit, especially aggregation
@@ -63,6 +70,9 @@ model_format = 'IQQM - NSW 10,000 years'
 ```
 
 ### Climate info
+
+To have an R object that works as a `dict` in python, use a named list. The names can be quoted or unquoted; keep quoted to be most like python specs.
+
 ```{r}
 MINT = (100 - 0)/100
 MAXT = (100 + 0 )/100
@@ -77,22 +87,9 @@ climate = 'Standard - 1911 to 2018 climate categorisation'
 
 ## Wrapper internals
 
-Typically, the stuff below is wrapped. Here, I'm exposing it so we can see what's happening and where we need to tweak as formats change. 
+Typically, the stuff below is wrapped. Here, I'm exposing it so we can see what's happening and where we need to tweak as formats change.
 
 Once we have the directory and set any other needed params (e.g. point at a config), we should just click go, and auto-generate the folder structure, run the ewr, and output the results. I'm stepping through that here though and then will wrap it up.
-
-## Set some climate info
-
-Not sure why this isn't either baked-in or from somewhere.
-
-To have an R object that works as a `dict` in python, use a named list. The names can be quoted or unquoted; keep quoted to be most like python specs.
-
-```{r}
-
-# hoping this works to pass a list instead of a dict
-allowance = list('minThreshold' = MINT, 'maxThreshold' = MAXT, 'duration' = DUR, 'drawdown' = DRAW)
-
-```
 
 ## Set up output directories
 
@@ -121,7 +118,6 @@ for (i in 1:length(sceneinfodict)) {
 everyhydro = as.list(paths_gauges(sceneinfodict)[[1]])
 ```
 
-
 ## Run the ewr tool
 
 Now we run the ewr tool. Currently I have the test data in IQQM format, but if that changes for a particular run, we'll need to pass it in.
@@ -135,6 +131,7 @@ Will need to ask Martin what those do.
 This works, but there's an issue with `outputType = 'annual'` - I'm getting an error there inside the EWR tool. Until the bug is found, skip that.
 
 To make a `list` in python, need to have unnamed lists in R
+
 ```{r}
 if (!params$REBUILD_DATA) {
   outputType = list('none')
@@ -156,8 +153,6 @@ ewr_out = run_save_ewrs(everyhydro, outpath, model_format = model_format, allowa
 -   climate categorisation
 
 -   allowances
-
--   wrap
 
 -   document
 

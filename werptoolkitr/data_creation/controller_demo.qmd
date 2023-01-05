@@ -29,6 +29,8 @@ repo
 
 # Goal
 
+**Use this file or the R version of this file, not the vignette, to build new test EWR output data. It provides more fine-grained access to the functions if we need to change things and test.** 
+
 We want a notebook that points at a directory of scenario hydrographs, runs the EWR tool (and in future any others), processes outputs into standard format(s), puts them in standard places, and writes any metadata. Will likely point to a config file with all arguments for the run, once I sort that out.
 
 ## Point at directory
@@ -64,10 +66,6 @@ Tell it the format- typically will be IQQM, at least for a while
 model_format = 'IQQM - NSW 10,000 years'
 ```
 
-# Below here turns into wrappers
-
-Once we have the directory and set any other needed params (e.g. point at a config), we should just click go, and auto-generate the folder structure, run the ewr, and output the results. I'm stepping through that here though and then will wrap it up.
-
 ## Set some climate info
 
 Not sure why this isn't either baked-in or from somewhere.
@@ -83,7 +81,15 @@ allowance ={'minThreshold': MINT, 'maxThreshold': MAXT, 'duration': DUR, 'drawdo
 climate = 'Standard - 1911 to 2018 climate categorisation'
 ```
 
+## Wrapper internals
+
+Typically, the stuff below is wrapped. Here, I'm exposing it so we can see what's happening and where we need to tweak as formats change.
+
+Once we have the directory and set any other needed params (e.g. point at a config), we should just click go, and auto-generate the folder structure, run the ewr, and output the results. I'm stepping through that here though and then will wrap it up.
+
 ## Set up output directories
+
+This will typically be hidden in `prep_run_save_ewrs`, but I'm exposing the steps here for easier viewing and testing, especially as the formats change. see the Vignette for the wrapped version.
 
 This was assuming there would be gauge-files, and now there's not. Still seems to basically work, and not really worth spending too much time until we know the actual structure we want to use. We get the information about the directory structure and files as a dict with `make_scenario_info`- if there are multiple gauges within each, they enter the dict as a 'gauge' value. If not, the 'gauge' value is confusingly just the filename, but otherwise this works. The output directory and subdirs for scenarios is created by `make_output_dir`, which also returns that outer directory location. The EWR tool needs the paths to the gauge data as a list, so `paths_gauges` just unfolds the dict to give that.
 
