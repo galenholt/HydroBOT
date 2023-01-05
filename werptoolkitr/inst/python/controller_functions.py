@@ -76,8 +76,8 @@ def paths_gauges(scenedict):
     for fp in scenedict.keys():
         fl = scenedict[fp]['paths']
         g1 = scenedict[fp]['gauge']
-        file_locations = file_locations + fl
-        gaugenum = gaugenum + g1
+        file_locations.extend(fl)
+        gaugenum.extend(g1)
 
     return file_locations, gaugenum
 
@@ -111,9 +111,9 @@ def save_ewrs(ewr_results, ewr_type, output_path, datesuffix = True):
         sceneresults.insert(1, 'scenario', scenename)
         sceneresults.to_csv(outfile, index = False)
 
-def run_save_ewrs(pathlist, output_path, format, allowance, climate, outputType = 'none', datesuffix = False, returnType = False):
+def run_save_ewrs(pathlist, output_path, model_format, allowance, climate, outputType = 'none', datesuffix = False, returnType = False):
     thisewr = ScenarioHandler(scenario_files = pathlist, 
-                         model_format = format, 
+                         model_format = model_format, 
                          allowance = allowance, 
                          climate = climate)
     
@@ -136,22 +136,47 @@ def run_save_ewrs(pathlist, output_path, format, allowance, climate, outputType 
         save_ewrs(ewr_all, 'allevents', output_path, datesuffix = datesuffix)
 
     # Only return the parts we want
-    if returnType == 'summary':
-        return(ewr_sum)
-    if returnType == 'annual':
-        return(ewr_yr)
-    if returnType == 'all':
-        return(ewr_all)
+    if not returnType:
+        return None
+    
+    returndict = {}
+    if 'summary' in returnType:
+        returndict.update({ "summary" : ewr_sum})
+    if 'annual' in returnType:
+        returndict.update({ "annual" : ewr_yr})
+    if 'all' in returnType:
+        returndict.update({ "all" : ewr_all})
+    
+    return(returndict)
+
+
+# wrap all of the creation and running so we can call with one line once we have user inputs.
+# MINT, MAXT, DUR, and DRAW are input separately for two reasons- no processing is required in the parameter script, and makes calling from R or Python easier (R can do list -> dict, but the syntax differs and I want to be able to send the same code to either)
+def prep_run_save_ewrs(scenario_dir, output_dir, model_format, climate, outputType = 'none', returnType = False, MINT = (100 - 0)/100, MAXT = (100 + 0 )/100, DUR = (100 - 0 )/100, DRAW = (100 -0 )/100):
+    # create dict
+    allowance ={'minThreshold': MINT, 'maxThreshold': MAXT, 'duration': DUR, 'drawdown': DRAW}
+
+    # Gives file locations as a dict- 
+    sceneinfodict = make_scenario_info(scenario_dir)
+    # make the output directory structure
+    outpath = make_output_dir(output_dir, sceneinfodict)
+    # unfold the sceneinfodict to make it easy to get the lists of paths and gauges
+    everyhydro = paths_gauges(sceneinfodict)[0]
+
+    ewr_return = run_save_ewrs(everyhydro, outpath, format = model_format, allowance = allowance, climate = climate, outputType = outputType, datesuffix = False, returnType = returnType)
+
+    return(ewr_return)
+
 
 
 # This is leftover from a bug in the EWR tool. That has been fixed, but saving this because it may come in handy for parallelisation
-def loopewrs(pathlist, output_path, format, allowance, climate, datesuffix = False):
+def loopewrs(pathlist, output_path, model_format, allowance, climate, datesuffix = False):
 
     # Let's return the summary
     allsummary = []
     for scenario in pathlist:
         thisewr = ScenarioHandler(scenario_files = [scenario], 
-                         model_format = format, 
+                         model_format = model_format, 
                          allowance = allowance, 
                          climate = climate)
         ewr_sum = thisewr.get_ewr_results()
