@@ -11,7 +11,7 @@ params:
 
 ## TO REBUILD
 
-Rebuilding data is done with params. To rebuild, at the terminal run `quarto render data_creation/THISFILE.qmd -P REBUILD_DATA:TRUE` or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
+Rebuilding data is done with params. To rebuild, at the terminal run `quarto render data_creation/controller_ewr_testrun_R.qmd -P REBUILD_DATA:TRUE` or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
 
 ```{r setup}
 #| warning: false
