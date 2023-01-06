@@ -12,8 +12,8 @@
 #'
 #' @examples
 prep_run_save_ewrs_R <- function(...) {
-  reticulate::source_python(system.file("python/controller_functions.py", package = 'werptoolkitr'))
-  ewrout <- prep_run_save_ewrs(...)
+  # reticulate::source_python(system.file("python/controller_functions.py", package = 'werptoolkitr'))
+  ewrout <- controller_functions$prep_run_save_ewrs(...)
 }
 # prep_run_save_ewrs_R <- function(scenario_dir, output_dir,
 #                                  model_format, climate,
