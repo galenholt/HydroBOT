@@ -1,12 +1,13 @@
 
 # reference to py functions,
-controller_functions <- NULL
+# controller_functions <- NULL
 
 .onLoad <- function(libname, pkgname) {
   reticulate::configure_environment(pkgname)
 
   reticulate::source_python(system.file("python/controller_functions.py", package = 'werptoolkitr'), envir = globalenv())
 
+  # I'm leaving some of the reticulate::import code here from testing because it'll be better.
   # controller_functions <<- reticulate::import_from_path("controller_functions", path = system.file("python", package = 'werptoolkitr'), delay_load = TRUE)
 
   # also works, closer to the reticulate::import(module) we eventually want
