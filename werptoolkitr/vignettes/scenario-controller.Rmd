@@ -76,7 +76,7 @@ See `data_creation/controller_R_demo.qmd` for an expanded version used to run te
 We can ask `prep_run_save_ewrs` to return any of the outputs to the current session (e.g. `returnType = list('summary', 'all')` in R or `returnType = ['summary', 'all]` in python) in addition to saving, if we want to play with things interactively.
 
 ```{r}
-ewr_summary <- prep_run_save_ewrs(scenario_dir, output_dir, model_format, climate, 
+ewr_summary <- prep_run_save_ewrs_R(scenario_dir, output_dir, model_format, climate, 
                               outputType, returnType)
 ```
 
@@ -88,7 +88,7 @@ ewr_summary$summary
 And if we pass a list to return type, we get a list of different sorts of EWR output back
 
 ```{r}
-ewr_out <- prep_run_save_ewrs(scenario_dir, output_dir, model_format, climate, 
+ewr_out <- prep_run_save_ewrs_R(scenario_dir, output_dir, model_format, climate, 
                               outputType, returnType = list('summary', 'all'))
 ```
 

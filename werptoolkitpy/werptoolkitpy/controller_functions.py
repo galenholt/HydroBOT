@@ -111,7 +111,7 @@ def save_ewrs(ewr_results, ewr_type, output_path, datesuffix = True):
         sceneresults.insert(1, 'scenario', scenename)
         sceneresults.to_csv(outfile, index = False)
 
-def run_save_ewrs(pathlist, output_path, model_format, allowance, climate, outputType = 'none', datesuffix = False, returnType = False):
+def run_save_ewrs(pathlist, output_path, model_format, allowance, climate, outputType = 'none', returnType = 'none', datesuffix = False):
     thisewr = ScenarioHandler(scenario_files = pathlist, 
                          model_format = model_format, 
                          allowance = allowance, 
@@ -136,7 +136,7 @@ def run_save_ewrs(pathlist, output_path, model_format, allowance, climate, outpu
         save_ewrs(ewr_all, 'allevents', output_path, datesuffix = datesuffix)
 
     # Only return the parts we want
-    if not returnType:
+    if 'none' in returnType:
         return None
     
     returndict = {}
@@ -152,7 +152,7 @@ def run_save_ewrs(pathlist, output_path, model_format, allowance, climate, outpu
 
 # wrap all of the creation and running so we can call with one line once we have user inputs.
 # MINT, MAXT, DUR, and DRAW are input separately for two reasons- no processing is required in the parameter script, and makes calling from R or Python easier (R can do list -> dict, but the syntax differs and I want to be able to send the same code to either)
-def prep_run_save_ewrs(scenario_dir, output_dir, model_format, climate, outputType = 'none', returnType = False, MINT = (100 - 0)/100, MAXT = (100 + 0 )/100, DUR = (100 - 0 )/100, DRAW = (100 -0 )/100):
+def prep_run_save_ewrs(scenario_dir, output_dir, model_format, climate, outputType = 'none', returnType = 'none', MINT = (100 - 0)/100, MAXT = (100 + 0 )/100, DUR = (100 - 0 )/100, DRAW = (100 -0 )/100, datesuffix = False):
     # create dict
     allowance ={'minThreshold': MINT, 'maxThreshold': MAXT, 'duration': DUR, 'drawdown': DRAW}
 
@@ -163,7 +163,7 @@ def prep_run_save_ewrs(scenario_dir, output_dir, model_format, climate, outputTy
     # unfold the sceneinfodict to make it easy to get the lists of paths and gauges
     everyhydro = paths_gauges(sceneinfodict)[0]
 
-    ewr_return = run_save_ewrs(everyhydro, outpath, format = model_format, allowance = allowance, climate = climate, outputType = outputType, datesuffix = False, returnType = returnType)
+    ewr_return = run_save_ewrs(everyhydro, outpath, model_format, allowance, climate, outputType = outputType, returnType = returnType, datesuffix = datesuffix)
 
     return(ewr_return)
 

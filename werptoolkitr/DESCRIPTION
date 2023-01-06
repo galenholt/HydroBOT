@@ -18,6 +18,7 @@ Imports:
     paletteer,
     patchwork,
     readr,
+    reticulate,
     sf,
     stringr,
     tidyr
