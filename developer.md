@@ -51,11 +51,11 @@ Some of the data needs to be built, at least right now. And we'll always have th
 
 ### How do I get set up? ###
 
-Most of the work here is in R scripts, with the Rproject providing relative paths to the project directory (repo). *Please* do not `setwd()`- all paths should be relative to the project dir, unless (*maybe*) they are hardcoded to fixed shared data resources.
+Most of the work here is in R scripts, with the Rproject providing relative paths to the project directory (repo). This should be a self-contained package. *Please* do not `setwd()`- all paths should be relative to the project dir. In *analysis* repos that use this package, that's still a good idea, though *maybe* some limited paths will point to fixed shared data resources.
 
 The exception to the R code is the Scenario Controller and some initial test data creation, which are written in python/quarto and link closely with the [EWR tool](https://github.com/MDBAuth/EWR_tool).
 
-This is not currently a package, though we are moving that way.
+This is now a package (though very rough around the edges).
 
 The data in `data/` is test data, and so will be included in the repo, but will hopefully change little. This is not currently tracked during the migration, as it might change more frequently. It can be rebuilt with notebooks in `data_creation/`, which also adds data to `data-raw/`, which should not be tracked in the repo. The exception (currently) is data that cannot be gathered from elsewhere, but we should move away from this as possible.
 
