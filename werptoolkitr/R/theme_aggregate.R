@@ -52,7 +52,7 @@ theme_aggregate <- function(dat,
   polyflag <- FALSE
   if ('sf' %in% class(dat)) {
     spatialflag <- TRUE
-    if (!all(st_is(dat, 'POINT'))) {polyflag <- TRUE}
+    if (!all(sf::st_is(dat, 'POINT'))) {polyflag <- TRUE}
 
     if (!('polyID' %in% names(dat))) {
       dat <- dat %>%
@@ -62,10 +62,10 @@ theme_aggregate <- function(dat,
     geodat <- dat %>%
       dplyr::select(polyID, tidyselect::all_of(geonames)) %>%
       dplyr::group_by(polyID) %>%
-      slice(1) %>% # usual use of dplyr::distinct() checks the polys factorially. slice just indexes.
+      dplyr::slice(1) %>% # usual use of dplyr::distinct() checks the polys factorially. slice just indexes.
       dplyr::ungroup()
 
-    dat <- st_drop_geometry(dat)
+    dat <- sf::st_drop_geometry(dat)
     groupers <- c(groupers, 'polyID')
   }
 
@@ -112,7 +112,7 @@ theme_aggregate <- function(dat,
 
   if (spatialflag) {
     dat <- dplyr::left_join(agged, geodat, by = 'polyID') %>%
-      st_as_sf()
+      sf::st_as_sf()
   } else {
     dat <- agged
   }

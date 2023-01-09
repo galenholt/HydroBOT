@@ -31,14 +31,14 @@
 #' @export
 #'
 #' @examples
-#' 
+#'
 general_aggregate <- function(data, groupers,
-                           aggCols, funlist, 
+                           aggCols, funlist,
                            prefix = 'agg_',
-                           failmissing = TRUE, 
+                           failmissing = TRUE,
                            ...) {
 
-  
+
   # Get the function names differently if bare functions or a list of functions or a character vector
   if (is.list(funlist) | is.character(funlist)) {
     # make funlist a named list whether it comes in that way or as a character vector
@@ -51,15 +51,15 @@ general_aggregate <- function(data, groupers,
     # https://cran.r-project.org/web/packages/dplyr/vignettes/programming.html
     nameparser <- paste0(prefix, funname,'_{.col}')
   }
-  
+
   # Clean up groupers and aggCols from various formats and ensure only present
   # columns are included
-  groupers <- selectcreator(enquo(groupers), data, failmissing)
-  aggCols <- selectcreator(enquo(aggCols), data, failmissing)
-  
+  groupers <- selectcreator(rlang::enquo(groupers), data, failmissing)
+  aggCols <- selectcreator(rlang::enquo(aggCols), data, failmissing)
+
   data_agg <- data %>%
     dplyr::group_by(dplyr::across({{groupers}})) %>%
-    summarise(dplyr::across({{aggCols}}, funlist, ...,
+    dplyr::summarise(dplyr::across({{aggCols}}, funlist, ...,
                      .names = nameparser)) %>%
     dplyr::ungroup()
 }

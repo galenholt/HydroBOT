@@ -95,8 +95,8 @@ multi_aggregate <- function(dat,
     
     # turn the groupers and aggcols into character vectors however they came in
     # need to do this in the loop because dat changes and so available cols will too
-    thisgroup <- selectcreator(enquo(groupers), dat, failmissing)
-    thisagg <- selectcreator(expr(tidyselect::ends_with(!!aggCols)), dat, failmissing)
+    thisgroup <- selectcreator(rlang::enquo(groupers), dat, failmissing)
+    thisagg <- selectcreator(rlang::expr(tidyselect::ends_with(!!aggCols)), dat, failmissing)
     
     
     if (is.character(aggsequence[[i]])) {

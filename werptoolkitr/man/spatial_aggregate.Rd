@@ -11,7 +11,7 @@ spatial_aggregate(
   aggCols,
   funlist,
   ...,
-  whichcrs = st_crs(to_geo),
+  whichcrs = sf::st_crs(to_geo),
   keepAllPolys = FALSE,
   failmissing = TRUE,
   prefix = "spatial_"

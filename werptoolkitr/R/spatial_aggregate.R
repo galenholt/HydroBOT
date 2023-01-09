@@ -33,7 +33,7 @@
 #' @examples
 spatial_aggregate <- function(dat, to_geo, groupers,
                              aggCols, funlist, ...,
-                           whichcrs = st_crs(to_geo),
+                           whichcrs = sf::st_crs(to_geo),
                            keepAllPolys = FALSE,
                            failmissing = TRUE,
                            prefix = 'spatial_') {
@@ -46,7 +46,7 @@ spatial_aggregate <- function(dat, to_geo, groupers,
   # after cutting to unique polys in spatial_joiner
   to_geo <- to_geo %>%
     crs_clean(whichcrs) %>%
-    st_make_valid() %>%
+    sf::st_make_valid() %>%
     add_polyID()
 
   # make the intersected df for aggregating
@@ -54,8 +54,8 @@ spatial_aggregate <- function(dat, to_geo, groupers,
 
   # Clean up groupers and aggCols from various formats and ensure only present
   # columns are included.
-  groupers <- selectcreator(enquo(groupers), fromto_pair, failmissing)
-  aggCols <- selectcreator(enquo(aggCols), fromto_pair, failmissing)
+  groupers <- selectcreator(rlang::enquo(groupers), fromto_pair, failmissing)
+  aggCols <- selectcreator(rlang::enquo(aggCols), fromto_pair, failmissing)
 
   # the code typically drops polygons that have no data. but we might want to keep them for plotting.
 
@@ -98,7 +98,7 @@ spatial_aggregate <- function(dat, to_geo, groupers,
   # the dataframe gets shuffled or if there were lost areas in the intersection
   # step.
   aggPoly <- dplyr::left_join(agged, to_geo, by = 'polyID') %>%
-    st_as_sf()
+    sf::st_as_sf()
 
   # add the NAs on if we want
   if (keepAllPolys) {

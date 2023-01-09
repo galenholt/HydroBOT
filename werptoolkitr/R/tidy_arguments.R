@@ -27,14 +27,14 @@
 selectcreator <- function(selectvals, data, failmissing = TRUE) {
   if (is.character(selectvals)) {
     if (failmissing) {
-      s1g <- expr(tidyselect::all_of(selectvals))
+      s1g <- rlang::expr(tidyselect::all_of(selectvals))
     } else {
-      s1g <- expr(tidyselect::any_of(selectvals))
+      s1g <- rlang::expr(tidyselect::any_of(selectvals))
     }
   } else if (is.language(selectvals)) {
     s1g <- selectvals
   } else {
-    stop('selectvals should be characters or defused tidyselect- either `expr(tidyselect)` in call to function or `enquo(tidyselect)` internally')
+    stop('selectvals should be characters or defused tidyselect- either `rlang::expr(tidyselect)` in call to function or `rlang::enquo(tidyselect)` internally')
   }
 
   # Returning names instead of the indices is safer in case cols get reshuffled

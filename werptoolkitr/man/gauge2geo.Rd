@@ -4,12 +4,12 @@
 \alias{gauge2geo}
 \title{Pairs gauge numbers with geographic locations to make an \code{sf}}
 \usage{
-gauge2geo(gaugedf, gaugelocfile, whichcrs = 4283)
+gauge2geo(gaugedf, gaugelocs, whichcrs = 4283)
 }
 \arguments{
 \item{gaugedf}{A tibble or dataframe with a \code{gauge} column with gauge numbers as characters}
 
-\item{gaugelocfile}{Path to the csv with gauge numbers paired with lat-long. Currently assumes the BOM gauge file.}
+\item{gaugelocs}{sf or path to the csv with gauge numbers paired with lat-long. Currently assumes the BOM gauge file.}
 
 \item{whichcrs}{desired crs of the output. input crs assumed to be WGS84, EPSG 4326}
 }

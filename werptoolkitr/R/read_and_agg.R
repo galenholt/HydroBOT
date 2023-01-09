@@ -5,7 +5,7 @@
 #' modules), [make_edges()] and [multi_aggregate()]. Particularly useful if we
 #' want to pass parameters as strings from a config before anything is read in,
 #' and parallelisation.
-#' 
+#'
 #' @inheritParams prep_ewr_agg
 #' @inherit multi_aggregate params return
 #'
@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @examples
-read_and_agg <- function(datpath, type, 
+read_and_agg <- function(datpath, type,
                          geopath,
                          causalpath,
                          groupers = 'scenario',
@@ -28,22 +28,22 @@ read_and_agg <- function(datpath, type,
                          keepAllPolys = FALSE,
                          failmissing = TRUE,
                          ...) {
-  
+
   # The ... pass gauge and scenario filters to `prep_ewr_agg`
-  
+
   data <- prep_ewr_agg(datpath, type = type, geopath = geopath, ...)
-  
+
   # assume theme agg is character, spatial is sf
   themeseq <- aggsequence[purrr::map_lgl(aggsequence, is.character)]
-  
-  edges <- make_edges(dflist = ewr_causal_path, 
+
+  edges <- make_edges(dflist = causalpath,
                       fromtos = themeseq)
-  
+
   # be aggressive about parsing tidyselect into characters or expressions get
   # lost in the stack
-  groupers <- selectcreator(enquo(groupers), data, failmissing)
-  aggCols <- selectcreator(enquo(aggCols), data, failmissing)
-  
+  groupers <- selectcreator(rlang::enquo(groupers), data, failmissing)
+  aggCols <- selectcreator(rlang::enquo(aggCols), data, failmissing)
+
   # Annoying how much of this is just pass-through arguments. Could use dots,
   # but then would need to specify the prep_ewr_agg dots.
   aggout <- multi_aggregate(data,
@@ -56,6 +56,6 @@ read_and_agg <- function(datpath, type,
                             namehistory = namehistory,
                             keepAllPolys = keepAllPolys,
                             failmissing = failmissing)
-  
+
   return(aggout)
 }

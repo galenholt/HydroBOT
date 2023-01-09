@@ -13,7 +13,7 @@ spatial_joiner(from_geo, to_geo, whichcrs)
 \item{to_geo}{\code{sf} of the polygons or multipolygons to aggregate into}
 
 \item{whichcrs}{desired crs. Either the numeric EPSG or a crs definition, as
-from \code{st_crs()}}
+from \code{sf::st_crs()}}
 }
 \value{
 tibble (\emph{not} \code{sf}) with a \code{polyID} column mapping each row to it's
@@ -28,7 +28,7 @@ after aggregation or other processing.
 }
 \description{
 This ensures the polygons have the same crs, are valid, optimises the
-\code{st_intersection}, calculates an \code{area} column for future use, and drops
+\code{sf::st_intersection}, calculates an \code{area} column for future use, and drops
 geometry while retaining the \code{polyID} from the \code{from_geo} as a grouper for
 further aggregation and later re-joining to the geometry
 }

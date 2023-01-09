@@ -2,11 +2,11 @@
 
 # st_intersection is super slow with complex polygons. Let's at least warn and arrange the order
 vertcount <- function(polyg) {
-  verts <- polyg %>% 
-    st_geometry() %>% 
-    st_cast("MULTIPOINT") %>% 
-    sapply(length) %>% 
-    # purrr::map_dbl(length) %>% 
+  verts <- polyg %>%
+    sf::st_geometry() %>%
+    sf::st_cast("MULTIPOINT") %>%
+    sapply(length) %>%
+    # purrr::map_dbl(length) %>%
     sum()
 }
 
@@ -15,9 +15,9 @@ add_polyID <- function(geosf, failduplicate = TRUE) {
   # Make unique IDs for  the polygons being aggregated into. They probably have
   # something unique, but this ensures it rather than assumes, and gives it a
   # standard name
-  geosf <- geosf %>% 
+  geosf <- geosf %>%
     dplyr::mutate(polyID = lwgeom::st_geohash(geometry, precision = 11))
-  
+
   # Check
   # I could throw this in a while loop and increase precision, but if they
   # aren't unique at a precision of 11, it's possible they're identical and so
@@ -27,7 +27,7 @@ add_polyID <- function(geosf, failduplicate = TRUE) {
   if (failduplicate & any(duplicated(geosf$polyID))) {
     stop('polygons not unique at a precision of 11')
   }
-  
+
   return(geosf)
 }
 
@@ -35,13 +35,13 @@ add_polyID <- function(geosf, failduplicate = TRUE) {
 crs_clean <- function(geo, whichcrs) {
   # Turn numbers for the crs into real crss
   if (is.numeric(whichcrs)) {
-    whichcrs <- st_crs(whichcrs)
+    whichcrs <- sf::st_crs(whichcrs)
   }
-  
-  if (st_crs(geo) != whichcrs) {
-    geo <- st_transform(geo, whichcrs)
+
+  if (sf::st_crs(geo) != whichcrs) {
+    geo <- sf::st_transform(geo, whichcrs)
   }
-  
+
   return(geo)
 }
 
