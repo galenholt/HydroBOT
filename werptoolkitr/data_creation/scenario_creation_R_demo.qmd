@@ -333,7 +333,7 @@ scenenames = c('base', 'up4', 'down4')
 
 # a minimal set
 for (x in scenenames) {
-      scenedirS = file.path(dataextdir, 'testsmall', x)
+      scenedirS = file.path(dataextdir, 'testsmall', 'hydrographs', x)
     if (!dir.exists(scenedirS)) {
       dir.create(scenedirS, recursive = TRUE)
     }
@@ -412,17 +412,17 @@ if (REBUILD_DATA) {
     base %>% 
       dplyr::filter(Date > start15) %>% 
       dplyr::select(Date, tidyselect::all_of(minigauges)) %>% 
-      readr::write_csv(file.path(dataextdir, 'testsmall', 'base', 'base.csv'))
+      readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'base', 'base.csv'))
     
     down4 %>% 
       dplyr::filter(Date > start15) %>% 
       dplyr::select(Date, tidyselect::all_of(minigauges)) %>%  
-      readr::write_csv(file.path(dataextdir, 'testsmall', 'down4', 'down4.csv'))
+      readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'down4', 'down4.csv'))
     
     up4 %>% 
       dplyr::filter(Date > start15) %>% 
       dplyr::select(Date, tidyselect::all_of(minigauges)) %>%  
-      readr::write_csv(file.path(dataextdir, 'testsmall', 'up4', 'up4.csv'))
+      readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'up4', 'up4.csv'))
 }
     
 

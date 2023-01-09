@@ -30,9 +30,9 @@ For testing purposes, we use `testsmall`, which is 5 years and 6 gauges (3 in ea
 ```{r}
 # 'testsmall' is 5 years and 6 gauges, fast for testing the ewr tool
 
-scenario_dir <- system.file("extdata/testsmall", package = 'werptoolkitr')
+scenario_dir = system.file("extdata/testsmall/hydrographs", package = 'werptoolkitr')
 
-output_dir <- system.file("extdata/testsmall", package = 'werptoolkitr')
+output_dir = system.file("extdata/testsmall", package = 'werptoolkitr')
 ```
 
 Format of the hydrographs- the test data is modified hydrographs which match IQQM format.
