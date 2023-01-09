@@ -67,7 +67,7 @@ spatial_aggregate <- function(dat, to_geo, groupers,
       # need to save for each combo of grouping variable
       allgroups <- fromto_pair %>% dplyr::distinct(dplyr::across({{groupers}}))
       # combine
-      unusedPolys <- full_join(unusedPolys, allgroups, by = character())
+      unusedPolys <- dplyr::full_join(unusedPolys, allgroups, by = character())
     }
 
   }

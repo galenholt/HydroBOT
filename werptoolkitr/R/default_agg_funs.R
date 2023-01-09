@@ -2,22 +2,63 @@
 # Mostly, these are standard statistics with na.rm set to TRUE by default. But
 # we can add more complex functions if needed.
 
+#' Compensating aggregation
+#'
+#' Doing well in one time/place can compensate for doing poorly elsewhere. Implemented with max(). For binary, this means passing once means passing the aggregated value.
+#'
+#' @param x values to aggregate
+#' @param na.rm default `na.rm = TRUE` finds the aggregation ignoring NA, opposite usual na.rm default `na.rm = FALSE`, which returns NA if there are any NA.
+#'
+#' @return summarised data
+#' @export
+#'
+#' @examples
 CompensatingFactor <- function(x, na.rm = TRUE) {
   y <- max(x, na.rm = na.rm)
   return(y)
 }
 
+#' Limiting aggregation
+#'
+#' Doing poorly at one time/place negates benefits elsewhere. Implemented with min(). For binary, this means failing anywhere means failing everywhere.
+#'
+#' @inheritParams CompensatingFactor
+#'
+#' @return summarised data
+#' @export
+#'
+#' @examples
 LimitingFactor <- function(x, na.rm = TRUE) {
   y <- min(x, na.rm = na.rm)
   return(y)
 }
 
+#' Geometric mean aggregation
+#'
+#' Finds the geometric mean of the values.
+#'
+#' @inheritParams CompensatingFactor
+#'
+#' @return summarised data
+#' @export
+#'
+#' @examples
 GeometricMean <- function(x, na.rm = TRUE) {
   y <- exp(mean(log(x), na.rm = na.rm))
   return(y)
 }
 
-ArithmeticMean <- function(x, na.rm = TRUE) { 
+#' Arithmetic mean aggregation
+#'
+#' Finds the arithmetic mean of the values. Lightweight wrapper of `mean` with `na.rm = TRUE` to match other functions.
+#'
+#' @inheritParams CompensatingFactor
+#'
+#' @return summarised data
+#' @export
+#'
+#' @examples
+ArithmeticMean <- function(x, na.rm = TRUE) {
   y <- mean(x, na.rm = na.rm)
   return(y)
 }
