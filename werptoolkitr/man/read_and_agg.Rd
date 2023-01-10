@@ -17,16 +17,18 @@ read_and_agg(
   namehistory = TRUE,
   keepAllPolys = FALSE,
   failmissing = TRUE,
+  returnList = TRUE,
+  savepath = NULL,
   ...
 )
 }
 \arguments{
 \item{datpath}{path to indicator data. Currently needs to be EWR (same as \code{ewrpath} argument in \code{\link[=prep_ewr_agg]{prep_ewr_agg()}}), but left more general here for future}
 
-\item{type}{character, default \code{'summary'}, or \code{'annual'}.}
+\item{type}{character of which type of EWR output (currently \code{'summary'}, \code{'annual'}, or \code{'both'}). New values, e.g. \verb{'all}' probably work but untested.}
 
 \item{geopath}{path to the file with gauge locations in lat/long (assumes BOM
-currently)}
+currently), or an \code{sf} with gauge locations}
 
 \item{causalpath}{path to the causal relationships .rds file. Should typically be created in \verb{Causal networks}}
 
@@ -72,6 +74,10 @@ with the values in the new columns defining history.
 aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
 and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs \code{tidyselect::any_of()} in
 \code{tidyselect}}
+
+\item{returnList}{default \code{TRUE}, whether to return the output to the current session}
+
+\item{savepath}{default \code{NULL}, a path to save the output to. If \code{NULL}, does not save. If \code{savepath = NULL} and \code{returnList = FALSE}, the function errors to avoid wasting resources.}
 
 \item{...}{}
 }

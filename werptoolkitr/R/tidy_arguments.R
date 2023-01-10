@@ -39,7 +39,8 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
 
   # Returning names instead of the indices is safer in case cols get reshuffled
   # at some point
-  # as of R 4.2, this throws a warning when s1g evals to a character vector, and needs tidyselect::all_of( or tidyselect::any_of( wrapping
+  # as of R 4.2, this throws a warning when s1g evals to a character vector, and
+  # needs tidyselect::all_of( or tidyselect::any_of( wrapping
   s1g <- s1g %>%
     tidyselect::eval_select(data, strict = failmissing) %>%
     names()
