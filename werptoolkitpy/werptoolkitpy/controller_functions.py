@@ -12,15 +12,15 @@ import pandas as pd
 def scene_namer(outerdir):
     # index 0 is the folder path, 1 is the subdirs, and 2 is files in the outer dir
     scenarios = next(os.walk(outerdir))[1]
-    # allow running through additional times, and so skip the Output_files directory
+    # allow running through additional times, and so skip the module_output directory
 
-    scenarios = [fold for fold in scenarios if 'Output_files' not in fold]
+    scenarios = [fold for fold in scenarios if 'module_output' not in fold]
     
     return scenarios
 
 # create a standard output folder structure
 def make_output_dir(input_folder, scenedict):
-    Output_path = os.path.join(input_folder, "Output_files", "EWR")
+    Output_path = os.path.join(input_folder, "module_output", "EWR")
 
     for i in scenedict.keys():
         sceneout = os.path.join(Output_path, i)
