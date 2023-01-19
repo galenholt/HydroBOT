@@ -14,11 +14,11 @@ To use R in VScode, there are a few things to do, mostly listed at the [VScode d
 
 I'm experimenting with `radian` and `httpgd`, and think I like them, but they're not necessary. And there are other linters, debuggers, etc beyond what comes with the VScode R extension, but I haven't played with them yet.
 
-If you want to install [radian](github.com/randy3k/radian) as a terminal, it should be global as well. The azure boxes need to `pip3 install prompt-toolkit --upgrade` before `pip3 install -U radian` or we get TypeErrors. Hoping this doesn't screw up the python envs? Guess we'll see. It's a bit confusing because when we start a `radian` terminal, it says 'python', not 'R' because radian is written in python. Which is a bit confusing, especially when we're also actually doing python work. In practice, I like some of the things about radian, but have turned it off because it throws weird errors (but runs through them) that aren't real ('unexpected & in }' when neither symbol is in the code). I just don't fully trust it.
+If you want to install [radian](github.com/randy3k/radian) as a terminal, it should be global as well. The azure boxes need to `pip3 install prompt-toolkit --upgrade` before `pip3 install -U radian` or we get TypeErrors. Hoping this doesn't screw up the python envs? Guess we'll see. When we start a `radian` terminal, it says 'python', not 'R' because radian is written in python. Which is a bit confusing, especially when we're also actually doing python work. In practice, I like some of the things about radian, but have turned it off because it throws weird errors (but runs through them) that aren't real ('unexpected & in }' when neither symbol is in the code). I just don't fully trust it. I *think* the issue is that it doesn't handle running code chunks in Quarto correctly- it's effectively copy-pasting them into the terminal and isn't doing it right.
 
 Installing `httpgd` globally as well (inside R, `install.packages('httpgd')`).
 
-In settings, I used `which radian` to get the location, and put that (`/anaconda/envs/azureml_py38/bin/radian`) in `Rterm:Linux` in the settings. And I turned on `LSP:debug` and clicked `use httpgd` in the plots settings. I'll try to keep a record here of these setup things I've done so we don't forget and have different vs behaviour.
+In settings, I used `which radian` to get the location, and put that (`/anaconda/envs/azureml_py38/bin/radian`) in `Rterm:Linux` in the settings. And I turned on `LSP:debug` and clicked `use httpgd` in the plots settings. I'll try to keep a record here of these setup things I've done so we don't forget and have different VS behaviour.
 
 ### System setup
 On Windows, you'll need Rtools, whichever version matches your local R. Rtools provides access to compilation of C/C++/Fortran. Mac and Unix just have that built-in. But, at least on the Azure boxes, there are a lot of missing libs the R packages depend on. As of this writing, I hit errors with libcurl, libjq, libgeos, libudunits2, libgdal, and libxml2. One option is to try to `renv::restore()` and fix these as they come, but likely easier to just hit them all at once with `sudo apt-get install libcurl4-openssl-dev libjq-dev libgeos-dev libgdal-dev libudunits2-dev libxml2-dev`. Note that if you do need to install after a failure in R and it tells you what it needs, you can use `system("sudo apt-get install packagename")` if you want to stay within R and not switch to bash.
@@ -40,6 +40,9 @@ Typically, we would next run `renv::restore()` which will use the local `renv.lo
 
 `xml2` seems to be extra touchy to install on Unix, and errors sometimes with a message about `pkg-config` and sometimes about permissions to move things from the `00LOCK` directory. I am working on a smoother fix for this- currently tried `install.packages('xml2', dependencies = TRUE, INSTALL_opts = c('--no-lock'))` inside R, which worked but took *forever* and seems to have messed up my `activate.R` file.
 
+### Python environments
+Use the poetry in `/werptoolkitpy` to build the python environment in `/werptoolkitpy`. See the note in the werptoolkitr readme about what is needed on the python side to actually use the package- the short answer is a python environment with `py-ewr`. I'm working on making that automatic, for now, users will need to set that up manually. Can use WERP_toolkit_demo as a template.
+
 ## Notes-edit
 VS seems to sometimes struggle to find the library if started in WERP_toolkit. In that case, start a new workspace in WERP_toolkit/werptoolkitr. 
 
@@ -51,7 +54,7 @@ Some of the data needs to be built, at least right now. And we'll always have th
 
 ### How do I get set up? ###
 
-Most of the work here is in R scripts, with the Rproject providing relative paths to the project directory (repo). This should be a self-contained package. *Please* do not `setwd()`- all paths should be relative to the project dir. In *analysis* repos that use this package, that's still a good idea, though *maybe* some limited paths will point to fixed shared data resources.
+Most of the work here is in R files and Quarto notebooks, with the Rproject providing relative paths to the project directory (repo). This should be a self-contained package. *Please* do not `setwd()`- all paths should be relative to the project dir. In *analysis* repos that use this package, that's still a good idea, though *maybe* some limited paths will point to fixed shared data resources.
 
 The exception to the R code is the Scenario Controller and some initial test data creation, which are written in python/quarto and link closely with the [EWR tool](https://github.com/MDBAuth/EWR_tool).
 

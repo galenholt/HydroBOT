@@ -41,27 +41,10 @@ devtools::install_github("MDBAuth/WERP_toolkit", subdir = 'werptoolkitr')
 *IMPORTANT DEV NOTE*
 To install from a branch other than "HEAD", use `ref = 'branchname'`. 
 
+## Python dependency
+To run, this needs a Python environment containing `py_ewr` (currently 1.0.1). In theory, I have set up the DESCRIPTION file and `.onLoad` to check the environment and build one with that dependency when the package is loaded. But it's not working quite right, and so for now just set up python manually. That should be fine for internal use. This way we can use poetry anyway instead of miniconda. I think I'll be able to sort out the auto-install, but need to do it with a more minimal example. There's a poetry environment in the WERP_toolkit_demo repo that works. 
+
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+Need to include a local example here, high level and linking to vignettes. In the meantime, see the [WERP_toolkit_demo](https://github.com/MDBAuth/WERP_toolkit_demo) for a full demonstration.
 
-```{r example}
-library(werptoolkitr)
-## basic example code
-```
-
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-```{r cars}
-summary(cars)
-```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/v1/examples>.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
