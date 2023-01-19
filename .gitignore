@@ -27,3 +27,5 @@ _quarto_output/
 controller/__pycache__/
 
 *.pyc
+
+*.gz
