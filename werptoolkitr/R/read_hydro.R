@@ -1,0 +1,37 @@
+#' Wrapper to read hydrographs into R
+#'
+#' @param hydropath path to the hydrographs
+#' @param long logical, default TRUE. Do we want the data long (with a column for gauge number) or wide (FALSE, with gauge numbers as columns)
+#' @param format character, default 'csv'. Format of the hydrographs, determines which reading function gets called.
+#'
+#' @return tibble of hydrographs
+#' @export
+#'
+#' @examples
+read_hydro <- function(hydropath, long = TRUE, format = 'csv') {
+  if (format == 'csv') {
+    return(read_hydro_csv(hydropath, long))
+  }
+}
+
+#' Read csv hydrographs in the standard directory structure
+#'
+#' @inheritParams read_hydro
+#'
+#' @return tibble of hydrographs
+#' @export
+#'
+#' @examples
+read_hydro_csv <- function(hydropath, long) {
+  all_hydros <- list.files(hydropath, recursive = TRUE)
+  # read-in and extract the names
+  hydros <- readr::read_csv(file.path(hydropath, all_hydros), id = 'scenario') |>
+    dplyr::mutate(scenario = stringr::str_extract(scenario, "(\\w|\\d)+\\.csv$"),
+                  scenario = stringr::str_extract(scenario, '^[\\w|\\d]+'))
+
+  if (long) {
+    hydros <- tidyr::pivot_longer(hydros, cols = -c(scenario, Date), names_to = "gauge", values_to = "flow")
+  }
+
+  return(hydros)
+}
