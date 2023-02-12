@@ -18,7 +18,7 @@ plot_hydrographs <- function(hydrolong,
                              scales = 'fixed',
                              transy = 'identity') {
 
-  if (class(colors) != 'colors') {
+  if (!inherits(colors, 'colors')) {
     warning("colors not specified per level. Trying to use the 'colors' argument as a palette name")
     colors <- make_pal(levels = unique(hydrolong$scenario), palette = colors)
   }

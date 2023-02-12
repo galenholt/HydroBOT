@@ -9,7 +9,7 @@ theme_werp_toolkit(base_size = 10, ...)
 \arguments{
 \item{base_size}{set the base_size as in other \code{ggplot} themes}
 
-\item{...}{other arguments to \code{\link[ggplot:theme]{ggplot::theme()}}}
+\item{...}{other arguments to \code{\link[ggplot2:theme]{ggplot2::theme()}}}
 }
 \value{
 a ggplot theme
@@ -18,5 +18,5 @@ a ggplot theme
 A standard ggplot theme for the toolkit
 }
 \examples{
-ggplot2::ggplot(iris, ggplot2::aes(x = Sepal.Length, y = Sepal.Width, color = Species)) + geom_point() + theme_werp_toolkit()
+ggplot2::ggplot(iris, ggplot2::aes(x = Sepal.Length, y = Sepal.Width, color = Species)) + ggplot2::geom_point() + theme_werp_toolkit()
 }
