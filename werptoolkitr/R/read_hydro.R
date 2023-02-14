@@ -25,7 +25,8 @@ read_hydro <- function(hydropath, long = TRUE, format = 'csv') {
 read_hydro_csv <- function(hydropath, long) {
   all_hydros <- list.files(hydropath, recursive = TRUE)
   # read-in and extract the names
-  hydros <- readr::read_csv(file.path(hydropath, all_hydros), id = 'scenario') |>
+  hydros <- readr::read_csv(file.path(hydropath, all_hydros),
+                            id = 'scenario', show_col_types = FALSE) |>
     dplyr::mutate(scenario = stringr::str_extract(scenario, "(\\w|\\d)+\\.csv$"),
                   scenario = stringr::str_extract(scenario, '^[\\w|\\d]+'))
 

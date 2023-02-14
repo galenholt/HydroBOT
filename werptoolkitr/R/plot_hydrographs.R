@@ -14,6 +14,7 @@
 plot_hydrographs <- function(hydrolong,
                              gaugefilter = NULL,
                              scenariofilter = NULL,
+                             y_col = flow,
                              colors = "RColorBrewer::Dark2",
                              scales = 'fixed',
                              transy = 'identity') {
@@ -32,7 +33,7 @@ plot_hydrographs <- function(hydrolong,
 
   hydro_plot <- hydrolong |>
     dplyr::filter(gauge %in% gaugefilter & scenario %in% scenariofilter) |>
-    ggplot2::ggplot(ggplot2::aes(x = Date, y = flow, color = scenario)) +
+    ggplot2::ggplot(ggplot2::aes(x = Date, y = {{ y_col }}, color = scenario)) +
     ggplot2::geom_line() +
     ggplot2::facet_wrap(~gauge, scales = scales) +
     ggplot2::labs(y = "Flow (ML/day)", color = 'Scenario') +

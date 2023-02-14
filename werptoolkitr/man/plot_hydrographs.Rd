@@ -8,6 +8,7 @@ plot_hydrographs(
   hydrolong,
   gaugefilter = NULL,
   scenariofilter = NULL,
+  y_col = flow,
   colors = "RColorBrewer::Dark2",
   scales = "fixed",
   transy = "identity"

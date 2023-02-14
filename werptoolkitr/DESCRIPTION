@@ -21,6 +21,7 @@ Imports:
     patchwork,
     readr,
     reticulate,
+    rlang,
     sf,
     stringr,
     tidyr
