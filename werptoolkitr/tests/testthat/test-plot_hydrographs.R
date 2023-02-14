@@ -4,7 +4,7 @@ test_that("expected use makes plot", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
   hydpal <- make_pal(levels = unique(hydlong$scenario), palette = 'calecopal::superbloom3')
   hydplot <- plot_hydrographs(hydlong, colors = hydpal)
-  expect_equal(class(hydplot), c('gg', 'ggplot'))
+  expect_s3_class(hydplot, 'ggplot')
   vdiffr::expect_doppelganger("default hydroplot", hydplot)
 
 })
@@ -12,7 +12,7 @@ test_that("expected use makes plot", {
 test_that("palette name makes plot", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
   hydplot <- plot_hydrographs(hydlong, colors = 'calecopal::superbloom3')
-  expect_equal(class(hydplot), c('gg', 'ggplot'))
+  expect_s3_class(hydplot, 'ggplot')
   vdiffr::expect_doppelganger("palname hydro", hydplot)
 
 })
@@ -23,7 +23,7 @@ test_that("gauge and scenariofilter work", {
   gauges_to_plot <- c('412002', '421001')
   scenes_to_plot <- c('down4', 'up4')
   hydplot <- plot_hydrographs(hydlong, colors = hydpal, gaugefilter = gauges_to_plot, scenariofilter = scenes_to_plot)
-  expect_equal(class(hydplot), c('gg', 'ggplot'))
+  expect_s3_class(hydplot, 'ggplot')
   vdiffr::expect_doppelganger("filtered hydro", hydplot)
 
 })
@@ -31,8 +31,25 @@ test_that("gauge and scenariofilter work", {
 test_that("scales and transy makes plot", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
   hydpal <- make_pal(levels = unique(hydlong$scenario), palette = 'calecopal::superbloom3')
-  hydplot <- plot_hydrographs(hydlong, colors = hydpal, scales = 'free_y', transy = 'log10')
-  expect_equal(class(hydplot), c('gg', 'ggplot'))
+  # Add an eps to avoid log(0) warnings, since that's not the point here
+  hydplot <- hydlong |>
+    dplyr::mutate(flow = flow + 1) |>
+    plot_hydrographs(colors = hydpal, scales = 'free_y', transy = 'log10')
+  expect_s3_class(hydplot, 'ggplot')
   vdiffr::expect_doppelganger("scaletrans hydro", hydplot)
+
+})
+
+test_that("auto-baselining works", {
+  hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
+  hydpal <- make_pal(levels = unique(hydlong$scenario), palette = 'calecopal::superbloom3', refvals = 'base', refcols = 'black')
+  hydplot <- plot_hydrographs(hydlong, colors = hydpal, base_lev = 'base', comp_fun = difference)
+  hydplot_rel <- plot_hydrographs(hydlong, colors = hydpal,
+                                  base_lev = 'base', comp_fun = relative,
+                                  transy = 'log10', add_eps = 1e-6)
+  expect_s3_class(hydplot, 'ggplot')
+  vdiffr::expect_doppelganger("difference baseline hydro", hydplot)
+  expect_s3_class(hydplot_rel, 'ggplot')
+  vdiffr::expect_doppelganger("relative baseline hydro", hydplot_rel)
 
 })

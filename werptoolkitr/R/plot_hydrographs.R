@@ -14,13 +14,16 @@
 plot_hydrographs <- function(hydrolong,
                              gaugefilter = NULL,
                              scenariofilter = NULL,
-                             y_col = flow,
+                             y_col = 'flow',
                              colors = "RColorBrewer::Dark2",
                              scales = 'fixed',
-                             transy = 'identity') {
+                             transy = 'identity',
+                             base_lev = NULL,
+                             comp_fun = NULL,
+                             ...) {
 
-  if (!inherits(colors, 'colors')) {
-    warning("colors not specified per level. Trying to use the 'colors' argument as a palette name")
+    if (!inherits(colors, 'colors')) {
+    rlang::inform("colors not specified per level. Trying to use the 'colors' argument as a palette name")
     colors <- make_pal(levels = unique(hydrolong$scenario), palette = colors)
   }
 
@@ -31,12 +34,26 @@ plot_hydrographs <- function(hydrolong,
     scenariofilter <- unique(hydrolong$scenario)
   }
 
+  ylab_append <- ''
+  if (!is.null(comp_fun) & !is.null(base_lev)) {
+    hydrolong <- hydrolong |>
+      baseline_compare(scene_col = 'scenario', base_lev = base_lev,
+                       values_col = y_col, comp_fun = comp_fun, ...)
+
+    comp_fun_name <- as.character(substitute(comp_fun))
+    base_col_name <- paste0(comp_fun_name, '_', y_col)
+    names(hydrolong)[names(hydrolong) == paste0('comp_fun_', y_col)] <- base_col_name
+    y_col <- base_col_name
+    ylab_append <- paste0('\n', comp_fun_name, ' to ', as.character(base_lev))
+  }
+
+
   hydro_plot <- hydrolong |>
     dplyr::filter(gauge %in% gaugefilter & scenario %in% scenariofilter) |>
-    ggplot2::ggplot(ggplot2::aes(x = Date, y = {{ y_col }}, color = scenario)) +
+    ggplot2::ggplot(ggplot2::aes(x = Date, y = .data[[y_col]], color = scenario)) +
     ggplot2::geom_line() +
     ggplot2::facet_wrap(~gauge, scales = scales) +
-    ggplot2::labs(y = "Flow (ML/day)", color = 'Scenario') +
+    ggplot2::labs(y = paste0("Flow (ML/day)", ylab_append), color = 'Scenario') +
     ggplot2::scale_y_continuous(trans = transy) +
     ggplot2::scale_color_manual(values = colors) +
     theme_werp_toolkit()
