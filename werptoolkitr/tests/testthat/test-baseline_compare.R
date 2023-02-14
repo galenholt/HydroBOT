@@ -67,14 +67,26 @@ test_that("relative comparison works with add_eps", {
   expect_equal(sum(is.nan(baselong$relative_flow)), 0)
 })
 
-# test_that("character functions work", {
-#
-#   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
-#                                                 package = 'werptoolkitr'))
-#   baselong <- baseline_compare(hydlong, scene_col = 'scenario', comp_fun = relative,
-#                                base_lev = 'base', values_col = 'flow')
-#   # names are right
-#   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'relative_flow'))
-#   # all the bases should be 1 or div/0
-#   expect_true(all(baselong$relative_flow[which(baselong$scenario == 'base' & baselong$flow != 0)] == 1))
-# })
+test_that("character functions work", {
+
+  hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
+                                                package = 'werptoolkitr'))
+  baselong <- baseline_compare(hydlong, scene_col = 'scenario', comp_fun = 'difference',
+                               base_lev = 'base', values_col = 'flow')
+  # names are right
+  expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
+  # all the bases are 0
+  expect_equal(sum(baselong$difference_flow[which(baselong$scenario == 'base')]), 0)
+})
+
+test_that("list functions work", {
+
+  hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
+                                                package = 'werptoolkitr'))
+  baselong <- baseline_compare(hydlong, scene_col = 'scenario', comp_fun = list(difference = ~difference(., y = ref_flow)),
+                               base_lev = 'base', values_col = 'flow')
+  # names are right
+  expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
+  # all the bases are 0
+  expect_equal(sum(baselong$difference_flow[which(baselong$scenario == 'base')]), 0)
+})

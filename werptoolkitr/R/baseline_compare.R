@@ -11,24 +11,42 @@ baseline_compare <- function(val_df, scene_col, base_lev, values_col, comp_fun, 
   valcols <- selectcreator(rlang::enquo(values_col), val_df, failmissing)
 
 
-  # The functions here are fundamentally different than in the aggregation-
-  # there we were worried about groups and different aggregations, here we're
-  # always comparing two cols with known names.
+  # Defining a y in a list has to be done externally, while auto-generating y is
+  # done in the `across`. There's probably a slick way to do either, (or
+  # generate one version from the other). But for now, we already need the
+  # conditionals for names and functionlister, so just do different mutates too
 
-  # Should only be one valcol by this point, but stay safe. Different functions
-  # for different variables not yet implemented. Pass in separately for now
+  if (is.list(comp_fun)) {
+    # make comp_fun a named list whether it comes in that way or as a character vector
+    comp_fun <- functionlister(comp_fun)
+    nameparser = paste0('{.fn}_{.col}')
+    val_df <- val_df %>%
+      dplyr::mutate(dplyr::across({{valcols}},
+                                  comp_fun, ...,
+                                  .names = nameparser))
+  }
 
-  # if funlist is a bare function, leave it alone but get its name
-  # https://stackoverflow.com/questions/1567718/getting-a-function-name-as-a-string
-  funname <- as.character(substitute(comp_fun))
-  # https://cran.r-project.org/web/packages/dplyr/vignettes/programming.html
-  nameparser <- paste0(funname,'_{.col}')
+  if (is.character(comp_fun)) {
+    comp_fun <- functionlister(comp_fun)
+    nameparser = paste0('{.fn}_{.col}')
+    val_df <- val_df %>%
+      dplyr::mutate(dplyr::across({{valcols}},
+                                  comp_fun, y = .data[[stringr::str_c('ref_', valcols)]], ...,
+                                  .names = nameparser))
+  }
 
-  val_df <- val_df %>%
-    dplyr::mutate(dplyr::across({{valcols}},
-                                ~comp_fun(.data[[valcols]],
-                                          .data[[stringr::str_c('ref_', valcols)]], ...),
-                                .names = nameparser))
+  if (is.function(comp_fun)) {
+    # if comp_fun is a bare function, leave it alone but get its name
+    # https://stackoverflow.com/questions/1567718/getting-a-function-name-as-a-string
+    funname <- as.character(substitute(comp_fun))
+    # https://cran.r-project.org/web/packages/dplyr/vignettes/programming.html
+    nameparser <- paste0(funname,'_{.col}')
+    val_df <- val_df %>%
+      dplyr::mutate(dplyr::across({{valcols}},
+                                  comp_fun, y = .data[[stringr::str_c('ref_', valcols)]], ...,
+                                  .names = nameparser))
+  }
+
 
   return(val_df)
 
