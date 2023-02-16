@@ -47,13 +47,3 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
 
   return(s1g)
 }
-
-functionlister <- function(funs) {
-  if (is.list(funs)) {
-    funlist <- funs
-  } else if (is.character(funs)) {
-    funlist <- mget(funs, inherits = TRUE)
-  } else {
-    stop('functions need to be characters or lists, otherwise the naming breaks')
-  }
-}
