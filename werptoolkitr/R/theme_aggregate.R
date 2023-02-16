@@ -34,7 +34,8 @@
 #'
 #' @examples
 theme_aggregate <- function(dat,
-                            from_theme, to_theme,
+                            from_theme,
+                            to_theme,
                             groupers,
                             aggCols,
                             funlist,
@@ -71,7 +72,12 @@ theme_aggregate <- function(dat,
 
   # may not need this, but too many conditionals
   g2p <- gauge_pu(causal_edges)
+
   # clean up the edges to only relevant
+  # auto-generate the edges if a full list has been passed in
+  if (!inherits(causal_edges, 'data.frame') & inherits(causal_edges, 'list')) {
+    causal_edges <- make_edges(causal_edges, list(c(from_theme, to_theme)))
+  }
   causal_edges <- causal_edges %>%
     dplyr::filter(fromtype == from_theme & totype == to_theme) %>%
     dplyr::select(tidyselect::where(~!all(is.na(.))))
