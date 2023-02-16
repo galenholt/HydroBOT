@@ -1,11 +1,11 @@
 #' Aggregate data along theme dimension
 #'
 #' This is the core aggregation function for all the aggregation types. it's
-#' really a fairly lightweight wrapper over a small dplyr::group_by and summarise to
-#' handle passing in grouping columns, aggregation columns, and functions as
-#' arguments and handle naming. It assumes no spatial information to deal with.
-#' Preparing the data to have the proper grouping columns is the job of the
-#' outer calling functions (or the user)
+#' really a fairly lightweight wrapper over a small dplyr::group_by and
+#' summarise to handle passing in grouping columns, aggregation columns, and
+#' functions as arguments and handle naming. It assumes no spatial information
+#' to deal with. Preparing the data to have the proper grouping columns is the
+#' job of the outer calling functions (or the user)
 #'
 #' @param data a dataframe or tibble with data to aggregate
 #' @param groupers an expression for the columns to use as grouping variables
@@ -19,10 +19,12 @@
 #'   calling function to give it the type of aggregation
 #' @param failmissing logical, default `TRUE`: fail if the requested grouping or
 #'   aggregation columns not exist. If `FALSE`, proceed with those that do exist
-#'   and silently drop those that don't. Similar to `tidyselect::all_of()` vs `tidyselect::any_of()` in
-#'   `tidyselect`
-#' @param ... arguments passed to the aggregation functions. Almost always better to specify
-#'   explicitly when building `funlist`, but works OK with simple functions
+#'   and silently drop those that don't. Similar to `tidyselect::all_of()` vs
+#'   `tidyselect::any_of()` in `tidyselect`
+#' @param ... arguments passed to the aggregation functions. This is *very*
+#'   limited, and does not work with data arguments under most conditions.
+#'   Almost always better to specify explicitly when building `funlist`, but
+#'   works OK with simple functions, e.g. passing `na.rm = TRUE` to mean
 
 #'
 #' @return a tibble with columns for the grouping variables and a column of

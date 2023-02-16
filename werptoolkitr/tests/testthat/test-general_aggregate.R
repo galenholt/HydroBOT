@@ -48,3 +48,34 @@ test_that("tidyselect for groupers and aggCols works", {
   expect_equal(aggchar2$carb, c(1,2,1,4,6,2,3,4,8))
   # too much effort to get the others. If this becomes an issue, use something that checks an output.
 })
+
+test_that("failmissing works", {
+  aggchar1 <- general_aggregate(mtcars, groupers = c('cyl', 'not_a_col'),
+                                aggCols = c('disp', 'also_not'),
+                                funlist = 'mean', failmissing = FALSE)
+
+  expect_equal(names(aggchar1), c('cyl', 'agg_mean_disp'))
+  expect_equal(aggchar1$cyl, c(4,6,8))
+  expect_equal(round(aggchar1$agg_mean_disp, 4), c(105.1364, 183.3143, 353.1000))
+
+  # explicit TRUE
+  expect_error(aggchar1 <- general_aggregate(mtcars, groupers = c('cyl', 'not_a_col'),
+                                             aggCols = c('disp', 'also_not'),
+                                             funlist = 'mean', failmissing = TRUE))
+
+  # Default TRUE
+  expect_error(aggchar1 <- general_aggregate(mtcars, groupers = c('cyl', 'not_a_col'),
+                                             aggCols = c('disp', 'also_not'),
+                                             funlist = 'mean'))
+})
+
+test_that("dots pass", {
+  mtna <- mtcars
+  mtna[c(1, 5, 9, 19), 'disp'] <- NA
+  aggchar1 <- general_aggregate(mtna, groupers = cyl, aggCols = disp,
+                                funlist = mean, na.rm = TRUE)
+  expect_equal(names(aggchar1), c('cyl', 'agg_mean_disp'))
+  expect_equal(aggchar1$cyl, c(4,6,8))
+  expect_equal(round(aggchar1$agg_mean_disp, 4), c(104.4444, 187.2000, 352.5692))
+
+})
