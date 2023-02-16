@@ -2,6 +2,7 @@ test_that("summary works", {
   ewrpath <- system.file("extdata/testsmall/module_output/EWR", package = 'werptoolkitr')
   sumdat <- get_ewr_output(ewrpath, type = 'summary')
   # The names as they exist
+  # stringr::str_flatten(names(sumdat), "', '")
   namestring <- c('scenario_path', 'scenario', 'gauge', 'planning_unit',
                   'multigauge', 'ewr_code', 'ewr_code_timing', 'event_years',
                   'frequency', 'target_frequency', 'achievement_count',
