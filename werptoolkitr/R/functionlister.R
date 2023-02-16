@@ -6,15 +6,23 @@
 #' @export
 #'
 #' @examples
-functionlister <- function(funs) {
+functionlister <- function(funs, forcenames = NULL) {
+
+  # if this is nested, there's no good way to get names for the cases with bare
+  # functions, so allow forcing.
+  if (is.null(forcenames)) {
+    funnames <- as.character(substitute(funs))
+    # if bare names are c(name, name), the c gets included, so cut it
+    if(funnames[1] == "c") {funnames <- funnames[2:length(funnames)]}
+  } else {
+    funnames <- forcenames
+  }
+
   # the list specification of ~ functions
   if (is.list(funs)) {
     funlist <- funs
     # also catches c(barename, barename2), so deal with that.
     if (is.function(funs[[1]])) {
-      funnames <- as.character(substitute(funs))
-      # if bare names are c(name, name), the c gets included, so cut it
-      if(funnames[1] == "c") {funnames <- funnames[2:length(funnames)]}
       names(funlist) <- funnames
     }
 
@@ -22,10 +30,12 @@ functionlister <- function(funs) {
     funlist <- mget(funs, inherits = TRUE)
   } else if (is.function(funs)) {
     funlist <- list(funs)
-    names(funlist) <- as.character(substitute(funs))
+    names(funlist) <- funnames
   } else {
     rlang::abort("funs is of unsupported type (bare names, character, or list")
   }
+
+
 
   return(funlist)
 }

@@ -33,16 +33,23 @@
 #' @examples
 #'
 general_aggregate <- function(data, groupers,
-                           aggCols, funlist,
-                           prefix = 'agg_',
-                           failmissing = TRUE,
-                           ...) {
+                              aggCols, funlist,
+                              prefix = 'agg_',
+                              failmissing = TRUE,
+                              ...) {
 
 
   # Get the function names differently if bare functions or a list of functions or a character vector
   if (is.list(funlist) | is.character(funlist)) {
     # make funlist a named list whether it comes in that way or as a character vector
-    funlist <- functionlister(funlist)
+    if (is.null(names(funlist))) {
+      funnam <- as.character(substitute(funlist))
+      if(funnam[1] == "c") {funnam <- funnam[2:length(funnam)]}
+    } else {
+      funnam <- names(funlist)
+    }
+    funlist <- functionlister({{funlist}}, forcenames = funnam)
+
     nameparser = paste0(prefix, '{.fn}_{.col}')
   } else {
     # if funlist is a bare function, leave it alone but get its name
@@ -60,7 +67,7 @@ general_aggregate <- function(data, groupers,
   data_agg <- data %>%
     dplyr::group_by(dplyr::across({{groupers}})) %>%
     dplyr::summarise(dplyr::across({{aggCols}}, funlist, ...,
-                     .names = nameparser)) %>%
+                                   .names = nameparser)) %>%
     dplyr::ungroup()
 }
 
