@@ -30,8 +30,8 @@ devtools::load_all()
 ```
 
 ## TO REBUILD
-Rebuilding data is done with params. To rebuild, at the terminal run
-`quarto render data_creation/causal_data_cleaning.qmd -P REBUILD_DATA:TRUE`
+
+Rebuilding data is done with params. To rebuild, at the terminal run `quarto render data_creation/causal_data_cleaning.qmd -P REBUILD_DATA:TRUE`
 
 ## Purpose
 

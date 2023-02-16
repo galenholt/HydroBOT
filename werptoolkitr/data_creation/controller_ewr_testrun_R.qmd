@@ -51,9 +51,9 @@ Use the `testsmall/` directory for development. 6 gauges in 2 catchments.
 # 'testscenarios' is 10 years and 40+ gauges, slower but better for testing whole toolkit, especially aggregation
 # scenario_dir = os.path.join(repo, 'demo_data', 'testsmall')
 
-scenario_dir = system.file("extdata/testsmall/hydrographs", package = 'werptoolkitr')
+scenario_dir = file.path("inst/extdata/testsmall/hydrographs")
 
-output_dir = system.file("extdata/testsmall", package = 'werptoolkitr')
+output_dir =file.path("inst/extdata/testsmall")
 ```
 
 ### Format
