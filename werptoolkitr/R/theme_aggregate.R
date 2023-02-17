@@ -44,6 +44,13 @@ theme_aggregate <- function(dat,
                             failmissing = TRUE,
                             ...) {
 
+  # Bare names get lost as we go down into further functions, so use characters
+  # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
+  if (is.function(funlist) || (is.list(funlist) & is.function(funlist[[1]]))) {
+    funlist <- as.character(substitute(funlist))
+    if(funlist[1] == "c") {funlist <- funlist[2:length(funlist)]}
+  }
+
   # including geometry in non-geometric
   # aggregates takes forever, drop and re-pair if present
 

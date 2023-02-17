@@ -79,9 +79,10 @@ spatial_aggregate <- function(dat, to_geo, groupers,
   # could just use bare aggCols, but it throws warnings. Could use tidyselect::ends_with too, as in theme.
 
   # Bare names get lost as we go down into further functions, so use characters
-  # and throw an ugly conditional on to do that
-  if (is.function(funlist)) {
+  # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
+  if (is.function(funlist) || (is.list(funlist) & is.function(funlist[[1]]))) {
     funlist <- as.character(substitute(funlist))
+    if(funlist[1] == "c") {funlist <- funlist[2:length(funlist)]}
   }
 
   agged <- general_aggregate(fromto_pair,
