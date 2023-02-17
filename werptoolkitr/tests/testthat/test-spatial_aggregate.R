@@ -30,12 +30,16 @@ test_that("gauge to poly works", {
   g2sdl_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data =spatagg,
                      ggplot2::aes(fill = spatial_mean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat)
+    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::facet_wrap(~scenario) +
+    ggplot2::theme(legend.position = 'bottom')
 
   g2sdl_all_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data =spataggkeep,
                      ggplot2::aes(fill = spatial_mean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat)
+    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::facet_wrap(~scenario) +
+    ggplot2::theme(legend.position = 'bottom')
 
   vdiffr::expect_doppelganger("gauge to sdl", g2sdl_plot)
   vdiffr::expect_doppelganger("gauge to sdl all", g2sdl_all_plot)
@@ -50,14 +54,14 @@ test_that("poly to poly works", {
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
                                funlist = 'mean')
-
+  # Expect_warning because sf throws a warning about spatially constant attributes
   expect_warning(p2pagg <- spatial_aggregate(g2pagg,
                               to_geo = cewo_valleys,
                               groupers = 'scenario',
                               aggCols = 'spatial_mean_ewr_achieved',
                               funlist = 'mean'))
 
-  # stringr::str_flatten(names(spatagg), "', '")
+  # stringr::str_flatten(names(p2pagg), "', '")
   namestring <- c('scenario', 'polyID', 'spatial_mean_spatial_mean_ewr_achieved',
                   'ValleyName', 'ValleyID', 'ValleyCode', 'geometry')
   expect_equal(names(p2pagg), namestring)
@@ -68,7 +72,9 @@ test_that("poly to poly works", {
   g2sdl2cewo_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data =p2pagg,
                      ggplot2::aes(fill = spatial_mean_spatial_mean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat)
+    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::facet_wrap(~scenario) +
+    ggplot2::theme(legend.position = 'bottom')
 
   vdiffr::expect_doppelganger("g2sdl2cewo", g2sdl2cewo_plot)
 

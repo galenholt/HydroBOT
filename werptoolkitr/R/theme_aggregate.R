@@ -2,22 +2,22 @@
 #'
 #' Aggregation along the theme dimension uses causal mappings to aggregate from
 #' lower to higher levels. This function sets up the data with specific prep for
-#' the way the theme dimension works, and then wraps `general_aggregate`. Many
+#' the way the theme dimension works, and then wraps [general_aggregate()]. Many
 #' of the arguments here are just passed through to general aggregate.
 #'
 #' @inheritParams general_aggregate
 #'
 #' @param dat sf or tibble or dataframe of values to aggregate, with necessary
 #'   grouping information for non-theme axis (e.g. scenario, location). *Not*
-#'   necessarily the same as `data` in `general_aggregate`- this function makes
-#'   necessary adjustments to the data before calling `general_aggregate`
+#'   necessarily the same as `data` in [general_aggregate()]- this function makes
+#'   necessary adjustments to the data before calling [general_aggregate()]
 #' @param from_theme character, column name of the theme level the data is
 #'   currently in
 #' @param to_theme character, column name of the theme level to aggregate *to*
 #' @param groupers as in [general_aggregate()], with the note that these should
 #'   be all grouping columns *except* the theme column specified by `to_theme`
 #'   and any spatial information. These are both automatically added to
-#'   `groupers` before passing to `general_aggregate`.
+#'   `groupers` before passing to [general_aggregate()].
 #' @param causal_edges the causal links between theme levels. Needs to include
 #'   `from_theme` and `to_theme`, but can also include others. Creates the theme
 #'   grouping

@@ -16,7 +16,7 @@
 #' @param groupers as in [general_aggregate()], with the note that these should
 #'   be all grouping columns *except* theme and spatial groupings. These are
 #'   both automatically added to `groupers` according to `aggsequence` before
-#'   passing to `general_aggregate`.
+#'   passing to [general_aggregate()].
 #' @param aggsequence a named list of aggregation steps in the order to apply
 #'   them. Entries for theme aggregation should be character vectors- e.g. `name
 #'   = c('from_theme', 'to_theme')`. Entries for spatial aggregation should be
@@ -60,8 +60,8 @@ multi_aggregate <- function(dat,
                             namehistory = TRUE,
                             keepAllPolys = FALSE,
                             failmissing = TRUE) {
-  
-   # start with the input data
+
+  # start with the input data
   # Name the starting data- best is to name it to match the first theme level,
   # but otherwise it gets named as the incoming object
   if (saveintermediate) {
@@ -72,7 +72,28 @@ multi_aggregate <- function(dat,
       names(datlist) <- deparse(substitute(dat))
     }
   }
-  
+
+  # Bare names get lost as we go down into further functions, so use characters
+  # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
+  # and now we have to loop over the funsequence and the names are even harder to extract
+  namefunsequence <- vector(mode = 'list', length = length(funsequence))
+  for (i in 1:length(funsequence)) {
+    funlist <- funsequence[[i]]
+    if (is.function(funlist) || (is.list(funlist) & is.function(funlist[[1]]))) {
+      if (length(substitute(funsequence)) == 1) {rlang::abort("Cannot infer names of funsequence, likely because it's a named object. Use something other than a pre-built list of bare function names.")}
+      funlist <- as.character(substitute(funsequence)[[i+1]]) # The +1 is because the first item is 'list'.
+      if(funlist[1] == "c") {funlist <- funlist[2:length(funlist)]}
+      namefunsequence[[i]] <- funlist
+    }
+    rm(funlist)
+  }
+
+  notnull <- which(purrr::map_lgl(namefunsequence, ~!is.null(.)))
+
+  if (length(notnull) > 0) {funsequence[notnull] <- namefunsequence[notnull]}
+
+
+
   # need to track the grouping when switch between theme and spatial- we want to
   # do theme groupings within the current spatial unit, and spatial groupings
   # within the current theme level. Spatial groups (geometry column) are kept
@@ -84,33 +105,34 @@ multi_aggregate <- function(dat,
   # groupings when we do spatial.
   recenttheme <- NULL
   spatial_to_info <- NULL
-  
+
   # Don't use a foreach even though it's tempting, since the loop is dependent-
   # the outcome of the first agg needs to be the input of the second
-  
+
   for (i in 1:length(aggsequence)) {
 
     # theme aggregations will be defined as from-to pairs of character vectors,
     # spatial aggs are the polygons being agged into. That allows autodetect
-    
+
     # turn the groupers and aggcols into character vectors however they came in
     # need to do this in the loop because dat changes and so available cols will too
     thisgroup <- selectcreator(rlang::enquo(groupers), dat, failmissing)
-    thisagg <- selectcreator(rlang::expr(tidyselect::ends_with(!!aggCols)), dat, failmissing)
-    
-    
+    thisagg <- selectcreator(rlang::expr(tidyselect::ends_with(!!aggCols)),
+                             dat, failmissing)
+
+
     if (is.character(aggsequence[[i]])) {
-      
+
       # If the aggsequence isn't named, name it. This is less obviously doable
       # for sf. deal with that later. There three different ways unnamed lists
       # can end up here, and so need to deal with them all
-      if (is.null(names(aggsequence[i])) || 
+      if (is.null(names(aggsequence[i])) ||
           is.na(names(aggsequence[i])) ||
           names(aggsequence[i]) == "") {
         names(aggsequence)[[i]] <- aggsequence[[i]][2]
       }
-      
-      dat <- theme_aggregate(dat = dat, 
+
+      dat <- theme_aggregate(dat = dat,
                             from_theme = aggsequence[[i]][1],
                              to_theme = aggsequence[[i]][2],
                             groupers = c(thisgroup, 'gauge'),
@@ -119,12 +141,12 @@ multi_aggregate <- function(dat,
                              causal_edges = causal_edges,
                             geonames = spatial_to_info,
                             failmissing = FALSE) # Don't fail if no gauge col
-      
+
       # Track theme so we don't drop it during spatial
       recenttheme <- aggsequence[[i]][2]
-      
+
     } else if ('sf' %in% class(aggsequence[[i]])) {
-      dat <- spatial_aggregate(dat = dat, 
+      dat <- spatial_aggregate(dat = dat,
                                to_geo = aggsequence[[i]],
                                groupers = c(thisgroup, recenttheme),
                                aggCols = thisagg,
@@ -132,41 +154,45 @@ multi_aggregate <- function(dat,
                                prefix = paste0(names(aggsequence)[i], '_'),
                                failmissing = failmissing,
                                keepAllPolys = keepAllPolys)
-      
+
       spatial_to_info <- names(aggsequence[[i]])[names(aggsequence[[i]]) != 'geometry']
     }
-    
-    
-    
+
+
+
     # add each level to a list if saving
     if (saveintermediate) {
       # namehistory saves history in the names, otherwise in a set of columns
+      # The assignment for namehistory fails
       if (!namehistory) {
-        datlist[[names(aggsequence)[i]]] <- agg_names_to_cols(dat, 
-                                                              aggsequence = names(aggsequence[1:i]), 
-                                                              funsequence = funsequence[1:i], 
+        datlist[[names(aggsequence)[i]]] <- agg_names_to_cols(dat,
+                                                              aggsequence = names(aggsequence[1:i]),
+                                                              funsequence = funsequence[1:i],
                                                               aggCols = aggCols)
       } else {
-        datlist[[aggsequence[[i]][2]]] <- dat
+        # aggsequence[[i]][2]
+        thisname <- names(aggsequence)[i]
+        if (is.null(names(aggsequence)[i])) {thisname <- length(datlist) + 1}
+        datlist[[thisname]] <- dat
       }
-      
+
     }
-    
+
   }
-  
+
   # Determine what to return
   if (saveintermediate) {
     return(datlist)
   } else {
     # history in columns if namehistory is FALSE
     if (!namehistory) {
-      dat <- agg_names_to_cols(dat, 
-                               aggsequence = names(aggsequence), 
-                               funsequence = funsequence, 
+      dat <- agg_names_to_cols(dat,
+                               aggsequence = names(aggsequence),
+                               funsequence = funsequence,
                                aggCols = aggCols)
     }
-    
+
     return(dat)
   }
-  
+
 }

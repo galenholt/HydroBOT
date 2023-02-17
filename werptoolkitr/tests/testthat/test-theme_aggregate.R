@@ -140,6 +140,7 @@ test_that("multiple functions", {
 
 # bare names groupers and aggcols
 # multiple aggcols
+# multiple groupers (e.g. year as in annual data)
 # different theme levels- easier once we generate some test data
 # ...
 
