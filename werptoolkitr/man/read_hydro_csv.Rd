@@ -15,5 +15,10 @@ read_hydro_csv(hydropath, long)
 tibble of hydrographs
 }
 \description{
-Read csv hydrographs in the standard directory structure
+Standard structure is
+hydropath(name of set of scenarios) ->
+hydrographs ->
+dirs for scenario names ->
+csv files named SCENARIO_NAME.csv, with cols for date and each gauge
+This last bit could have files for each gauge separately (was the original format)
 }

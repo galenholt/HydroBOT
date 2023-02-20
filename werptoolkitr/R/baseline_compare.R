@@ -1,9 +1,27 @@
-baseline_compare <- function(val_df, scene_col, base_lev, values_col, comp_fun, ...,
+#' Compare values to a baseline
+#'
+#' This is used to automate comparison to baselines of various sorts without needing to do all the data wrangling by hand.
+#'
+#' @param val_df dataframe of values
+#' @param group_col column or columns to use for grouping- needed if the baseline is one level in this column. Otherwise ignored
+#' @param base_lev value for baseline. Can be a level in `group_col`, or a scalar, or a vector of `length(unique(val_df$group_col))`. A dataframe would be useful but not yet implemented.
+#' @param values_col column containing the values. Can be character or tidyselect or bare names, though the last are fragile.
+#' @param comp_fun function to use for comparison comparing the first two arguments (`difference` and `relative` included here as wrappers for `-` and `/`). Can be character, or list-format, (both safe) or bare name (brittle)
+#' @param ... additional arguments to [create_base()]
+#' @param failmissing logical, default TRUE. Use `tidyselect::any_of` or `tidyselect::all_of` when `values_col` or `group_col` are character. see [selectcreator()]
+#' @param names_to character, as in [tidyr::pivot_longer()], used for auto-pivotting
+#' @param values_to character, as in [tidyr::pivot_longer()], used for auto-pivotting
+#'
+#' @return a tibble matching `val_df` (or a long version thereof if `val_df` is wide), with an added column for the reference level (named `ref_values_col`) and a column of the compared values (named `comp_fun_values_col`)
+#' @export
+#'
+#' @examples
+baseline_compare <- function(val_df, group_col, base_lev, values_col, comp_fun, ...,
                              failmissing = TRUE,
                              names_to = 'name', values_to = 'value') {
 
   # generate the standard format with the reference
-  val_df <- create_base(val_df, scene_col, base_lev, values_col, failmissing, names_to, values_to)
+  val_df <- create_base(val_df, group_col, base_lev, values_col, failmissing, names_to, values_to)
 
   # We have to generate valcols both in create_base and here, unfortunately.And
   # Deal with the expected change to multiple valcols
@@ -52,8 +70,15 @@ baseline_compare <- function(val_df, scene_col, base_lev, values_col, comp_fun, 
 
 }
 
-
-create_base <- function(val_df, scene_col, base_lev, values_col,
+#' Creates a baseline column in several different ways. Helper for [baseline_compare()] but useful elsewhere too
+#'
+#' @inheritParams baseline_compare
+#'
+#' @return a tibble matching `val_df` (or a long version thereof if `val_df` is wide), with an added column for the reference level (named `ref_values_col`)
+#' @export
+#'
+#' @examples
+create_base <- function(val_df, group_col, base_lev, values_col,
                              failmissing = TRUE, names_to, values_to) {
 
 
@@ -61,7 +86,7 @@ create_base <- function(val_df, scene_col, base_lev, values_col,
   # Should probably split this out into a separate function.
 
   # Get the scenario columns however they were passed
-  compcols <- selectcreator(rlang::enquo(scene_col), val_df, failmissing)
+  compcols <- selectcreator(rlang::enquo(group_col), val_df, failmissing)
 
   valcols <- selectcreator(rlang::enquo(values_col), val_df, failmissing)
 

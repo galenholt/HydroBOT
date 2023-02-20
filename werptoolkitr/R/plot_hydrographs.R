@@ -6,15 +6,19 @@
 #' @param colors a named `colors` object or character vector giving a {paletteer} `palette` argument. Typically the former using `make_pal` to keep scenarios with consistent colours throughout, likely with a reference level.
 #' @param scales facet scales, as in `?ggplot2::facet_wrap`. Default `scales = 'fixed'` holds them the same, most common change will be to `scales = 'free_y'` if gauges have very differen flows.
 #' @param transy transformation for y axis as in `?ggplot2::scale_y_continuous`. Default `transy = 'identity'` just uses the data. Most common change likely `transy = 'log10`
+#' @param y_col character, column name for what's plotted on the y-axis. Default 'flow', but will need to change if fed data with a different name
+#' @param base_lev value to use as the base for comparison. Default NULL, no comparison. See [baseline_compare()] and [create_base()] for options.
+#' @param comp_fun function to use in comparison. Default NULL, no comparison. See [baseline_compare()] and [create_base()] for options.
+#' @param ...
 #'
 #' @return ggplot object
 #' @export
 #'
 #' @examples
 plot_hydrographs <- function(hydrolong,
+                             y_col = 'flow',
                              gaugefilter = NULL,
                              scenariofilter = NULL,
-                             y_col = 'flow',
                              colors = "RColorBrewer::Dark2",
                              scales = 'fixed',
                              transy = 'identity',
@@ -37,7 +41,7 @@ plot_hydrographs <- function(hydrolong,
   ylab_append <- ''
   if (!is.null(comp_fun) & !is.null(base_lev)) {
     hydrolong <- hydrolong |>
-      baseline_compare(scene_col = 'scenario', base_lev = base_lev,
+      baseline_compare(group_col = 'scenario', base_lev = base_lev,
                        values_col = y_col, comp_fun = comp_fun, ...)
 
     comp_fun_name <- as.character(substitute(comp_fun))

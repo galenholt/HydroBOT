@@ -20,8 +20,8 @@ theme_aggregate(
 \arguments{
 \item{dat}{sf or tibble or dataframe of values to aggregate, with necessary
 grouping information for non-theme axis (e.g. scenario, location). \emph{Not}
-necessarily the same as \code{data} in \code{general_aggregate}- this function makes
-necessary adjustments to the data before calling \code{general_aggregate}}
+necessarily the same as \code{data} in \code{\link[=general_aggregate]{general_aggregate()}}- this function makes
+necessary adjustments to the data before calling \code{\link[=general_aggregate]{general_aggregate()}}}
 
 \item{from_theme}{character, column name of the theme level the data is
 currently in}
@@ -31,7 +31,7 @@ currently in}
 \item{groupers}{as in \code{\link[=general_aggregate]{general_aggregate()}}, with the note that these should
 be all grouping columns \emph{except} the theme column specified by \code{to_theme}
 and any spatial information. These are both automatically added to
-\code{groupers} before passing to \code{general_aggregate}.}
+\code{groupers} before passing to \code{\link[=general_aggregate]{general_aggregate()}}.}
 
 \item{aggCols}{an expression for the columns to aggregate (the data columns).
 See \code{selectcreator} for formats}
@@ -50,8 +50,8 @@ be more general}
 
 \item{failmissing}{logical, default \code{TRUE}: fail if the requested grouping or
 aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
-and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs \code{tidyselect::any_of()} in
-\code{tidyselect}}
+and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
+\code{tidyselect::any_of()} in \code{tidyselect}}
 
 \item{...}{}
 }
@@ -63,6 +63,6 @@ included
 \description{
 Aggregation along the theme dimension uses causal mappings to aggregate from
 lower to higher levels. This function sets up the data with specific prep for
-the way the theme dimension works, and then wraps \code{general_aggregate}. Many
+the way the theme dimension works, and then wraps \code{\link[=general_aggregate]{general_aggregate()}}. Many
 of the arguments here are just passed through to general aggregate.
 }

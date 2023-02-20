@@ -9,7 +9,7 @@ gauge2geo(gaugedf, gaugelocs, whichcrs = 4283)
 \arguments{
 \item{gaugedf}{A tibble or dataframe with a \code{gauge} column with gauge numbers as characters}
 
-\item{gaugelocs}{sf or path to the csv with gauge numbers paired with lat-long. Currently assumes the BOM gauge file.}
+\item{gaugelocs}{sf or path to the csv with gauge numbers paired with lat-long.}
 
 \item{whichcrs}{desired crs of the output. input crs assumed to be WGS84, EPSG 4326}
 }

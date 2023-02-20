@@ -5,19 +5,19 @@
 \title{Standard hydrograph plot}
 \usage{
 plot_hydrographs(
-  hydrolong,
-  gaugefilter = NULL,
+  outdf,
+  y_col,
   scenariofilter = NULL,
-  y_col = flow,
   colors = "RColorBrewer::Dark2",
   scales = "fixed",
-  transy = "identity"
+  transy = "identity",
+  base_lev = NULL,
+  comp_fun = NULL,
+  ...
 )
 }
 \arguments{
-\item{hydrolong}{hydrograph data in long format}
-
-\item{gaugefilter}{set of gauges to plot, default \code{NULL} plots all of them}
+\item{y_col}{character, column name for what's plotted on the y-axis. Default 'flow', but will need to change if fed data with a different name}
 
 \item{scenariofilter}{set of scenarios to plot, default \code{NULL} plots all of them}
 
@@ -26,6 +26,16 @@ plot_hydrographs(
 \item{scales}{facet scales, as in \code{?ggplot2::facet_wrap}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if gauges have very differen flows.}
 
 \item{transy}{transformation for y axis as in \code{?ggplot2::scale_y_continuous}. Default \code{transy = 'identity'} just uses the data. Most common change likely \verb{transy = 'log10}}
+
+\item{base_lev}{value to use as the base for comparison. Default NULL, no comparison. See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}
+
+\item{comp_fun}{function to use in comparison. Default NULL, no comparison. See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}
+
+\item{...}{}
+
+\item{hydrolong}{hydrograph data in long format}
+
+\item{gaugefilter}{set of gauges to plot, default \code{NULL} plots all of them}
 }
 \value{
 ggplot object

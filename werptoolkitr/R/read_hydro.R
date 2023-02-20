@@ -16,6 +16,14 @@ read_hydro <- function(hydropath, long = TRUE, format = 'csv') {
 
 #' Read csv hydrographs in the standard directory structure
 #'
+#' Standard structure is
+#' hydropath(name of set of scenarios) ->
+#' hydrographs ->
+#' dirs for scenario names ->
+#' csv files named SCENARIO_NAME.csv, with cols for date and each gauge
+#'  This last bit could have files for each gauge separately (was the original format)
+#'
+#'
 #' @inheritParams read_hydro
 #'
 #' @return tibble of hydrographs

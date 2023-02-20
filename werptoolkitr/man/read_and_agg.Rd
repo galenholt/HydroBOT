@@ -35,7 +35,7 @@ currently), or an \code{sf} with gauge locations}
 \item{groupers}{as in \code{\link[=general_aggregate]{general_aggregate()}}, with the note that these should
 be all grouping columns \emph{except} theme and spatial groupings. These are
 both automatically added to \code{groupers} according to \code{aggsequence} before
-passing to \code{general_aggregate}.}
+passing to \code{\link[=general_aggregate]{general_aggregate()}}.}
 
 \item{aggCols}{an expression for the columns to aggregate (the data columns).
 See \code{selectcreator} for formats}
@@ -72,8 +72,8 @@ with the values in the new columns defining history.
 
 \item{failmissing}{logical, default \code{TRUE}: fail if the requested grouping or
 aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
-and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs \code{tidyselect::any_of()} in
-\code{tidyselect}}
+and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
+\code{tidyselect::any_of()} in \code{tidyselect}}
 
 \item{returnList}{default \code{TRUE}, whether to return the output to the current session}
 

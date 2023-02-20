@@ -32,11 +32,13 @@ calling function to give it the type of aggregation}
 
 \item{failmissing}{logical, default \code{TRUE}: fail if the requested grouping or
 aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
-and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs \code{tidyselect::any_of()} in
-\code{tidyselect}}
+and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
+\code{tidyselect::any_of()} in \code{tidyselect}}
 
-\item{...}{arguments passed to the aggregation functions. Almost always better to specify
-explicitly when building \code{funlist}, but works OK with simple functions}
+\item{...}{arguments passed to the aggregation functions. This is \emph{very}
+limited, and does not work with data arguments under most conditions.
+Almost always better to specify explicitly when building \code{funlist}, but
+works OK with simple functions, e.g. passing \code{na.rm = TRUE} to mean}
 }
 \value{
 a tibble with columns for the grouping variables and a column of
@@ -45,9 +47,9 @@ named according to the function applied and original name.
 }
 \description{
 This is the core aggregation function for all the aggregation types. it's
-really a fairly lightweight wrapper over a small dplyr::group_by and summarise to
-handle passing in grouping columns, aggregation columns, and functions as
-arguments and handle naming. It assumes no spatial information to deal with.
-Preparing the data to have the proper grouping columns is the job of the
-outer calling functions (or the user)
+really a fairly lightweight wrapper over a small dplyr::group_by and
+summarise to handle passing in grouping columns, aggregation columns, and
+functions as arguments and handle naming. It assumes no spatial information
+to deal with. Preparing the data to have the proper grouping columns is the
+job of the outer calling functions (or the user)
 }

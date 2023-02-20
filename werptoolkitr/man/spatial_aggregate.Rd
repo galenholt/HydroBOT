@@ -36,16 +36,18 @@ See \code{selectcreator} for formats}
 \item{funlist}{a list of functions and their arguments used to aggregate the
 data. See \code{functionlister} for creation in many cases.}
 
-\item{...}{arguments passed to the aggregation functions. Almost always better to specify
-explicitly when building \code{funlist}, but works OK with simple functions}
+\item{...}{arguments passed to the aggregation functions. This is \emph{very}
+limited, and does not work with data arguments under most conditions.
+Almost always better to specify explicitly when building \code{funlist}, but
+works OK with simple functions, e.g. passing \code{na.rm = TRUE} to mean}
 
 \item{whichcrs}{desired coordinate reference system, easiest is just the
 numeric EPSG code, but could a full crs definition. See \code{\link[sf:st_crs]{sf::st_crs()}}}
 
 \item{failmissing}{logical, default \code{TRUE}: fail if the requested grouping or
 aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
-and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs \code{tidyselect::any_of()} in
-\code{tidyselect}}
+and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
+\code{tidyselect::any_of()} in \code{tidyselect}}
 
 \item{prefix}{character, differs from \code{general_aggregate} in that default is
 \code{'spatial_'} instead of \code{'agg_'}.}
