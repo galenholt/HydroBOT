@@ -26,40 +26,27 @@ plot_hydrographs <- function(hydrolong,
                              comp_fun = NULL,
                              ...) {
 
-    if (!inherits(colors, 'colors')) {
-    rlang::inform("colors not specified per level. Trying to use the 'colors' argument as a palette name")
-    colors <- make_pal(levels = unique(hydrolong$scenario), palette = colors)
+  # Bare names get lost as we go down into further functions, so use characters
+  # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
+  if (is.function(comp_fun) || (is.list(comp_fun) & is.function(comp_fun[[1]]))) {
+    comp_fun <- as.character(substitute(comp_fun))
+    if(comp_fun[1] == "c") {comp_fun <- comp_fun[2:length(comp_fun)]}
   }
 
-  if (is.null(gaugefilter)) {
-    gaugefilter <- unique(hydrolong$gauge)
-  }
-  if (is.null(scenariofilter)) {
-    scenariofilter <- unique(hydrolong$scenario)
-  }
-
-  ylab_append <- ''
-  if (!is.null(comp_fun) & !is.null(base_lev)) {
-    hydrolong <- hydrolong |>
-      baseline_compare(group_col = 'scenario', base_lev = base_lev,
-                       values_col = y_col, comp_fun = comp_fun, ...)
-
-    comp_fun_name <- as.character(substitute(comp_fun))
-    base_col_name <- paste0(comp_fun_name, '_', y_col)
-    names(hydrolong)[names(hydrolong) == paste0('comp_fun_', y_col)] <- base_col_name
-    y_col <- base_col_name
-    ylab_append <- paste0('\n', comp_fun_name, ' to ', as.character(base_lev))
-  }
+  prepped <- plot_prep(data = hydrolong, y_col = y_col, colors = colors, gaugefilter = gaugefilter,
+                       scenariofilter = scenariofilter,
+                       base_lev = base_lev,
+                       comp_fun = comp_fun, ...)
 
 
-  hydro_plot <- hydrolong |>
-    dplyr::filter(gauge %in% gaugefilter & scenario %in% scenariofilter) |>
-    ggplot2::ggplot(ggplot2::aes(x = Date, y = .data[[y_col]], color = scenario)) +
+  hydro_plot <- prepped$data |>
+    dplyr::filter(gauge %in% prepped$gaugefilter & scenario %in% prepped$scenariofilter) |>
+    ggplot2::ggplot(ggplot2::aes(x = Date, y = .data[[prepped$y_col]], color = scenario)) +
     ggplot2::geom_line() +
     ggplot2::facet_wrap(~gauge, scales = scales) +
-    ggplot2::labs(y = paste0("Flow (ML/day)", ylab_append), color = 'Scenario') +
+    ggplot2::labs(y = paste0("Flow (ML/day)", prepped$ylab_append), color = 'Scenario') +
     ggplot2::scale_y_continuous(trans = transy) +
-    ggplot2::scale_color_manual(values = colors) +
+    ggplot2::scale_color_manual(values = prepped$colors) +
     theme_werp_toolkit()
 
   return(hydro_plot)
