@@ -15,6 +15,15 @@ make_pal <- function(levels, palette,
                      refvals = NULL, refcols = NULL,
                      includeRef = FALSE, returnUnref = FALSE) {
 
+  # need some name references to know what function to use
+  cnames <- paletteer::palettes_c_names %>%
+    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) %>%
+    dplyr::select(formatted) %>% dplyr::pull()
+
+  dnames <- paletteer::palettes_d_names %>%
+    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) %>%
+    dplyr::select(formatted) %>% dplyr::pull()
+
   if (returnUnref) {
     if (!includeRef) {
       stop("does not make sense to return a reffed and unreffed palette that don't match")
@@ -25,8 +34,12 @@ make_pal <- function(levels, palette,
 
   if (!includeRef) {levels <- levels[!(levels %in% refvals)]}
 
-  # nonrefs <- levels[!(levels %in% refvals)]
-  cols <- paletteer::paletteer_d(palette, length(levels))
+  if (palette %in% cnames) {
+    cols <- paletteer::paletteer_c(palette, length(levels))
+  } else if (palette %in% dnames) {
+    cols <- paletteer::paletteer_d(palette, length(levels))
+  }
+  # cols <- paletteer::paletteer_d(palette, length(levels))
 
   if (returnUnref & includeRef) {unref <- setNames(cols, levels)}
 
