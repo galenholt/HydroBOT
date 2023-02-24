@@ -1,0 +1,104 @@
+---
+title: "aggregation_for_testing"
+author: "Galen Holt"
+format:
+  html:
+    df-print: paged
+editor: visual
+params:
+  REBUILD_DATA: FALSE
+---
+
+## TO REBUILD
+
+Rebuilding data is done with params. To rebuild, at the terminal run `quarto render data_creation/aggregation_for_testing.qmd -P REBUILD_DATA:TRUE` or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
+
+```{r setup}
+#| warning: false
+#| message: false
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+```
+
+```{r}
+#| warning: false
+#| message: false
+
+# library(werptoolkitr) works when running interactively, but not when quarto
+# rendering. Just use load_all for now.
+# Also have to turn off caching and delete _cache directories or it gets really
+# upset.
+devtools::load_all()
+# library(werptoolkitr)
+```
+
+# Goal
+
+To produce some rds files that make testing aggregation easier than having to always start from the csvs output from EWR.
+
+### Save the output from ewr re-read in
+
+This is how the ewr output comes back in via `get_ewr_output` . Use rda files to maintain data names as is standard in R packages.
+
+```{r}
+ewrpath <- file.path("inst/extdata/testsmall/module_output/EWR")
+
+summary_ewr_output <- get_ewr_output(ewrpath, type = 'summary')
+
+if (REBUILD_DATA) {
+  usethis::use_data(summary_ewr_output, overwrite = TRUE)
+
+}
+  
+```
+
+## Create a stepwise list that's not too complicated
+
+This is taken similar to the tests, with the addition of more appropriate weighted means for the areas and multiple functions at one stage to make sure I maintain the ability to handle that in later processing. There might be other things to save, but this covers a lot of bases.
+
+**NOTE** the *first* aggregation into a spatial unit doesn't need to be area-weighted, because the thing being aggregated doesn't have area. After that, it does. It shouldn't *hurt* to use weighted.mean though, since it defaults to even weights. But there won't be an area column.
+
+```{r}
+sumspat <- gauge2geo(summary_ewr_output,
+                     gaugelocs = bom_basin_gauges)
+
+aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+               env_obj =  c('ewr_code', "env_obj"),
+               sdl_units = sdl_units,
+               Specific_goal = c('env_obj', "Specific_goal"),
+               catchment = cewo_valleys,
+               Objective = c('Specific_goal', 'Objective'),
+               mdb = basin,
+               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+
+funseq <- list('CompensatingFactor',
+               'ArithmeticMean',
+               'ArithmeticMean',
+               c('ArithmeticMean', 'LimitingFactor'),
+               list(wm = ~weighted.mean(., w = area, 
+                                        na.rm = TRUE)),
+               'ArithmeticMean',
+               list(wm = ~weighted.mean(., w = area, 
+                                        na.rm = TRUE)),
+               'ArithmeticMean')
+
+# Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
+agg_theme_space <- multi_aggregate(sumspat,
+                           aggsequence = aggseq,
+                           groupers = 'scenario',
+                           aggCols = 'ewr_achieved',
+                           funsequence = funseq,
+                           causal_edges = causal_ewr,
+                           saveintermediate = TRUE)
+```
+
+```{r}
+if (REBUILD_DATA) {
+  usethis::use_data(agg_theme_space, overwrite = TRUE)
+
+}
+```
+
+```{r}
+names(agg_theme_space)
+```
