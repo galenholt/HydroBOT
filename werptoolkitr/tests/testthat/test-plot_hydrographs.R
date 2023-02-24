@@ -9,6 +9,15 @@ test_that("expected use makes plot", {
 
 })
 
+test_that("sceneorder works", {
+  hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
+  hydpal <- make_pal(levels = unique(hydlong$scenario), palette = 'calecopal::superbloom3')
+  hydplot <- plot_hydrographs(hydlong, colors = hydpal, sceneorder = c('down4', 'base', 'up4'))
+  expect_s3_class(hydplot, 'ggplot')
+  vdiffr::expect_doppelganger("sceneorder hydroplot", hydplot)
+
+})
+
 test_that("palette name makes plot", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
   hydplot <- plot_hydrographs(hydlong, colors = 'calecopal::superbloom3')

@@ -20,6 +20,7 @@ plot_hydrographs <- function(hydrolong,
                              gaugefilter = NULL,
                              scenariofilter = NULL,
                              colors = "RColorBrewer::Dark2",
+                             sceneorder = NULL,
                              scales = 'fixed',
                              transy = 'identity',
                              base_lev = NULL,
@@ -33,10 +34,13 @@ plot_hydrographs <- function(hydrolong,
     if(comp_fun[1] == "c") {comp_fun <- comp_fun[2:length(comp_fun)]}
   }
 
-  prepped <- plot_prep(data = hydrolong, y_col = y_col, colors = colors, gaugefilter = gaugefilter,
+  prepped <- plot_prep(data = hydrolong, y_col = y_col, colors = colors,
+                       sceneorder = sceneorder,
+                       gaugefilter = gaugefilter,
                        scenariofilter = scenariofilter,
                        base_lev = base_lev,
                        comp_fun = comp_fun, ...)
+
 
 
   hydro_plot <- prepped$data |>
