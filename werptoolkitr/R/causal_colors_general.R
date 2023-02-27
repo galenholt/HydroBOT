@@ -65,9 +65,11 @@ causal_colors_general <- function(df, pal_list,
   # If colordef is numeric, we want to make a long palette and then grab the
   # color in the right spot.
   if (is.numeric(dfcols$colordef)) {
+    # The funny indexing here is because propor has x-min(x) on top, yielding
+    # 0-indexed values, so we need to shift and add.
     dfcols <- dfcols %>%
-      dplyr::mutate(pallength = 100,
-             palindex = round(propor(colordef)*100))
+      dplyr::mutate(pallength = 1000,
+             palindex = round(propor(colordef)*(pallength-1))+1)
   } else {
     dfcols <- dfcols %>%
       dplyr::mutate(pallength = dplyr::n(),
@@ -148,7 +150,9 @@ make_colorcol <- function(df, colorset) {
 fontcol <- function(boxcol) {
   # replace failures with white
   boxcol[boxcol == 'character(0)'] <- '#FFFFFFFF'
-  r <- colorspace::hex2RGB(boxcol)
+    # colorspace defines rgb differently to base. this was
+    # colorspace::hex2RGB(boxcol), but that didn't handle named colors.
+  r <- colorspace::sRGB(t(col2rgb(boxcol))/255)
   pl <- as(r, 'polarLUV')
   l <- colorspace::coords(pl)[,1]
   fc <- ifelse(l > 50, 'black', 'white')
