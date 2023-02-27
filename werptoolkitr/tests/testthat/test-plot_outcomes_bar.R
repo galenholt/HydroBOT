@@ -7,7 +7,7 @@ test_that("ewr works", {
     dplyr::filter(ewr_code %in% c('BF1', 'LF1', "OB5") &
                     gauge %in% c("412002", "412005", "412038"))
 
-  ewr_plot <- plot_outcomes_1d(ewr_to_bar_data,
+  ewr_plot <- plot_outcomes_bar(ewr_to_bar_data,
                                y_col = 'ewr_achieved',
                                facet_row = 'gauge',
                                facet_col = 'ewr_code',
@@ -23,7 +23,7 @@ test_that("basin works (facet_wrap, no gauge, better aggregated)", {
     dplyr::filter(!is.na(Objective))
 
   scene_pal <- make_pal(levels = unique(basin_to_plot$scenario), palette = 'calecopal::superbloom3')
-  basin_plot <- plot_outcomes_1d(basin_to_plot,
+  basin_plot <- plot_outcomes_bar(basin_to_plot,
                                  y_col = 'allArith',
                                  facet_wrapper = 'Objective',
                                  colors = scene_pal,
@@ -31,7 +31,7 @@ test_that("basin works (facet_wrap, no gauge, better aggregated)", {
 
   vdiffr::expect_doppelganger("bar_basin", basin_plot)
 
-  basin_plot_L <- plot_outcomes_1d(basin_to_plot,
+  basin_plot_L <- plot_outcomes_bar(basin_to_plot,
                                  y_col = 'allArith',
                                  y_lab = "Aggregated outcome",
                                  facet_wrapper = 'Objective',

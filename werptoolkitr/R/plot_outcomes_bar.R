@@ -1,4 +1,4 @@
-plot_outcomes_1d <- function(outdf,
+plot_outcomes_bar <- function(outdf,
                              y_col,
                              y_lab = y_col,
                              facet_row = NULL,
