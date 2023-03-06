@@ -58,8 +58,8 @@ test_that("multi-palette and facetting", {
                           colorgroups = 'colcol',
                           colorset = 'env_obj',
                           pal_list = grouplist,
-                          facet_row = 'SWSDLName',
-                          facet_col = 'colcol',
+                          facet_row = 'colcol',
+                          facet_col = 'SWSDLName',
                           sceneorder = c('down4', 'base', 'up4'))
 
   vdiffr::expect_doppelganger("bar_basin_groupfacet_sdl", sdl_plot_factgroup)
@@ -70,27 +70,52 @@ test_that("flipped", {
   # What I want to do is just swap the x and fill arguments and pass in the
   # scenario palette. Can I do that easily?
 
+  obj_sdl_to_plot <- agg_theme_space$sdl_units %>%
+    dplyr::rename(allArith = 4) # for readability
 
-  # obj_sdl_to_plot <- agg_theme_space$sdl_units %>%
-  #   dplyr::rename(allArith = 4) # for readability
-  #
-  # # Create a grouping variable
-  # obj_sdl_to_plot <- obj_sdl_to_plot |>
-  #   dplyr::mutate(colcol = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-  #   dplyr::filter(!is.na(colcol)) |>
-  #   dplyr::arrange(colcol, env_obj)
-  #
-  # scene_pal <- make_pal(levels = unique(basin_to_plot$scenario), palette = 'calecopal::superbloom3')
-  #
-  # # need to facet by space sdl unit and create a group col to take multiple palettes
-  # sdl_plot <- obj_sdl_to_plot |>
-  #   plot_outcomes_stacked(y_col = 'allArith',
-  #                         colorgroups = 'colcol',
-  #                         colorset = 'env_obj',
-  #                         pal_list = scene_pal,
-  #                         facet_wrapper = 'SWSDLName',
-  #                         sceneorder = c('down4', 'base', 'up4'))
-  # sdl_plot
-  #
+  # Create a grouping variable
+  obj_sdl_to_plot <- obj_sdl_to_plot |>
+    dplyr::mutate(colcol = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+    dplyr::filter(!is.na(colcol)) |>
+    dplyr::arrange(colcol, env_obj)
+
+  scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
+                        palette = 'calecopal::superbloom3')
+
+  # need to facet by space sdl unit and create a group col to take multiple palettes
+  sdl_plot <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          colorgroups = NULL,
+                          colorset = 'env_obj',
+                          pal_list = list('scico::berlin'),
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_x = FALSE,
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'))
+
+  vdiffr::expect_doppelganger("scenario stack", sdl_plot)
+
+
+  # outcome groups- If I want to do this, I need pass a named palette, I think
+  # It doesn't actually plot any differently at present, but I'm leaving it here
+  # because if we can figure out how to plot those colors in a not-ugly way,
+  # we'll be there.
+  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$colcol),
+                      palette = 'scico::berlin')
+
+  sdl_plot_g <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          pal_list = obj_pal,
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_x = FALSE,
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'))
+
+  vdiffr::expect_doppelganger("scenario stack group", sdl_plot_g)
+
 
 })
