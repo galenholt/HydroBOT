@@ -1,9 +1,35 @@
+#' Sets up colors within groups according to separate palettes
+#'
+#' @param df input dataframe
+#' @param pal_list list of palettes, or color name or color object that maps to `colorgroups`, `colorset`, or `scenario`. Typically a list of names of {palletteer} palettes of the same length as unique values in `colorgroups`
+#' @param colorgroups character column name of column defining the groups that define different palettes to use
+#' @param colorset  character column name of the values to assign colors from those palettes
+#'
+#' @return a dataframe with new column `color` with hex colors
+#' @export
+#'
+#' @examples
 grouped_colours <- function(df, pal_list,
                             colorgroups = NULL,
                             colorset = NULL) {
 
-  # short-circuit if pal_list is just a color name- accepts single values or a vector of length nrow(df)
+  # short-circuit if pal_list is just a color name or a named color object-
+  # accepts single values, a named object of class color or a vector of length
+  # nrow(df)
   if (!is.list(pal_list) & is.character(pal_list)) {
+    if (inherits(pal_list, 'colors')) {
+      coltib <- tibble::tibble(name = names(pal_list), color = pal_list)
+      # which column does the pal_list match?
+      colnames <- names(pal_list)
+      if (any(colnames %in% df$scenario)) {namematch <- 'scenario'}
+      if (any(colnames %in%
+              dplyr::pull(df, colorgroups))) {namematch <- colorgroups}
+      if (any(colnames %in%
+              dplyr::pull(df, colorset))) {namematch <- colorset}
+      names(coltib)[1] <- namematch
+      df <- dplyr::left_join(df, coltib, by = namematch)
+      return(df)
+    }
     df$color <- pal_list
     return(df)
   }
