@@ -27,6 +27,7 @@ Imports:
     stringr,
     tidyr
 Suggests: 
+    covr,
     knitr,
     rmapshaper (>= 0.4.6),
     rmarkdown,
