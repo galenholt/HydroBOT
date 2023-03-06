@@ -13,6 +13,14 @@ params:
 
 Rebuilding data is done with params. To rebuild, at the terminal run `quarto render data_creation/aggregation_for_testing.qmd -P REBUILD_DATA:TRUE` or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
 
+```{r}
+if ("params" %in% ls()) {
+  REBUILD_DATA <- params$REBUILD_DATA
+} else {
+  REBUILD_DATA <- FALSE
+}
+```
+
 ```{r setup}
 #| warning: false
 #| message: false
@@ -45,10 +53,7 @@ ewrpath <- file.path("inst/extdata/testsmall/module_output/EWR")
 
 summary_ewr_output <- get_ewr_output(ewrpath, type = 'summary')
 
-if (REBUILD_DATA) {
-  usethis::use_data(summary_ewr_output, overwrite = TRUE)
-
-}
+  usethis::use_data(summary_ewr_output, overwrite = REBUILD_DATA)
   
 ```
 
@@ -93,12 +98,31 @@ agg_theme_space <- multi_aggregate(sumspat,
 ```
 
 ```{r}
-if (REBUILD_DATA) {
-  usethis::use_data(agg_theme_space, overwrite = TRUE)
-
-}
+  usethis::use_data(agg_theme_space, overwrite = REBUILD_DATA)
 ```
 
 ```{r}
 names(agg_theme_space)
+```
+
+We want an example of that with the sequence in columns too
+
+```{r}
+# Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
+agg_theme_space_colsequence <- multi_aggregate(sumspat,
+                           aggsequence = aggseq,
+                           groupers = 'scenario',
+                           aggCols = 'ewr_achieved',
+                           funsequence = funseq,
+                           causal_edges = causal_ewr,
+                           saveintermediate = TRUE,
+                           namehistory = FALSE)
+```
+
+```{r}
+names(agg_theme_space_colsequence$mdb)
+```
+
+```{r}
+  usethis::use_data(agg_theme_space_colsequence, overwrite = REBUILD_DATA)
 ```
