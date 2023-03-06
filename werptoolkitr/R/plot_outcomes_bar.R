@@ -1,3 +1,15 @@
+#' Plot outcomes as bar graph with scenario on x, possibly facetted and colored
+#'
+#' This is a simpler version of `plot_outcomes_stacked`
+#'
+#' @inheritParams plot_outcomes_stacked
+#'
+#' @param colors named `colors` object specifying the colors for the scenarios
+#'
+#' @return a ggplot bar graph with standardized style and color, possibly facetted
+#' @export
+#'
+#' @examples
 plot_outcomes_bar <- function(outdf,
                              y_col,
                              y_lab = y_col,

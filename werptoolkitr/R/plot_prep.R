@@ -1,3 +1,33 @@
+#' Some standard data preparation for plotting
+#'
+#' This is an attempt to pull a lot of copy-paste out of the top of plot
+#' functions. It's likely to continue to evolve quite a bit as we see all the
+#' different things we need to manage in the plot setup. One of the goals here
+#' is to avoid making a million very similar datasets- doing it in functions
+#' keeps those changes sandboxed
+#'
+#' @param data dataframe to prep
+#' @param gaugefilter set of gauges to plot, default `NULL` plots all of them
+#' @param scenariofilter set of scenarios to plot, default `NULL` plots all of
+#'   them
+#' @param colors a named `colors` object or character vector giving a
+#'   {paletteer} `palette` argument. Typically the former using `make_pal` to
+#'   keep scenarios with consistent colours throughout, likely with a reference
+#'   level.
+#' @param y_col character, column name for what's plotted on the y-axis. Default
+#'   'flow', but will need to change if fed data with a different name
+#' @param base_lev value to use as the base for comparison. Default NULL, no
+#'   comparison. See [baseline_compare()] and [create_base()] for options.
+#' @param comp_fun function to use in comparison. Default NULL, no comparison.
+#'   See [baseline_compare()] and [create_base()] for options.
+#' @param ...
+#'
+#' @return a list with prepped versions of `data`, `y_col`, `colors`,
+#'   `gaugefilter`, `scenariofilter`, `base_lev`, `comp_fun`, `ylab_append` to
+#'   be used in plot calls
+#' @export
+#'
+#' @examples
 plot_prep <- function(data, y_col,
                       colors = 'ggsci::default_igv',
                       sceneorder = NULL,
@@ -48,6 +78,7 @@ plot_prep <- function(data, y_col,
 
   # Order the scenario if I've given it an order.
   if (!is.null(sceneorder)) {
+    if (inherits(sceneorder, 'factor')) (sceneorder <- levels(sceneorder))
     data <- data |>
       dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
   }
