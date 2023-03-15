@@ -16,6 +16,9 @@ grouped_colours <- function(df, pal_list,
   # short-circuit if pal_list is just a color name or a named color object-
   # accepts single values, a named object of class color or a vector of length
   # nrow(df)
+
+  # downstream functions expect a 'colordef' column that allows us to not
+  # explicitly track variable names, so add that.
   if (!is.list(pal_list) & is.character(pal_list)) {
     if (inherits(pal_list, 'colors')) {
       coltib <- tibble::tibble(name = names(pal_list), color = pal_list)
@@ -27,10 +30,12 @@ grouped_colours <- function(df, pal_list,
       if (any(colnames %in%
               dplyr::pull(df, colorset))) {namematch <- colorset}
       names(coltib)[1] <- namematch
-      df <- dplyr::left_join(df, coltib, by = namematch)
+      df <- dplyr::left_join(df, coltib, by = namematch) |>
+        dplyr::mutate(colordef = .data[[namematch]])
       return(df)
     }
-    df$color <- pal_list
+    df$color <- pal_list |>
+      dplyr::mutate(colordef = color)
     return(df)
   }
 

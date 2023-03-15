@@ -8,20 +8,23 @@ plot_outcomes_stacked(
   outdf,
   y_col,
   y_lab = y_col,
+  x_col = "scenario",
+  x_lab = x_col,
   facet_row = NULL,
   facet_col = NULL,
   facet_wrapper = NULL,
   scenariofilter = NULL,
   colorgroups = NULL,
   colorset = "scenario",
+  color_lab = ifelse(is.null(colorgroups), colorset, colorgroups),
   pal_list = "scico::berlin",
   sceneorder = NULL,
-  scene_x = TRUE,
   scene_pal = "scico::oslo",
   scales = "fixed",
   transy = "identity",
   base_lev = NULL,
   comp_fun = NULL,
+  position = "stack",
   ...
 )
 }
@@ -32,24 +35,34 @@ plot_outcomes_stacked(
 
 \item{y_lab}{character, default \code{y_col}, allows changing y-label}
 
-\item{facet_row}{NULL (default) or character for facet row. Can be \code{'.'} to have one row and column-facets}
+\item{x_col}{character, name of column for the x-axis. Default \code{'scenario'}}
 
-\item{facet_col}{NULL (default) or character for facet column. Can be \code{'.'} to have one column and row-facets}
+\item{x_lab}{character, default \code{x_col}, allows changing x-label}
 
-\item{facet_wrapper}{NULL (default) or character for column to use for \code{facet_wrap}}
+\item{facet_row}{NULL (default) or character for facet row. Can be \code{'.'} to
+have one row and column-facets}
+
+\item{facet_col}{NULL (default) or character for facet column. Can be \code{'.'}
+to have one column and row-facets}
+
+\item{facet_wrapper}{NULL (default) or character for column to use for
+\code{facet_wrap}}
 
 \item{scenariofilter}{set of scenarios to plot, default \code{NULL} plots all of
 them}
 
-\item{colorgroups}{character, column name for grouping \code{colorset}, particularly into different palettes}
+\item{colorgroups}{character, column name for grouping \code{colorset},
+particularly into different palettes}
 
-\item{colorset}{character, column name defining the colors to use (if \code{scene_x = TRUE}) or the x-levels (if \code{scene_x = FALSE})- needs to be renamed to reflect that it isn't just colors}
+\item{colorset}{character, column name defining the colors to use (if
+\code{scene_x = TRUE}) or the x-levels (if \code{scene_x = FALSE})- needs to be
+renamed to reflect that it isn't just colors}
 
-\item{pal_list}{list of palettes for defining colors for \code{colorset}. Should be length of \code{colorgroups}}
+\item{pal_list}{list of palettes for defining colors for \code{colorset}. Should
+be length of \code{colorgroups}}
 
-\item{sceneorder}{character or factor giving the order to present scenario levels}
-
-\item{scene_x}{logical, default \code{TRUE}- scenario on x-axis. \code{FALSE} puts \code{colorset} on x-axis and stacks scenarios}
+\item{sceneorder}{character or factor giving the order to present scenario
+levels}
 
 \item{scene_pal}{named palette for scenarios, only used if \code{scene_x = FALSE}}
 
@@ -63,13 +76,23 @@ comparison. See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\l
 \item{comp_fun}{function to use in comparison. Default NULL, no comparison.
 See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}
 
+\item{position}{character, \code{position} argument from \code{\link[ggplot2:geom_bar]{ggplot2::geom_col()}}, to
+change from stacked to dodged bars}
+
 \item{...}{}
+
+\item{scene_x}{logical, default \code{TRUE}- scenario on x-axis. \code{FALSE} puts
+\code{colorset} on x-axis and stacks scenarios}
 }
 \value{
-a ggplot stacked bar plot with standard formatting and coloring, stacking either scenarios or colorset
+a ggplot stacked bar plot with standard formatting and coloring,
+stacking either scenarios or colorset
 }
 \description{
 Has several ways to color, including grouped palettes. Lets us choose whether
 to stack scenarios with outcome groups on x (\code{scene_x = FALSE}) or stack
-outcome groups with scenarios on x (\code{scene_x = TRUE})
+outcome groups with scenarios on x (\code{scene_x = TRUE}). I do \emph{not} provide an
+argument to drop legend labels on purpose- it's dangerous to auto-drop them.
+The user can always \code{+ theme(legend.position = 'none')} to the returned
+object.
 }

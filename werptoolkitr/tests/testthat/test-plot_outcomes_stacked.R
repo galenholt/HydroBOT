@@ -7,7 +7,8 @@ test_that("basin works with single color palette", {
                                       y_col = 'allArith',
                                       colorset = 'Objective',
                                       pal_list = list("scico::oslo"),
-                                      sceneorder = c('down4', 'base', 'up4'))
+                                      sceneorder = c('down4', 'base', 'up4')) +
+    ggplot2::theme(legend.position = 'none')
 
   vdiffr::expect_doppelganger("stacked bar simple", basin_plot)
 })
@@ -85,12 +86,12 @@ test_that("flipped", {
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_plot <- obj_sdl_to_plot |>
     plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'env_obj',
                           colorgroups = NULL,
                           colorset = 'env_obj',
                           pal_list = list('scico::berlin'),
                           facet_row = 'SWSDLName',
                           facet_col = '.',
-                          scene_x = FALSE,
                           scene_pal = scene_pal,
                           sceneorder = c('down4', 'base', 'up4'))
 
@@ -106,16 +107,59 @@ test_that("flipped", {
 
   sdl_plot_g <- obj_sdl_to_plot |>
     plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'env_obj',
                           colorgroups = 'colcol',
                           colorset = 'env_obj',
                           pal_list = obj_pal,
                           facet_row = 'SWSDLName',
                           facet_col = '.',
-                          scene_x = FALSE,
                           scene_pal = scene_pal,
                           sceneorder = c('down4', 'base', 'up4'))
 
   vdiffr::expect_doppelganger("scenario stack group", sdl_plot_g)
 
+  # interesting plot, good for testing labels
+  sdl_plot_groupblock <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'scenario',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          pal_list = obj_pal,
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'))
+  vdiffr::expect_doppelganger("stacked_objgroups", sdl_plot_groupblock)
+
+  # change label name
+  # interesting plot, good for testing labels
+  sdl_plot_groupblock_l <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'scenario',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          color_lab = 'Environmental\ngroup',
+                          pal_list = obj_pal,
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'))
+  vdiffr::expect_doppelganger("legend_name", sdl_plot_groupblock_l)
+  # Drop labels
+  sdl_plot_groupblock_n <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'scenario',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          color_lab = NULL,
+                          pal_list = obj_pal,
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'))
+
+  vdiffr::expect_doppelganger("no legend title", sdl_plot_groupblock_n)
+
+  # do I want to allow dropping the legend?
 
 })

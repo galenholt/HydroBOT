@@ -28,18 +28,22 @@ plot_outcomes_bar(
 
 \item{y_lab}{character, default \code{y_col}, allows changing y-label}
 
-\item{facet_row}{NULL (default) or character for facet row. Can be \code{'.'} to have one row and column-facets}
+\item{facet_row}{NULL (default) or character for facet row. Can be \code{'.'} to
+have one row and column-facets}
 
-\item{facet_col}{NULL (default) or character for facet column. Can be \code{'.'} to have one column and row-facets}
+\item{facet_col}{NULL (default) or character for facet column. Can be \code{'.'}
+to have one column and row-facets}
 
-\item{facet_wrapper}{NULL (default) or character for column to use for \code{facet_wrap}}
+\item{facet_wrapper}{NULL (default) or character for column to use for
+\code{facet_wrap}}
 
 \item{scenariofilter}{set of scenarios to plot, default \code{NULL} plots all of
 them}
 
 \item{colors}{named \code{colors} object specifying the colors for the scenarios}
 
-\item{sceneorder}{character or factor giving the order to present scenario levels}
+\item{sceneorder}{character or factor giving the order to present scenario
+levels}
 
 \item{scales}{facet scales, as in \code{?ggplot2::facet_wrap}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if gauges have very differen flows.}
 
