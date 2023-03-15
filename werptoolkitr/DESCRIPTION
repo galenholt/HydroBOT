@@ -16,6 +16,7 @@ Imports:
     forcats,
     foreach,
     ggplot2,
+    glue,
     lwgeom,
     magrittr,
     paletteer,

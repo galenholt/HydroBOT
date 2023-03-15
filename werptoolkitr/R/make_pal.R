@@ -34,10 +34,22 @@ make_pal <- function(levels, palette,
 
   if (!includeRef) {levels <- levels[!(levels %in% refvals)]}
 
+
+
   if (palette %in% cnames) {
     cols <- paletteer::paletteer_c(palette, length(levels))
   } else if (palette %in% dnames) {
     cols <- paletteer::paletteer_d(palette, length(levels))
+  } else {
+    # try to inform a bit- I could auto-set palettes this way, but I'd rather
+    # make the user do it right
+    paltest <- grepl(palette, c(cnames, dnames), ignore.case = TRUE)
+    if (any(paltest)) {
+      rlang::abort(glue::glue("Requested palette not present, likely because wrong case or missing letters.
+                   Try `{c(cnames, dnames)[which(paltest)]}`"))
+    } else {
+      rlang::abort("Requested palette not available in paletteer")
+    }
   }
   # cols <- paletteer::paletteer_d(palette, length(levels))
 

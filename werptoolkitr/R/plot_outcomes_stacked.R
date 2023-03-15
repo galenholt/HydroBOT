@@ -40,6 +40,7 @@ plot_outcomes_stacked <- function(outdf,
                               transy = 'identity',
                               base_lev = NULL,
                               comp_fun = NULL,
+                              position = 'stack',
                               ...) {
 
   # enforcing scenario as x, but that could change. It just ends up as a ggplot
@@ -75,7 +76,7 @@ plot_outcomes_stacked <- function(outdf,
       dplyr::filter(scenario %in% prepped$scenariofilter) |>
       ggplot2::ggplot(ggplot2::aes(x = scenario, y = .data[[prepped$y_col]],
                                    fill = forcats::fct_inorder(color))) +
-      ggplot2::geom_col() +
+      ggplot2::geom_col(position = position) +
       ggplot2::labs(y = paste0(y_lab, prepped$ylab_append), color = colorset) +
       ggplot2::scale_y_continuous(trans = transy) +
       ggplot2::scale_fill_identity() +
@@ -90,7 +91,7 @@ plot_outcomes_stacked <- function(outdf,
       ggplot2::ggplot(ggplot2::aes(x = .data[[colorset]], y = .data[[prepped$y_col]],
                                    # color = color,
                                    fill = scenario)) +
-      ggplot2::geom_col() +
+      ggplot2::geom_col(position = position) +
       ggplot2::labs(y = paste0(y_lab, prepped$ylab_append)) +
       ggplot2::scale_y_continuous(trans = transy) +
       ggplot2::scale_fill_manual(values = prepped$colors) +

@@ -42,3 +42,23 @@ test_that("returnunref works", {
   expect_equal(class(refpal$refcols), 'colors')
   expect_equal(class(refpal$unrefcols), 'colors')
 })
+
+test_that("informative errors with unknown palettes", {
+
+  # try just a simple case issue
+  levnames <- c('one', 'two', 'three')
+  err_case <- expect_error(make_pal(levnames, palette = 'ggsci::NRC_NPG'))
+  expect_equal(err_case$message, "Requested palette not present, likely because wrong case or missing letters.
+Try `ggsci::nrc_npg`")
+
+  err_missing <- expect_error(make_pal(levnames, palette = 'ggsci::nrc'))
+  expect_equal(err_missing$message, "Requested palette not present, likely because wrong case or missing letters.
+Try `ggsci::nrc_npg`")
+
+  err_pkg <- expect_error(make_pal(levnames, palette = 'nopkg::notapal'))
+  expect_equal(err_pkg$message, "Requested palette not available in paletteer")
+
+  # being informative about this would involve fuzzy matching, and that would
+  # need to import a whole new package, so not going to bother
+  # simplepal <- make_pal(levnames, palette = 'ggsci::npg')
+})
