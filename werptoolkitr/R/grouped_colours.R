@@ -13,6 +13,8 @@ grouped_colours <- function(df, pal_list,
                             colorgroups = NULL,
                             colorset = NULL) {
 
+
+
   # short-circuit if pal_list is just a color name or a named color object-
   # accepts single values, a named object of class color or a vector of length
   # nrow(df)
@@ -81,12 +83,24 @@ grouped_colours <- function(df, pal_list,
   # Need to determine `paletteer_c` vs `paletteer_d` dependent on the name. This
   # should be doable with case_when but it won't run in a dplyr::mutate. Loop over
   # rows, getting the correct color index for the correct palette.
+    # this is *very* close to `make_pal`, and could be combined, but the issue
+    # is the rowwise loop. Just need a bit more thinking there
   colmap <- foreach::foreach(i = 1:nrow(dfcols)) %do% {
     thispal <- dfcols$palname[i]
     if (thispal %in% cnames) {
       thiscol <- paletteer::paletteer_c(thispal, n = dfcols$pallength[i])[dfcols$palindex[i]]
     } else if (thispal %in% dnames) {
       thiscol <- paletteer::paletteer_d(thispal, n = dfcols$pallength[i])[dfcols$palindex[i]]
+    } else {
+      # try to inform a bit- I could auto-set palettes this way, but I'd rather
+      # make the user do it right
+      paltest <- grepl(thispal, c(cnames, dnames), ignore.case = TRUE)
+      if (any(paltest)) {
+        rlang::abort(glue::glue("Requested palette not present, likely because wrong case or missing letters.
+                   Try `{c(cnames, dnames)[which(paltest)]}`"))
+      } else {
+        rlang::abort("Requested palette not available in paletteer")
+      }
     }
   }
 

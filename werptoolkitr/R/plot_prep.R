@@ -58,7 +58,7 @@ plot_prep <- function(data, y_col,
   ylab_append <- ''
   if (!is.null(comp_fun) & !is.null(base_lev)) {
     data <- data |>
-      baseline_compare(group_col = 'scenario', base_lev = base_lev,
+      baseline_compare(compare_col = 'scenario', base_lev = base_lev,
                        values_col = y_col, comp_fun = comp_fun, ...)
 
     if (is.character(comp_fun)) {
@@ -78,7 +78,7 @@ plot_prep <- function(data, y_col,
 
   # Order the scenario if I've given it an order.
   if (!is.null(sceneorder)) {
-    if (inherits(sceneorder, 'factor')) (sceneorder <- levels(sceneorder))
+    if (inherits(sceneorder, 'factor')) {sceneorder <- levels(sceneorder)}
     data <- data |>
       dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
   }

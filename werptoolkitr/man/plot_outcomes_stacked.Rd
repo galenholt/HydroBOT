@@ -17,14 +17,19 @@ plot_outcomes_stacked(
   colorgroups = NULL,
   colorset = "scenario",
   color_lab = ifelse(is.null(colorgroups), colorset, colorgroups),
+  point_group = NULL,
   pal_list = "scico::berlin",
   sceneorder = NULL,
   scene_pal = "scico::oslo",
   scales = "fixed",
   transy = "identity",
+  transx = "identity",
   base_lev = NULL,
   comp_fun = NULL,
   position = "stack",
+  smooth = FALSE,
+  smooth_method = NULL,
+  smooth_se = TRUE,
   ...
 )
 }
@@ -58,6 +63,13 @@ particularly into different palettes}
 \code{scene_x = TRUE}) or the x-levels (if \code{scene_x = FALSE})- needs to be
 renamed to reflect that it isn't just colors}
 
+\item{color_lab}{character, default either \code{colorgroups} or \code{colorset} (if
+\code{is.null(colorgroups)}). Allows changing the color legend label}
+
+\item{point_group}{character, column to add additional point groupings to,
+e.g. if plotting color by an environmental group, but need separate
+lines/points for each environmental objective.}
+
 \item{pal_list}{list of palettes for defining colors for \code{colorset}. Should
 be length of \code{colorgroups}}
 
@@ -66,9 +78,15 @@ levels}
 
 \item{scene_pal}{named palette for scenarios, only used if \code{scene_x = FALSE}}
 
-\item{scales}{facet scales, as in \code{?ggplot2::facet_wrap}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if gauges have very differen flows.}
+\item{scales}{facet scales, as in \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if gauges have very different flows.}
 
-\item{transy}{transformation for y axis as in \code{?ggplot2::scale_y_continuous}. Default \code{transy = 'identity'} just uses the data. Most common change likely \verb{transy = 'log10}}
+\item{transy}{transformation for y axis as in \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}}.
+Default \code{transy = 'identity'} just uses the data. Most common change likely
+\verb{transy = 'log10}}
+
+\item{transx}{transformation for x axis as in \code{\link[ggplot2:scale_continuous]{ggplot2::scale_x_continuous()}}.
+Default \code{transx = 'identity'} just uses the data. Most common change likely
+\verb{transx = 'log10}}
 
 \item{base_lev}{value to use as the base for comparison. Default NULL, no
 comparison. See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}
@@ -76,13 +94,16 @@ comparison. See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\l
 \item{comp_fun}{function to use in comparison. Default NULL, no comparison.
 See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}
 
-\item{position}{character, \code{position} argument from \code{\link[ggplot2:geom_bar]{ggplot2::geom_col()}}, to
-change from stacked to dodged bars}
+\item{position}{character or \code{position} function, \code{position} arguments from \code{\link[ggplot2:geom_bar]{ggplot2::geom_col()}} and \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} (depending on plot type), to
+change from stacked to dodged bars or jitter points. Can be character, e.g. 'jitter' or a function, e.g. \code{ggplot2::position_jitter(width = 0.1, height = 0)}}
+
+\item{smooth, }{logical, default \code{FALSE}. If plotting lines (\code{x_col} is numeric), do we want straight lines (the default, \code{\link[ggplot2:geom_path]{ggplot2::geom_line()}}) or fits (\code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}})?}
+
+\item{smooth_method}{\code{method} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. Ignored if not smoothing}
+
+\item{smooth_se}{\code{se} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. Ignored if not smoothing}
 
 \item{...}{}
-
-\item{scene_x}{logical, default \code{TRUE}- scenario on x-axis. \code{FALSE} puts
-\code{colorset} on x-axis and stacks scenarios}
 }
 \value{
 a ggplot stacked bar plot with standard formatting and coloring,

@@ -2,8 +2,12 @@
 #'
 #' @inheritParams plot_prep
 #' @param hydrolong hydrograph data in long format
-#' @param scales facet scales, as in `?ggplot2::facet_wrap`. Default `scales = 'fixed'` holds them the same, most common change will be to `scales = 'free_y'` if gauges have very differen flows.
-#' @param transy transformation for y axis as in `?ggplot2::scale_y_continuous`. Default `transy = 'identity'` just uses the data. Most common change likely `transy = 'log10`
+#' @param scales facet scales, as in [ggplot2::facet_wrap()]. Default `scales =
+#'   'fixed'` holds them the same, most common change will be to `scales =
+#'   'free_y'` if gauges have very different flows.
+#' @param transy transformation for y axis as in [ggplot2::scale_y_continuous()].
+#'   Default `transy = 'identity'` just uses the data. Most common change likely
+#'   `transy = 'log10`
 #'
 #' @return ggplot object
 #' @export

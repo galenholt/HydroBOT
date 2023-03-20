@@ -3,12 +3,12 @@
 #' This is used to automate comparison to baselines of various sorts without needing to do all the data wrangling by hand.
 #'
 #' @param val_df dataframe of values
-#' @param group_col column or columns to use for grouping- needed if the baseline is one level in this column. Otherwise ignored
-#' @param base_lev value for baseline. Can be a level in `group_col`, or a scalar, or a vector of `length(unique(val_df$group_col))`. A dataframe would be useful but not yet implemented.
+#' @param compare_col column or columns to use for grouping- needed if the baseline is one level in this column. Otherwise ignored
+#' @param base_lev value for baseline. Can be a level in `compare_col`, or a scalar, or a vector of `length(unique(val_df$compare_col))`. A dataframe would be useful but not yet implemented.
 #' @param values_col column containing the values. Can be character or tidyselect or bare names, though the last are fragile.
 #' @param comp_fun function to use for comparison comparing the first two arguments (`difference` and `relative` included here as wrappers for `-` and `/`). Can be character, or list-format, (both safe) or bare name (brittle)
 #' @param ... additional arguments to [create_base()]
-#' @param failmissing logical, default TRUE. Use `tidyselect::any_of` or `tidyselect::all_of` when `values_col` or `group_col` are character. see [selectcreator()]
+#' @param failmissing logical, default TRUE. Use `tidyselect::any_of` or `tidyselect::all_of` when `values_col` or `compare_col` are character. see [selectcreator()]
 #' @param names_to character, as in [tidyr::pivot_longer()], used for auto-pivotting
 #' @param values_to character, as in [tidyr::pivot_longer()], used for auto-pivotting
 #'
@@ -16,12 +16,16 @@
 #' @export
 #'
 #' @examples
-baseline_compare <- function(val_df, group_col, base_lev, values_col, comp_fun, ...,
+baseline_compare <- function(val_df, compare_col, base_lev, values_col,
+                             group_cols = NULL, comp_fun, ...,
                              failmissing = TRUE,
                              names_to = 'name', values_to = 'value') {
 
   # generate the standard format with the reference
-  val_df <- create_base(val_df, group_col, base_lev, values_col, failmissing, names_to, values_to)
+  val_df <- create_base(val_df = val_df, compare_col = compare_col,
+                        base_lev = base_lev, values_col = values_col,
+                        group_cols = group_cols, failmissing = failmissing,
+                        names_to = names_to, values_to = values_to)
 
   # We have to generate valcols both in create_base and here, unfortunately.And
   # Deal with the expected change to multiple valcols
@@ -78,7 +82,7 @@ baseline_compare <- function(val_df, group_col, base_lev, values_col, comp_fun, 
 #' @export
 #'
 #' @examples
-create_base <- function(val_df, group_col, base_lev, values_col,
+create_base <- function(val_df, compare_col, base_lev, values_col, group_cols = NULL,
                              failmissing = TRUE, names_to, values_to) {
 
 
@@ -86,7 +90,7 @@ create_base <- function(val_df, group_col, base_lev, values_col,
   # Should probably split this out into a separate function.
 
   # Get the scenario columns however they were passed
-  compcols <- selectcreator(rlang::enquo(group_col), val_df, failmissing)
+  compcols <- selectcreator(rlang::enquo(compare_col), val_df, failmissing)
 
   valcols <- selectcreator(rlang::enquo(values_col), val_df, failmissing)
 
@@ -106,7 +110,13 @@ create_base <- function(val_df, group_col, base_lev, values_col,
   # Get the grouping columns- assume everything but the scene cols and values
   # cols- otherwise we'd end up duplicating values. Maybe that's OK, but needs
   # more thought and clear tests
-  groupcols <- names(val_df)[which(!(names(val_df) %in% c(compcols, valcols)))]
+    # including 'geometry' col because we drop it and match on polyID
+  if (is.null(group_cols)) {
+    groupcols <- names(val_df)[which(!(names(val_df) %in% c(compcols, valcols, 'geometry')))]
+  } else {
+    groupcols <- selectcreator(rlang::enquo(group_cols), val_df, failmissing)
+  }
+
 
 
   # Deal with the most-common situation- baselev as a single lev in the scenario column
@@ -116,7 +126,9 @@ create_base <- function(val_df, group_col, base_lev, values_col,
     refdf <- dplyr::filter(val_df, .data[[compcols]] == base_lev) %>%
       dplyr::rename_with(.fn = ~stringr::str_c('ref_', .),
                          .cols = tidyselect::all_of(valcols)) %>%
-      dplyr::select(-{{compcols}})
+      dplyr::select({{groupcols}}, tidyselect::starts_with('ref_')) |>
+      sf::st_drop_geometry()
+
     val_df <- dplyr::left_join(val_df, refdf, by = groupcols)
   }
 
@@ -144,7 +156,9 @@ create_base <- function(val_df, group_col, base_lev, values_col,
       dplyr::rename_with(.fn = ~stringr::str_c('ref_', valcols),
                          .cols = refcol)  %>%
       dplyr::rename_with(.fn = ~names_to,
-                         .cols = name)
+                         .cols = name) |>
+      sf::st_drop_geometry()
+
     val_df <- val_df %>%
       dplyr::left_join(refdf, by = names_to)
   }

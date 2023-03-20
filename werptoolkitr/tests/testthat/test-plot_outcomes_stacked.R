@@ -163,3 +163,160 @@ test_that("flipped", {
   # do I want to allow dropping the legend?
 
 })
+
+test_that("quant x", {
+  # What I want to do is just use a quantitative x and have it automatically use
+  # a line. Can I do that easily?
+
+  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
+    dplyr::rename(allArith = 4) # for readability
+
+  # create a quant description of scenarios
+  scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+
+  # Create a grouping variable
+  obj_sdl_to_plot <- obj_sdl_to_plot |>
+    dplyr::mutate(colcol = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+    dplyr::filter(!is.na(colcol)) |>
+    dplyr::arrange(colcol, env_obj) |>
+    # and join the quant descriptions
+    dplyr::left_join(scenarios, by = 'scenario')
+
+  scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
+                        palette = 'calecopal::superbloom3')
+
+  # need to facet by space sdl unit and create a group col to take multiple palettes
+  sdl_line <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'delta',
+                          colorgroups = NULL,
+                          colorset = 'env_obj',
+                          pal_list = list('scico::berlin'),
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'))
+
+  vdiffr::expect_doppelganger("line defaults", sdl_line)
+
+  # change a bunch of options
+  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$colcol),
+                      palette = 'scico::berlin')
+
+  sdl_line_options <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'delta',
+                          y_lab = 'Proportion met',
+                          x_lab = 'Change in flow',
+                          transx = 'log10',
+                          color_lab = 'Environmental\ngroup',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          pal_list = obj_pal,
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          base_lev = 'base',
+                          comp_fun = 'difference',
+                          group_cols = c('env_obj', 'polyID'))
+
+  vdiffr::expect_doppelganger("line with scaling and labels", sdl_line_options)
+
+  # check that it works with other things as colors
+  # and that the point_group argument works.
+  sdl_line_catchment <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'delta',
+                          y_lab = 'Proportion met',
+                          x_lab = 'Change in flow',
+                          transx = 'log10',
+                          color_lab = 'Catchment',
+                          colorgroups = NULL,
+                          colorset = 'SWSDLName',
+                          point_group = 'env_obj',
+                          pal_list = list('RColorBrewer::Dark2'),
+                          facet_row = 'colcol',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          base_lev = 'base',
+                          comp_fun = 'difference',
+                          group_cols = c('env_obj', 'polyID'),
+                          smooth = FALSE)
+  vdiffr::expect_doppelganger("line by catchment with obj groups", sdl_line_catchment)
+
+  # jittering
+  sdl_smooth_mean_jf <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'delta',
+                          y_lab = 'Proportion met',
+                          x_lab = 'Change in flow',
+                          transx = 'log10',
+                          color_lab = 'Environmental\ngroup',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          pal_list = obj_pal,
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          base_lev = 'base',
+                          comp_fun = 'difference',
+                          group_cols = c('polyID'),
+                          smooth = TRUE,
+                          smooth_method = 'lm',
+                          position = ggplot2::position_jitter(width = 0.01, height = 0))
+  vdiffr::expect_doppelganger("jitter_function", sdl_smooth_mean_jf)
+
+  # jittering- default
+  sdl_smooth_mean_jc <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'delta',
+                          y_lab = 'Proportion met',
+                          x_lab = 'Change in flow',
+                          transx = 'log10',
+                          color_lab = 'Environmental\ngroup',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          pal_list = obj_pal,
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          base_lev = 'base',
+                          comp_fun = 'difference',
+                          group_cols = c('polyID'),
+                          smooth = TRUE,
+                          smooth_method = 'lm',
+                          position = 'jitter')
+
+  vdiffr::expect_doppelganger("jitter_character", sdl_smooth_mean_jc)
+
+  skip("skip loess- warnings can't be silenced. Inspect visually")
+  # The loess isn't happy about singularities. I don't want to silence them, but also don't care for this example.
+  sdl_line_catchment_smooth <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'delta',
+                          y_lab = 'Proportion met',
+                          x_lab = 'Change in flow',
+                          color_lab = 'Catchment',
+                          colorgroups = NULL,
+                          colorset = 'SWSDLName',
+                          point_group = NULL,
+                          pal_list = list('RColorBrewer::Dark2'),
+                          facet_row = 'colcol',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          base_lev = 'base',
+                          comp_fun = 'difference',
+                          group_cols = c('env_obj', 'polyID'),
+                          smooth = TRUE)
+
+  vdiffr::expect_doppelganger("smoothed_lines",
+                              suppressWarnings(print(sdl_line_catchment_smooth)))
+
+})
+
+

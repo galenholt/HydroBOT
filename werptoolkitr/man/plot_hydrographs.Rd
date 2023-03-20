@@ -34,9 +34,11 @@ them}
 keep scenarios with consistent colours throughout, likely with a reference
 level.}
 
-\item{scales}{facet scales, as in \code{?ggplot2::facet_wrap}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if gauges have very differen flows.}
+\item{scales}{facet scales, as in \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if gauges have very different flows.}
 
-\item{transy}{transformation for y axis as in \code{?ggplot2::scale_y_continuous}. Default \code{transy = 'identity'} just uses the data. Most common change likely \verb{transy = 'log10}}
+\item{transy}{transformation for y axis as in \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}}.
+Default \code{transy = 'identity'} just uses the data. Most common change likely
+\verb{transy = 'log10}}
 
 \item{base_lev}{value to use as the base for comparison. Default NULL, no
 comparison. See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}

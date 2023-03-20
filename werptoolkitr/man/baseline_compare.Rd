@@ -6,9 +6,10 @@
 \usage{
 baseline_compare(
   val_df,
-  group_col,
+  compare_col,
   base_lev,
   values_col,
+  group_cols = NULL,
   comp_fun,
   ...,
   failmissing = TRUE,
@@ -19,9 +20,9 @@ baseline_compare(
 \arguments{
 \item{val_df}{dataframe of values}
 
-\item{group_col}{column or columns to use for grouping- needed if the baseline is one level in this column. Otherwise ignored}
+\item{compare_col}{column or columns to use for grouping- needed if the baseline is one level in this column. Otherwise ignored}
 
-\item{base_lev}{value for baseline. Can be a level in \code{group_col}, or a scalar, or a vector of \code{length(unique(val_df$group_col))}. A dataframe would be useful but not yet implemented.}
+\item{base_lev}{value for baseline. Can be a level in \code{compare_col}, or a scalar, or a vector of \code{length(unique(val_df$compare_col))}. A dataframe would be useful but not yet implemented.}
 
 \item{values_col}{column containing the values. Can be character or tidyselect or bare names, though the last are fragile.}
 
@@ -29,7 +30,7 @@ baseline_compare(
 
 \item{...}{additional arguments to \code{\link[=create_base]{create_base()}}}
 
-\item{failmissing}{logical, default TRUE. Use \code{tidyselect::any_of} or \code{tidyselect::all_of} when \code{values_col} or \code{group_col} are character. see \code{\link[=selectcreator]{selectcreator()}}}
+\item{failmissing}{logical, default TRUE. Use \code{tidyselect::any_of} or \code{tidyselect::all_of} when \code{values_col} or \code{compare_col} are character. see \code{\link[=selectcreator]{selectcreator()}}}
 
 \item{names_to}{character, as in \code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}}, used for auto-pivotting}
 
