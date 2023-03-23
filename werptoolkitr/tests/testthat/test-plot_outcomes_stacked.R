@@ -185,6 +185,9 @@ test_that("quant x", {
   scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
                         palette = 'calecopal::superbloom3')
 
+  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$colcol),
+                      palette = 'scico::berlin')
+
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_line <- obj_sdl_to_plot |>
     plot_outcomes_stacked(y_col = 'allArith',
@@ -200,9 +203,6 @@ test_that("quant x", {
   vdiffr::expect_doppelganger("line defaults", sdl_line)
 
   # change a bunch of options
-  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$colcol),
-                      palette = 'scico::berlin')
-
   sdl_line_options <- obj_sdl_to_plot |>
     plot_outcomes_stacked(y_col = 'allArith',
                           x_col = 'delta',
@@ -246,7 +246,8 @@ test_that("quant x", {
                           smooth = FALSE)
   vdiffr::expect_doppelganger("line by catchment with obj groups", sdl_line_catchment)
 
-  # jittering
+  # jittering- set the seed each time or the jitters differ
+  set.seed(18)
   sdl_smooth_mean_jf <- obj_sdl_to_plot |>
     plot_outcomes_stacked(y_col = 'allArith',
                           x_col = 'delta',
@@ -270,6 +271,7 @@ test_that("quant x", {
   vdiffr::expect_doppelganger("jitter_function", sdl_smooth_mean_jf)
 
   # jittering- default
+  set.seed(18)
   sdl_smooth_mean_jc <- obj_sdl_to_plot |>
     plot_outcomes_stacked(y_col = 'allArith',
                           x_col = 'delta',
@@ -319,4 +321,131 @@ test_that("quant x", {
 
 })
 
+test_that("maps", {
 
+  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
+    dplyr::rename(allArith = 4) # for readability
+
+  # create a quant description of scenarios
+  scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+
+  # Create a grouping variable
+  obj_sdl_to_plot <- obj_sdl_to_plot |>
+    dplyr::mutate(colcol = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+    dplyr::filter(!is.na(colcol)) |>
+    dplyr::arrange(colcol, env_obj) |>
+    # and join the quant descriptions
+    dplyr::left_join(scenarios, by = 'scenario')
+
+  scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
+                        palette = 'calecopal::superbloom3')
+
+  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$colcol),
+                      palette = 'scico::berlin')
+
+  # Make a minimal map
+  sdl_map <- obj_sdl_to_plot |>
+    dplyr::filter(colcol == 'EF') |> # Need to reduce dimensionality
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'env_obj',
+                          facet_row = 'scenario',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'))
+
+  vdiffr::expect_doppelganger("sdl_map_simple", sdl_map)
+
+  # put the basin in the background
+  sdl_basin_background <- obj_sdl_to_plot |>
+    dplyr::filter(colcol == 'WB') |> # Need to reduce dimensionality
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'env_obj',
+                          facet_row = 'scenario',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          plotbasin = TRUE,
+                          basincolor = 'azure')
+
+  vdiffr::expect_doppelganger("sdl_basin_background", sdl_basin_background)
+
+  # include gauges- looks better without facetting
+  sdl_gauges_all <- obj_sdl_to_plot |>
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'scenario',
+                          facet_row = 'env_obj',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          plotbasin = TRUE,
+                          plotgauges = 'all') +
+    ggplot2::theme(legend.position = 'bottom')
+
+  vdiffr::expect_doppelganger("sdl_gauges_all", sdl_gauges_all)
+
+  sdl_gauges_clip <- obj_sdl_to_plot |>
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'scenario',
+                          facet_row = 'env_obj',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          plotbasin = TRUE,
+                          plotgauges = 'clip') +
+    ggplot2::theme(legend.position = 'bottom')
+
+  vdiffr::expect_doppelganger("sdl_gauges_clip", sdl_gauges_clip)
+
+  # Does it work for gauges?
+  gauges_map <- agg_theme_space$env_obj |>
+    dplyr::rename(allArith = 5) |> # for readability
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'scenario',
+                          facet_row = 'env_obj',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          plotbasin = TRUE) +
+    ggplot2::theme(legend.position = 'bottom')
+
+  vdiffr::expect_doppelganger("gauges_map", gauges_map)
+
+  # Does it work for the basin?
+  basin_map <- agg_theme_space$mdb |>
+    dplyr::rename(allArith = 4) |> # for readability
+    dplyr::filter(Objective %in% c("Maintain water-dependent species richness",
+                                 "Increase opportunities for colonial waterbird breeding*",
+                                 "Support instream & floodplain productivity")) |> # Need to reduce dimensionality
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'scenario',
+                          facet_row = 'Objective',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          plotgauges = 'clip')+
+    ggplot2::theme(legend.position = 'bottom')
+
+  vdiffr::expect_doppelganger("basin_map", basin_map)
+
+})

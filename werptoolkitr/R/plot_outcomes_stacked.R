@@ -74,6 +74,9 @@ plot_outcomes_stacked <- function(outdf,
                               smooth = FALSE,
                               smooth_method = NULL,
                               smooth_se = TRUE,
+                              plotbasin = FALSE,
+                              basincolor = 'lightcyan',
+                              plotgauges = 'none',
                               ...) {
 
 
@@ -125,6 +128,7 @@ plot_outcomes_stacked <- function(outdf,
 
   ## different plot types
 
+  # scenario on x, bar
   if (x_col == 'scenario') {
 
     outcome_plot <- prepped$data |>
@@ -140,9 +144,10 @@ plot_outcomes_stacked <- function(outdf,
       theme_werp_toolkit()
   }
 
+  # Something else on x, scenario as fill. bar
   # close to allowing a grouping aesthetic, but it's ugly with color, so not
   # doing it now.
-  if (x_col != 'scenario' &
+  if (!(x_col %in% c('scenario', 'map')) &&
       !is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
     outcome_plot <- prepped$data |>
       dplyr::filter(scenario %in% prepped$scenariofilter) |>
@@ -158,62 +163,157 @@ plot_outcomes_stacked <- function(outdf,
       theme_werp_toolkit()
   }
 
-  # yeesh, hard to peel all the bits back to check numeric
-  if (is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
+  # Some quantitative x, typically a quant representation of scenario
+  if (x_col != 'map') {
+    if (is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
 
-    # I was trying to get this to work to color the *points* one way and the
-    # lines another. It's kind of a mess because ggplot doesn't like that
-    # I can potentially use 'fill' if I use shapes that take that argument
+      # I was trying to get this to work to color the *points* one way and the
+      # lines another. It's kind of a mess because ggplot doesn't like that
+      # I can potentially use 'fill' if I use shapes that take that argument
 
-    # The more I think about this, I *could* force the use of filled points, but
-    # that's not really the point. The point is the scenarios give us the values
-    # on x, so let's just leave them alone, and color by whatever we're coloring
-    # by. We can revisit that decision later if we want.
+      # The more I think about this, I *could* force the use of filled points, but
+      # that's not really the point. The point is the scenarios give us the values
+      # on x, so let's just leave them alone, and color by whatever we're coloring
+      # by. We can revisit that decision later if we want.
 
-    if (!inherits(position, 'gg')) {
-      if (is.null(position) || position == 'stack') {
-        position = 'identity'
+      if (!inherits(position, 'gg')) {
+        if (is.null(position) || position == 'stack') {
+          position = 'identity'
+        }
       }
-    }
 
 
-    outcome_plot <- prepped$data |>
-      dplyr::filter(scenario %in% prepped$scenariofilter) |>
-      ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]],
-                                   y = .data[[prepped$y_col]],
-                                   group = .data$pointgroup # interaction(env_obj, .data[[colorset]])
-                                   )) +
-      # ggplot2::geom_line(mapping = ggplot2::aes(color = .data$color)) +
-      #
-      # ggplot2::geom_smooth(mapping = ggplot2::aes(color = .data$color), method = NULL, linewidth = 0.1) +
-      ggplot2::geom_point(mapping = ggplot2::aes(color = .data$color,
-                                                 shape = scenario),
-                          position = position) +
-      ggplot2::labs(y = paste0(y_lab, prepped$ylab_append),
-                    x = x_lab) +
-      ggplot2::scale_y_continuous(trans = transy) +
-      ggplot2::scale_x_continuous(trans = transx) +
-      ggplot2::scale_fill_manual(values = prepped$colors) +
-      ggplot2::scale_color_identity(guide = 'legend',
-                                    labels = labfind,
-                                    name = color_lab) +
-      theme_werp_toolkit()
+      outcome_plot <- prepped$data |>
+        dplyr::filter(scenario %in% prepped$scenariofilter) |>
+        ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]],
+                                     y = .data[[prepped$y_col]],
+                                     group = .data$pointgroup # interaction(env_obj, .data[[colorset]])
+        )) +
+        # ggplot2::geom_line(mapping = ggplot2::aes(color = .data$color)) +
+        #
+        # ggplot2::geom_smooth(mapping = ggplot2::aes(color = .data$color), method = NULL, linewidth = 0.1) +
+        ggplot2::geom_point(mapping = ggplot2::aes(color = .data$color,
+                                                   shape = scenario),
+                            position = position) +
+        ggplot2::labs(y = paste0(y_lab, prepped$ylab_append),
+                      x = x_lab) +
+        ggplot2::scale_y_continuous(trans = transy) +
+        ggplot2::scale_x_continuous(trans = transx) +
+        ggplot2::scale_fill_manual(values = prepped$colors) +
+        ggplot2::scale_color_identity(guide = 'legend',
+                                      labels = labfind,
+                                      name = color_lab) +
+        theme_werp_toolkit()
 
-    if (smooth) {
-      outcome_plot <- outcome_plot +
-        ggplot2::geom_smooth(mapping = ggplot2::aes(color = .data$color),
-                             method = smooth_method, linewidth = 0.1,
-                             se = smooth_se)
+      if (smooth) {
+        outcome_plot <- outcome_plot +
+          ggplot2::geom_smooth(mapping = ggplot2::aes(color = .data$color),
+                               method = smooth_method, linewidth = 0.1,
+                               se = smooth_se)
       }
-    if (!smooth) {
-      outcome_plot <- outcome_plot +
-        ggplot2::geom_line(mapping = ggplot2::aes(color = .data$color))
-    }
+      if (!smooth) {
+        outcome_plot <- outcome_plot +
+          ggplot2::geom_line(mapping = ggplot2::aes(color = .data$color))
+      }
 
+    }
   }
 
 
-  ## facetting
+  # This is getting contrived to do all these in one function. I *really* need
+  # to fully pull out the dataprep from the plotting in this function.
+    # I *think* I'm going to have to call the same col y_col and colorset to get the transforms to work as if it's y as well as the colors.
+    # This might just be too contrived.
+  # I probably really need a catcher here that identifies if there are multiple values being plotted and fail.
+  # Can we split mulitple palettes? probably, and it might make sense if we
+  # crossed with facetting. Doing it is a bit unclear, and I'll need to think
+  # more. Do we have a way to generate the color mapping for continuuous? I
+  # think yes. Do we have a way to also do that for `trans` functions? What
+  # about preserving the values for display on the legend? That's all doable,
+  # but gets tricky
+  # What else do I want here? potentially additional geoms- gauge points and basin.
+  if (x_col == 'map') {
+
+    if (length(pal_list) > 1) {rlang::warn(glue::glue("using first palette for {y_col}, splitting up palettes needs more thought"))}
+
+    overplot_test <- prepped$data |>
+      dplyr::group_by(geometry)
+
+    if (!is.null(facet_wrapper)) {
+      overplot_test <- overplot_test |>
+        dplyr::group_by(.data[[facet_wrapper]], .add = TRUE)
+    }
+    if (!is.null(facet_row) & facet_row != '.') {
+      overplot_test <- overplot_test |>
+        dplyr::group_by(.data[[facet_row]], .add = TRUE)
+    }
+    if (!is.null(facet_col) & facet_col != '.') {
+      overplot_test <- overplot_test |>
+        dplyr::group_by(.data[[facet_col]], .add = TRUE)
+    }
+
+    overplot_test <- overplot_test |>
+      dplyr::summarise(nrows = dplyr::n()) |>
+      dplyr::ungroup()
+
+    if (!all(overplot_test$nrows == 1)) {
+      rlang::abort("Trying to plot multiple values
+                   (up to {max(overplot_test$nrows)}) in single polygons.
+                   Something is duplicated-
+                   do you need more facetting or filtering?")
+    }
+
+    outcome_plot <- ggplot2::ggplot()
+
+    # underlay basin
+    if (plotbasin) {
+      outcome_plot <- outcome_plot +
+        ggplot2::geom_sf(data = basin, fill = basincolor)
+    }
+
+
+    if (all(sf::st_is(prepped$data, c("POINT", "LINESTRING")))) {
+      outcome_plot <- outcome_plot +
+        ggplot2::geom_sf(data = prepped$data |>
+                           dplyr::filter(scenario %in% prepped$scenariofilter),
+                         ggplot2::aes(color = .data[[prepped$y_col]])) +
+        paletteer::scale_color_paletteer_c(palette = pal_list[[1]], trans = transy)
+    }
+    if (all(sf::st_is(prepped$data, c("POLYGON", "MULTIPOLYGON")))) {
+      outcome_plot <- outcome_plot +
+        ggplot2::geom_sf(data = prepped$data |>
+                           dplyr::filter(scenario %in% prepped$scenariofilter),
+                         ggplot2::aes(fill = .data[[prepped$y_col]])) +
+        paletteer::scale_fill_paletteer_c(palette = pal_list[[1]], trans = transy)
+    }
+
+    outcome_plot <- outcome_plot +
+      ggplot2::labs(fill = paste0(y_lab, prepped$ylab_append)) +
+      # ggplot2::scale_fill_manual(values = prepped$colors) +
+      # ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 45)) +
+      # ggplot2::scale_color_identity() +
+      theme_werp_toolkit()
+
+
+    # I need to have a way to send in color args etc for the gauges, I think.
+    if (inherits(plotgauges, 'sf')) {
+      outcome_plot <- outcome_plot +
+        ggplot2::geom_sf(data = plotgauges)
+    } else if (is.character(plotgauges) && plotgauges != 'none') {
+      if (plotgauges == 'clip') {
+        gauges_to_plot <- sf::st_filter(bom_basin_gauges, dplyr::distinct(overplot_test))
+      }
+      if (plotgauges == 'all') {
+        gauges_to_plot <- bom_basin_gauges
+      }
+      outcome_plot <- outcome_plot +
+        ggplot2::geom_sf(data = gauges_to_plot)
+    }
+
+
+  }
+
+  ## facetting- happens in common for all plot types
 
 
   if (!is.null(facet_row) & !is.null(facet_col)) {
