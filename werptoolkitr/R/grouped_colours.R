@@ -36,9 +36,13 @@ grouped_colours <- function(df, pal_list,
         dplyr::mutate(colordef = .data[[namematch]])
       return(df)
     }
-    df$color <- pal_list |>
-      dplyr::mutate(colordef = color)
-    return(df)
+    if (is.character(pal_list) & (length(pal_list) == 1 | length(pal_list == nrow(df)))) {
+      # expects a colordef col later, just make one
+      df$colordef <- NA
+      df$color <- pal_list
+
+      return(df)
+    }
   }
 
   # need some name references to know what function to use

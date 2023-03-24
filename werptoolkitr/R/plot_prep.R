@@ -35,6 +35,7 @@ plot_prep <- function(data, y_col,
                       scenariofilter = NULL,
                       base_lev = NULL,
                       comp_fun = NULL,
+                      zero_adjust = 0,
                       ...) {
 
   # This probably needs more thought to handle continuous palettes if it is to
@@ -47,10 +48,26 @@ plot_prep <- function(data, y_col,
   }
 
   # ensure y is numeric
-  if (!is.numeric(data[,y_col])) {
+  # Have to [[]] because [] yields an sf-tibble, not just the col.
+  if (!is.numeric(data[[y_col]])) {
     data <- data |>
       dplyr::mutate("{y_col}" := as.numeric(.data[[y_col]]))
-    }
+  }
+
+  # Adjust to keep off zero if requested
+  if (!('relative' %in% comp_fun) & zero_adjust != 0) {
+    rlang::warn(glue::glue("`comp_fun` is {comp_fun}, but you're adjusting the data by {zero_adjust}. Do you really want to do that? It may be appropriate if you're log-transforming, but be careful."))
+  }
+  if (grepl('auto', zero_adjust)) {
+    zero_adjust <- min(abs(data[[y_col]])[data[[y_col]] != 0], na.rm = TRUE)*0.1
+  }
+  # move data away from zero
+  data <- data |>
+    dplyr::mutate("{y_col}" := ifelse(.data[[y_col]] == 0,
+                                      .data[[y_col]] + sample(c(zero_adjust, -1*zero_adjust), 1),
+                                      ifelse(.data[[y_col]] > 0,
+                                             .data[[y_col]] + zero_adjust,
+                                             .data[[y_col]] - zero_adjust)))
 
   gaugefilter <- if(is.null(gaugefilter) & ('gauge' %in% names(data))) {unique(data$gauge)} else {gaugefilter}
   scenariofilter <- if(is.null(scenariofilter)) {unique(data$scenario)} else  {scenariofilter}
