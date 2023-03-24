@@ -35,21 +35,38 @@
 #' @param sceneorder character or factor giving the order to present scenario
 #'   levels
 #' @param scene_pal named palette for scenarios, only used if `scene_x = FALSE`
-#' @param transx transformation for x axis as in [ggplot2::scale_x_continuous()].
-#'   Default `transx = 'identity'` just uses the data. Most common change likely
-#'   `transx = 'log10`
-#' @param position character or `position` function, `position` arguments from [ggplot2::geom_col()] and [ggplot2::geom_point()] (depending on plot type), to
-#'   change from stacked to dodged bars or jitter points. Can be character, e.g. 'jitter' or a function, e.g. `ggplot2::position_jitter(width = 0.1, height = 0)`
-#' @param smooth, logical, default `FALSE`. If plotting lines (`x_col` is numeric), do we want straight lines (the default, [ggplot2::geom_line()]) or fits ([ggplot2::geom_smooth()])?
-#' @param smooth_method `method` argument to [ggplot2::geom_smooth()]. Ignored if not smoothing
-#' @param smooth_se `se` argument to [ggplot2::geom_smooth()]. Ignored if not smoothing
+#' @param transx transformation for x axis as in
+#'   [ggplot2::scale_x_continuous()]. Default `transx = 'identity'` just uses
+#'   the data. Most common change likely `transx = 'log10`
+#' @param position character or `position` function, `position` arguments from
+#'   [ggplot2::geom_col()] and [ggplot2::geom_point()] (depending on plot type),
+#'   to change from stacked to dodged bars or jitter points. Can be character,
+#'   e.g. 'jitter' or a function, e.g. `ggplot2::position_jitter(width = 0.1,
+#'   height = 0)`
+#' @param smooth, logical, default `FALSE`. If plotting lines (`x_col` is
+#'   numeric), do we want straight lines (the default, [ggplot2::geom_line()])
+#'   or fits ([ggplot2::geom_smooth()])?
+#' @param smooth_method `method` argument to [ggplot2::geom_smooth()]. Ignored
+#'   if not smoothing
+#' @param smooth_se `se` argument to [ggplot2::geom_smooth()]. Ignored if not
+#'   smoothing
+#' @param underlay_list default NULL, named list (or list of named lists for
+#'   multiple underlay levels) of arguments to plot a map underlying the main
+#'   map data. Names define arguments, `underlay` is required, either character
+#'   or an sf, `underlay_pal` do define colors, can be single color or paletteer
+#'   name, and `underlay_ycol` if coloring the underlay by values. Multiple
+#'   values (e.g. having an `underlay_ycol` and a palette for `underlay_pal`)
+#'   only works if the main data is not the same type- we can't use different
+#'   palettes for underlay fill and main data fill, for example, but can if the
+#'   underlay is fill (polygons) and the main data is points.
+#' @param overlay_list as `underlay_list`, but names `"overlay_*"`
 #'
 #' @return a ggplot stacked bar plot with standard formatting and coloring,
 #'   stacking either scenarios or colorset
 #' @export
 #'
 #' @examples
-plot_outcomes_stacked <- function(outdf,
+plot_outcomes <- function(outdf,
                                   y_col,
                                   y_lab = y_col,
                                   x_col = 'scenario',

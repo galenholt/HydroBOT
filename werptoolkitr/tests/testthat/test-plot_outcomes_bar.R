@@ -1,3 +1,5 @@
+
+
 test_that("ewr works", {
   ewr_to_bar_data <- summary_ewr_output %>%
     # just grab the first code_timing
@@ -6,6 +8,9 @@ test_that("ewr works", {
     dplyr::ungroup() %>%
     dplyr::filter(ewr_code %in% c('BF1', 'LF1', "OB5") &
                     gauge %in% c("412002", "412005", "412038"))
+
+  scene_pal <- make_pal(levels = unique(ewr_to_bar_data$scenario), palette = 'calecopal::superbloom3')
+
 
   ewr_plot <- plot_outcomes_bar(ewr_to_bar_data,
                                y_col = 'ewr_achieved',

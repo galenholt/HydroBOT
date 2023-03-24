@@ -20,6 +20,12 @@
 #'   comparison. See [baseline_compare()] and [create_base()] for options.
 #' @param comp_fun function to use in comparison. Default NULL, no comparison.
 #'   See [baseline_compare()] and [create_base()] for options.
+#' @param zero_adjust numeric (default 0) or `"auto"`, adjustment to data to
+#'   avoid zeros by adding `zero_adjust` to `abs(data)`, e.g shifting all data
+#'   away from zero, either positively or negatively. Zeros themselves are
+#'   shifted up or down randomly. Used for avoiding x/0, NaN, and Inf when
+#'   relativiszing and taking logs, primarily. Auto shifts by
+#'   `0.1*min(abs(data[data != 0]))`.
 #' @param ...
 #'
 #' @return a list with prepped versions of `data`, `y_col`, `colors`,

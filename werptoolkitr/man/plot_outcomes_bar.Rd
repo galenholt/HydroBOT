@@ -63,5 +63,5 @@ See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_
 a ggplot bar graph with standardized style and color, possibly facetted
 }
 \description{
-This is a simpler version of \code{plot_outcomes_stacked}
+This is a simpler version of \code{plot_outcomes}
 }

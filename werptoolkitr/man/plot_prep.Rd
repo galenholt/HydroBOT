@@ -13,6 +13,7 @@ plot_prep(
   scenariofilter = NULL,
   base_lev = NULL,
   comp_fun = NULL,
+  zero_adjust = 0,
   ...
 )
 }
@@ -37,6 +38,13 @@ comparison. See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\l
 
 \item{comp_fun}{function to use in comparison. Default NULL, no comparison.
 See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}
+
+\item{zero_adjust}{numeric (default 0) or \code{"auto"}, adjustment to data to
+avoid zeros by adding \code{zero_adjust} to \code{abs(data)}, e.g shifting all data
+away from zero, either positively or negatively. Zeros themselves are
+shifted up or down randomly. Used for avoiding x/0, NaN, and Inf when
+relativiszing and taking logs, primarily. Auto shifts by
+\code{0.1*min(abs(data[data != 0]))}.}
 
 \item{...}{}
 }

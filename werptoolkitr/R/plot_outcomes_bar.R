@@ -1,8 +1,8 @@
 #' Plot outcomes as bar graph with scenario on x, possibly facetted and colored
 #'
-#' This is a simpler version of `plot_outcomes_stacked`
+#' This is a simpler version of `plot_outcomes`
 #'
-#' @inheritParams plot_outcomes_stacked
+#' @inheritParams plot_outcomes
 #'
 #' @param colors named `colors` object specifying the colors for the scenarios
 #'

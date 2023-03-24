@@ -27,9 +27,9 @@ grouped_colours <- function(df, pal_list,
       # which column does the pal_list match?
       colnames <- names(pal_list)
       if (any(colnames %in% df$scenario)) {namematch <- 'scenario'}
-      if (any(colnames %in%
+      if (!is.null(colorgroups) && any(colnames %in%
               dplyr::pull(df, colorgroups))) {namematch <- colorgroups}
-      if (any(colnames %in%
+      if (!is.null(colorset) && any(colnames %in%
               dplyr::pull(df, colorset))) {namematch <- colorset}
       names(coltib)[1] <- namematch
       df <- dplyr::left_join(df, coltib, by = namematch) |>
