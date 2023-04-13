@@ -19,9 +19,9 @@ test_that("multi-palette and facetting", {
 
   # Create a grouping variable
   obj_sdl_to_plot <- obj_sdl_to_plot |>
-    dplyr::mutate(colcol = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-    dplyr::filter(!is.na(colcol)) |>
-    dplyr::arrange(colcol, env_obj)
+    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+    dplyr::filter(!is.na(env_group)) |>
+    dplyr::arrange(env_group, env_obj)
 
   # Create a palette list
   grouplist = list(EF = 'grDevices::Purp',
@@ -33,7 +33,7 @@ test_that("multi-palette and facetting", {
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_plot <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = grouplist,
                           facet_wrapper = 'SWSDLName',
@@ -45,7 +45,7 @@ test_that("multi-palette and facetting", {
   # behaves as expected
   sdl_plot_facrow <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = grouplist,
                           facet_col = 'SWSDLName',
@@ -56,10 +56,10 @@ test_that("multi-palette and facetting", {
 
   sdl_plot_factgroup <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = grouplist,
-                          facet_row = 'colcol',
+                          facet_row = 'env_group',
                           facet_col = 'SWSDLName',
                           sceneorder = c('down4', 'base', 'up4'))
 
@@ -76,9 +76,9 @@ test_that("flipped", {
 
   # Create a grouping variable
   obj_sdl_to_plot <- obj_sdl_to_plot |>
-    dplyr::mutate(colcol = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-    dplyr::filter(!is.na(colcol)) |>
-    dplyr::arrange(colcol, env_obj)
+    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+    dplyr::filter(!is.na(env_group)) |>
+    dplyr::arrange(env_group, env_obj)
 
   scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
                         palette = 'calecopal::superbloom3')
@@ -102,13 +102,13 @@ test_that("flipped", {
   # It doesn't actually plot any differently at present, but I'm leaving it here
   # because if we can figure out how to plot those colors in a not-ugly way,
   # we'll be there.
-  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$colcol),
+  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$env_group),
                       palette = 'scico::berlin')
 
   sdl_plot_g <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
                           x_col = 'env_obj',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = obj_pal,
                           facet_row = 'SWSDLName',
@@ -122,7 +122,7 @@ test_that("flipped", {
   sdl_plot_groupblock <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
                           x_col = 'scenario',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = obj_pal,
                           facet_row = 'SWSDLName',
@@ -136,7 +136,7 @@ test_that("flipped", {
   sdl_plot_groupblock_l <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
                           x_col = 'scenario',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           color_lab = 'Environmental\ngroup',
                           pal_list = obj_pal,
@@ -150,7 +150,7 @@ test_that("flipped", {
   sdl_plot_groupblock_n <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
                           x_col = 'scenario',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           color_lab = NULL,
                           pal_list = obj_pal,
@@ -177,16 +177,16 @@ test_that("quant x", {
 
   # Create a grouping variable
   obj_sdl_to_plot <- obj_sdl_to_plot |>
-    dplyr::mutate(colcol = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-    dplyr::filter(!is.na(colcol)) |>
-    dplyr::arrange(colcol, env_obj) |>
+    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+    dplyr::filter(!is.na(env_group)) |>
+    dplyr::arrange(env_group, env_obj) |>
     # and join the quant descriptions
     dplyr::left_join(scenarios, by = 'scenario')
 
   scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
                         palette = 'calecopal::superbloom3')
 
-  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$colcol),
+  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$env_group),
                       palette = 'scico::berlin')
 
   # need to facet by space sdl unit and create a group col to take multiple palettes
@@ -211,7 +211,7 @@ test_that("quant x", {
                           x_lab = 'Change in flow',
                           transx = 'log10',
                           color_lab = 'Environmental\ngroup',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = obj_pal,
                           facet_row = 'SWSDLName',
@@ -237,7 +237,7 @@ test_that("quant x", {
                           colorset = 'SWSDLName',
                           point_group = 'env_obj',
                           pal_list = list('RColorBrewer::Dark2'),
-                          facet_row = 'colcol',
+                          facet_row = 'env_group',
                           facet_col = '.',
                           scene_pal = scene_pal,
                           sceneorder = c('down4', 'base', 'up4'),
@@ -256,7 +256,7 @@ test_that("quant x", {
                           x_lab = 'Change in flow',
                           transx = 'log10',
                           color_lab = 'Environmental\ngroup',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = obj_pal,
                           facet_row = 'SWSDLName',
@@ -280,7 +280,7 @@ test_that("quant x", {
                           x_lab = 'Change in flow',
                           transx = 'log10',
                           color_lab = 'Environmental\ngroup',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = obj_pal,
                           facet_row = 'SWSDLName',
@@ -308,7 +308,7 @@ test_that("quant x", {
                           colorset = 'SWSDLName',
                           point_group = NULL,
                           pal_list = list('RColorBrewer::Dark2'),
-                          facet_row = 'colcol',
+                          facet_row = 'env_group',
                           facet_col = '.',
                           scene_pal = scene_pal,
                           sceneorder = c('down4', 'base', 'up4'),
@@ -332,16 +332,16 @@ test_that("maps", {
 
   # Create a grouping variable
   obj_sdl_to_plot <- obj_sdl_to_plot |>
-    dplyr::mutate(colcol = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-    dplyr::filter(!is.na(colcol)) |>
-    dplyr::arrange(colcol, env_obj) |>
+    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+    dplyr::filter(!is.na(env_group)) |>
+    dplyr::arrange(env_group, env_obj) |>
     # and join the quant descriptions
     dplyr::left_join(scenarios, by = 'scenario')
 
   scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
                         palette = 'calecopal::superbloom3')
 
-  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$colcol),
+  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$env_group),
                       palette = 'scico::berlin')
 
   env_obj_points_to_plot <- agg_theme_space$env_obj |>
@@ -349,7 +349,7 @@ test_that("maps", {
 
   # Make a minimal map
   sdl_map <- obj_sdl_to_plot |>
-    dplyr::filter(colcol == 'EF') |> # Need to reduce dimensionality
+    dplyr::filter(env_group == 'EF') |> # Need to reduce dimensionality
     plot_outcomes(y_col = 'allArith',
                           x_col = 'map',
                           colorgroups = NULL,
@@ -364,7 +364,7 @@ test_that("maps", {
 
   # put the basin in the background
   sdl_basin_background <- obj_sdl_to_plot |>
-    dplyr::filter(colcol == 'WB') |> # Need to reduce dimensionality
+    dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
     plot_outcomes(y_col = 'allArith',
                           x_col = 'map',
                           colorgroups = NULL,
@@ -381,7 +381,7 @@ test_that("maps", {
   # If I try to put a palette on the background with a palette in the foreground, it should warn and swap to NA
   # Using cewo valleys because then it makes sense to have a fill sometimes.
  expect_warning(sdl_valley_background_warn <- obj_sdl_to_plot |>
-    dplyr::filter(colcol == 'WB') |> # Need to reduce dimensionality
+    dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
     plot_outcomes(y_col = 'allArith',
                           x_col = 'map',
                           colorgroups = NULL,
@@ -627,7 +627,7 @@ test_that("maps", {
   # put the basin in the background
 
   sdl_basin_background_difference <- obj_sdl_to_plot |>
-    dplyr::filter(colcol == 'WB') |> # Need to reduce dimensionality
+    dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
     plot_outcomes(y_col = 'allArith',
                           x_col = 'map',
                           colorgroups = NULL,
@@ -646,7 +646,7 @@ test_that("maps", {
 
   # Relative to baseline
   sdl_basin_background_rel <- obj_sdl_to_plot |>
-    dplyr::filter(colcol == 'WB') |> # Need to reduce dimensionality
+    dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
     plot_outcomes(y_col = 'allArith',
                           x_col = 'map',
                           colorgroups = NULL,
