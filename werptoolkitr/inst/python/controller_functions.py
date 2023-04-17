@@ -152,7 +152,7 @@ def run_save_ewrs(pathlist, output_path, model_format, allowance, climate, outpu
 
 # wrap all of the creation and running so we can call with one line once we have user inputs.
 # MINT, MAXT, DUR, and DRAW are input separately for two reasons- no processing is required in the parameter script, and makes calling from R or Python easier (R can do list -> dict, but the syntax differs and I want to be able to send the same code to either)
-def prep_run_save_ewrs(scenario_dir, output_dir, model_format, climate, outputType = 'none', returnType = 'none', MINT = (100 - 0)/100, MAXT = (100 + 0 )/100, DUR = (100 - 0 )/100, DRAW = (100 -0 )/100, datesuffix = False):
+def prep_run_save_ewrs(scenario_dir, output_dir, model_format = 'IQQM - NSW 10,000 years', climate = 'Standard - 1911 to 2018 climate categorisation', outputType = 'none', returnType = 'none', MINT = (100 - 0)/100, MAXT = (100 + 0 )/100, DUR = (100 - 0 )/100, DRAW = (100 -0 )/100, datesuffix = False):
     # create dict
     allowance ={'minThreshold': MINT, 'maxThreshold': MAXT, 'duration': DUR, 'drawdown': DRAW}
 
