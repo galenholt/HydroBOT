@@ -94,6 +94,7 @@ plot_outcomes <- function(outdf,
                                   smooth_se = TRUE,
                                   underlay_list = NULL,
                                   overlay_list = NULL,
+                                  setLimits = NULL,
                                   ...) {
 
 
@@ -295,8 +296,12 @@ plot_outcomes <- function(outdf,
     # the new y_col name if baselined). Should I just use that? Or can I call it from inside the `scale`
     # x here is a length-2 default set of limits.
     findlimits <- function(x) {
+      # use hard-set user-supplied limits
+      if (!is.null(setLimits)) {
+        return(setLimits)
+      }
       # use default limits
-      if (is.null(comp_fun)) {return(x)}
+      if (is.null(comp_fun) & is.null(setLimits)) {return(x)}
       # Set limits to make midpoint 0 if difference
       if (comp_fun == 'difference') {
         limits <- max(abs(x), na.rm = TRUE) * c(-1, 1)

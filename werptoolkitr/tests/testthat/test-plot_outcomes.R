@@ -362,6 +362,23 @@ test_that("maps", {
 
   vdiffr::expect_doppelganger("sdl_map_simple", sdl_map)
 
+  # control the limits- typically this would be done over several plots
+  # Make a minimal map
+  sdl_mapL <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == 'EF') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                  x_col = 'map',
+                  colorgroups = NULL,
+                  colorset = 'allArith',
+                  pal_list = list('scico::berlin'),
+                  facet_col = 'env_obj',
+                  facet_row = 'scenario',
+                  scene_pal = scene_pal,
+                  sceneorder = c('down4', 'base', 'up4'),
+                  setLimits = c(0, 2))
+  vdiffr::expect_doppelganger("sdl_map_limits", sdl_mapL)
+
+
   # put the basin in the background
   sdl_basin_background <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
