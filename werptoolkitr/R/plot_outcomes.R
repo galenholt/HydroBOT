@@ -143,8 +143,11 @@ plot_outcomes <- function(outdf,
     rlang::warn(glue::glue("NaN and Inf introduced in `plot_prep`, likely due to division by zero. {new_nan_inf - old_nan_inf} values were lost."))
   }
 
-  if (transy %in% c('log', 'log10') & any(prepped$data[[prepped$y_col]] == 0)) {
-    rlang::warn(glue::glue("`transy` takes logs, but data has {sum(prepped$data[[prepped$y_col]] == 0)} zeros, which will get lost"))
+  if (!inherits(transy, 'trans') && transy %in% c('log', 'log10') & any(prepped$data[[prepped$y_col]] == 0)) {
+    rlang::warn(glue::glue("`transy` takes logs, but data has
+                           {sum(prepped$data[[prepped$y_col]] == 0)} zeros and
+                           {sum(prepped$data[[prepped$y_col]] < 0)} less than 0,
+                           which will get lost"))
   }
 
 
@@ -167,7 +170,8 @@ plot_outcomes <- function(outdf,
       ggplot2::ggplot(ggplot2::aes(x = scenario, y = .data[[prepped$y_col]],
                                    fill = forcats::fct_inorder(color))) +
       ggplot2::geom_col(position = position) +
-      ggplot2::labs(y = paste0(y_lab, prepped$ylab_append), color = colorset) +
+      ggplot2::labs(y = paste0(y_lab, prepped$ylab_append), x = x_lab,
+                    color = colorset) +
       ggplot2::scale_y_continuous(trans = transy) +
       ggplot2::scale_fill_identity(guide = 'legend',
                                    labels = labfind,
@@ -301,7 +305,8 @@ plot_outcomes <- function(outdf,
         return(setLimits)
       }
       # use default limits
-      if (is.null(comp_fun) & is.null(setLimits)) {return(x)}
+      if (is.null(comp_fun) || (!comp_fun %in% c('difference', 'relative')) &
+          is.null(setLimits)) {return(x)}
       # Set limits to make midpoint 0 if difference
       if (comp_fun == 'difference') {
         limits <- max(abs(x), na.rm = TRUE) * c(-1, 1)

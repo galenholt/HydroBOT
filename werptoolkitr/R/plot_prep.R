@@ -62,7 +62,7 @@ plot_prep <- function(data, y_col,
 
   # Adjust to keep off zero if requested
   if (!('relative' %in% comp_fun) & zero_adjust != 0) {
-    rlang::warn(glue::glue("`comp_fun` is {comp_fun}, but you're adjusting the data by {zero_adjust}. Do you really want to do that? It may be appropriate if you're log-transforming, but be careful."))
+    rlang::warn(glue::glue("`comp_fun` is {comp_fun}, but you're adjusting the data by {zero_adjust}. Do you really want to do that? It may be appropriate if you're log-transforming or dividing, but be careful.\n"))
   }
   if (grepl('auto', zero_adjust)) {
     zero_adjust <- min(abs(data[[y_col]])[data[[y_col]] != 0], na.rm = TRUE)*0.1

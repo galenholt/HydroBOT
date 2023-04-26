@@ -9,13 +9,23 @@
 #' @inheritParams multi_aggregate
 #' @inherit multi_aggregate params return
 #'
-#' @param datpath path to indicator data. Currently needs to be EWR (same as `ewrpath` argument in [prep_ewr_agg()]), but left more general here for future
-#' @param type character of which type of EWR output (currently `'summary'`, `'annual'`, or `'both'`). New values, e.g. `'all`' probably work but untested.
+#' @param datpath path to indicator data. Currently needs to be EWR (same as
+#'   `ewrpath` argument in [prep_ewr_agg()]), but left more general here for
+#'   future
+#' @param type character of which type of EWR output (currently `'summary'`,
+#'   `'annual'`, or `'both'`). New values, e.g. `'all`' probably work but
+#'   untested.
 #' @param geopath path to the file with gauge locations in lat/long (assumes BOM
 #'   currently), or an `sf` with gauge locations
-#' @param causalpath path to the causal relationships .rds file. Should typically be created in `Causal networks`
-#' @param returnList default `TRUE`, whether to return the output to the current session
-#' @param savepath default `NULL`, a path to save the output to. If `NULL`, does not save. If `savepath = NULL` and `returnList = FALSE`, the function errors to avoid wasting resources.
+#' @param causalpath path to the causal relationships .rds file. Should
+#'   typically be created in `Causal networks`
+#' @param returnList default `TRUE`, whether to return the output to the current
+#'   session
+#' @param savepath default `NULL`, a path to save the output to. Note that this
+#'   names the output rds file directly '`type`_aggregated.rds', so the path
+#'   should include only the directory structure.  If `NULL`, does not save. If
+#'   `savepath = NULL` and `returnList = FALSE`, the function errors to avoid
+#'   wasting resources.
 #' @param ...
 #'
 #' @export

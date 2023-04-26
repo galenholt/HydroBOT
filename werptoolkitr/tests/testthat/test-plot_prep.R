@@ -1,6 +1,8 @@
+obj_sdl <- agg_theme_space$sdl_units %>%
+  dplyr::rename(allArith = 4)
+
 test_that("character sceneorder works", {
-  obj_sdl <- agg_theme_space$sdl_units %>%
-    dplyr::rename(allArith = 4)
+
 
   test_prep <- plot_prep(obj_sdl, y_col = 'allArith',
                          sceneorder = c('down4', 'base', 'up4'))

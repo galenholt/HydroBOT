@@ -33,6 +33,7 @@ plot_outcomes(
   smooth_se = TRUE,
   underlay_list = NULL,
   overlay_list = NULL,
+  setLimits = NULL,
   ...
 )
 }

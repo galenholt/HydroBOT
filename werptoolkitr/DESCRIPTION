@@ -29,9 +29,11 @@ Imports:
     tidyr
 Suggests: 
     covr,
+    ggthemes,
     knitr,
     rmapshaper (>= 0.4.6),
     rmarkdown,
+    scico,
     testthat (>= 3.0.0),
     vdiffr
 Config/testthat/edition: 3
