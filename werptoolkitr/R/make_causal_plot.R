@@ -51,7 +51,7 @@
 #' @examples
 make_causal_plot <- function(nodes, edges,
                              focalnodes = unique(nodes$Name),
-                             drop_unused_nodes = TRUE, 
+                             drop_unused_nodes = TRUE,
                              edge_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
                              edge_colorgroups = NULL,
                              edge_colorset = 'fromtype',
@@ -59,62 +59,64 @@ make_causal_plot <- function(nodes, edges,
                              node_colorgroups = NULL,
                              node_colorset = 'NodeType',
                              wrap_names = TRUE,
-                             render = TRUE, 
+                             render = TRUE,
                              returnnetwork = TRUE,
                              save = FALSE, savedir, savename = NULL) {
   # Function to make plots assuming standard WERP column names. Could allow name
   # passing I guess? But then what's the point of a function if it ends up just
   # looking like the call
-  
+
   # Make sure no duplicate nodes
-  nodes <- nodes %>% 
+  nodes <- nodes %>%
     dplyr::distinct(Name, .keep_all = TRUE)
-  
+
   # IF WE"RE GOING TO WRAP NAMES IT NEEDS TO HAPPEN BY HERE or the rest of this doesn't match
   if (wrap_names) {
-    edges <- edges %>% 
-      dplyr::mutate(from = stringr::str_wrap(from, 40), 
+    edges <- edges %>%
+      dplyr::mutate(from = stringr::str_wrap(from, 40),
              to = stringr::str_wrap(to, 40))
-    nodes <- nodes %>% 
+    nodes <- nodes %>%
       dplyr::mutate(Name = stringr::str_wrap(Name, 40))
   }
-  
+
   # Cut both to the desired nodeset
   relevantnodes <- find_related_nodes(edges, focalnodes)
-  
-  nodes <- nodes %>% 
+
+  nodes <- nodes %>%
     dplyr::filter(Name %in% relevantnodes)
-  
-  edges <- edges %>% 
+
+  edges <- edges %>%
     dplyr::filter(from %in% relevantnodes | to %in% relevantnodes)
-  
+
   # drop nodes with no edges?
   if (drop_unused_nodes) {
-    nodes <- nodes %>% 
+    nodes <- nodes %>%
       dplyr::filter(Name %in% edges$from | Name %in% edges$to)
   }
-  
+
   # colors
-  edges <- causal_colors_general(edges, 
+  edges <- causal_colors_general(edges,
                                  edge_pal,
                                  edge_colorgroups,
                                  edge_colorset)
-  
-  nodes <- causal_colors_general(nodes, 
+
+  nodes <- causal_colors_general(nodes,
                                  node_pal,
                                  node_colorgroups,
                                  node_colorset)
-  
+
   # deal with names, position, shape etc
   nodes <- node_plot_atts(nodes)
-  
-  
+
+
   # Syntax for diagrammer is confusing.
   # table and node are env variables (dfs)
   # label_col, type_col, from_col, and to_col are data variables (column names)
   # from_to_map is just an argument that says to label the fromto, it's not an env or data variable
   # The attributes (color etc) are not called out here at all, and depend on having the right column names in the dfs
-  causalnetwork <- 
+
+  # Cryptic errors here related to `c.c` and extra rows seem to be caused by having rows that are duplicated over the Name and NodeType columns (even if there are differences elsewhere)
+  causalnetwork <-
     DiagrammeR::create_graph() %>%
     DiagrammeR::add_nodes_from_table(
       table = nodes,
@@ -125,32 +127,32 @@ make_causal_plot <- function(nodes, edges,
       from_col = from,
       to_col = to,
       from_to_map = label) %>%
-    
+
     DiagrammeR::add_global_graph_attrs(
       attr = c("layout", "splines"),
       value = c("neato", "true"),
       attr_type = c("graph", "graph"))
-  
+
   if (render) {
-    print(causalnetwork %>% 
+    print(causalnetwork %>%
             DiagrammeR::render_graph())
   }
 
   if (save) {
-    causalnetwork %>% 
-      DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(savename, 
+    causalnetwork %>%
+      DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(savename,
                                                         format(Sys.time(), "%Y%m%d%H%M"),
                                                         '.png')))
-    
-    
-    causalnetwork %>% 
-      DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(savename, 
+
+
+    causalnetwork %>%
+      DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(savename,
                                                         format(Sys.time(), "%Y%m%d%H%M"),
                                                         '.pdf')))
   }
-  
+
   if (returnnetwork) {
     return(causalnetwork)
   }
-  
+
 }

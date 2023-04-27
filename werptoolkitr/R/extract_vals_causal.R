@@ -18,6 +18,7 @@
 #'   this should be run again, because it is not appropriate to mix histories in
 #'   a causal plot.
 #' @param valcol character, name of the column with the aggregated values.
+#' @param targetlevels character, names of levels to include. Defaults to `names(agglist)`. Any subset of those names can be used.
 #'
 #' @return a tibble with grouping variables for scenario and gauge, a column for
 #'   values named the same as `valcol`, and `Name` and `NodeType` columns to
@@ -30,6 +31,9 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
   # throw the parser on it if not though.
 
   # Will likely need more work to handle list item names once spatial is involved.
+
+  # Filter to just the targets
+  agglist <- agglist[names(agglist) %in% targetlevels]
 
   # Could almost certainly be a purrr::map()
   stackvalues <- foreach::foreach (i = 1:length(agglist),
@@ -62,8 +66,10 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
                             }
 
                             # Get just the relevant columns- scenario, gauge, the aggregation units, and the values
+                            # Don't assume scenario and gauge exist though
                             simpledf <- simpledf %>%
-                              dplyr::select(scenario, gauge, tidyselect::all_of(c(thesenodes, valcol))) %>%
+                              dplyr::select(tidyselect::any_of(c('scenario', 'gauge')),
+                                            tidyselect::all_of(c(thesenodes, valcol))) %>%
                               dplyr::rename(Name = tidyselect::all_of(thesenodes)) %>%
                               dplyr::mutate(NodeType = tidyselect::all_of(thesenodes))
 
