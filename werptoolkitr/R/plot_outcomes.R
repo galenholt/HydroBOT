@@ -336,6 +336,19 @@ plot_outcomes <- function(outdf,
       for (u in underlay_list) {
         # Allow passing names
         if (is.character(u$underlay)) {u$underlay <- get(u$underlay)}
+
+        # deal with ordering scenarios if the underlay has them- otherwise the facets lose the ordering.
+        # We really should be `plot_prep` ing the underlays and overlays, or
+        # at least some subset of `plot_prep`
+        if ('scenario' %in% names(u$underlay)) {
+          # Order the scenario if I've given it an order.
+          if (!is.null(sceneorder)) {
+            if (inherits(sceneorder, 'factor')) {sceneorder <- levels(sceneorder)}
+            u$underlay <- u$underlay |>
+              dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
+          }
+        }
+
         # use `grouped_colors` to set colour groups
         # Do we need to pass separate colorgroups and colorset to the underlay? Likely
         # undercolor <- grouped_colours(underlay, underlay_pal, underlay_colorgroups, underlay_colorset)
@@ -455,6 +468,18 @@ plot_outcomes <- function(outdf,
       for (o in overlay_list) {
         # Allow passing names
         if (is.character(o$overlay)) {o$overlay <- get(o$overlay)}
+
+        # deal with ordering scenarios if the overlay has them- otherwise the facets lose the ordering.
+        # We really should be `plot_prep` ing the underlays and overlays, or
+        # at least some subset of `plot_prep`
+        if ('scenario' %in% names(o$overlay)) {
+          # Order the scenario if I've given it an order.
+          if (!is.null(sceneorder)) {
+            if (inherits(sceneorder, 'factor')) {sceneorder <- levels(sceneorder)}
+            o$overlay <- o$overlay |>
+              dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
+          }
+        }
 
         # clip to main data automatically
         if ('clip' %in% names(o) && o$clip) {
