@@ -112,7 +112,26 @@ create_base <- function(val_df, compare_col, base_lev, values_col, group_cols = 
   # more thought and clear tests
     # including 'geometry' col because we drop it and match on polyID
   if (is.null(group_cols)) {
-    groupcols <- names(val_df)[which(!(names(val_df) %in% c(compcols, valcols, 'geometry')))]
+
+    # Deal with potentially missed grouping factors- are values duplicated?
+    ndups <- val_df |>
+      dplyr::group_by(dplyr::across(tidyselect::any_of(c(compcols, 'geometry')))) |>
+      dplyr::summarise(nvals = dplyr::n())
+    ndups <- max(ndups$nvals, na.rm = TRUE)
+
+    if (ndups == 1) {groupcols <- NULL}
+    if (ndups > 1) {
+      nonnumnames <- names(val_df)[!purrr::map_lgl(val_df, is.numeric)]
+      nonnumnames <- nonnumnames[!(nonnumnames %in% c(compcols, valcols, 'geometry'))]
+      rlang::warn(glue::glue("`group_cols` argument not passed, but multiple
+                             data points in {stringr::str_flatten_comma(compcols)}.
+                             Trying to group by non-numeric columns {stringr::str_flatten_comma(nonnumnames)},
+                             but FAR better to be explicit."))
+
+      groupcols <- nonnumnames
+    }
+
+
   } else {
     groupcols <- selectcreator(rlang::enquo(group_cols), val_df, failmissing)
   }
@@ -129,7 +148,13 @@ create_base <- function(val_df, compare_col, base_lev, values_col, group_cols = 
       dplyr::select({{groupcols}}, tidyselect::starts_with('ref_')) |>
       sf::st_drop_geometry()
 
-    val_df <- dplyr::left_join(val_df, refdf, by = groupcols)
+    # handle the special case of no groups, so a single reference
+    if (nrow(refdf) == 1 & ncol(refdf) == 1) {
+      val_df <- dplyr::bind_cols(val_df, refdf)
+    } else {
+      val_df <- dplyr::left_join(val_df, refdf, by = groupcols)
+    }
+
   }
 
   # The easiest thing to do is if base_lev is a scalar
