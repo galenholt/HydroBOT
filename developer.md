@@ -10,7 +10,7 @@ Basically, setting up the github ssh key follows the [github instructions](https
 A couple small notes:
 -   Don't name the file- leave it as the default 'id_TypeOfEncyption'. `ssh-add` auto adds 'id_*' files, but not other names. 
 -   Don't include a passphrase (just press enter when it asks for one)- that just yields another layer of signin complexity. 
--   The github docs code sometimes says to use `clip ~/.ssh/id_ed25519.pub` to copy the contents of the file, and sometimes says to use `cat ~/.ssh/id_ed25519.pub` to print it to terminal and then copy (docs seem to be under development). `clip` doesn't work, `cat` does.
+-   The github docs code sometimes says to use `clip ~/.ssh/id_ed25519.pub` to copy the contents of the file, and sometimes says to use `cat ~/.ssh/id_ed25519.pub` to print it to terminal and then copy (docs seem to be under development). `clip` seems to work on windows with git bash, `cat` works on Linux.
 
 If we stopped here, things would work, but we'd have to use `eval "$(ssh-agent -s)"` and then `ssh-add ~/.ssh/NAME_OF_KEY` every time. So, change the `.bashrc` according to Andrew to auto-run `ssh-add`. I tend to use nano for small edits, so `nano ~/.bashrc` (or `cd` and then `nano .bashrc`), and copy-paste in 
 
@@ -50,6 +50,9 @@ IdentityFile  /home/azureuser/.ssh/[your key file name]
 but it didn't solve the issue with persisting named keys and doesn't seem to be needed if they have the default names. I've dropped it, but may want to resurrect if we have issues.
 
 If the key still isn't persisting, it's likely that `ssh-add` isn't auto-starting it because it has a non-default name. The best solution is to use a default name, but you could also run `ssh-add ~/.ssh/KEY_NAME` every time, and then it works. Sometimes VS's source control pane still doesn't talk to github, but the command line seems to always work after that.
+
+### WINDOWS ssh
+Setting up ssh on Windows works basically the same way. Just click the Windows tab at the git instructions, but it's nearly identical if you use git bash. That should be fine for typical repo use, but we have to do more to get ssh to work for *installing* packages from protected repos. To prepare for this, there seem to be an inability to pass anything other than rsa keys, so create one of those (I have one of those and and an ed25519, but I'm pretty sure the rsa is auto-enforced with the `install_git`). The rigmarole for installing is dealt with in the developer.md for WERP_toolkit_demo, since that's where we need to install this from.
 
 ### R global setup
 The R version that comes on the machines is 4.0, and the usual `apt-get` isn't finding anything newer, but currently (late December 2022) R is at 4.2.2 and that's what I've been developing on. We can use [rig](https://github.com/r-lib/rig) to manage R versions (and this is likely better anyway, because we can swap around). It does seem to run with the old version, but it will be good to be able to choose. At the bash terminal, type `curl -Ls https://github.com/r-lib/rig/releases/download/latest/rig-linux-latest.tar.z | sudo tar xz -C /usr/local` to install rig. Then, `rig list` to see available R versions (likely none- it doesn't store its versions with the system). Then `rig add 4.2.2` (or whatever the current version is). There are ways to use Rstudio with the version in the `renv.lock`, and likely ways to do the same with VS, but for now, easiest is to make sure `renv default` matches the version in `renv.lock`.

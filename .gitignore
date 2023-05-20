@@ -10,7 +10,7 @@
 *.xlsx
 
 # test data- ignoring because should be constructed. If becomes a released package, will need to be included.
-*data/
+#data/
 
 # Ignore the downloaded data because that can be constructed, but not the emailed data because that can't.
 werptoolkitr/data-raw/downloaded/
