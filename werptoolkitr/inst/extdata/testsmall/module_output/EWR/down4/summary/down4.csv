@@ -6,7 +6,7 @@ hydrographs\down4\down4,down4,412002,Upper Lachlan River,BF2_b,,6,100,100,9,1.5,
 hydrographs\down4\down4,down4,412002,Upper Lachlan River,BK1_P,,0,0,50,0,0.0,0,0,0.0,0.0,0.0,0,0,0,1825
 hydrographs\down4\down4,down4,412002,Upper Lachlan River,BK1_S,,0,0,50,0,0.0,0,0,0.0,0.0,0.0,0,0,0,1825
 hydrographs\down4\down4,down4,412002,Upper Lachlan River,CF1_b,,0,0,5,0,0.0,0,0,0.0,0.0,0.0,0,0,0,1825
-hydrographs\down4\down4,down4,412002,Upper Lachlan River,CF1_c,,0,0,0.7,0,0.0,0,0,0.0,0.0,0.0,0,0,0,1825
+hydrographs\down4\down4,down4,412002,Upper Lachlan River,CF1_c,,0,0,7,0,0.0,0,0,0.0,0.0,0.0,0,0,0,1825
 hydrographs\down4\down4,down4,412002,Upper Lachlan River,LF1_P,,1,17,75,2,0.3333333333333333,2,2,0.3333333333333333,0.3333333333333333,7.0,14,2,0,1825
 hydrographs\down4\down4,down4,412002,Upper Lachlan River,LF1_S,,1,17,75,2,0.3333333333333333,2,3,0.3333333333333333,0.5,5.0,15,2,0,1825
 hydrographs\down4\down4,down4,412002,Upper Lachlan River,LF2,,0,0,40,0,0.0,0,1,0.0,0.16666666666666666,1.0,1,4,0,1825
@@ -67,7 +67,7 @@ hydrographs\down4\down4,down4,412038,Lachlan River - Lake Cargelligo to Willandr
 hydrographs\down4\down4,down4,412038,Lachlan River - Lake Cargelligo to Willandra Weir,LF2,,1,17,40,1,0.16666666666666666,1,1,0.16666666666666666,0.16666666666666666,60.0,60,4,0,1825
 hydrographs\down4\down4,down4,412038,Lachlan River - Lake Cargelligo to Willandra Weir,OB1_P,,1,17,75,1,0.16666666666666666,1,1,0.16666666666666666,0.16666666666666666,40.0,40,2,0,1825
 hydrographs\down4\down4,down4,412038,Lachlan River - Lake Cargelligo to Willandra Weir,OB1_S,,1,17,75,1,0.16666666666666666,1,1,0.16666666666666666,0.16666666666666666,40.0,40,2,0,1825
-hydrographs\down4\down4,down4,412038,Lachlan River - Lake Cargelligo to Willandra Weir,OB2,,0,0,55,0,0.0,0,1,0.0,0.16666666666666666,3.0,3,3,0,1825
+hydrographs\down4\down4,down4,412038,Lachlan River - Lake Cargelligo to Willandra Weir,OB2,,0,0,55,0,0.0,0,1,0.0,0.16666666666666666,4.0,4,3,0,1825
 hydrographs\down4\down4,down4,412038,Lachlan River - Lake Cargelligo to Willandra Weir,OB3_P,,0,0,40,0,0.0,0,0,0.0,0.0,0.0,0,4,0,1825
 hydrographs\down4\down4,down4,412038,Lachlan River - Lake Cargelligo to Willandra Weir,OB3_S,,0,0,40,0,0.0,0,0,0.0,0.0,0.0,0,4,0,1825
 hydrographs\down4\down4,down4,412038,Lachlan River - Lake Cargelligo to Willandra Weir,OB4_P,,0,0,25,0,0.0,0,0,0.0,0.0,0.0,0,5,0,1825
@@ -80,7 +80,7 @@ hydrographs\down4\down4,down4,412038,Lachlan River - Lake Cargelligo to Willandr
 hydrographs\down4\down4,down4,412038,Lachlan River - Lake Cargelligo to Willandra Weir,VF_b,,4,67,100,4,0.6666666666666666,4,38,0.6666666666666666,6.333333333333333,42.89473684210526,1630,1,0,1825
 hydrographs\down4\down4,down4,412038,Merrowie Creek,OB1_P,,1,17,75,1,0.16666666666666666,1,1,0.16666666666666666,0.16666666666666666,47.0,47,2,0,1825
 hydrographs\down4\down4,down4,412038,Merrowie Creek,OB1_S,,1,17,75,1,0.16666666666666666,1,1,0.16666666666666666,0.16666666666666666,47.0,47,2,0,1825
-hydrographs\down4\down4,down4,412038,Merrowie Creek,OB2,,1,17,55,1,0.16666666666666666,1,1,0.16666666666666666,0.16666666666666666,11.0,11,3,0,1825
+hydrographs\down4\down4,down4,412038,Merrowie Creek,OB2,,1,17,55,1,0.16666666666666666,1,1,0.16666666666666666,0.16666666666666666,9.0,9,3,0,1825
 hydrographs\down4\down4,down4,412038,Merrowie Creek,OB3_P,,0,0,40,0,0.0,0,0,0.0,0.0,0.0,0,4,0,1825
 hydrographs\down4\down4,down4,412038,Merrowie Creek,OB3_S,,0,0,40,0,0.0,0,0,0.0,0.0,0.0,0,4,0,1825
 hydrographs\down4\down4,down4,412038,Merrowie Creek,OB4_P,,0,0,25,0,0.0,0,0,0.0,0.0,0.0,0,5,0,1825
@@ -112,7 +112,7 @@ hydrographs\down4\down4,down4,421011,Marthaguy Creek,BF1_a,,1,17,50,1,0.16666666
 hydrographs\down4\down4,down4,421011,Marthaguy Creek,BF1_b,,5,83,96,14,2.3333333333333335,14,14,2.3333333333333335,2.3333333333333335,22.142857142857142,310,1.167123,0,1825
 hydrographs\down4\down4,down4,421011,Marthaguy Creek,BF2_a,,1,17,50,1,0.16666666666666666,1,6,0.16666666666666666,1.0,29.5,177,2,0,1825
 hydrographs\down4\down4,down4,421011,Marthaguy Creek,BF2_b,,2,33,75,3,0.5,3,6,0.5,1.0,29.5,177,2,0,1825
-hydrographs\down4\down4,down4,421011,Marthaguy Creek,CF_a,,6,100,50,9,1.5,9,10,1.5,1.6666666666666667,119.7,1197,0,0,1825
+hydrographs\down4\down4,down4,421011,Marthaguy Creek,CF_a,,6,100,0,9,1.5,9,10,1.5,1.6666666666666667,119.7,1197,0,0,1825
 hydrographs\down4\down4,down4,421011,Marthaguy Creek,CF_b,,1,17,5,1,0.16666666666666666,1,10,0.16666666666666666,1.6666666666666667,119.7,1197,0,0,1825
 hydrographs\down4\down4,down4,421011,Marthaguy Creek,CF_c,,6,100,97,10,1.6666666666666667,10,10,1.6666666666666667,1.6666666666666667,119.7,1197,0,0,1825
 hydrographs\down4\down4,down4,421011,Marthaguy Creek,LF1,,2,33,75,3,0.5,3,4,0.5,0.6666666666666666,16.75,67,2,0,1825

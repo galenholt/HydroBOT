@@ -22,6 +22,8 @@ this should be run again, because it is not appropriate to mix histories in
 a causal plot.}
 
 \item{valcol}{character, name of the column with the aggregated values.}
+
+\item{targetlevels}{character, names of levels to include. Defaults to \code{names(agglist)}. Any subset of those names can be used.}
 }
 \value{
 a tibble with grouping variables for scenario and gauge, a column for

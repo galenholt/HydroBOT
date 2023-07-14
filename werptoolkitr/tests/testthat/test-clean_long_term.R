@@ -1,6 +1,6 @@
 test_that("clean_long_term as expected", {
 
-  yrpath <- system.file('data-raw/causal_networks/unknown/Env_objectives_5_10_20_year_targets_nodes Murray Lower Darling.csv',
+  yrpath <- system.file('data-raw/causal_networks/unknown/EObjYrTargets.csv',
                         package = 'werptoolkitr')
 
   yrtarget <- clean_long_term(yrpath,
