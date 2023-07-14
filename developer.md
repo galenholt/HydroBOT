@@ -2,20 +2,17 @@
 
 
 ## Git/github
-Configure git username and email. In bash, `git config --global user.name "User Name"` and `git config --global user.email "user.email@email"`. 
-Clone the repo.
 
-Set up an ssh key to be able to talk to github. Largely following Andrew's instructions:
+Set up an ssh key to be able to talk to github. Largely following Github and Andrew's instructions (below for Linux and Windows). Use an RSA key, not the default ed25519, and *do not name it*. Overriding defaults is a pain, so just use them.
 
-### Linux/Azure
-Basically, setting up the github ssh key follows the [github instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=linux), and then adding that key to your github account, again [as described by github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). This sets up the key in `~/.ssh`. To be safe, I typically cd there with `cd ~/.ssh` to start, though most of the commands put it there no matter where you are. 
+Basically, setting up the github ssh key follows the [github instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent), and then adding that key to your github account, again [as described by github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). This sets up the key in `~/.ssh`. To be safe, I typically cd there with `cd ~/.ssh` to start, though most of the commands put it there no matter where you are. 
 
 A couple small notes:
 -   Don't name the file- leave it as the default 'id_TypeOfEncyption'. `ssh-add` auto adds 'id_*' files, but not other names. 
 -   Don't include a passphrase (just press enter when it asks for one)- that just yields another layer of signin complexity. 
--   The github docs code sometimes says to use `clip ~/.ssh/id_ed25519.pub` to copy the contents of the file, and sometimes says to use `cat ~/.ssh/id_ed25519.pub` to print it to terminal and then copy (docs seem to be under development). `clip` seems to work on windows with git bash, `cat` works on Linux.
+-   The github docs for copying the public key sometimes swap OSes,  `clip` seems to work on windows with git bash, `cat` works on Linux.
 
-If we stopped here, things would work, but we'd have to use `eval "$(ssh-agent -s)"` and then `ssh-add ~/.ssh/NAME_OF_KEY` every time. So, change the `.bashrc` according to Andrew to auto-run `ssh-add`. I tend to use nano for small edits, so `nano ~/.bashrc` (or `cd` and then `nano .bashrc`), and copy-paste in 
+If we stopped here, things would work, but we'd have to use `eval "$(ssh-agent -s)"` and then `ssh-add ~/.ssh/NAME_OF_KEY` every time. So, change the `.bashrc` according to Andrew to auto-run `ssh-add` . I tend to use nano for small edits, so `nano ~/.bashrc` (or `cd` and then `nano .bashrc`), and copy-paste in the below. (and on Windows also add this to `~/.profile`)
 
 ```
 [ -z "$SSH_AUTH_SOCK" ] && eval "$(ssh-agent -s)"
@@ -54,8 +51,23 @@ but it didn't solve the issue with persisting named keys and doesn't seem to be 
 
 If the key still isn't persisting, it's likely that `ssh-add` isn't auto-starting it because it has a non-default name. The best solution is to use a default name, but you could also run `ssh-add ~/.ssh/KEY_NAME` every time, and then it works. Sometimes VS's source control pane still doesn't talk to github, but the command line seems to always work after that.
 
-### WINDOWS ssh
-Setting up ssh on Windows works basically the same way. Just click the Windows tab at the git instructions, but it's nearly identical if you use git bash. That should be fine for typical repo use, but we have to do more to get ssh to work for *installing* packages from protected repos. To prepare for this, there seem to be an inability to pass anything other than rsa keys, so create one of those (I have one of those and and an ed25519, but I'm pretty sure the rsa is auto-enforced with the `install_git`). The rigmarole for actually installing from github is dealt with in the developer.md for WERP_toolkit_demo, since that's where we need to install this from.
+### Git username
+Configure git username and email. In bash, `git config --global user.name "User Name"` and `git config --global user.email "user.email@email"`. See [github instructions](https://docs.github.com/en/get-started/getting-started-with-git/setting-your-username-in-git) and [email](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address). *Use the `noreply` github email or github gets mad when you push*. If you have a Deakin computer, you probably have to set the config `--local` once you've cloned because of the horrible `h/` drive HOME.
+
+After you have the ssh key, and ideally git user name and email, clone the repo.
+
+### Windows issues
+
+If you're on a Deakin computer, HOME is set to the horrible `/h` drive that is locked down and changes. To fix that (I hope), Georgia followed instructions from [stackoverflow](https://superuser.com/questions/1190364/how-to-set-home-directory-in-win10), specifically 
+
+From the Start menu, enter env to display the Environment Variables window. Click environment variables button in bottom right.
+Enter a new $HOME variable for my account:
+Variable Name: HOME
+Value: C:\Users\USERNAME
+
+Confirm by starting a bash and typing `cd ~`.
+
+Setting up ssh on Windows is easiest if you use git bash. That should be fine for typical repo use, but we have to do more to get ssh to work for *installing* packages from protected repos. To prepare for this, there seem to be an inability to pass anything other than rsa keys, so create one of those (I have one of those and and an ed25519, but I'm pretty sure the rsa is auto-enforced with the `install_git`). The rigmarole for actually installing from github is dealt with in the developer.md for WERP_toolkit_demo, since that's where we need to install this from.
 
 Windows should connect with SSH so we're using the same system everywhere. What seems to be working is to go to Settings \--\> Services (really, search for Services), \--\> openSSH authentication \--\> properties \--\> startup type Automatic. Run `ls-remote git@github.com:MDBAuth/WERP_toolkit.git` in command prompt interactively to add github as a known location. Then create a `~/.profile` and `~/.bashrc` with the same bits as in the linux bashrc in the werptoolkitr dev docs, and are given [at the github instructions for auto-launching](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/working-with-ssh-key-passphrases#auto-launching-ssh-agent-on-git-for-windows). Both profile and bashrc seem to be needed. And it's unclear why, since those are for bash, and `install_git` calls cmd. cmd must be calling git bash internally. Then, we also need to install the `git2r` package, or `install_git` will still fail, but we *cannot* pass the `credentials` argument, even though that seems like what we should do.
 
