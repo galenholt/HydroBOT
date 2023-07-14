@@ -93,7 +93,7 @@ Once we have the directory and set any other needed params (e.g. point at a conf
 
 ## Set up output directories
 
-This will typically be hidden in `prep_run_save_ewrs`, but I'm exposing the steps here for easier viewing and testing, especially as the formats change. see the Vignette for the wrapped version.
+This will typically be hidden in `prep_run_save_ewrs_R`, but I'm exposing the steps here for easier viewing and testing, especially as the formats change. see the Vignette for the wrapped version.
 
 This was assuming there would be gauge-files, and now there's not. Still seems to basically work, and not really worth spending too much time until we know the actual structure we want to use. We get the information about the directory structure and files as a dict with `make_scenario_info`- if there are multiple gauges within each, they enter the dict as a 'gauge' value. If not, the 'gauge' value is confusingly just the filename, but otherwise this works. The output directory and subdirs for scenarios is created by `make_output_dir`, which also returns that outer directory location. The EWR tool needs the paths to the gauge data as a list, so `paths_gauges` just unfolds the dict to give that.
 
@@ -101,9 +101,9 @@ I expect all of this to change once we have a set data format.
 
 ```{r}
 # Gives file locations as a dict- 
-sceneinfodict = make_scenario_info(scenario_dir)
+sceneinfodict = make_scenario_info_R(scenario_dir)
 # make the output directory structure
-outpath = make_output_dir(output_dir, sceneinfodict)
+outpath = make_output_dir_R(output_dir, sceneinfodict)
 # unfold the sceneinfodict to make it easy to get the lists of paths and gauges
 # everyhydro = paths_gauges(sceneinfodict)[0]
 
@@ -115,7 +115,7 @@ for (i in 1:length(sceneinfodict)) {
 }
 
 # more list-making to work from R-Python
-everyhydro = as.list(paths_gauges(sceneinfodict)[[1]])
+everyhydro = as.list(paths_gauges_R(sceneinfodict)[[1]])
 ```
 
 ## Run the ewr tool
@@ -141,7 +141,7 @@ if (params$REBUILD_DATA) {
 }
 
 
-ewr_out = run_save_ewrs(everyhydro, outpath, model_format = model_format, allowance = allowance, climate = climate, outputType = outputType, datesuffix = FALSE, returnType = list('summary', 'all'))
+ewr_out = run_save_ewrs_R(everyhydro, outpath, model_format = model_format, allowance = allowance, climate = climate, outputType = outputType, datesuffix = FALSE, returnType = list('summary', 'all'))
 ```
 
 # Still do to

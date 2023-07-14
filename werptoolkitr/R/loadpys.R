@@ -1,5 +1,9 @@
-
 # Wrap the python
+controller_functions <- reticulate::import_from_path("controller_functions",
+                                       path = system.file("python",
+                                                          package = 'werptoolkitr'),
+                                       delay_load = TRUE)
+
 #' Wrapper for prep_run_save_ewrs
 #'
 #' @param ... All params for python fun
@@ -10,9 +14,7 @@
 #' @examples
 # The shortest but least helpful version
 prep_run_save_ewrs_R <- function(...) {
-  ewrout <- prep_run_save_ewrs(...)
-  # a better solution, but can't quite get it to work in practice.
-  # ewrout <- controller_functions$prep_run_save_ewrs(...)
+  ewrout <- controller_functions$prep_run_save_ewrs(...)
 }
 
 # More expressive, but then have to keep up with args both places
@@ -42,7 +44,7 @@ prep_run_save_ewrs_R <- function(...) {
 #'
 #' @examples
 make_scenario_info_R <- function(...) {
-  r_py_out <- make_scenario_info(...)
+  r_py_out <- controller_functions$make_scenario_info(...)
 }
 
 #' Wrapper for make_output_dir
@@ -54,7 +56,7 @@ make_scenario_info_R <- function(...) {
 #'
 #' @examples
 make_output_dir_R <- function(...) {
-  r_py_out <- make_output_dir(...)
+  r_py_out <- controller_functions$make_output_dir(...)
 }
 
 #' Wrapper for run_save_ewrs
@@ -66,7 +68,19 @@ make_output_dir_R <- function(...) {
 #'
 #' @examples
 run_save_ewrs_R <- function(...) {
-  r_py_out <- run_save_ewrs(...)
+  r_py_out <- controller_functions$run_save_ewrs(...)
 }
 
+
+#' Wrapper for paths_gauges
+#'
+#' @param ... arguments to the py function
+#'
+#' @return paths
+#' @export
+#'
+#' @examples
+paths_gauges_R <- function(...) {
+  pg_out <- controller_functions$paths_gauges(...)
+}
 # There are other functions, but that should cover us for now.

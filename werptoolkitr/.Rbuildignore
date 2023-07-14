@@ -3,3 +3,4 @@
 ^werptoolkitr\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
+^.venv$
