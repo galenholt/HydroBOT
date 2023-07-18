@@ -4,7 +4,7 @@ test_that("summary works", {
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
   namestring <- c('scenario_path', 'scenario', 'gauge', 'planning_unit',
-                  'multigauge', 'ewr_code', 'ewr_code_timing', 'event_years',
+                  'ewr_code', 'ewr_code_timing', 'multigauge', 'event_years',
                   'frequency', 'target_frequency', 'achievement_count',
                   'achievement_per_year', 'event_count', 'event_count_all',
                   'events_per_year', 'events_per_year_all',

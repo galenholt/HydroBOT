@@ -8,7 +8,7 @@ test_that("long produces expected output", {
 
   expect_s3_class(ewr2obj, 'tbl_df')
   # paste(names(ewr2obj), collapse = '", "')
-  ewrnames <- c("WatReqID", "PlanningUnitID", "LTWPShortName", "gauge", "env_obj", "ewr_code", "ewr_code_timing")
+  ewrnames <- c("WatReqID", "PlanningUnitID", "LTWPShortName", "gauge", "ewr_code", "ewr_code_timing", "env_obj")
   expect_equal(names(ewr2obj), ewrnames)
 
   # being a bit more general here, since the ordering could easily change
@@ -34,3 +34,4 @@ test_that("long produces expected output", {
   expect_snapshot_value(purrr::map(ewr2objw, is.logical))
 
 })
+
