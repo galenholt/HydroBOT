@@ -55,7 +55,11 @@ list of improvements.}
 apply them. Each list entry can be one value, e.g. a character or bare
 name, or can be multiple if mulitiple aggregations should be done at that
 step, e.g. \code{c('ArithmeticMean', 'LimitingFactor')}. The entries can also be
-lists themselves, useful for passing functions with arguments, e.g \code{list(wm = ~weighted.mean(., w = area, na.rm = TRUE))}}
+lists themselves, useful for passing functions with arguments, e.g \code{list(wm = ~weighted.mean(., w = area, na.rm = TRUE))}. \emph{Important:} as of {dplyr}
+1.1, if these are anonymous functions that refer to data variables (like
+the \code{w = area} argument in the \code{\link[=weighted.mean]{weighted.mean()}} example), that list needs
+to be wrapped in \code{\link[rlang:defusing-advanced]{rlang::quo()}}, e.g. \verb{rlang::quo(list(wm = ~weighted.mean(., w = area, na.rm = TRUE))}. And we can no longer mix
+character and other forms in the same sub-list (single aggregation step).}
 
 \item{saveintermediate}{logical, default \code{FALSE}. * \code{FALSE} (the default):
 Save only the final result as a tibble or sf * \code{TRUE}: Save every step of

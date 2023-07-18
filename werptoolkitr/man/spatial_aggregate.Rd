@@ -26,15 +26,26 @@ level to group into. This uses the intersection \code{\link[sf:geos_binary_ops]{
 if \code{dat} and \code{to_geo} are both polygons, they do not have to be
 nested.}
 
-\item{groupers}{as in \code{\link{general_aggregate}}, with the note that these should
+\item{groupers}{as in \code{\link[=general_aggregate]{general_aggregate()}}, with the note that these should
 be all grouping columns \emph{except} the polygons in \code{to_geo}, which are
-automatically added to \code{groupers} before passing to \code{general_aggregate}.}
+automatically added to \code{groupers} before passing to \code{\link[=general_aggregate]{general_aggregate()}}.}
 
 \item{aggCols}{an expression for the columns to aggregate (the data columns).
 See \code{selectcreator} for formats}
 
 \item{funlist}{a list of functions and their arguments used to aggregate the
-data. See \code{functionlister} for creation in many cases.}
+data. See \code{functionlister} for creation in many cases. The situation with a
+bare anonymous function, e.g. \code{~mean(., na.rm = T)} is not supported
+because we need a name. Use a named list if using anonymous functions, e.g.
+\code{list(mean = ~mean(., na.rm = T))}. \emph{If using functions with a
+data-variable argument}, e.g. weighted.mean with a column of weights, we
+now (as of {dplyr} 1.1) have some major restrictions. If specified \emph{as a
+function argument}, the function can just go in as a bare name or
+anonymous. If specified elsewhere, it \emph{has} to be wrapped in
+\code{\link[rlang:defusing-advanced]{rlang::quo()}}, e.g. \code{agglist <- rlang::quo(list(mean = mean, wm = ~weighted.mean(., weight_column_name, na.rm = T)))}. And if building custom
+aggregation functions (not-anonymous), the argument has to be exposed, it
+can't be hardcoded into the function body. The error checks for names do
+not work for quosures, so make sure you name the list.}
 
 \item{...}{arguments passed to the aggregation functions. This is \emph{very}
 limited, and does not work with data arguments under most conditions.
@@ -49,7 +60,7 @@ aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
 and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
 \code{tidyselect::any_of()} in \code{tidyselect}}
 
-\item{prefix}{character, differs from \code{general_aggregate} in that default is
+\item{prefix}{character, differs from \code{\link[=general_aggregate]{general_aggregate()}} in that default is
 \code{'spatial_'} instead of \code{'agg_'}.}
 
 \item{keepAllPoly}{logical, default \code{FALSE}. Should polygons in \code{to_geo} that
@@ -65,6 +76,6 @@ polygons in \code{to_geo} and retaining desired theme-level information
 Takes geographic data (points or polygons), and aggregates into polygons,
 while retaining theme-level information. This function sets up the data with
 specific prep for the way the spatial dimension works, and then wraps
-\code{general_aggregate}. Many of the arguments here are just passed through to
+\code{\link[=general_aggregate]{general_aggregate()}}. Many of the arguments here are just passed through to
 general aggregate.
 }
