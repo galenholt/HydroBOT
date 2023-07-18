@@ -79,7 +79,7 @@ clean_obj_target <- function(ewrobjs,
   pu2ltwp <- ewrobjs %>%
     dplyr::distinct(PlanningUnitID, LTWPShortName)
 
-  qc_fix <- dplyr::left_join(qc_fix, pu2ltwp, by = 'LTWPShortName')
+  qc_fix <- dplyr::left_join(qc_fix, pu2ltwp, by = 'LTWPShortName', relationship = 'many-to-many')
 
   qc_fix <- qc_fix %>%
     dplyr::filter(link != 0) %>% #watch out for the 2s = Renee changes
