@@ -37,10 +37,23 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
     stop('selectvals should be characters or defused tidyselect- either `rlang::expr(tidyselect)` in call to function or `rlang::enquo(tidyselect)` internally')
   }
 
+  # a secondary check in case s1g evals to just a character vector. This
+  # typically only happens if a character vector is passed in but wrapped in
+  # rlang::enquo, since the first conditional wraps incoming bare character
+  # vectors in tidyselect already
+  if (is.character(rlang::get_expr(s1g))) {
+    charvec <- rlang::get_expr(s1g)
+    if (failmissing) {
+      s1g <- rlang::expr(tidyselect::all_of(charvec))
+    } else {
+      s1g <- rlang::expr(tidyselect::any_of(charvec))
+    }
+  }
+
   # Returning names instead of the indices is safer in case cols get reshuffled
-  # at some point
-  # as of R 4.2, this throws a warning when s1g evals to a character vector, and
-  # needs tidyselect::all_of( or tidyselect::any_of( wrapping
+  # at some point as of R 4.2, this throws a warning when s1g evals to a
+  # character vector, and needs tidyselect::all_of( or tidyselect::any_of(
+  # wrapping- see secondary conditional above
   s1g <- s1g %>%
     tidyselect::eval_select(data, strict = failmissing) %>%
     names()
