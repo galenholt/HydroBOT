@@ -107,8 +107,8 @@ theme_aggregate <- function(dat,
       dplyr::left_join(causal_edges)
   } else {
     pairdat <- dat %>%
-      dplyr::left_join(g2p) %>%
-      dplyr::left_join(causal_edges)
+      dplyr::left_join(g2p, relationship = "many-to-many") %>%
+      dplyr::left_join(causal_edges, relationship = "many-to-many")
   }
 
 

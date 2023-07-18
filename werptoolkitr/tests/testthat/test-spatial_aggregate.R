@@ -1,3 +1,5 @@
+rlang::local_options(lifecycle_verbosity = "error")
+
 test_that("gauge to poly works", {
   sumspat <- gauge2geo(summary_ewr_output,
                        gaugelocs = bom_basin_gauges)

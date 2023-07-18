@@ -54,9 +54,14 @@ general_aggregate <- function(data, groupers,
 
 
   # Clean up groupers and aggCols from various formats and ensure only present
-  # columns are included
+  # columns are included as character vectors. We're in this mess because some
+  # of the rlang breaks with depth
   groupers <- selectcreator(rlang::enquo(groupers), data, failmissing)
   aggCols <- selectcreator(rlang::enquo(aggCols), data, failmissing)
+
+  if (!is.character(groupers) || !is.character(aggCols)) {
+    rlang::abort('the new way of enforcing characters is not working, we have tidyselect still. back to `{{}}` in the `across`')
+  }
 
   # typical name parsing
   nameparser = paste0(prefix, '{.fn}_{.col}')
@@ -64,8 +69,8 @@ general_aggregate <- function(data, groupers,
   # if a quosure, just do the processing and return
   if (rlang::is_quosure(funlist)) {
     data_agg <- data %>%
-      dplyr::group_by(dplyr::across({{groupers}})) %>%
-      dplyr::summarise(dplyr::across({{aggCols}}, !!funlist, ...,
+      dplyr::group_by(dplyr::across(all_of(groupers))) %>%
+      dplyr::summarise(dplyr::across(all_of(aggCols), !!funlist, ...,
                                      .names = nameparser)) %>%
       dplyr::ungroup()
 
@@ -94,8 +99,8 @@ general_aggregate <- function(data, groupers,
 
 
   data_agg <- data %>%
-    dplyr::group_by(dplyr::across({{groupers}})) %>%
-    dplyr::summarise(dplyr::across({{aggCols}}, {{funlist}}, ...,
+    dplyr::group_by(dplyr::across(all_of(groupers))) %>%
+    dplyr::summarise(dplyr::across(all_of(aggCols), {{funlist}}, ...,
                                    .names = nameparser)) %>%
     dplyr::ungroup()
 }

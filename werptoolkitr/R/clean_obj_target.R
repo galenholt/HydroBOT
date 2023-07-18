@@ -71,7 +71,7 @@ clean_obj_target <- function(ewrobjs,
   PUs_names <- suppressWarnings(readr::read_csv(qcfiles[2], col_types = readr::cols())) #the names didnt match the way i was doing it before
   PUs_names$X1 <- NULL
   qc_fix$X1 <- NULL
-  qc_fix <- dplyr::left_join(qc_fix, PUs_names, by = "PU")
+  qc_fix <- dplyr::left_join(qc_fix, PUs_names, by = "PU", relationship = 'many-to-many')
   #need to check with Renee - these are not objective specific but macquarie seem to be.
 
   # This is crazy how much re-joining we're doing. Need to find where all this

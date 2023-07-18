@@ -25,16 +25,58 @@
 #'
 #' @examples
 selectcreator <- function(selectvals, data, failmissing = TRUE) {
+
+  # Simple if they're characters
   if (is.character(selectvals)) {
     if (failmissing) {
       s1g <- rlang::expr(tidyselect::all_of(selectvals))
     } else {
       s1g <- rlang::expr(tidyselect::any_of(selectvals))
     }
-  } else if (is.language(selectvals)) {
-    s1g <- selectvals
-  } else {
-    stop('selectvals should be characters or defused tidyselect- either `rlang::expr(tidyselect)` in call to function or `rlang::enquo(tidyselect)` internally')
+
+  }
+
+  # Deal with quosures and tidyselect
+  if (is.language(selectvals)) {
+
+    # If it directly evaluates as a character vector, just get it and wrap as above
+    if (is.character(rlang::get_expr(selectvals))) {
+      charvec <- rlang::get_expr(selectvals)
+      if (failmissing) {
+        s1g <- rlang::expr(tidyselect::all_of(charvec))
+      } else {
+        s1g <- rlang::expr(tidyselect::any_of(charvec))
+      }
+    }
+
+    # If it's not a character, it *could* still evaluate to one, but it could
+    # also evaluate to tidyselect, and we can't treat those the same.
+    if (!is.character(rlang::get_expr(selectvals))) {
+      # I can't figure out a way to ask what it evaluates to without evaluating
+      # it and potentially triggering an error if it's tidyselect.
+
+      # So, set it to s1g, in case it's tidyselect, but also do a trycatch to
+      # find the character version and overwrite s1g if so. Done in that order
+      # to avoid interrupted promises from evaluating the tidy
+      s1g <- selectvals
+
+      # touching it again breaks the quosures, so get s1g here, I guess, and overwrite later if needed.
+      # s1g <- s1g %>%
+      #   tidyselect::eval_select(data, strict = failmissing) %>%
+      #   names()
+
+      charvec <- tryCatch(rlang::eval_tidy(selectvals), error = function(c) FALSE)
+
+      # if it's a character, we have it now, process as above.
+      if (is.character(charvec)) {
+        if (failmissing) {
+          s1g <- rlang::expr(tidyselect::all_of(charvec))
+        } else {
+          s1g <- rlang::expr(tidyselect::any_of(charvec))
+        }
+      }
+    }
+
   }
 
   # a secondary check in case s1g evals to just a character vector. This
@@ -54,9 +96,16 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
   # at some point as of R 4.2, this throws a warning when s1g evals to a
   # character vector, and needs tidyselect::all_of( or tidyselect::any_of(
   # wrapping- see secondary conditional above
-  s1g <- s1g %>%
-    tidyselect::eval_select(data, strict = failmissing) %>%
-    names()
+
+  # The `suppressWarnings` here is because I get an interrupted promise
+  # evaluatation message if I ever touch selectvals or s1g after I set them to
+  # each other for the tidyselect case. I could probably work around it with a
+  # different order of operations, but the check whether it evals to character
+  # is necessary and does it.
+  suppressWarnings(s1g <- s1g %>%
+                     tidyselect::eval_select(data, strict = failmissing) %>%
+                     names())
 
   return(s1g)
 }
+
