@@ -38,6 +38,15 @@ baseline_compare <- function(val_df, compare_col, base_lev, values_col,
   # generate one version from the other). But for now, we already need the
   # conditionals for names and functionlister, so just do different mutates too
 
+  # The new deal where lists of anonymous functions have to be quosures
+  if (rlang::is_quosure(comp_fun)) {
+    nameparser = paste0('{.fn}_{.col}')
+    val_df <- val_df %>%
+      dplyr::mutate(dplyr::across({{valcols}},
+                                  !!comp_fun, ...,
+                                  .names = nameparser))
+  }
+
   if (is.list(comp_fun)) {
     # make comp_fun a named list whether it comes in that way or as a character vector
     comp_fun <- functionlister(comp_fun)

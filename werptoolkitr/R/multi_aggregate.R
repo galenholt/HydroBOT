@@ -28,7 +28,12 @@
 #'   name, or can be multiple if mulitiple aggregations should be done at that
 #'   step, e.g. `c('ArithmeticMean', 'LimitingFactor')`. The entries can also be
 #'   lists themselves, useful for passing functions with arguments, e.g `list(wm
-#'   = ~weighted.mean(., w = area, na.rm = TRUE))`
+#'   = ~weighted.mean(., w = area, na.rm = TRUE))`. *Important:* as of {dplyr}
+#'   1.1, if these are anonymous functions that refer to data variables (like
+#'   the `w = area` argument in the [weighted.mean()] example), that list needs
+#'   to be wrapped in [rlang::quo()], e.g. `rlang::quo(list(wm =
+#'   ~weighted.mean(., w = area, na.rm = TRUE))`. And we can no longer mix
+#'   character and other forms in the same sub-list (single aggregation step).
 #' @param saveintermediate logical, default `FALSE`. * `FALSE` (the default):
 #'   Save only the final result as a tibble or sf * `TRUE`: Save every step of
 #'   the aggregation as a tibble or sf in a list

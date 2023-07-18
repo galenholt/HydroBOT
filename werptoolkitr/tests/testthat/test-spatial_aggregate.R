@@ -169,6 +169,9 @@ test_that("multiple functions", {
 
   # # Should also work with other anonymous function, but only actually has once.
   # # list- typically specified outside the call
+  # For some reason this version gets passed in as a character "fnlistx", not a
+  # list. We can see the list if we type `fnlistx`, but `funlist` is a
+  # character. Need to do some more sorting out to get it to work.
   # fnlistx <- list(mean = \(x) mean(x, na.rm = TRUE),
   #                sd = \(x) sd(x, na.rm = TRUE))
   # spatagg_lx <- spatial_aggregate(sumspat,
@@ -182,19 +185,14 @@ test_that("multiple functions", {
   # expect_equal(nrow(spatagg_lx), 6)
 
 
-
-
-
-
-
   # vector arguments (e.g. weighting)
   wtgauge <- sumspat %>%
     dplyr::group_by(scenario, gauge) %>%
     dplyr::mutate(wt = dplyr::n()) %>%
     dplyr::ungroup()
 
-  fnlistw <- list(mean = ~mean(., na.rm = TRUE),
-                 wm = ~weighted.mean(., wt, na.rm = TRUE))
+  fnlistw <- rlang::quo(list(mean = ~mean(., na.rm = TRUE),
+                 wm = ~weighted.mean(., w = wt, na.rm = TRUE)))
 
   spatagg_lw <- spatial_aggregate(wtgauge,
                                  to_geo = sdl_units,
@@ -209,10 +207,12 @@ test_that("multiple functions", {
   expect_equal(nrow(spatagg_l), 6)
 
   # DPLYR 1.1 WILL BREAK THIS- need to sort that out sometime
-  fnlistw <- list(mean = ~mean(., na.rm = TRUE),
-                  wm = ~weighted.mean(., wt, na.rm = TRUE))
+  fnlistw <- rlang::quo(list(mean = ~mean(., na.rm = TRUE),
+                  wm = ~weighted.mean(., wt, na.rm = TRUE)))
+
   sumdat <- prep_ewr_agg(summary_ewr_output, type = 'summary',
                          geopath = bom_basin_gauges)
+
   wtgauge2 <- sumdat %>%
     dplyr::group_by(scenario, gauge) %>%
     dplyr::mutate(wt = dplyr::n()) %>%

@@ -3,7 +3,7 @@
 #' Takes geographic data (points or polygons), and aggregates into polygons,
 #' while retaining theme-level information. This function sets up the data with
 #' specific prep for the way the spatial dimension works, and then wraps
-#' `general_aggregate`. Many of the arguments here are just passed through to
+#' [general_aggregate()]. Many of the arguments here are just passed through to
 #' general aggregate.
 #'
 #' @inheritParams general_aggregate
@@ -14,16 +14,16 @@
 #'   level to group into. This uses the intersection [sf::st_intersection()], so
 #'   if `dat` and `to_geo` are both polygons, they do not have to be
 #'   nested.
-#' @param groupers as in [`general_aggregate`], with the note that these should
+#' @param groupers as in [general_aggregate()], with the note that these should
 #'   be all grouping columns *except* the polygons in `to_geo`, which are
-#'   automatically added to `groupers` before passing to `general_aggregate`.
+#'   automatically added to `groupers` before passing to [general_aggregate()].
 #' @param whichcrs desired coordinate reference system, easiest is just the
 #'   numeric EPSG code, but could a full crs definition. See [sf::st_crs()]
 #' @param keepAllPoly logical, default `FALSE`. Should polygons in `to_geo` that
 #'   have no values in `dat` be retained? The default `FALSE` keeps NA
 #'   polygons from cluttering things up, but `TRUE` is very useful to not lose
 #'   them, especially for later plotting.
-#' @param prefix character, differs from `general_aggregate` in that default is
+#' @param prefix character, differs from [general_aggregate()] in that default is
 #'   `'spatial_'` instead of `'agg_'`.
 #'
 #' @return an `sf` with columns for the grouping variables aggregated into the

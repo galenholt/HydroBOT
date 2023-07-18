@@ -28,6 +28,60 @@ test_that("bare names for everything works", {
   # too much effort to get the others. If this becomes an issue, use something that checks an output.
 })
 
+test_that("list of ~ functions works", {
+  aggchar1 <- general_aggregate(mtcars, groupers = cyl, aggCols = disp,
+                                funlist = list(mean = ~mean(., na.rm = T)))
+  expect_equal(names(aggchar1), c('cyl', 'agg_mean_disp'))
+  expect_equal(aggchar1$cyl, c(4,6,8))
+  expect_equal(round(aggchar1$agg_mean_disp, 4), c(105.1364, 183.3143, 353.1000))
+
+  aggchar2 <- general_aggregate(mtcars, groupers = c(cyl, carb), aggCols = c(disp, wt),
+                                funlist = list(mean = ~mean(., na.rm = T), min = ~min(., na.rm = T)))
+  # stringr::str_flatten(names(aggchar2), "', '")
+  namestring <- c('cyl', 'carb', 'agg_mean_disp', 'agg_min_disp', 'agg_mean_wt', 'agg_min_wt')
+  expect_equal(names(aggchar2), namestring)
+  expect_equal(aggchar2$cyl, c(4,4, 6,6, 6, 8, 8, 8, 8))
+  expect_equal(aggchar2$carb, c(1,2,1,4,6,2,3,4,8))
+
+  # lists specified externally
+  anlist <- list(mean = ~mean(., na.rm = T), min = ~min(., na.rm = T))
+  aggchar2 <- general_aggregate(mtcars, groupers = c(cyl, carb), aggCols = c(disp, wt),
+                                funlist = anlist)
+  # stringr::str_flatten(names(aggchar2), "', '")
+  namestring <- c('cyl', 'carb', 'agg_mean_disp', 'agg_min_disp', 'agg_mean_wt', 'agg_min_wt')
+  expect_equal(names(aggchar2), namestring)
+  expect_equal(aggchar2$cyl, c(4,4, 6,6, 6, 8, 8, 8, 8))
+  expect_equal(aggchar2$carb, c(1,2,1,4,6,2,3,4,8))
+  # too much effort to get the others. If this becomes an issue, use something that checks an output.
+})
+
+test_that("list of \\(x) functions works", {
+  aggchar1 <- general_aggregate(mtcars, groupers = cyl, aggCols = disp,
+                                funlist = list(mean = \(x) mean(x, na.rm = T)))
+  expect_equal(names(aggchar1), c('cyl', 'agg_mean_disp'))
+  expect_equal(aggchar1$cyl, c(4,6,8))
+  expect_equal(round(aggchar1$agg_mean_disp, 4), c(105.1364, 183.3143, 353.1000))
+
+  aggchar2 <- general_aggregate(mtcars, groupers = c(cyl, carb), aggCols = c(disp, wt),
+                                funlist = list(mean = \(x) mean(x, na.rm = T), min = \(x) min(x, na.rm = T)))
+  # stringr::str_flatten(names(aggchar2), "', '")
+  namestring <- c('cyl', 'carb', 'agg_mean_disp', 'agg_min_disp', 'agg_mean_wt', 'agg_min_wt')
+  expect_equal(names(aggchar2), namestring)
+  expect_equal(aggchar2$cyl, c(4,4, 6,6, 6, 8, 8, 8, 8))
+  expect_equal(aggchar2$carb, c(1,2,1,4,6,2,3,4,8))
+
+  # lists specified externally
+  anlist <- list(mean = \(x) mean(x, na.rm = T), min = \(x) min(x, na.rm = T))
+  aggchar2 <- general_aggregate(mtcars, groupers = c(cyl, carb), aggCols = c(disp, wt),
+                                funlist = anlist)
+  # stringr::str_flatten(names(aggchar2), "', '")
+  namestring <- c('cyl', 'carb', 'agg_mean_disp', 'agg_min_disp', 'agg_mean_wt', 'agg_min_wt')
+  expect_equal(names(aggchar2), namestring)
+  expect_equal(aggchar2$cyl, c(4,4, 6,6, 6, 8, 8, 8, 8))
+  expect_equal(aggchar2$carb, c(1,2,1,4,6,2,3,4,8))
+  # too much effort to get the others. If this becomes an issue, use something that checks an output.
+})
+
 test_that("tidyselect for groupers and aggCols works", {
   # This is more like the aggchar2s above- two groups, two variables
   aggchar <- general_aggregate(mtcars, groupers = tidyselect::starts_with('c'),
@@ -78,4 +132,82 @@ test_that("dots pass", {
   expect_equal(aggchar1$cyl, c(4,6,8))
   expect_equal(round(aggchar1$agg_mean_disp, 4), c(104.4444, 187.2000, 352.5692))
 
+})
+
+test_that("handling data-variables as arguments works", {
+
+  # \(x) form of anonymous
+  aggchar1 <- general_aggregate(mtcars, groupers = cyl, aggCols = disp,
+                                funlist = rlang::quo(list(mean = \(x) mean(x, na.rm = TRUE),
+                                               wm = \(x) weighted.mean(x, gear, na.rm = TRUE))))
+
+  expect_equal(names(aggchar1), c('cyl', 'agg_mean_disp', 'agg_wm_disp'))
+  expect_equal(aggchar1$cyl, c(4,6,8))
+  expect_equal(round(aggchar1$agg_mean_disp, 4), c(105.1364, 183.3143, 353.1000))
+
+  # same thing, but specified externally
+  anlist <- rlang::quo(list(mean = \(x) mean(x, na.rm = TRUE),
+                           wm = \(x) weighted.mean(x, gear, na.rm = TRUE)))
+
+  aggchare <- general_aggregate(mtcars, groupers = cyl, aggCols = disp,
+                                funlist = anlist)
+  expect_equal(names(aggchare), c('cyl', 'agg_mean_disp', 'agg_wm_disp'))
+  expect_equal(aggchare$cyl, c(4,6,8))
+  expect_equal(round(aggchare$agg_mean_disp, 4), c(105.1364, 183.3143, 353.1000))
+
+  # tilde form of anonymous
+  aggchart <- general_aggregate(mtcars, groupers = cyl, aggCols = disp,
+                                funlist = rlang::quo(list(mean = ~mean(., na.rm = TRUE),
+                                                          wm = ~weighted.mean(., gear, na.rm = TRUE))))
+
+  expect_equal(names(aggchart), c('cyl', 'agg_mean_disp', 'agg_wm_disp'))
+  expect_equal(aggchart$cyl, c(4,6,8))
+  expect_equal(round(aggchart$agg_mean_disp, 4), c(105.1364, 183.3143, 353.1000))
+
+  # same thing, but specified externally
+  anlistt <- rlang::quo(list(mean = ~mean(., na.rm = TRUE),
+                            wm = ~weighted.mean(., gear, na.rm = TRUE)))
+
+  aggcharte <- general_aggregate(mtcars, groupers = cyl, aggCols = disp,
+                                funlist = anlistt)
+  expect_equal(names(aggcharte), c('cyl', 'agg_mean_disp', 'agg_wm_disp'))
+  expect_equal(aggcharte$cyl, c(4,6,8))
+  expect_equal(round(aggcharte$agg_mean_disp, 4), c(105.1364, 183.3143, 353.1000))
+
+  # mixed with bare names
+  anlistb <- rlang::quo(list(mean = mean,
+                            wm = \(x) weighted.mean(x, gear, na.rm = TRUE)))
+
+  aggchareb <- general_aggregate(mtcars, groupers = cyl, aggCols = disp,
+                                funlist = anlistb)
+  expect_equal(names(aggchareb), c('cyl', 'agg_mean_disp', 'agg_wm_disp'))
+  expect_equal(aggchareb$cyl, c(4,6,8))
+  expect_equal(round(aggchareb$agg_mean_disp, 4), c(105.1364, 183.3143, 353.1000))
+
+  # mixed with character names- this doesn't work, the quosure prevents the
+  # function extraction from quoted names
+  anlistc <- rlang::quo(list(mean = 'mean',
+                             wm = \(x) weighted.mean(x, gear, na.rm = TRUE)))
+
+  expect_error(aggcharec <- general_aggregate(mtcars, groupers = cyl, aggCols = disp,
+                                 funlist = anlistc))
+
+  # using named, not anonymous functions with data variables
+  # This fails with the second arg buried in the function
+  wem <- function(x) {weighted.mean(x, gear, na.rm = TRUE)}
+
+  expect_error(aggcharwe <- general_aggregate(mtcars, groupers = cyl, aggCols = disp,
+                                 funlist = rlang::quo(list(mean = mean, wem = wem))))
+
+
+  # it works here because we quo and expose the gear argument
+  wem2 <- function(x, gear) {weighted.mean(x, gear, na.rm = TRUE)}
+
+  l2 <- rlang::quo(list(mean = mean, wm = wem2))
+
+  aggcharwe2 <- general_aggregate(mtcars, groupers = cyl, aggCols = disp,
+                                 funlist = l2)
+  expect_equal(names(aggcharwe2), c('cyl', 'agg_mean_disp', 'agg_wm_disp'))
+  expect_equal(aggcharwe2$cyl, c(4,6,8))
+  expect_equal(round(aggcharwe2$agg_mean_disp, 4), c(105.1364, 183.3143, 353.1000))
 })

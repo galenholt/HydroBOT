@@ -95,7 +95,8 @@ test_that("list functions work", {
 
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
                                                 package = 'werptoolkitr'))
-  baselong <- baseline_compare(hydlong, compare_col = 'scenario', comp_fun = list(difference = ~difference(., y = ref_flow)),
+  baselong <- baseline_compare(hydlong, compare_col = 'scenario',
+                               comp_fun = rlang::quo(list(difference = ~difference(., y = ref_flow))),
                                base_lev = 'base', values_col = 'flow', group_cols = c('Date', 'gauge'))
   # names are right
   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
@@ -128,3 +129,4 @@ test_that("ignore other cols", {
   # names are right
   expect_equal(based$difference_vals, -1:8)
 })
+

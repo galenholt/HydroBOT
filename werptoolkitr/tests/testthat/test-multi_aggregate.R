@@ -795,25 +795,29 @@ test_that("mixed functions between steps", {
   expect_equal(sum(is.na(spatagg$sdl_units)), 3)
 
 
-  # Mixed character and list within a single level
+  # Mixed character and list within a single level- this is no longer supported
+  # as of dplyr 1.1. It *does* work with dplyr 1.0, but I think we need to move
+  # forward from that.
+  skip_if_not_installed("dplyr", minimum_version = 1.1)
   funseq_clc <- list(c('ArithmeticMean', 'LimitingFactor'),
                     list('ArithmeticMean', GeometricMean = ~GeometricMean(.)),
                     list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
-  spatagg <- multi_aggregate(sumspat,
+  expect_error(spatagg <- multi_aggregate(sumspat,
                              aggsequence = aggseq,
                              groupers = 'scenario',
                              aggCols = 'ewr_achieved',
                              funsequence = funseq_clc,
                              causal_edges = causal_ewr,
-                             saveintermediate = TRUE)
+                             saveintermediate = TRUE))
 
-  expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
-  expect_type(spatagg, 'list')
-  expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  expect_equal(nrow(spatagg$sdl_units), 189)
-  expect_equal(ncol(spatagg$sdl_units), 15)
-  expect_equal(sum(is.na(spatagg$sdl_units)), 3)
+  # for dplyr 1.0 these work
+  # expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
+  # expect_type(spatagg, 'list')
+  # expect_s3_class(spatagg[[length(spatagg)]], 'sf')
+  # expect_equal(nrow(spatagg$sdl_units), 189)
+  # expect_equal(ncol(spatagg$sdl_units), 15)
+  # expect_equal(sum(is.na(spatagg$sdl_units)), 3)
 })
 
 # tidyselect for other groupers and aggcols
