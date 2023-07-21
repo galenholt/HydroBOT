@@ -29,7 +29,7 @@ But, if using R 4.3, the {git2r} package does not support ssh, and so
 you have to clone the directory, and use
 
 ``` r
-`devtools::install_local('path/to/repo')`
+`devtools::install_local('path/to/repo', force = TRUE, upgrade = 'ask')`
 ```
 
 I have been unable to get HTTPS to work consistently because we cannot
