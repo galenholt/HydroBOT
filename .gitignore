@@ -13,11 +13,15 @@
 #data/
 
 # Ignore the downloaded data because that can be constructed, but not the emailed data because that can't.
-werptoolkitr/data-raw/downloaded/
+/data-raw/downloaded/
 
 # Ignore some auto-generated data from tests
-werptoolkitr/tests/testthat/_test_data
+*tests/testthat/_test_data
 
+# dev/testing that's not worth tracking
+inst/doc
+scratch*
+tests_limited
 
 # Quarto-related outputs. Might want some of this back to publish
 _quarto_output/

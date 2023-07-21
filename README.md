@@ -1,14 +1,95 @@
-# WERP climate adaptation toolkit
 
-## Purpose
-Development of the WERP climate adaptation toolkit, to ingest hydrological scenarios representing historical or future climates or adaptation options, and process those through various response models (currently [MDBA EWR tool](https://github.com/MDBAuth/EWR_tool), with intention to include other tools in future). Subsequent processing of outcomes along spatial, theme, and temporal axes are available, as well as control over outputs and comparisons between scenarios. Causal networks defining relationships in the response models are included.
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# werptoolkitr
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The WERP climate adaptation toolkit, to ingest hydrological scenarios
+representing historical or future climates or adaptation options, and
+process those through various response models (currently [MDBA EWR
+tool](https://github.com/MDBAuth/EWR_tool), with intention to include
+other tools in future). Subsequent processing of outcomes along spatial,
+theme, and temporal axes are available, as well as control over outputs
+and comparisons between scenarios. Causal networks defining
+relationships in the response models are included.
+
+## Installation
+
+You should be able to install the development version of werptoolkitr
+from [GitHub](https://github.com/) with
+
+``` r
+# install.packages("devtools")
+devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask')
+```
+
+But, if using R 4.3, the {git2r} package does not support ssh, and so
+you have to clone the directory, and use
+
+``` r
+`devtools::install_local('path/to/repo')`
+```
+
+I have been unable to get HTTPS to work consistently because we cannot
+create PATs on the MDBA group, but if we can, the following method
+should work as well.
+
+Authorisation can happen a couple ways. No matter what, go to
+<https://github.com/settings/tokens> and create a PAT with at least repo
+scope and copy it. SAVE IT SOMEWHERE OTHER THAN PLAINTEXT. Then, to
+authorise, the simplest but most dangerous is to use
+`auth_token = 'YOUR GITHUB PAT'`.
+
+The better option is to use `credentials::set_github_pat()` to set your
+PAT using the github signin, which doesn’t require you to have it in
+plaintext. That sets the `GITHUB_PAT` environment variable, which is the
+default for `auth_token`.
+
+So, assuming you’ve created a PAT in github,
+
+``` r
+# install.packages("devtools")
+credentials::set_github_pat()
+devtools::install_github("MDBAuth/WERP_toolkit")
+```
 
 ## Use
-Still in development, will have several options for running, including purely scripted and step-by-step with user control over each aspect of the analysis and aggregation.
 
-### Developement 
+Can be run piecemeal or all at once, scripted. Point at a directory of
+hydrologic scenarios, and the toolkit will run them through the modules,
+aggregate the outputs, and present results, with control by the user
+through function arguments. See the
+[WERP_toolkit_demo](https://special-disco-eyonrvy.pages.github.io/) for
+a full demonstration
+
+## Developement
+
 [see developer page](developer.md)
 
-### Who do I talk to? ###
+*IMPORTANT DEV NOTE* To install from a branch other than “HEAD”, use
+`ref = 'branchname'`.
 
-* Galen Holt, g.holt@deakin.edu.au
+While we have to do the `install_local` method, the `renv` version
+management will be less reliable.
+
+### Python dependency
+
+To run, this needs a Python environment containing `py_ewr` (currently
+1.0.6). In theory, I have set up the DESCRIPTION file and `.onLoad` to
+check the environment and either use an existing one or build one with
+that dependency when the package is loaded.There are `poetry.lock` and
+`pyproject.toml` files in the repo that allow for dev work and building
+one manually if needed.
+
+## Example
+
+Need to include a local example here, high level and linking to
+vignettes. In the meantime, see the
+[WERP_toolkit_demo](https://special-disco-eyonrvy.pages.github.io/) for
+a full demonstration.
+
+## Who do I talk to?
+
+- Galen Holt, <g.holt@deakin.edu.au>

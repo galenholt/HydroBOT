@@ -5,3 +5,8 @@
 ^README\.Rmd$
 ^.venv$
 ^data-raw$
+*quarto*
+^poetry
+^pyproject
+
+
