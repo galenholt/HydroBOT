@@ -86,7 +86,7 @@ test_that('running and returning list of annual, all, and summary ewr outputs wo
 test_that('csv per gauge works', {
   # First, generate temporary hydrograph files
 
-  single_dir <- '_test_data/temp_hydro'
+  single_dir <- '_test_data/temp_hydro/hydrographs'
 
   # rebuild the data, but only if it's not already in /tests/testthat
   if (!dir.exists(single_dir)) {
