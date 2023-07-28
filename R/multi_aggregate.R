@@ -84,7 +84,10 @@ multi_aggregate <- function(dat,
   namefunsequence <- vector(mode = 'list', length = length(funsequence))
   for (i in 1:length(funsequence)) {
     funlist <- funsequence[[i]]
-    if (is.function(funlist) || (is.list(funlist) & is.function(funlist[[1]]))) {
+    if (!rlang::is_quosure(funlist) &&
+        (is.function(funlist) ||
+         (is.list(funlist) &
+          is.function(funlist[[1]])))) {
       if (length(substitute(funsequence)) == 1) {rlang::abort("Cannot infer names of funsequence, likely because it's a named object. Use something other than a pre-built list of bare function names.")}
       funlist <- as.character(substitute(funsequence)[[i+1]]) # The +1 is because the first item is 'list'.
       if(funlist[1] == "c") {funlist <- funlist[2:length(funlist)]}

@@ -168,12 +168,11 @@ test_that("poly to poly works", {
                             aggCols = 'ewr_achieved',
                             funsequence = list('mean'))
 
-  # Expect_warning because sf throws a warning about spatially constant attributes
-  expect_warning(p2pagg <- multi_aggregate(g2pagg,
+  p2pagg <- multi_aggregate(g2pagg,
                                            aggsequence = list(cewo_valleys = cewo_valleys),
                                            groupers = 'scenario',
                                            aggCols = 'sdl_units_mean_ewr_achieved',
-                                           funsequence = list('mean')))
+                                           funsequence = list('mean'))
 
   # stringr::str_flatten(names(p2pagg), "', '")
   namestring <- c('scenario', 'polyID', 'cewo_valleys_mean_sdl_units_mean_ewr_achieved',
@@ -346,12 +345,13 @@ test_that("multi-step spatial works", {
   funseq <- list('ArithmeticMean',
                  'ArithmeticMean',
                  'ArithmeticMean')
-  # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
-  expect_warning(expect_warning(spatagg <- multi_aggregate(sumspat,
-                                                           aggsequence = aggseq,
-                                                           groupers = 'scenario',
-                                                           aggCols = 'ewr_achieved',
-                                                           funsequence = funseq)))
+
+    spatagg <- multi_aggregate(sumspat,
+                                            aggsequence = aggseq,
+                                            groupers = 'scenario',
+                                            aggCols = 'ewr_achieved',
+                                            funsequence = funseq)
+
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c('scenario', 'polyID',
                   'basin_ArithmeticMean_cewo_valleys_ArithmeticMean_sdl_units_ArithmeticMean_ewr_achieved',
@@ -362,13 +362,12 @@ test_that("multi-step spatial works", {
   expect_equal(nrow(spatagg), 3)
 
   # Keeping the whole set of polys doesn't really matter here
-  # Expect_warning because sf throws a warning about spatially constant attributes
-  expect_warning(expect_warning(spataggkeep <- multi_aggregate(sumspat,
-                                                               aggsequence = aggseq,
-                                                               groupers = 'scenario',
-                                                               aggCols = 'ewr_achieved',
-                                                               funsequence = funseq,
-                                                               keepAllPolys = TRUE)))
+  spataggkeep <- multi_aggregate(sumspat,
+                                                aggsequence = aggseq,
+                                                groupers = 'scenario',
+                                                aggCols = 'ewr_achieved',
+                                                funsequence = funseq,
+                                                keepAllPolys = TRUE)
   # stringr::str_flatten(names(spatagg), "', '")
   # namestring <- c('scenario', 'polyID', 'sdl_units_mean_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spataggkeep), namestring)
@@ -416,13 +415,14 @@ test_that("multi-step theme and spatial works", {
                  'ArithmeticMean',
                  'ArithmeticMean',
                  'ArithmeticMean')
-  # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
-  expect_warning(expect_warning(spatagg <- multi_aggregate(sumspat,
-                                                           aggsequence = aggseq,
-                                                           groupers = 'scenario',
-                                                           aggCols = 'ewr_achieved',
-                                                           funsequence = funseq,
-                                                           causal_edges = causal_ewr)))
+
+  spatagg <- multi_aggregate(sumspat,
+                                            aggsequence = aggseq,
+                                            groupers = 'scenario',
+                                            aggCols = 'ewr_achieved',
+                                            funsequence = funseq,
+                                            causal_edges = causal_ewr)
+
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c('scenario', 'polyID', 'target_5_year_2024',
                   'target_5_year_2024_ArithmeticMean_mdb_ArithmeticMean_Objective_ArithmeticMean_catchment_ArithmeticMean_Specific_goal_ArithmeticMean_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_ewr_achieved',
@@ -468,14 +468,16 @@ test_that("multi-step theme and spatial works with !namehistory", {
                  'ArithmeticMean',
                  'ArithmeticMean',
                  'ArithmeticMean')
-  # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
-  expect_warning(expect_warning(spatagg <- multi_aggregate(sumspat,
-                                                           aggsequence = aggseq,
-                                                           groupers = 'scenario',
-                                                           aggCols = 'ewr_achieved',
-                                                           funsequence = funseq,
-                                                           causal_edges = causal_ewr,
-                                                           namehistory = FALSE)))
+
+
+  spatagg <- multi_aggregate(sumspat,
+                                            aggsequence = aggseq,
+                                            groupers = 'scenario',
+                                            aggCols = 'ewr_achieved',
+                                            funsequence = funseq,
+                                            causal_edges = causal_ewr,
+                                            namehistory = FALSE)
+
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c('scenario', 'polyID', 'target_5_year_2024', 'OBJECTID',
                   'DDIV_NAME', 'AREA_HA', 'SHAPE_AREA', 'SHAPE_LEN', 'geometry',
@@ -524,14 +526,13 @@ test_that("saving the list of steps", {
                  'ArithmeticMean',
                  'ArithmeticMean')
 
-  # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
-  expect_warning(expect_warning(spatagg <- multi_aggregate(sumspat,
+  spatagg <- multi_aggregate(sumspat,
                                                            aggsequence = aggseq,
                                                            groupers = 'scenario',
                                                            aggCols = 'ewr_achieved',
                                                            funsequence = funseq,
                                                            causal_edges = causal_ewr,
-                                                           saveintermediate = TRUE)))
+                                                           saveintermediate = TRUE)
 
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg, 'list')
@@ -566,17 +567,17 @@ test_that("single functions at each step, called in different ways", {
                  sdl_units = sdl_units)
   # character
   funseq_c <- list('ArithmeticMean',
-                 'ArithmeticMean',
-                 'ArithmeticMean')
+                   'ArithmeticMean',
+                   'ArithmeticMean')
 
   # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
   spatagg_c <- multi_aggregate(sumspat,
-                             aggsequence = aggseq,
-                             groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
-                             funsequence = funseq_c,
-                             causal_edges = causal_ewr,
-                             saveintermediate = TRUE)
+                               aggsequence = aggseq,
+                               groupers = 'scenario',
+                               aggCols = 'ewr_achieved',
+                               funsequence = funseq_c,
+                               causal_edges = causal_ewr,
+                               saveintermediate = TRUE)
 
   expect_equal(names(spatagg_c), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_c, 'list')
@@ -586,17 +587,17 @@ test_that("single functions at each step, called in different ways", {
 
   # bare
   funseq_b <- list(ArithmeticMean,
-                 ArithmeticMean,
-                 ArithmeticMean)
+                   ArithmeticMean,
+                   ArithmeticMean)
 
   # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
   expect_error(spatagg_b <- multi_aggregate(sumspat,
-                             aggsequence = aggseq,
-                             groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
-                             funsequence = funseq_b,
-                             causal_edges = causal_ewr,
-                             saveintermediate = TRUE))
+                                            aggsequence = aggseq,
+                                            groupers = 'scenario',
+                                            aggCols = 'ewr_achieved',
+                                            funsequence = funseq_b,
+                                            causal_edges = causal_ewr,
+                                            saveintermediate = TRUE))
 
   spatagg_b <- multi_aggregate(sumspat,
                                aggsequence = aggseq,
@@ -648,7 +649,6 @@ test_that("multiple functions at each step", {
                    c('ArithmeticMean', 'GeometricMean'),
                    c('ArithmeticMean', 'CompensatingFactor'))
 
-  # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
   spatagg_c <- multi_aggregate(sumspat,
                                aggsequence = aggseq,
                                groupers = 'scenario',
@@ -718,16 +718,16 @@ test_that("mixed functions between steps", {
 
   # all three- I don't expect the multiple bare to work
   funseq <- list(c('ArithmeticMean', 'LimitingFactor'),
-                  c(ArithmeticMean, GeometricMean),
+                 c(ArithmeticMean, GeometricMean),
                  list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
   expect_error(spatagg <- multi_aggregate(sumspat,
-                               aggsequence = aggseq,
-                               groupers = 'scenario',
-                               aggCols = 'ewr_achieved',
-                               funsequence = funseq,
-                               causal_edges = causal_ewr,
-                               saveintermediate = TRUE))
+                                          aggsequence = aggseq,
+                                          groupers = 'scenario',
+                                          aggCols = 'ewr_achieved',
+                                          funsequence = funseq,
+                                          causal_edges = causal_ewr,
+                                          saveintermediate = TRUE))
 
   # Directly declaring list
   spatagg <- multi_aggregate(sumspat,
@@ -749,22 +749,22 @@ test_that("mixed functions between steps", {
 
   # a single bare to avoid that issue still fails
   funseq_1b <- list(c('ArithmeticMean', 'LimitingFactor'),
-                 ArithmeticMean,
-                 list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
+                    ArithmeticMean,
+                    list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
   expect_error(spatagg <- multi_aggregate(sumspat,
-                             aggsequence = aggseq,
-                             groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
-                             funsequence = funseq_1b,
-                             causal_edges = causal_ewr,
-                             saveintermediate = TRUE))
+                                          aggsequence = aggseq,
+                                          groupers = 'scenario',
+                                          aggCols = 'ewr_achieved',
+                                          funsequence = funseq_1b,
+                                          causal_edges = causal_ewr,
+                                          saveintermediate = TRUE))
 
   # Mixed single functions
   # a single of everything still fails
   funseq_1 <- list('ArithmeticMean',
-                    ArithmeticMean,
-                    list(ArithmeticMean = ~ArithmeticMean(.)))
+                   ArithmeticMean,
+                   list(ArithmeticMean = ~ArithmeticMean(.)))
 
   expect_error(spatagg <- multi_aggregate(sumspat,
                                           aggsequence = aggseq,
@@ -776,16 +776,16 @@ test_that("mixed functions between steps", {
 
   # Mixed character and list
   funseq_cl <- list(c('ArithmeticMean', 'LimitingFactor'),
-                 c('ArithmeticMean', 'GeometricMean'),
-                 list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
+                    c('ArithmeticMean', 'GeometricMean'),
+                    list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
   spatagg <- multi_aggregate(sumspat,
-                                          aggsequence = aggseq,
-                                          groupers = 'scenario',
-                                          aggCols = 'ewr_achieved',
-                                          funsequence = funseq_cl,
-                                          causal_edges = causal_ewr,
-                                          saveintermediate = TRUE)
+                             aggsequence = aggseq,
+                             groupers = 'scenario',
+                             aggCols = 'ewr_achieved',
+                             funsequence = funseq_cl,
+                             causal_edges = causal_ewr,
+                             saveintermediate = TRUE)
 
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg, 'list')
@@ -800,16 +800,16 @@ test_that("mixed functions between steps", {
   # forward from that.
   skip_if_not_installed("dplyr", minimum_version = 1.1)
   funseq_clc <- list(c('ArithmeticMean', 'LimitingFactor'),
-                    list('ArithmeticMean', GeometricMean = ~GeometricMean(.)),
-                    list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
+                     list('ArithmeticMean', GeometricMean = ~GeometricMean(.)),
+                     list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
   expect_error(spatagg <- multi_aggregate(sumspat,
-                             aggsequence = aggseq,
-                             groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
-                             funsequence = funseq_clc,
-                             causal_edges = causal_ewr,
-                             saveintermediate = TRUE))
+                                          aggsequence = aggseq,
+                                          groupers = 'scenario',
+                                          aggCols = 'ewr_achieved',
+                                          funsequence = funseq_clc,
+                                          causal_edges = causal_ewr,
+                                          saveintermediate = TRUE))
 
   # for dplyr 1.0 these work
   # expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))

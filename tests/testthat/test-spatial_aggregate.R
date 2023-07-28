@@ -57,11 +57,11 @@ test_that("poly to poly works", {
                               aggCols = 'ewr_achieved',
                               funlist = 'mean')
   # Expect_warning because sf throws a warning about spatially constant attributes
-  expect_warning(p2pagg <- spatial_aggregate(g2pagg,
-                                             to_geo = cewo_valleys,
-                                             groupers = 'scenario',
-                                             aggCols = 'spatial_mean_ewr_achieved',
-                                             funlist = 'mean'))
+  p2pagg <- spatial_aggregate(g2pagg,
+                              to_geo = cewo_valleys,
+                              groupers = 'scenario',
+                              aggCols = 'spatial_mean_ewr_achieved',
+                              funlist = 'mean')
 
   # stringr::str_flatten(names(p2pagg), "', '")
   namestring <- c('scenario', 'polyID', 'spatial_mean_spatial_mean_ewr_achieved',
@@ -151,10 +151,10 @@ test_that("multiple functions", {
   # multiple bare names does not work if declared externally
   bare2 <- c(mean, sd)
   expect_error(spatagg_b2 <- spatial_aggregate(sumspat,
-                                 to_geo = sdl_units,
-                                 groupers = 'scenario',
-                                 aggCols = 'ewr_achieved',
-                                 funlist = bare2))
+                                               to_geo = sdl_units,
+                                               groupers = 'scenario',
+                                               aggCols = 'ewr_achieved',
+                                               funlist = bare2))
 
   # list- typically specified outside the call
   fnlist <- list(mean = ~mean(., na.rm = TRUE),
@@ -194,23 +194,23 @@ test_that("multiple functions", {
     dplyr::ungroup()
 
   fnlistw <- rlang::quo(list(mean = ~mean(., na.rm = TRUE),
-                 wm = ~weighted.mean(., w = wt, na.rm = TRUE)))
+                             wm = ~weighted.mean(., w = wt, na.rm = TRUE)))
 
   spatagg_lw <- spatial_aggregate(wtgauge,
-                                 to_geo = sdl_units,
-                                 groupers = 'scenario',
-                                 aggCols = 'ewr_achieved',
-                                 funlist = fnlistw)
+                                  to_geo = sdl_units,
+                                  groupers = 'scenario',
+                                  aggCols = 'ewr_achieved',
+                                  funlist = fnlistw)
 
   namestringw <- c('scenario', 'polyID', 'spatial_mean_ewr_achieved',
-                  'spatial_wm_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
+                   'spatial_wm_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg_lw), namestringw)
   expect_s3_class(spatagg_l, 'sf')
   expect_equal(nrow(spatagg_l), 6)
 
   # DPLYR 1.1 WILL BREAK THIS- need to sort that out sometime
   fnlistw <- rlang::quo(list(mean = ~mean(., na.rm = TRUE),
-                  wm = ~weighted.mean(., wt, na.rm = TRUE)))
+                             wm = ~weighted.mean(., wt, na.rm = TRUE)))
 
   sumdat <- prep_ewr_agg(summary_ewr_output, type = 'summary',
                          geopath = bom_basin_gauges)
@@ -221,12 +221,12 @@ test_that("multiple functions", {
     dplyr::ungroup()
 
   spataggsumdat_lw <- spatial_aggregate(dat = wtgauge2,
-                                 to_geo = sdl_units,
-                                 groupers = c('scenario', 'env_obj'),
-                                 aggCols = 'ewr_achieved',
-                                 funlist = fnlistw,
-                                 keepAllPolys = TRUE,
-                                 failmissing = FALSE)
+                                        to_geo = sdl_units,
+                                        groupers = c('scenario', 'env_obj'),
+                                        aggCols = 'ewr_achieved',
+                                        funlist = fnlistw,
+                                        keepAllPolys = TRUE,
+                                        failmissing = FALSE)
 
 })
 

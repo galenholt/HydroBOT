@@ -58,11 +58,15 @@ baseline_compare <- function(val_df, compare_col, base_lev, values_col,
   }
 
   if (is.character(comp_fun)) {
+    if (length(comp_fun) > 1) {rlang::abort('baselining with more than one function not supported.')}
     comp_fun <- functionlister(comp_fun)
-    nameparser = paste0('{.fn}_{.col}')
+    nameparser = paste0(names(comp_fun), '_{.col}')
+    # this assumes a single function to solve the across dots deprecation
+    # simply. We were making that assumption anyway, but this may not
+    # generalise.
     val_df <- val_df %>%
       dplyr::mutate(dplyr::across({{valcols}},
-                                  comp_fun, y = .data[[stringr::str_c('ref_', valcols)]], ...,
+                                  \(x) comp_fun[[1]](x, y = .data[[stringr::str_c('ref_', valcols)]], ...),
                                   .names = nameparser))
   }
 
@@ -74,7 +78,7 @@ baseline_compare <- function(val_df, compare_col, base_lev, values_col,
     nameparser <- paste0(funname,'_{.col}')
     val_df <- val_df %>%
       dplyr::mutate(dplyr::across({{valcols}},
-                                  comp_fun, y = .data[[stringr::str_c('ref_', valcols)]], ...,
+                                  \(x) comp_fun(x, y = .data[[stringr::str_c('ref_', valcols)]], ...),
                                   .names = nameparser))
   }
 
@@ -161,7 +165,7 @@ create_base <- function(val_df, compare_col, base_lev, values_col, group_cols = 
     if (nrow(refdf) == 1 & ncol(refdf) == 1) {
       val_df <- dplyr::bind_cols(val_df, refdf)
     } else {
-      val_df <- dplyr::left_join(val_df, refdf, by = groupcols)
+      val_df <- dplyr::left_join(val_df, refdf, by = groupcols, relationship = "many-to-many")
     }
 
   }

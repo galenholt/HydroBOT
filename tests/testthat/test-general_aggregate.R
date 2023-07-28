@@ -126,8 +126,13 @@ test_that("failmissing works", {
 test_that("dots pass", {
   mtna <- mtcars
   mtna[c(1, 5, 9, 19), 'disp'] <- NA
-  aggchar1 <- general_aggregate(mtna, groupers = cyl, aggCols = disp,
-                                funlist = mean, na.rm = TRUE)
+  # expect warning as of dplyr 1.1- they're deprecating the use of dots- and yet
+  # sometimes it *doesn't* throw a warning- having a hard time getting this test
+  # to consistently pass because the warning is intermittent- I think it
+  # typically does not warn if we test_file, but does when we test() the
+  # package.
+  expect_warning(aggchar1 <- general_aggregate(mtna, groupers = cyl, aggCols = disp,
+                                funlist = mean, na.rm = TRUE))
   expect_equal(names(aggchar1), c('cyl', 'agg_mean_disp'))
   expect_equal(aggchar1$cyl, c(4,6,8))
   expect_equal(round(aggchar1$agg_mean_disp, 4), c(104.4444, 187.2000, 352.5692))

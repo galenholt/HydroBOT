@@ -67,7 +67,7 @@ spatial_aggregate <- function(dat, to_geo, groupers,
       # need to save for each combo of grouping variable
       allgroups <- fromto_pair %>% dplyr::distinct(dplyr::across({{groupers}}))
       # combine
-      unusedPolys <- dplyr::full_join(unusedPolys, allgroups, by = character())
+      unusedPolys <- dplyr::cross_join(unusedPolys, allgroups)
     }
 
   }
@@ -80,14 +80,18 @@ spatial_aggregate <- function(dat, to_geo, groupers,
 
   # Bare names get lost as we go down into further functions, so use characters
   # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
-  if (is.function(funlist) || (is.list(funlist) & is.function(funlist[[1]]))) {
+  # Have to specifically exclude quosures to avoid rlang warning, but this conditional is a mess.
+  if (!rlang::is_quosure(funlist) &&
+      (is.function(funlist) ||
+       (is.list(funlist) &
+        is.function(funlist[[1]])))) {
     funlist <- as.character(substitute(funlist))
     if(funlist[1] == "c") {funlist <- funlist[2:length(funlist)]}
   }
 
   agged <- general_aggregate(fromto_pair,
                               groupers = groupers,
-                              aggCols = tidyselect::all_of(!!aggCols),
+                              aggCols = tidyselect::ends_with(!!aggCols),
                               funlist = funlist,
                               failmissing = failmissing,
                               prefix = prefix)

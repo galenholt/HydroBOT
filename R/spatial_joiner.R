@@ -90,9 +90,9 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
     # spatial indexing on x means putting the low-vertex set of polygons in x is
     # MUCH faster
     if (toverts <= fromverts) {
-      fromto_pair <- sf::st_intersection(to_poly, from_poly)
+      suppressWarnings(fromto_pair <- sf::st_intersection(to_poly, from_poly))
     } else {
-      fromto_pair <- sf::st_intersection(from_poly, to_poly)
+      suppressWarnings(fromto_pair <- sf::st_intersection(from_poly, to_poly))
     }
 
     # calculate area and drop geometry
@@ -103,8 +103,8 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
 
     # join the data back on from the relevant polyIDs
     fromto_data <- from_data %>%
-      dplyr::left_join(fromto_pair, by = 'polyID_f') %>%
-      dplyr::left_join(to_data, by = 'polyID_t') %>%
+      dplyr::left_join(fromto_pair, by = 'polyID_f', relationship = "many-to-many") %>%
+      dplyr::left_join(to_data, by = 'polyID_t', relationship = "many-to-many") %>%
       dplyr::select(everything(), polyID = polyID_t, -polyID_f)
 
   return(fromto_data)

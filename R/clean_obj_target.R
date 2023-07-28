@@ -46,7 +46,7 @@ clean_obj_target <- function(ewrobjs,
 
 
   # Expands the objective to target mapping to all relevant planning units
-  obj2target <- dplyr::full_join(objpu, targets,  by = "env_obj")
+  obj2target <- dplyr::full_join(objpu, targets,  by = "env_obj", relationship = "many-to-many")
 
   # adjust for manual QC from Renee This is separate because it's not ideal way
   # to do the QC adjustment.

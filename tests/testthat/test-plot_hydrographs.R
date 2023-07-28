@@ -52,9 +52,12 @@ test_that("scales and transy makes plot", {
 test_that("auto-baselining works", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
   hydpal <- make_pal(levels = unique(hydlong$scenario), palette = 'calecopal::superbloom3', refvals = 'base', refcols = 'black')
-  hydplot <- plot_hydrographs(hydlong, colors = hydpal, base_lev = 'base', comp_fun = difference)
+  hydplot <- plot_hydrographs(hydlong, colors = hydpal, base_lev = 'base',
+                              comp_fun = difference,
+                              group_cols = c('Date', 'gauge'))
   hydplot_rel <- plot_hydrographs(hydlong, colors = hydpal,
                                   base_lev = 'base', comp_fun = relative,
+                                  group_cols = c('Date', 'gauge'),
                                   transy = 'log10', add_eps = 1e-6)
   expect_s3_class(hydplot, 'ggplot')
   vdiffr::expect_doppelganger("difference baseline hydro", hydplot)
