@@ -1,7 +1,12 @@
-test_that("clean_long_term as expected", {
+# skip_if_no_raw() because data-raw only exists in dev, not build, and these are
+# really just consistency checks for the building of the causal networks, which
+# happens during the dev process and isn't part of the package per se
 
+test_that("clean_long_term as expected", {
   yrpath <- system.file('data-raw/causal_networks/unknown/EObjYrTargets.csv',
                         package = 'werptoolkitr')
+
+  skip_if_no_file(yrpath)
 
   yrtarget <- clean_long_term(yrpath,
                               saveout = FALSE,

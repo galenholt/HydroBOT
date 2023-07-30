@@ -4,7 +4,7 @@
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^.venv$
-^data-raw/downloaded.*$
+^data-raw/downloaded.*
 .*quarto.*
 ^poetry
 ^pyproject
