@@ -165,6 +165,11 @@ plot_outcomes <- function(outdf,
   # scenario on x, bar
   if (x_col == 'scenario') {
 
+    # end-run a situation where we color and x by scenario- need to clean this up
+    if (all(names(pal_list) %in% prepped$data$scenario)) {
+      prepped$data <- dplyr::arrange(prepped$data, scenario)
+    }
+
     outcome_plot <- prepped$data |>
       dplyr::filter(scenario %in% prepped$scenariofilter) |>
       ggplot2::ggplot(ggplot2::aes(x = scenario, y = .data[[prepped$y_col]],
