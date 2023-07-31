@@ -574,6 +574,48 @@ test_that("maps", {
   vdiffr::expect_doppelganger("sdl_gauges_quant", sdl_gauges_quant)
 
 
+  # check that scenariofilter works on underlay and overlay
+  # that one would be good with two levels- basin and sdl
+  gauges_scenefilter_u <- env_obj_points_to_plot |> # for readability
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                  x_col = 'map',
+                  colorgroups = NULL,
+                  colorset = 'allArith',
+                  pal_list = list('scico::berlin'),
+                  facet_col = 'scenario',
+                  facet_row = 'env_obj',
+                  scene_pal = scene_pal,
+                  sceneorder = c('down4', 'base', 'up4'),
+                  scenariofilter = c('down4', 'up4'),
+                  underlay_list = list(list(underlay = dplyr::filter(obj_sdl_to_plot, env_obj == 'NF1'),
+                                            underlay_ycol = 'allArith',
+                                            underlay_pal = 'scico::oslo'))) +
+    ggplot2::theme(legend.position = 'bottom')
+
+  vdiffr::expect_doppelganger("gauges_scenefilter_u", gauges_scenefilter_u)
+
+  gauges_scenefilter_o <- obj_sdl_to_plot |>
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                  x_col = 'map',
+                  colorgroups = NULL,
+                  colorset = 'allArith',
+                  pal_list = list('scico::berlin'),
+                  facet_col = 'scenario',
+                  facet_row = 'env_obj',
+                  scene_pal = scene_pal,
+                  sceneorder = c('down4', 'base', 'up4'),
+                  underlay_list = 'basin',
+                  scenariofilter = c('down4', 'up4'),
+                  overlay_list = list(overlay = dplyr::filter(env_obj_points_to_plot, env_obj == 'NF1'),
+                                      overlay_pal = 'scico::oslo',
+                                      overlay_ycol = 'allArith',
+                                      clip = TRUE)) +
+    ggplot2::theme(legend.position = 'bottom')
+
+  vdiffr::expect_doppelganger("gauges_scenefilter_o", gauges_scenefilter_o)
+
 
   # Does it work for the basin?
   basin_map <- agg_theme_space$mdb |>

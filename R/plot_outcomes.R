@@ -228,8 +228,7 @@ plot_outcomes <- function(outdf,
         ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]],
                                      y = .data[[prepped$y_col]],
                                      group = .data$pointgroup)) +
-        ggplot2::geom_point(mapping = ggplot2::aes(color = .data$color,
-                                                   shape = scenario),
+        ggplot2::geom_point(mapping = ggplot2::aes(color = .data$color),
                             position = position) +
         ggplot2::labs(y = paste0(y_lab, prepped$ylab_append),
                       x = x_lab) +
@@ -352,6 +351,9 @@ plot_outcomes <- function(outdf,
             u$underlay <- u$underlay |>
               dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
           }
+
+          # filter the underlay scenarios too
+          u$underlay <- u$underlay |> dplyr::filter(scenario %in% prepped$scenariofilter)
         }
 
         # use `grouped_colors` to set colour groups
@@ -485,6 +487,9 @@ plot_outcomes <- function(outdf,
               dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
           }
         }
+
+        # filter scenarios in overlay
+        o$overlay <- o$overlay |> dplyr::filter(scenario %in% prepped$scenariofilter)
 
         # clip to main data automatically
         if ('clip' %in% names(o) && o$clip) {

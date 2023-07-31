@@ -13,13 +13,16 @@
 #' @param defaults character, path to default set of yaml parameters, so the
 #'   `yamlpath` file and `passed_args` only need to include those that are
 #'   modified
+#' @param list_args list of arguments. Typically would come in from
+#'   parameterised quarto notebook, which pre-parses yaml into a list
 #'
-#' @return runs the toolkit, returns NULL
+#' @return runs the toolkit, returns NULL invisibly, or the aggregated output if the params have `aggReturn: TRUE`
 #' @export
 #'
 #' @examples
 run_toolkit_params <- function(yamlpath = NULL,
                                passed_args = NULL,
+                               list_args = NULL,
                                defaults = system.file('yml/default_params.yml', package = 'werptoolkitr')) {
 
   # I could have a 'defaults' file and then a params that just changes some.
@@ -39,6 +42,9 @@ run_toolkit_params <- function(yamlpath = NULL,
 
   # Replace the arglist vals with passed args from command line
   if (is.list(comargs)) {arglist <- modifyList(arglist, comargs)}
+
+  # bring in list-args (especially useful for parameterised quarto notebook)
+  if (is.list(list_args)) {arglist <- modifyList(arglist, list_args)}
 
   # R file contains the aggregation definition, since it may need R types
   source(arglist$aggregation_def)
@@ -68,6 +74,12 @@ run_toolkit_params <- function(yamlpath = NULL,
                          keepAllPolys = arglist$keepAllPolys,
                          returnList = arglist$aggReturn,
                          savepath = arglist$agg_results)
+
+  if (arglist$aggReturn) {
+    return(aggout)
+  } else {
+    return(invisible())
+  }
 
 }
 
