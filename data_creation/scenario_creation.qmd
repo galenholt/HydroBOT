@@ -407,6 +407,8 @@ geom_sf(data = minigauge, color = 'black') +
 scale_fill_brewer(type = 'qual', palette = 8))
 ```
 
+Write out the scenarios, including metadata to check that that is working (and that we're not picking up extra files in some of the crawling functions).
+
 ```{r}
 if (REBUILD_DATA) {
   start15 = lubridate::ymd(20150101)
@@ -425,7 +427,37 @@ if (REBUILD_DATA) {
       dplyr::filter(Date > start15) %>% 
       dplyr::select(Date, tidyselect::all_of(minigauges)) %>%  
       readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'up4', 'up4.csv'))
+    
+    # make JSON metadata
+    jsonlite::write_json(list(scenario_name = 'base', 
+                            flow_multiplier = 1), 
+                       path = file.path(dataextdir, 'testsmall', 
+                                        'hydrographs', 'base', 'base.json'))
+    
+    jsonlite::write_json(list(scenario_name = 'down4', 
+                            flow_multiplier = 0.25), 
+                       path = file.path(dataextdir, 'testsmall', 
+                                        'hydrographs', 'down4', 'down4.json'))
+    
+    jsonlite::write_json(list(scenario_name = 'up4', 
+                            flow_multiplier = 4), 
+                       path = file.path(dataextdir, 'testsmall', 
+                                        'hydrographs', 'up4', 'up4.json'))
 }
     
 
+```
+
+And all the scenario metadata- it might come in like this and we need to be robust
+
+```{r}
+scenario_meta <- list(scenario_name = c('down4', 'base', 'up4'),
+                      flow_multiplier = c(0.25, 1, 4))
+# I don't know the format we'll be using, but this works to create yaml metadata
+hydro_dir <- file.path(dataextdir, 'testsmall', 'hydrographs')
+yaml::write_yaml(scenario_meta, 
+                 file = file.path(hydro_dir, 'scenario_metadata.yml'))
+# and this does the same with JSON
+jsonlite::write_json(scenario_meta, 
+                     path = file.path(hydro_dir, 'scenario_metadata.json'))
 ```

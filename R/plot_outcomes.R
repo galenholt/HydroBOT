@@ -486,10 +486,12 @@ plot_outcomes <- function(outdf,
             o$overlay <- o$overlay |>
               dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
           }
+
+          # filter scenarios in overlay
+          o$overlay <- o$overlay |> dplyr::filter(scenario %in% prepped$scenariofilter)
         }
 
-        # filter scenarios in overlay
-        o$overlay <- o$overlay |> dplyr::filter(scenario %in% prepped$scenariofilter)
+
 
         # clip to main data automatically
         if ('clip' %in% names(o) && o$clip) {

@@ -59,9 +59,10 @@ def make_scenario_info(input_folder):
     for sc in scenarios:
         subpath = os.path.join(input_folder, sc)
         file_names = os.listdir(subpath)
-        gauges = [i.split('_', 1)[0] for i in file_names]
-        file_paths = os.path.join(subpath, file_names[0])
-        file_paths = [os.path.join(subpath, f) for f in file_names]
+        csv_files = list(filter(lambda f: f.endswith('.csv'), file_names))
+        gauges = [i.split('_', 1)[0] for i in csv_files]
+        file_paths = os.path.join(subpath, csv_files[0])
+        file_paths = [os.path.join(subpath, f) for f in csv_files]
 
         gaugefiledict = {'gauge':gauges, 'paths':file_paths}
         scenedict[sc] = gaugefiledict
