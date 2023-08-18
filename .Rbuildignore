@@ -10,3 +10,4 @@
 ^pyproject
 
 
+^\.github$
