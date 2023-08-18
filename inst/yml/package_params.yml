@@ -1,7 +1,7 @@
 # Because this gets used in testing, and my testthat::test_path() is 'tests/testthat', I have to use paths relative to that.
 
-# Outer directory for scenario
-scenario_dir: '_test_data/temp_hydro'
+# Outer directory for project
+output_parent_dir: '_test_data/temp_one'
 
 # aggregation sequences (need to be defined in R)
 aggregation_def: '_test_data/params.R'

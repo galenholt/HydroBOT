@@ -55,8 +55,8 @@ run_toolkit_params <- function(yamlpath = NULL,
   # Type cleanup
   arglist <- type_cleanup(arglist)
 
-  ewr_out <- prep_run_save_ewrs_R(scenario_dir = arglist$hydro_dir,
-                                  output_dir = arglist$scenario_dir,
+  ewr_out <- prep_run_save_ewrs(hydro_dir = arglist$hydro_dir,
+                                  output_parent_dir = arglist$output_parent_dir,
                                   outputType = arglist$outputType,
                                   returnType = arglist$returnType,
                                   climate = arglist$climate)
@@ -91,15 +91,15 @@ run_toolkit_params <- function(yamlpath = NULL,
 #' @examples
 make_default_args <- function(arglist) {
   if (arglist$hydro_dir == 'default' || is.null(arglist$hydro_dir)) {
-    arglist$hydro_dir = file.path(arglist$scenario_dir, 'hydrographs')
+    arglist$hydro_dir = file.path(arglist$output_parent_dir, 'hydrographs')
   }
 
   if (arglist$ewr_results == 'default' || is.null(arglist$ewr_results)) {
-    arglist$ewr_results <- file.path(arglist$scenario_dir, 'module_output', 'EWR')
+    arglist$ewr_results <- file.path(arglist$output_parent_dir, 'module_output', 'EWR')
   }
 
   if (arglist$agg_results == 'default' || is.null(arglist$agg_results)) {
-    arglist$agg_results <- file.path(arglist$scenario_dir, 'aggregator_output')
+    arglist$agg_results <- file.path(arglist$output_parent_dir, 'aggregator_output')
   }
 
   return(arglist)

@@ -18,13 +18,12 @@ spatial_aggregate(
 )
 }
 \arguments{
-\item{dat}{sf of values to aggregate with any necessary non-spatial
-grouping information (e.g. scenario, theme)}
+\item{dat}{sf of values to aggregate with any necessary non-spatial grouping
+information (e.g. scenario, theme)}
 
 \item{to_geo}{sf polygon or multipolygon that provides the desired spatial
 level to group into. This uses the intersection \code{\link[sf:geos_binary_ops]{sf::st_intersection()}}, so
-if \code{dat} and \code{to_geo} are both polygons, they do not have to be
-nested.}
+if \code{dat} and \code{to_geo} are both polygons, they do not have to be nested.}
 
 \item{groupers}{as in \code{\link[=general_aggregate]{general_aggregate()}}, with the note that these should
 be all grouping columns \emph{except} the polygons in \code{to_geo}, which are
@@ -55,18 +54,20 @@ works OK with simple functions, e.g. passing \code{na.rm = TRUE} to mean}
 \item{whichcrs}{desired coordinate reference system, easiest is just the
 numeric EPSG code, but could a full crs definition. See \code{\link[sf:st_crs]{sf::st_crs()}}}
 
+\item{keepAllPolys}{logical, default \code{FALSE}. Should polygons in \code{to_geo}
+that have no values in \code{dat} be retained? The default \code{FALSE} keeps NA
+polygons from cluttering things up, but \code{TRUE} can be useful to not lose
+them, especially for later plotting. However, it is typically best from a
+data and cleanliness perspective to use \code{FALSE} here and use the bare set
+of polys as an \code{underlay} in \code{\link[=plot_outcomes]{plot_outcomes()}}.}
+
 \item{failmissing}{logical, default \code{TRUE}: fail if the requested grouping or
 aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
 and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
 \code{tidyselect::any_of()} in \code{tidyselect}}
 
-\item{prefix}{character, differs from \code{\link[=general_aggregate]{general_aggregate()}} in that default is
-\code{'spatial_'} instead of \code{'agg_'}.}
-
-\item{keepAllPoly}{logical, default \code{FALSE}. Should polygons in \code{to_geo} that
-have no values in \code{dat} be retained? The default \code{FALSE} keeps NA
-polygons from cluttering things up, but \code{TRUE} is very useful to not lose
-them, especially for later plotting.}
+\item{prefix}{character, differs from \code{\link[=general_aggregate]{general_aggregate()}} in that default
+is \code{'spatial_'} instead of \code{'agg_'}.}
 }
 \value{
 an \code{sf} with columns for the grouping variables aggregated into the

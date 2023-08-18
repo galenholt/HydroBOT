@@ -100,22 +100,22 @@ This was assuming there would be gauge-files, and now there's not. Still seems t
 I expect all of this to change once we have a set data format.
 
 ```{r}
-# Gives file locations as a dict- 
-sceneinfodict = make_scenario_info_R(scenario_dir)
-# make the output directory structure
-outpath = make_output_dir_R(output_dir, sceneinfodict)
-# unfold the sceneinfodict to make it easy to get the lists of paths and gauges
-# everyhydro = paths_gauges(sceneinfodict)[0]
-
-# The inner level turned into characters in R and needs to stay as a list. This is annoying but needed *only in R*
-for (i in 1:length(sceneinfodict)) {
-  for (j in 1:2) {
-    sceneinfodict[[i]][[j]] <- as.list(sceneinfodict[[i]][[j]])
-  }
-}
-
-# more list-making to work from R-Python
-everyhydro = as.list(paths_gauges_R(sceneinfodict)[[1]])
+# # Gives file locations as a dict- 
+# sceneinfodict = make_scenario_info_R(scenario_dir)
+# # make the output directory structure
+# outpath = make_output_dir_R(output_dir, sceneinfodict)
+# # unfold the sceneinfodict to make it easy to get the lists of paths and gauges
+# # everyhydro = paths_gauges(sceneinfodict)[0]
+# 
+# # The inner level turned into characters in R and needs to stay as a list. This is annoying but needed *only in R*
+# for (i in 1:length(sceneinfodict)) {
+#   for (j in 1:2) {
+#     sceneinfodict[[i]][[j]] <- as.list(sceneinfodict[[i]][[j]])
+#   }
+# }
+# 
+# # more list-making to work from R-Python
+# everyhydro = as.list(paths_gauges_R(sceneinfodict)[[1]])
 ```
 
 ## Run the ewr tool
@@ -141,7 +141,7 @@ if (params$REBUILD_DATA) {
 }
 
 
-ewr_out = run_save_ewrs_R(everyhydro, outpath, model_format = model_format, allowance = allowance, climate = climate, outputType = outputType, datesuffix = FALSE, returnType = list('summary', 'all'))
+ewr_out = prep_run_save_ewrs(everyhydro, outpath, model_format = model_format, allowance = allowance, climate = climate, outputType = outputType, datesuffix = FALSE, returnType = list('summary', 'all'))
 ```
 
 # Still do to

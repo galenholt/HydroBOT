@@ -67,6 +67,13 @@ the meaning of the values in the aggregation column have to be interpreted
 with the values in the new columns defining history.
 }}
 
+\item{keepAllPolys}{logical, default \code{FALSE}. Should polygons in \code{to_geo}
+that have no values in \code{dat} be retained? The default \code{FALSE} keeps NA
+polygons from cluttering things up, but \code{TRUE} can be useful to not lose
+them, especially for later plotting. However, it is typically best from a
+data and cleanliness perspective to use \code{FALSE} here and use the bare set
+of polys as an \code{underlay} in \code{\link[=plot_outcomes]{plot_outcomes()}}.}
+
 \item{failmissing}{logical, default \code{TRUE}: fail if the requested grouping or
 aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
 and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs

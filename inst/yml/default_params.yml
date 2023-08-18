@@ -1,7 +1,7 @@
 # Those things defined as paths can be input as NULL to build a default project structure
 
-# Outer directory for scenario
-scenario_dir: 'toolkit_project'
+# Outer directory for project
+output_parent_dir: 'toolkit_project'
 
 # aggregation sequences (need to be defined in R)
 aggregation_def: 'toolkit_project/agg_params.R'

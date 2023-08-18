@@ -8,23 +8,24 @@
 #'
 #' @inheritParams general_aggregate
 #'
-#' @param dat sf of values to aggregate with any necessary non-spatial
-#'   grouping information (e.g. scenario, theme)
+#' @param dat sf of values to aggregate with any necessary non-spatial grouping
+#'   information (e.g. scenario, theme)
 #' @param to_geo sf polygon or multipolygon that provides the desired spatial
 #'   level to group into. This uses the intersection [sf::st_intersection()], so
-#'   if `dat` and `to_geo` are both polygons, they do not have to be
-#'   nested.
+#'   if `dat` and `to_geo` are both polygons, they do not have to be nested.
 #' @param groupers as in [general_aggregate()], with the note that these should
 #'   be all grouping columns *except* the polygons in `to_geo`, which are
 #'   automatically added to `groupers` before passing to [general_aggregate()].
 #' @param whichcrs desired coordinate reference system, easiest is just the
 #'   numeric EPSG code, but could a full crs definition. See [sf::st_crs()]
-#' @param keepAllPoly logical, default `FALSE`. Should polygons in `to_geo` that
-#'   have no values in `dat` be retained? The default `FALSE` keeps NA
-#'   polygons from cluttering things up, but `TRUE` is very useful to not lose
-#'   them, especially for later plotting.
-#' @param prefix character, differs from [general_aggregate()] in that default is
-#'   `'spatial_'` instead of `'agg_'`.
+#' @param keepAllPolys logical, default `FALSE`. Should polygons in `to_geo`
+#'   that have no values in `dat` be retained? The default `FALSE` keeps NA
+#'   polygons from cluttering things up, but `TRUE` can be useful to not lose
+#'   them, especially for later plotting. However, it is typically best from a
+#'   data and cleanliness perspective to use `FALSE` here and use the bare set
+#'   of polys as an `underlay` in [plot_outcomes()].
+#' @param prefix character, differs from [general_aggregate()] in that default
+#'   is `'spatial_'` instead of `'agg_'`.
 #'
 #' @return an `sf` with columns for the grouping variables aggregated into the
 #'   polygons in `to_geo` and retaining desired theme-level information
