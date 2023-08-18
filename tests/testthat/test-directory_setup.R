@@ -3,6 +3,16 @@ proj_dir <- system.file("extdata/testsmall", package = 'werptoolkitr')
 hydro_dir <- system.file("extdata/testsmall/hydrographs", package = 'werptoolkitr')
 
 
+temp_hydro_dir = '_test_data/temp_one/hydrographs'
+temp_parent_dir = '_test_data/temp_one'
+
+temp_hydro_multi = '_test_data/temp_multi/hydrographs'
+temp_parent_multi = '_test_data/temp_multi'
+
+# Make sure the test dirs are blank
+destroy_temp_hydro(temp_parent_dir)
+destroy_temp_multifile(temp_parent_multi)
+
 # Tests -------------------------------------------------------------------
 
 test_that("get scenario names and nothing else", {
@@ -21,11 +31,11 @@ test_that("scenario paths works for single csvs in each", {
 })
 
 test_that("scenario paths and the name fixer works for multiple csvs in each", {
-  single_dir <- '_test_data/temp_multi/hydrographs'
+  temp_hydro_multi <- '_test_data/temp_multi/hydrographs'
   # If needed, build the dir. This takes a while so don't tear it down, typically
-  make_temp_multifile(single_dir = single_dir)
+  make_temp_multifile(temp_hydro_multi = temp_hydro_multi)
 
-  scenario_paths <- find_scenario_paths(single_dir)
+  scenario_paths <- find_scenario_paths(temp_hydro_multi)
 
   expected_vector <- c('_test_data/temp_multi/hydrographs/base/412002.csv',
                        '_test_data/temp_multi/hydrographs/base/412005.csv',
@@ -48,14 +58,14 @@ test_that("scenario paths and the name fixer works for multiple csvs in each", {
   expect_equal(scenario_paths, expected_vector)
 
   # Now find the scenario names, fix non-unique naming, and check
-  scenenames <- scenario_names_from_hydro(single_dir)
+  scenenames <- scenario_names_from_hydro(temp_hydro_multi)
   expect_equal(scenenames, c('base', 'down4', 'up4'))
 
   # This should fix
   newpaths <- fix_file_scenarios(scenario_paths, scenarios = scenenames)
 
   # check they changed
-  scenario_paths <- find_scenario_paths(single_dir)
+  scenario_paths <- find_scenario_paths(temp_hydro_multi)
 
   expected_vector <- c('_test_data/temp_multi/hydrographs/base/base_412002.csv',
                        '_test_data/temp_multi/hydrographs/base/base_412005.csv',

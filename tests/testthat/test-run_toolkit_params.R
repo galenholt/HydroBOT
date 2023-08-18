@@ -7,6 +7,9 @@ temp_parent_dir = '_test_data/temp_one'
 temp_hydro_multi = '_test_data/temp_multi/hydrographs'
 temp_parent_multi = '_test_data/temp_multi'
 
+destroy_temp_hydro(temp_parent_dir)
+destroy_temp_multifile(temp_parent_multi)
+
 test_that("parameter file works", {
   make_temp_hydro(temp_hydro_dir)
   test <- run_toolkit_params(yamlpath = system.file('yml/package_params.yml',
