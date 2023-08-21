@@ -78,6 +78,30 @@ multi_aggregate <- function(dat,
     }
   }
 
+  # For now, throw an informative error if trying to aggregate with backsteps in
+  # the causal network. Will want to implement that at some point, probably.
+  causalsteps <- aggsequence[purrr::map_lgl(aggsequence, is.character)]
+  if (any(duplicated(purrr::map_chr(causalsteps, \(x) x[1])))) {
+
+    thedups <- causalsteps[duplicated(purrr::map_chr(causalsteps, \(x) x[1]))] |>
+      purrr::map_chr(\(x) x[1])
+    dupfind <- function(x) {
+      if (x[1] %in% thedups) {
+        return(x)
+      } else {
+        return(NULL)
+      }
+    }
+    dupped <- purrr::map(causalsteps, \(x) dupfind(x))
+    rlang::abort(glue::glue("Aggregating multiple times from the same causal level(s):
+                            {glue::glue_collapse(dupped[!purrr::map_lgl(dupped, is.null)], sep = ',\n')}.
+                            This non-nested causal aggregation is currently not supported.
+                            Until it is, do multiple aggregations to get to the
+                            multiple outcome levels.
+                            And please raise an issue on github."))
+  }
+
+
   # Bare names get lost as we go down into further functions, so use characters
   # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
   # and now we have to loop over the funsequence and the names are even harder to extract
@@ -140,6 +164,8 @@ multi_aggregate <- function(dat,
         names(aggsequence)[[i]] <- aggsequence[[i]][2]
       }
 
+      # Will need to be able to go get a previous `dat` here if we want to do
+      # nonnested aggsequences.
       dat <- theme_aggregate(dat = dat,
                             from_theme = aggsequence[[i]][1],
                              to_theme = aggsequence[[i]][2],

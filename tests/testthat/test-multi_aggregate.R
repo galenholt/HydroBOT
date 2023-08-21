@@ -504,6 +504,47 @@ test_that("multi-step theme and spatial works with !namehistory", {
   vdiffr::expect_doppelganger("spatial-theme_multi_namehistory", g2sdl_plot)
 })
 
+
+# Theme and spatial together
+test_that("backstepping along theme axis throws informative error", {
+  # How does the code behave if we try to back back up a previous  causal level,
+  # e.g. not move in a nested way through the network?
+  sumspat <- gauge2geo(summary_ewr_output,
+                       gaugelocs = bom_basin_gauges)
+
+  aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                 env_obj =  c('ewr_code', "env_obj"),
+                 sdl_units = sdl_units,
+                 Specific_goal = c('env_obj', "Specific_goal"),
+                 Objective = c('Specific_goal', 'Objective'),
+                 Target = c('Objective', 'Target'),
+                 target_5_year_2024 = c('Objective', 'target_5_year_2024'),
+                 test1 = c('Objective', 'testy'),
+                 test2 = c('env_obj', 'more_testy'))
+
+  funseq <- list('CompensatingFactor',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean')
+
+
+  expect_error(spatagg <- multi_aggregate(sumspat,
+                             aggsequence = aggseq,
+                             groupers = 'scenario',
+                             aggCols = 'ewr_achieved',
+                             funsequence = funseq,
+                             causal_edges = causal_ewr,
+                             namehistory = FALSE),
+               regexp = 'Aggregating multiple times')
+
+})
+
+
 test_that("saving the list of steps", {
   sumspat <- gauge2geo(summary_ewr_output,
                        gaugelocs = bom_basin_gauges)
