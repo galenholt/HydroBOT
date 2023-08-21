@@ -40,4 +40,4 @@ aggReturn: FALSE
 namehistory: FALSE
 keepAllPolys: TRUE
 
-# we could expose more defaults in `prep_run_save_ewrs` to `param_runner`,but I don't think I want to.
+# we could expose more defaults in `prep_run_save_ewrs` to `param_runner`, but that's so open-ended let's wait.

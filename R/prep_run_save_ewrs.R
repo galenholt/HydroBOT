@@ -4,10 +4,18 @@ controller_functions <- reticulate::import_from_path("controller_functions",
                                                                         package = 'werptoolkitr'),
                                                      delay_load = TRUE)
 
-#' Title
+#' Set up, run, and (possibly) save EWR outputs
 #'
-#' @param hydro_dir Directory containing hydrographs. Can be an outer directory, e.g. `hydrographs` that splits into scenario subdirs, or can be a single scenario subdir.
-#' @param output_parent_dir parent directory for the outputs. Can be anything, but two typical cases:
+#' This does some directory setup and parsing, runs the EWR tool and, if asked,
+#' saves the output. If the output saves, it also auto-saves both yaml and json
+#' metadata files with all parameters needed to run this part of the toolkit
+#' with parameters. Scenario metadata is prepended, if found.
+#'
+#' @param hydro_dir Directory containing hydrographs. Can be an outer directory,
+#'   e.g. `hydrographs` that splits into scenario subdirs, or can be a single
+#'   scenario subdir.
+#' @param output_parent_dir parent directory for the outputs. Can be anything,
+#'   but two typical cases:
 #'  * The directory containing `hydro_dir`, which puts the `module_outputs` at the same level as the hydrographs
 #'  * If running in batches for single scenarios, may be `hydro_dir`, which just puts the `module_outputs` in `hydro_dir`
 #' @param scenarios `NULL` (default) or character.
@@ -20,17 +28,20 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @param climate see EWR tool. One of:
 #'  * 'Standard - 1911 to 2018 climate categorisation' (default, with categories)
 #'  * 'NSW 10,000 year climate sequence' (not categorised, just a blank csv for 10,000 years that allows it to run)
-#' @param outputType list of strings or character vector defining what to save to disk. One or more of:
+#' @param outputType list of strings or character vector defining what to save
+#'   to disk. One or more of:
 #'  * 'none' (default), do not save outputs- ignored if in a list with others
 #'  * 'summary' saves the EWR outcomes summarised over the whole period
 #'  * 'all' saves the EWR all events
 #'  * 'annual' does not work with current EWR
-#' @param returnType list of strings or character vector defining what to return to the active R session. Same options as `outputType`
+#' @param returnType list of strings or character vector defining what to return
+#'   to the active R session. Same options as `outputType`
 #' @param MINT see EWR
 #' @param MAXT see EWR
 #' @param DUR see EWR
 #' @param DRAW see EWR
-#' @param datesuffix logical. whether to add a suffix to saved filenames to provide a datestamp. Should be deprecated in favour of metadata files.
+#' @param datesuffix logical. whether to add a suffix to saved filenames to
+#'   provide a datestamp. Should be deprecated in favour of metadata files.
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
@@ -65,12 +76,19 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   hydro_paths <- fix_file_scenarios(hydro_paths, scenarios)
 
 
-  # output_path doesnt get used for outputType == 'none', but we don't really
+  # output_path doesn't get used for outputType == 'none', but we don't really
   # want to build directories in that case, so skip it.
   if (length(outputType) == 1 && outputType == 'none') {
     output_path <- '' # This shouldn't do anything
   } else {
     output_path <- make_output_dir(output_parent_dir, scenarios = scenarios, module_name = 'EWR')
+    # set up flags for the metadata in case the ewr fails partway
+    init_params <- list(status = "Started run, has not finished. New metadata file will write when it does. If this file persists, the run failed.",
+                        time = format(Sys.time(), digits = 0, usetz = TRUE))
+    yaml::write_yaml(init_params,
+                     file = file.path(output_path, 'ewr_metadata.yml'))
+    jsonlite::write_json(init_params,
+                     path = file.path(output_path, 'ewr_metadata.json'))
   }
 
   ewr_out <- controller_functions$run_save_ewrs(hydro_paths, output_path,
@@ -78,6 +96,43 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                                                 outputType = outputType,
                                                 returnType = returnType,
                                                 datesuffix = datesuffix)
+
+
+  # auto-build metadata- this builds the data needed to run from params
+  # And do it *after* the ewrs get processed so it only happens if the run works
+  if (output_path != '') {
+    ewr_params <- list(output_parent_dir = output_parent_dir,
+                       hydro_dir = hydro_dir,
+                       ewr_results = output_path,
+                       model_format = model_format,
+                       climate = climate,
+                       outputType = outputType,
+                       returnType = returnType,
+                       ewr_finish_time = format(Sys.time(), digits = 0, usetz = TRUE))
+
+    # append any scenario metadata, so it all stays together
+    ymlscenepath <- list.files(hydro_dir, pattern = "*.yml")
+    if (length(ymlscenepath) != 0) {
+      ymlscenes <- file.path(hydro_dir, ymlscenepath) |>
+        yaml::read_yaml()
+    } else {
+      ymlscenes <- NULL
+    }
+
+    yaml::write_yaml(c(ymlscenes, ewr_params),
+                     file = file.path(output_path, 'ewr_metadata.yml'))
+
+    jsonscenepath <- list.files(hydro_dir, pattern = "*.json")
+    if (length(jsonscenepath) != 0) {
+      jsonscenes <- file.path(hydro_dir, jsonscenepath) |>
+        jsonlite::read_json()
+    } else {
+      jsonscenes <- NULL
+    }
+    jsonlite::write_json(c(jsonscenes, ewr_params),
+                     path = file.path(output_path, 'ewr_metadata.json'))
+  }
+
 
   return(ewr_out)
 }

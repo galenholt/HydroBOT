@@ -20,9 +20,10 @@
 #' @param aggsequence a named list of aggregation steps in the order to apply
 #'   them. Entries for theme aggregation should be character vectors- e.g. `name
 #'   = c('from_theme', 'to_theme')`. Entries for spatial aggregation should be
-#'   the sf polygon to aggregate to, e.g. `name = sfpolygons`. Not requiring
-#'   names and passing polygons as characters instead of objects are high on the
-#'   list of improvements.
+#'   the sf polygon to aggregate to, e.g. `name = sfpolygons` or a length-1
+#'   character, e.g. `name = "sfpolygons"`. The latter requires the object to be
+#'   available with `get("sfpolygons:)`, but allows passing characters rather
+#'   than objects. Not requiring names and is high on the list of improvements.
 #' @param funsequence a list of aggregation functions to apply in the order to
 #'   apply them. Each list entry can be one value, e.g. a character or bare
 #'   name, or can be multiple if mulitiple aggregations should be done at that

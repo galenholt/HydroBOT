@@ -131,6 +131,8 @@ test_that('saving works for one', {
                           'module_output/EWR/down4/annual',
                           'module_output/EWR/down4/summary',
                           'module_output/EWR/down4/summary/down4.csv',
+                          "module_output/EWR/ewr_metadata.json",
+                          "module_output/EWR/ewr_metadata.yml",
                           'module_output/EWR/up4',
                           'module_output/EWR/up4/allevents',
                           'module_output/EWR/up4/annual',
@@ -182,6 +184,8 @@ test_that('saving and returning works for multiple', {
                           'module_output/EWR/down4/annual',
                           'module_output/EWR/down4/summary',
                           'module_output/EWR/down4/summary/down4.csv',
+                          "module_output/EWR/ewr_metadata.json",
+                          "module_output/EWR/ewr_metadata.yml",
                           'module_output/EWR/up4',
                           'module_output/EWR/up4/allevents',
                           'module_output/EWR/up4/allevents/up4.csv',
@@ -235,6 +239,8 @@ test_that('specifying *Type as character instead of list', {
                           'module_output/EWR/down4/annual',
                           'module_output/EWR/down4/summary',
                           'module_output/EWR/down4/summary/down4.csv',
+                          "module_output/EWR/ewr_metadata.json",
+                          "module_output/EWR/ewr_metadata.yml",
                           'module_output/EWR/up4',
                           'module_output/EWR/up4/allevents',
                           'module_output/EWR/up4/allevents/up4.csv',
@@ -263,7 +269,8 @@ test_that('Single scenario among many, with access to the outer directory', {
 
 
   # Expect only the single output, not for all the scenarios
-  expect_equal(list.files(file.path(temp_parent_dir, 'module_output', 'EWR'), recursive = TRUE), "base/summary/base.csv")
+  expect_equal(list.files(file.path(temp_parent_dir, 'module_output', 'EWR'), recursive = TRUE),
+               c("base/summary/base.csv", "ewr_metadata.json", "ewr_metadata.yml"))
 
   # Tear down
   destroy_temp_hydro(temp_parent_dir)
@@ -290,7 +297,9 @@ test_that('Single scenario among many, no access to the outer directory', {
 
   # Expect only the single output, not for all the scenarios
   expected_structure <- c('base.csv', 'base.json',
-                          'module_output/EWR/base/summary/base.csv')
+                          'module_output/EWR/base/summary/base.csv',
+                          "module_output/EWR/ewr_metadata.json",
+                          "module_output/EWR/ewr_metadata.yml")
   expect_equal(list.files(scenario_path, recursive = TRUE), expected_structure)
 
   # Tear down
