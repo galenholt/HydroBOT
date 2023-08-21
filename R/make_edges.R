@@ -75,7 +75,10 @@ make_edges <- function(dflist,
   # I think iter() would let us send only the matching df (i.e.
   # do the thisdf bit right in the call). Deal with that later if it's an issue.
   alledges <- foreach::foreach (p = fromtos, i = iterators::icount(), .combine = dplyr::bind_rows) %do% {
-    dfindex <- which(unlist(purrr::map(dfnames, ~all(p %in% .))))
+
+    # Find the right causal sheet
+    # If there are multiple sheets, use the first one (No obvious heuristic here, and the index is simpler than anything more complex.)
+    dfindex <- which(unlist(purrr::map(dfnames, ~all(p %in% .))))[1]
 
     thisdf <- dflist[[dfindex]]
 
