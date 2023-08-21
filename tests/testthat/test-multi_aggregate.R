@@ -504,6 +504,52 @@ test_that("multi-step theme and spatial works with !namehistory", {
   vdiffr::expect_doppelganger("spatial-theme_multi_namehistory", g2sdl_plot)
 })
 
+test_that("passing name of sf objects works", {
+  sumspat <- gauge2geo(summary_ewr_output,
+                       gaugelocs = bom_basin_gauges)
+
+  aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                 env_obj =  c('ewr_code', "env_obj"),
+                 sdl_units = 'sdl_units',
+                 Specific_goal = c('env_obj', "Specific_goal"),
+                 catchment = cewo_valleys,
+                 Objective = c('Specific_goal', 'Objective'),
+                 mdb = 'basin',
+                 target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+
+  funseq <- list('ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean')
+
+
+  spatagg <- multi_aggregate(sumspat,
+                             aggsequence = aggseq,
+                             groupers = 'scenario',
+                             aggCols = 'ewr_achieved',
+                             funsequence = funseq,
+                             causal_edges = causal_ewr,
+                             namehistory = FALSE)
+
+  # stringr::str_flatten(names(spatagg), "', '")
+  namestring <- c('scenario', 'polyID', 'target_5_year_2024', 'OBJECTID',
+                  'DDIV_NAME', 'AREA_HA', 'SHAPE_AREA', 'SHAPE_LEN', 'geometry',
+                  'ewr_achieved', 'aggfun_1', 'aggLevel_1', 'aggfun_2',
+                  'aggLevel_2', 'aggfun_3', 'aggLevel_3', 'aggfun_4',
+                  'aggLevel_4', 'aggfun_5', 'aggLevel_5', 'aggfun_6',
+                  'aggLevel_6', 'aggfun_7', 'aggLevel_7', 'aggfun_8',
+                  'aggLevel_8')
+  expect_equal(names(spatagg), namestring)
+  expect_s3_class(spatagg, 'sf')
+  expect_equal(nrow(spatagg), 228)
+
+  # Don't bother with the plots
+})
+
 
 # Theme and spatial together
 test_that("backstepping along theme axis throws informative error", {

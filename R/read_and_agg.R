@@ -55,7 +55,8 @@ read_and_agg <- function(datpath,
 
   data <- prep_ewr_agg(datpath, type = type, geopath = geopath, ...)
 
-  # assume theme agg is character, spatial is sf
+  # parse any character names for the spatial data, then character will be the themes
+  aggsequence <- purrr::map(aggsequence, parse_geo)
   themeseq <- aggsequence[purrr::map_lgl(aggsequence, is.character)]
 
   edges <- make_edges(dflist = causalpath,

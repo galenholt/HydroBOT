@@ -78,6 +78,9 @@ multi_aggregate <- function(dat,
     }
   }
 
+  # `get` from characters if needed
+  aggsequence <- purrr::map(aggsequence, parse_geo)
+
   # For now, throw an informative error if trying to aggregate with backsteps in
   # the causal network. Will want to implement that at some point, probably.
   causalsteps <- aggsequence[purrr::map_lgl(aggsequence, is.character)]

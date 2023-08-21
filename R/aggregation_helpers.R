@@ -78,3 +78,46 @@ agg_names_to_cols <-
 
     return(aggincols)
   }
+
+
+# Parsing the aggsequence -------------------------------------------------
+
+#' `get` character names for geographic data, allowing aggsequences that are
+#' only characters.
+#'
+#' Only length-1 entries in aggregation sequence are turned into dataframes.
+#' See [multi_aggregate()] for use. Intended to be used with [purrr::map()] or similar.
+#'
+#' @param x character vector or dataframe, typically one entry in the aggregation list
+#'
+#' @return aggregation sequence, with length-1 character vectors attempted to `get`
+#'
+#' @examples
+#' purrr::map(list(ewr_code = c('ewr_code_timing', 'ewr_code'), sdl_units = "sdl_units"), parse_geo)
+parse_geo <- function(x) {
+  if (length(x) == 1 & is.character(x)) {
+    return(get(x))
+  } else {
+    return(x)
+  }
+}
+
+#' Get an all-character version of the aggsequence by parsing entries that are
+#' dataframes back to their names
+#'
+#'  Intended to be used with [purrr::imap()].
+#'
+#' @param x character vector or dataframe, typically one entry in the aggregation list
+#' @param idx name of the list item
+#'
+#' @return character vector
+#'
+#' @examples
+#' purrr::imap(list(ewr_code = c('ewr_code_timing', 'ewr_code'), sdl_units = werptoolkitr::sdl_units), parse_char)
+parse_char <- function(x, idx) {
+  if (inherits(x, 'data.frame')) {
+    return(idx) # WHAT? not names(), that'll be the dataframe names. We want the list-name. Might have to map2?
+  } else {
+    return(x)
+  }
+}
