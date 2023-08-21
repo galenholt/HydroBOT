@@ -80,6 +80,10 @@ make_edges <- function(dflist,
     # If there are multiple sheets, use the first one (No obvious heuristic here, and the index is simpler than anything more complex.)
     dfindex <- which(unlist(purrr::map(dfnames, ~all(p %in% .))))[1]
 
+    if(is.na(dfindex)) {
+      rlang::abort(glue::glue("Cannot find causal relationship between {p[1]} and {p[2]}. This tends to be misspellings, but could also be mis-specification of the causal relationships"))
+    }
+
     thisdf <- dflist[[dfindex]]
 
     # Get the filtering values- this is its own function because it has
