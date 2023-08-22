@@ -18,14 +18,16 @@
 #'   because we need a name. Use a named list if using anonymous functions, e.g.
 #'   `list(mean = ~mean(., na.rm = T))`. *If using functions with a
 #'   data-variable argument*, e.g. weighted.mean with a column of weights, we
-#'   now (as of {dplyr} 1.1) have some major restrictions. If specified *as a
-#'   function argument*, the function can just go in as a bare name or
-#'   anonymous. If specified elsewhere, it *has* to be wrapped in
-#'   [rlang::quo()], e.g. `agglist <- rlang::quo(list(mean = mean, wm =
-#'   ~weighted.mean(., weight_column_name, na.rm = T)))`. And if building custom
-#'   aggregation functions (not-anonymous), the argument has to be exposed, it
-#'   can't be hardcoded into the function body. The error checks for names do
-#'   not work for quosures, so make sure you name the list.
+#'   now (as of {dplyr} 1.1) have some workarounds. One option is if specified
+#'   *as a function argument*, the function can just go in as a bare name or
+#'   anonymous. If specified elsewhere, it can be wrapped in [rlang::quo()],
+#'   e.g. `agglist <- rlang::quo(list(mean = mean, wm = ~weighted.mean(.,
+#'   weight_column_name, na.rm = T)))`. If it isn't, there is now an internal
+#'   workaround to add that on that seems to be stable but may cause unforeseen
+#'   issues. This workaround also allows building custom aggregation functions
+#'   (not-anonymous) with the data-variable argument either exposed or hardcoded
+#'   (see [SpatialWeightedMean()]). The error checks for names do not work for
+#'   quosures, so make sure you name the list if using [rlang::quo()].
 #' @param prefix character prefix for the column name. Default `"agg_"`, but
 #'   often better to use the aggregation step. Typically set by particular
 #'   calling function to give it the type of aggregation
@@ -98,11 +100,27 @@ general_aggregate <- function(data, groupers,
   }
 
 
-  data_agg <- data %>%
+  # Try, and if fail, force with characters. Should I just go straight for characters? It seems so clunky I'd rather not.
+  data_agg <- try(data %>%
     dplyr::group_by(dplyr::across(all_of(groupers))) %>%
     dplyr::summarise(dplyr::across(all_of(aggCols), {{funlist}}, ...,
                                    .names = nameparser)) %>%
-    dplyr::ungroup()
+    dplyr::ungroup(),
+    silent = TRUE)
+
+  if (inherits(data_agg, 'try-error')) {
+    fchar <- paste0(c("rlang::quo(", deparse(funlist), ")"), collapse = '')
+    # FUNS2 <- eval(parse(text = fchar)) # base R
+    FUNS_quo <- rlang::eval_tidy(rlang::parse_expr(fchar)) # rlang claims to be faster?
+
+    # go again
+    data_agg <- data %>%
+      dplyr::group_by(dplyr::across(all_of(groupers))) %>%
+      dplyr::summarise(dplyr::across(all_of(aggCols), {{FUNS_quo}}, ...,
+                                     .names = nameparser)) %>%
+      dplyr::ungroup()
+  }
+
 
   return(data_agg)
 }
