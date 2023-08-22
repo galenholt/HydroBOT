@@ -103,5 +103,7 @@ general_aggregate <- function(data, groupers,
     dplyr::summarise(dplyr::across(all_of(aggCols), {{funlist}}, ...,
                                    .names = nameparser)) %>%
     dplyr::ungroup()
+
+  return(data_agg)
 }
 

@@ -63,3 +63,18 @@ ArithmeticMean <- function(x, na.rm = TRUE) {
   return(y)
 }
 
+#' Weighted mean by `area` column
+#'
+#' Finds the arithmetic mean weighted by the `area` column, which is auto-created in the spatial datasets.
+#'
+#' @inheritParams CompensatingFactor
+#'
+#' @return summarised data
+#' @export
+#'
+#' @examples
+SpatialWeightedMean <- function(x, na.rm = TRUE) {
+  y <- weighted.mean(x = x, w = area, na.rm = na.rm)
+  return(y)
+}
+

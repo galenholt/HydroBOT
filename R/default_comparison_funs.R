@@ -26,10 +26,17 @@ difference <- function(x,y) {x-y}
 #'
 #' @param x data to compare
 #' @param y reference data
-#' @param add_eps default 0. epsilon to add to prevent divide-by-zero infs
+#' @param add_eps default 0. epsilon to add to prevent divide-by-zero infs. Can be `'auto'` to use half of the minimum nonzero value
 #'
 #' @return
 #' @export
 #'
 #' @examples
-relative <- function(x,y, add_eps = 0) {(x + add_eps)/(y + add_eps)}
+relative <- function(x,y, add_eps = 0) {
+  if (add_eps == 'auto') {
+    allvals <- c(x,y)
+    add_eps <- min(allvals[allvals > 0],
+                   na.rm = TRUE)/2
+  }
+  (x + add_eps)/(y + add_eps)
+  }
