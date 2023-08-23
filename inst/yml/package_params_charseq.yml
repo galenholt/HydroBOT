@@ -1,0 +1,46 @@
+# Because this gets used in testing, and my testthat::test_path() is 'tests/testthat', I have to use paths relative to that.
+
+# Outer directory for project
+output_parent_dir: '_test_data/temp_one'
+
+# aggregation sequences defined in R- either NULL to define here or a path to a .R file
+aggregation_def: NULL
+
+# These allow defining funs internally as lists. if aggregation_def is NULL, these need to have values and vice versa
+aggregation_sequence:
+  ewr_code:
+  - ewr_code_timing
+  - ewr_code
+  env_obj:
+  - ewr_code
+  - env_obj
+  sdl_units: sdl_units
+  Specific_goal:
+  - env_obj
+  - Specific_goal
+  cewo_valleys: cewo_valleys
+  Objective:
+  - Specific_goal
+  - Objective
+  basin: basin
+  target_5_year_2024:
+  - Objective
+  - target_5_year_2024
+
+aggregation_funsequence:
+  ewr_code:
+  - CompensatingFactor
+  env_obj:
+  - ArithmeticMean
+  sdl_units:
+  - ArithmeticMean
+  Specific_goal:
+  - list(mean = ~mean(., na.rm = TRUE))
+  cewo_valleys:
+  - SpatialWeightedMean
+  Objective:
+  - ArithmeticMean
+  basin:
+  - SpatialWeightedMean
+  target_5_year_2024:
+  - ArithmeticMean

@@ -45,12 +45,26 @@ read_and_agg <- function(datpath,
                          failmissing = TRUE,
                          returnList = TRUE,
                          savepath = NULL,
+                         extrameta = NULL,
                          ...) {
 
   # The ... pass gauge and scenario filters to `prep_ewr_agg`
 
   if (!returnList & is.null(savepath)) {
     rlang::abort(message = "not returning output to disk or session. aborting to not use the resources.")
+  }
+
+  # set up metadata placeholders to know if the run failed
+  if (!is.null(savepath)) {
+    if (!dir.exists(savepath)) {dir.create(savepath, recursive = TRUE)}
+    # set up flags for the metadata in case the ewr fails partway
+    init_params <- list(meta_message = "Started run, has not finished. New metadata file will write when it does. If this metadata entry persists, the run failed.",
+                        agg_status = FALSE,
+                        time = format(Sys.time(), digits = 0, usetz = TRUE))
+    yaml::write_yaml(init_params,
+                     file = file.path(savepath, 'agg_metadata.yml'))
+    jsonlite::write_json(init_params,
+                         path = file.path(savepath, 'agg_metadata.json'))
   }
 
   data <- prep_ewr_agg(datpath, type = type, geopath = geopath, ...)
@@ -84,6 +98,52 @@ read_and_agg <- function(datpath,
   if (!is.null(savepath)) {
     if (!dir.exists(savepath)) {dir.create(savepath, recursive = TRUE)}
     saveRDS(aggout, file.path(savepath, paste0(type, '_aggregated.rds')))
+
+    gitcom <- try(git2r::sha(git2r::commits()[[1]]), silent = TRUE)
+    if (inherits(gitcom, 'try-error')) {gitcom <- NULL}
+
+    char_aggsequence <- purrr::imap(aggsequence, parse_char)
+    char_funsequence <- purrr::map(funsequence, parse_char_funs)
+    # using names makes the yaml cleaner
+    names(char_funsequence) <- names(char_aggsequence)
+
+    agg_params <- list(agg_input_path = datpath,
+                       aggType = type,
+                       agg_groups = groupers,
+                       agg_var = aggCols,
+                       aggregation_sequence = char_aggsequence,
+                       aggregation_funsequence = char_funsequence,
+                       namehistory = namehistory,
+                       keepAllPolys = keepAllPolys,
+                       aggReturn = returnList,
+                       agg_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
+                       agg_status = TRUE,
+                       agg_git_commit = gitcom)
+
+    # add any passed metadata info
+    if (is.list(extrameta)) {agg_params <- modifyList(agg_params, extrameta)}
+
+    # append any module metadata, so it all stays together
+    ymlmodpath <- list.files(datpath, pattern = "*.yml")
+    if (length(ymlmodpath) != 0) {
+      ymlmods <- file.path(datpath, ymlmodpath) |>
+        yaml::read_yaml()
+    } else {
+      ymlmods <- NULL
+    }
+
+    yaml::write_yaml(c(ymlmods, agg_params),
+                     file = file.path(savepath, 'agg_metadata.yml'))
+
+    jsonmodpath <- list.files(datpath, pattern = "*.json")
+    if (length(jsonmodpath) != 0) {
+      jsonmods <- file.path(datpath, jsonmodpath) |>
+        jsonlite::read_json()
+    } else {
+      jsonmods <- NULL
+    }
+    jsonlite::write_json(c(jsonmods, agg_params),
+                         path = file.path(savepath, 'agg_metadata.json'))
   }
 
   if (returnList) {return(aggout)} else {return(NULL)}

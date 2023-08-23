@@ -24,6 +24,8 @@
 #'   character, e.g. `name = "sfpolygons"`. The latter requires the object to be
 #'   available with `get("sfpolygons:)`, but allows passing characters rather
 #'   than objects. Not requiring names and is high on the list of improvements.
+#'   If we want to be able to re-run from auto-saved metadata params, we need
+#'   the names of the spatial levels to match the object, e.g. basin: basin.
 #' @param funsequence a list of aggregation functions to apply in the order to
 #'   apply them. Each list entry can be one value, e.g. a character or bare
 #'   name, or can be multiple if mulitiple aggregations should be done at that

@@ -3,16 +3,21 @@
 # Outer directory for project
 output_parent_dir: 'toolkit_project'
 
-# aggregation sequences (need to be defined in R)
-aggregation_def: 'toolkit_project/agg_params.R'
+# aggregation sequences defined in R- either NULL to define here or a path to a .R file
+aggregation_def: NULL
+
+# These allow defining funs internally as lists. if aggregation_def is NULL, these need to have values and vice versa
+aggregation_sequence: NULL
+
+aggregation_funsequence: NULL
 
 # Preexisting data
 # Hydrographs (expected to exist already)
 hydro_dir: NULL
 
 # Generated data
-# EWR outputs (will be created here in controller, read from here in aggregator)
-ewr_results: NULL
+# Often the path the EWRs were saved to, but needs to be variable with more modules (will be created here in controller, read from here in aggregator)
+agg_input_path: NULL
 
 # outputs of aggregator. There may be multiple modules
 # NULL doesn't save it, but holds in memory.

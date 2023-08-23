@@ -53,7 +53,14 @@ run_toolkit_params <- function(yamlpath = NULL,
   # the most general, but also requires extra files and makes handling metadata
   # trickier
   if (!is.null(arglist$aggregation_def)) {
-    source(arglist$aggregation_def)
+    if (file.exists(arglist$aggregation_def)) {
+      source(arglist$aggregation_def, local = TRUE)
+    } else if ( file.exists(file.path('inst', arglist$aggregation_def))) {
+      source(file.path('inst', arglist$aggregation_def), local = TRUE)
+    } else {
+      rlang::abort(glue::glue('requested parameter R file {arglist$aggregation_def} does not exist.'))
+    }
+
     # check others
     if (!is.null(arglist$aggregation_sequence)) {
       rlang::warn("Aggregation sequence defined in both an R file and yml. R file supersedes, but best to only use one.")

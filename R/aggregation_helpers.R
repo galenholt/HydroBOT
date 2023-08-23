@@ -116,8 +116,34 @@ parse_geo <- function(x) {
 #' purrr::imap(list(ewr_code = c('ewr_code_timing', 'ewr_code'), sdl_units = werptoolkitr::sdl_units), parse_char)
 parse_char <- function(x, idx) {
   if (inherits(x, 'data.frame')) {
-    return(idx) # WHAT? not names(), that'll be the dataframe names. We want the list-name. Might have to map2?
+    return(idx)
   } else {
     return(x)
   }
+}
+
+#' Get an all-character version of the funsequence by parsing entries that are
+#' lists or quosures to characters
+#'
+#'  Intended to be used with [purrr::map()].
+#'
+#' @param x entry in funsequence, typically character, list, or quosure
+#'
+#' @return character vector
+#'
+parse_char_funs <- function(x) {
+  if (rlang::is_quosure(x)) {
+    # deparsing it removes the quo, so add it back
+    charfun <- deparse(rlang::quo_get_expr(x))
+    charfun <- paste0(c("rlang::quo(", charfun, ")"), collapse = '')
+    return(charfun)
+  }
+  if (is.character(x)) {
+    return(x)
+  }
+  if (is.list(x)) {
+    charfun <- deparse(x)
+    return(charfun)
+  }
+
 }

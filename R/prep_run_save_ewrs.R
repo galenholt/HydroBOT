@@ -53,6 +53,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                                outputType = 'none', returnType = 'none',
                                MINT = (100 - 0)/100, MAXT = (100 + 0 )/100,
                                DUR = (100 - 0 )/100, DRAW = (100 -0 )/100,
+                               extrameta = NULL,
                                datesuffix = FALSE) {
 
   # allow sloppy outputTypes and returnTypes
@@ -83,7 +84,8 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   } else {
     output_path <- make_output_dir(output_parent_dir, scenarios = scenarios, module_name = 'EWR')
     # set up flags for the metadata in case the ewr fails partway
-    init_params <- list(status = "Started run, has not finished. New metadata file will write when it does. If this file persists, the run failed.",
+    init_params <- list(meta_message = "Started run, has not finished. New metadata file will write when it does. If this metadata entry persists, the run failed.",
+                        ewr_status = FALSE,
                         time = format(Sys.time(), digits = 0, usetz = TRUE))
     yaml::write_yaml(init_params,
                      file = file.path(output_path, 'ewr_metadata.yml'))
@@ -101,6 +103,8 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   # auto-build metadata- this builds the data needed to run from params
   # And do it *after* the ewrs get processed so it only happens if the run works
   if (output_path != '') {
+    gitcom <- try(git2r::sha(git2r::commits()[[1]]), silent = TRUE)
+    if (inherits(gitcom, 'try-error')) {gitcom <- NULL}
     ewr_params <- list(output_parent_dir = output_parent_dir,
                        hydro_dir = hydro_dir,
                        ewr_results = output_path,
@@ -108,7 +112,12 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                        climate = climate,
                        outputType = outputType,
                        returnType = returnType,
-                       ewr_finish_time = format(Sys.time(), digits = 0, usetz = TRUE))
+                       ewr_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
+                       ewr_status = TRUE,
+                       ewr_git_commit = gitcom)
+
+    # add any passed metadata info
+    if (is.list(extrameta)) {ewr_params <- modifyList(ewr_params, extrameta)}
 
     # append any scenario metadata, so it all stays together
     ymlscenepath <- list.files(hydro_dir, pattern = "*.yml")

@@ -4,4 +4,4 @@
 output_parent_dir: '_test_data/temp_one'
 
 # aggregation sequences (need to be defined in R)
-aggregation_def: '_test_data/params.R'
+aggregation_def: 'yml/params.R'
