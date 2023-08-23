@@ -75,6 +75,5 @@ ArithmeticMean <- function(x, na.rm = TRUE) {
 #' @examples
 SpatialWeightedMean <- function(x, na.rm = TRUE) {
   y <- weighted.mean(x = x, w = area, na.rm = na.rm)
-  return(y)
 }
 

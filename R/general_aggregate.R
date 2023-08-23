@@ -109,9 +109,21 @@ general_aggregate <- function(data, groupers,
     silent = TRUE)
 
   if (inherits(data_agg, 'try-error')) {
-    fchar <- paste0(c("rlang::quo(", deparse(funlist), ")"), collapse = '')
-    # FUNS2 <- eval(parse(text = fchar)) # base R
-    FUNS_quo <- rlang::eval_tidy(rlang::parse_expr(fchar)) # rlang claims to be faster?
+    # turn the list into characters. Eval can't handle `return`, so make an
+    # attempt to get rid of it, though this is likely fragile.
+    if (is.character(funlist)) {
+      charfun <- funlist
+    } else {
+      charfun <- deparse(funlist)
+    }
+
+    # if charfun already has rlang::quo on it, don't add it
+    if(!grepl("quo", charfun)) {
+      charfun <- paste0(c("rlang::quo(", charfun, ")"), collapse = '')
+    }
+    charfun <- stringr::str_remove_all(charfun, 'return\\([A-z]\\)')
+    # FUNS2 <- eval(parse(text = charfun)) # base R
+    FUNS_quo <- rlang::eval_tidy(rlang::parse_expr(charfun)) # rlang claims to be faster?
 
     # go again
     data_agg <- data %>%

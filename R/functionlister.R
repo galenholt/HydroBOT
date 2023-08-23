@@ -18,6 +18,14 @@ functionlister <- function(funs, forcenames = NULL) {
     funnames <- forcenames
   }
 
+  # I could parse character-wrapped lists here, e.g. I'm not sure if this is too
+  # much complication, and we should just let the parsing in general_aggregate
+  # handle the characters or not.
+  if (length(funs) == 1 && is.character(funs) && grepl('^list', funs)) {
+    funs <- rlang::eval_tidy(rlang::parse_expr(funs))
+  }
+
+
   # the list specification of ~ functions
   if (is.list(funs)) {
     funlist <- funs
@@ -27,7 +35,11 @@ functionlister <- function(funs, forcenames = NULL) {
     }
 
   } else if (is.character(funs)) {
-    funlist <- mget(funs, inherits = TRUE)
+    funlist <- try(mget(funs, inherits = TRUE), silent = TRUE)
+    # Handle the situation of nothing to mget- try just returning the character and hope it works in an `eval` in `general_aggregate`
+    if (inherits(funlist, 'try-error')) {
+      funlist <- funs
+    }
   } else if (is.function(funs)) {
     funlist <- list(funs)
     names(funlist) <- funnames

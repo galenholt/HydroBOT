@@ -5,7 +5,9 @@
 #' simple parameters (e.g. directory) from command line or in other workflows
 #'
 #' @param yamlpath character, path to yaml file of parameters. Only needs to
-#'   contain values for parameters for which we wish to modify `defaults`
+#'   contain values for parameters for which we wish to modify `defaults`. If we
+#'   want to be able to auto-run off the saved param metadata, the names of the
+#'   spatial agg levels need to match the objects, e.g. basin: basin
 #' @param passed_args character, in yaml format, e.g. ""scenario_dir:
 #'   'project_dir/hydrographs'". Likely possible to pass more than one, but
 #'   complicated to get the yaml right. Suggest in that case modifying the
@@ -16,7 +18,8 @@
 #' @param list_args list of arguments. Typically would come in from
 #'   parameterised quarto notebook, which pre-parses yaml into a list
 #'
-#' @return runs the toolkit, returns NULL invisibly, or the aggregated output if the params have `aggReturn: TRUE`
+#' @return runs the toolkit, returns NULL invisibly, or the aggregated output if
+#'   the params have `aggReturn: TRUE`
 #' @export
 #'
 #' @examples
@@ -46,8 +49,41 @@ run_toolkit_params <- function(yamlpath = NULL,
   # bring in list-args (especially useful for parameterised quarto notebook)
   if (is.list(list_args)) {arglist <- modifyList(arglist, list_args)}
 
-  # R file contains the aggregation definition, since it may need R types
-  source(arglist$aggregation_def)
+  # R file allows aggregation definition with R types and expressions. This is
+  # the most general, but also requires extra files and makes handling metadata
+  # trickier
+  if (!is.null(arglist$aggregation_def)) {
+    source(arglist$aggregation_def)
+    # check others
+    if (!is.null(arglist$aggregation_sequence)) {
+      rlang::warn("Aggregation sequence defined in both an R file and yml. R file supersedes, but best to only use one.")
+    }
+    if (!is.null(arglist$aggregation_funsequence)) {
+      rlang::warn("Aggregation funsequence defined in both an R file and yml. R file supersedes, but best to only use one.")
+    }
+  }
+
+  if (is.null(arglist$aggregation_def)) {
+    aggseq <- arglist$aggregation_sequence
+    funseq <- arglist$aggregation_funsequence
+
+    # Some attempts at simple cleanup- funseq sometimes comes in as a vector
+    # from the yaml if we only have one function
+    if (!inherits(funseq, 'list')) {
+      if (length(funseq) == length(aggseq)) {
+        funseq <- as.list(aggseq)
+      } else {
+        rlang::abort("Function sequence is not a list and cannot obviously be translated into a list of the same length as the aggregation steps. Try to re-specify. The yaml is often easier to enforce a list using names.")
+      }
+    }
+
+  }
+
+  # catch edges
+  if (is.null(aggseq) | is.null(funseq)) {
+    rlang::abort("aggregation sequence or funsequence not defined in either the aggregation_def slot or the aggregation_sequence and aggregation_funsequence")
+  }
+
 
   # Some default modifications need R functions
   arglist <- make_default_args(arglist)
@@ -59,9 +95,14 @@ run_toolkit_params <- function(yamlpath = NULL,
                                   output_parent_dir = arglist$output_parent_dir,
                                   outputType = arglist$outputType,
                                   returnType = arglist$returnType,
-                                  climate = arglist$climate)
+                                  climate = arglist$climate,
+                                extrameta = list(ewr_run_from_params = TRUE,
+                                                 ewr_param_default = defaults,
+                                                 ewr_param_yml = yamlpath,
+                                                 ewr_param_passed = passed_args,
+                                                 ewr_param_list = list_args))
 
-  aggout <- read_and_agg(datpath = arglist$ewr_results,
+  aggout <- read_and_agg(datpath = arglist$agg_input_path,
                          type = arglist$aggType,
                          geopath = werptoolkitr::bom_basin_gauges,
                          causalpath = werptoolkitr::causal_ewr,
@@ -73,7 +114,12 @@ run_toolkit_params <- function(yamlpath = NULL,
                          namehistory = arglist$namehistory,
                          keepAllPolys = arglist$keepAllPolys,
                          returnList = arglist$aggReturn,
-                         savepath = arglist$agg_results)
+                         savepath = arglist$agg_results,
+                         extrameta = list(agg_run_from_params = TRUE,
+                                          agg_param_default = defaults,
+                                          agg_param_yml = yamlpath,
+                                          agg_param_passed = passed_args,
+                                          agg_param_list = list_args))
 
   if (arglist$aggReturn) {
     return(aggout)
@@ -94,8 +140,8 @@ make_default_args <- function(arglist) {
     arglist$hydro_dir = file.path(arglist$output_parent_dir, 'hydrographs')
   }
 
-  if (arglist$ewr_results == 'default' || is.null(arglist$ewr_results)) {
-    arglist$ewr_results <- file.path(arglist$output_parent_dir, 'module_output', 'EWR')
+  if (arglist$agg_input_path == 'default' || is.null(arglist$agg_input_path)) {
+    arglist$agg_input_path <- file.path(arglist$output_parent_dir, 'module_output', 'EWR')
   }
 
   if (arglist$agg_results == 'default' || is.null(arglist$agg_results)) {

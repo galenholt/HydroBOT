@@ -10,9 +10,22 @@ temp_parent_multi = '_test_data/temp_multi'
 destroy_temp_hydro(temp_parent_dir)
 destroy_temp_multifile(temp_parent_multi)
 
-test_that("parameter file works", {
+test_that("parameter file works with params.R", {
+  destroy_temp_hydro(temp_parent_dir)
   make_temp_hydro(temp_hydro_dir)
   test <- run_toolkit_params(yamlpath = system.file('yml/package_params.yml',
+                                                    package = 'werptoolkitr'))
+
+  # kind of silly- the main thing is that the above doesn't fail
+  expect_null(test)
+  destroy_temp_hydro(temp_parent_dir)
+
+})
+
+test_that("parameter file works with character aggregation", {
+  destroy_temp_hydro(temp_parent_dir)
+  make_temp_hydro(temp_hydro_dir)
+  test <- run_toolkit_params(yamlpath = system.file('yml/package_params_charseq.yml',
                                                     package = 'werptoolkitr'))
 
   # kind of silly- the main thing is that the above doesn't fail
@@ -39,5 +52,24 @@ test_that("passing from command works", {
   expect_null(test)
 
   destroy_temp_multifile(temp_parent_multi)
+
+})
+
+
+test_that("re-running from self-defined params works", {
+  destroy_temp_hydro(temp_parent_dir)
+  make_temp_hydro(temp_hydro_dir)
+  test <- run_toolkit_params(yamlpath = system.file('yml/package_params.yml',
+                                                    package = 'werptoolkitr'))
+
+  # now run that off the one it just created
+  test2 <- run_toolkit_params(yamlpath = file.path(temp_parent_dir,
+                                                   'aggregator_output',
+                                                   'agg_metadata.yml'))
+
+  # I'll have to again think more about stronger tests here, but the main thing is it runs.
+  expect_null(test)
+  expect_null(test2)
+  destroy_temp_hydro(temp_parent_dir)
 
 })

@@ -907,4 +907,164 @@ test_that("mixed functions between steps", {
   # expect_equal(sum(is.na(spatagg$sdl_units)), 3)
 })
 
+
+test_that("mixed functions between steps", {
+  sumspat <- gauge2geo(summary_ewr_output,
+                       gaugelocs = bom_basin_gauges)
+
+  # Use a smaller set of aggs
+  aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                 env_obj =  c('ewr_code', "env_obj"),
+                 sdl_units = sdl_units)
+
+  # all three- I don't expect the multiple bare to work
+  funseq <- list(c('ArithmeticMean', 'LimitingFactor'),
+                 c(ArithmeticMean, GeometricMean),
+                 list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
+
+  expect_error(spatagg <- multi_aggregate(sumspat,
+                                          aggsequence = aggseq,
+                                          groupers = 'scenario',
+                                          aggCols = 'ewr_achieved',
+                                          funsequence = funseq,
+                                          causal_edges = causal_ewr,
+                                          saveintermediate = TRUE))
+
+  # Directly declaring list
+  spatagg <- multi_aggregate(sumspat,
+                             aggsequence = aggseq,
+                             groupers = 'scenario',
+                             aggCols = 'ewr_achieved',
+                             funsequence = list(c('ArithmeticMean', 'LimitingFactor'),
+                                                c(ArithmeticMean, GeometricMean),
+                                                list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.))),
+                             causal_edges = causal_ewr,
+                             saveintermediate = TRUE)
+
+  expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
+  expect_type(spatagg, 'list')
+  expect_s3_class(spatagg[[length(spatagg)]], 'sf')
+  expect_equal(nrow(spatagg$sdl_units), 189)
+  expect_equal(ncol(spatagg$sdl_units), 15)
+  expect_equal(sum(is.na(spatagg$sdl_units)), 3)
+
+  # a single bare to avoid that issue still fails
+  funseq_1b <- list(c('ArithmeticMean', 'LimitingFactor'),
+                    ArithmeticMean,
+                    list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
+
+  expect_error(spatagg <- multi_aggregate(sumspat,
+                                          aggsequence = aggseq,
+                                          groupers = 'scenario',
+                                          aggCols = 'ewr_achieved',
+                                          funsequence = funseq_1b,
+                                          causal_edges = causal_ewr,
+                                          saveintermediate = TRUE))
+
+  # Mixed single functions
+  # a single of everything still fails
+  funseq_1 <- list('ArithmeticMean',
+                   ArithmeticMean,
+                   list(ArithmeticMean = ~ArithmeticMean(.)))
+
+  expect_error(spatagg <- multi_aggregate(sumspat,
+                                          aggsequence = aggseq,
+                                          groupers = 'scenario',
+                                          aggCols = 'ewr_achieved',
+                                          funsequence = funseq_1,
+                                          causal_edges = causal_ewr,
+                                          saveintermediate = TRUE))
+
+  # Mixed character and list
+  funseq_cl <- list(c('ArithmeticMean', 'LimitingFactor'),
+                    c('ArithmeticMean', 'GeometricMean'),
+                    list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
+
+  spatagg <- multi_aggregate(sumspat,
+                             aggsequence = aggseq,
+                             groupers = 'scenario',
+                             aggCols = 'ewr_achieved',
+                             funsequence = funseq_cl,
+                             causal_edges = causal_ewr,
+                             saveintermediate = TRUE)
+
+  expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
+  expect_type(spatagg, 'list')
+  expect_s3_class(spatagg[[length(spatagg)]], 'sf')
+  expect_equal(nrow(spatagg$sdl_units), 189)
+  expect_equal(ncol(spatagg$sdl_units), 15)
+  expect_equal(sum(is.na(spatagg$sdl_units)), 3)
+
+
+  # Mixed character and list within a single level- this is no longer supported
+  # as of dplyr 1.1. It *does* work with dplyr 1.0, but I think we need to move
+  # forward from that.
+  skip_if_not_installed("dplyr", minimum_version = 1.1)
+  funseq_clc <- list(c('ArithmeticMean', 'LimitingFactor'),
+                     list('ArithmeticMean', GeometricMean = ~GeometricMean(.)),
+                     list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
+
+  expect_error(spatagg <- multi_aggregate(sumspat,
+                                          aggsequence = aggseq,
+                                          groupers = 'scenario',
+                                          aggCols = 'ewr_achieved',
+                                          funsequence = funseq_clc,
+                                          causal_edges = causal_ewr,
+                                          saveintermediate = TRUE))
+
+  # for dplyr 1.0 these work
+  # expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
+  # expect_type(spatagg, 'list')
+  # expect_s3_class(spatagg[[length(spatagg)]], 'sf')
+  # expect_equal(nrow(spatagg$sdl_units), 189)
+  # expect_equal(ncol(spatagg$sdl_units), 15)
+  # expect_equal(sum(is.na(spatagg$sdl_units)), 3)
+})
+
+test_that("mixed functions including quosures, singles, multiples, and characters", {
+  sumspat <- gauge2geo(summary_ewr_output,
+                       gaugelocs = bom_basin_gauges)
+
+  # The goal here is mostly to provide tests of the situation where we get
+  # character vectors from a params file, and to give me things to look at in
+  # the debugger to figure out how it handles the different options
+  aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                 env_obj =  c('ewr_code', "env_obj"),
+                 sdl_units = "sdl_units",
+                 Specific_goal = c('env_obj', "Specific_goal"),
+                 cewo_valleys = 'cewo_valleys',
+                 Objective = c('Specific_goal', 'Objective'),
+                 mdb = "basin",
+                 target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+
+  funseq <- list('ArithmeticMean',
+                 list(mean = ~mean(., na.rm = TRUE)),
+                 "list(mean = ~mean(., na.rm = TRUE))", # as it might come in from yml
+                 'ArithmeticMean',
+                 rlang::quo(list(wm = ~weighted.mean(., w = area, na.rm = TRUE))),
+                 'ArithmeticMean',
+                 "rlang::quo(list(wm = ~weighted.mean(., w = area, na.rm = TRUE)))",
+                 c('ArithmeticMean', 'LimitingFactor'))
+
+  spatagg <- multi_aggregate(sumspat,
+                                          aggsequence = aggseq,
+                                          groupers = 'scenario',
+                                          aggCols = 'ewr_achieved',
+                                          funsequence = funseq,
+                                          causal_edges = causal_ewr,
+                                          saveintermediate = TRUE)
+
+  expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
+  expect_type(spatagg, 'list')
+  expect_s3_class(spatagg[[length(spatagg)]], 'sf')
+  expect_equal(nrow(spatagg$sdl_units), 189)
+  expect_equal(ncol(spatagg$sdl_units), 8)
+  expect_equal(sum(is.na(spatagg$sdl_units)), 3)
+  expect_equal(nrow(spatagg$target_5_year_2024), 228)
+  expect_equal(ncol(spatagg$target_5_year_2024), 11)
+  expect_equal(sum(is.na(spatagg$target_5_year_2024)), 3)
+
+
+})
+
 # tidyselect for other groupers and aggcols

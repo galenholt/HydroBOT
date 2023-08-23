@@ -711,6 +711,18 @@
       ],
       "Hash": "03533b1c875028233598f848fda44c4c"
     },
+    "git2r": {
+      "Package": "git2r",
+      "Version": "0.32.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "graphics",
+        "utils"
+      ],
+      "Hash": "1882d7a76fd8c14b2322865f74c9a348"
+    },
     "gitcreds": {
       "Package": "gitcreds",
       "Version": "0.1.2",
