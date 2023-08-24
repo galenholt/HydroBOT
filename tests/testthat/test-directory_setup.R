@@ -174,3 +174,6 @@ test_that('creating output dirs works with hydro_dir as a single scenario', {
   destroy_temp_hydro()
 
 })
+
+destroy_temp_hydro(temp_parent_dir)
+destroy_temp_multifile(temp_parent_multi)

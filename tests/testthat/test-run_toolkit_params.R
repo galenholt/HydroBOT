@@ -73,3 +73,6 @@ test_that("re-running from self-defined params works", {
   destroy_temp_hydro(temp_parent_dir)
 
 })
+
+destroy_temp_hydro(temp_parent_dir)
+destroy_temp_multifile(temp_parent_multi)

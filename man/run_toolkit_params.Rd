@@ -14,7 +14,9 @@ run_toolkit_params(
 }
 \arguments{
 \item{yamlpath}{character, path to yaml file of parameters. Only needs to
-contain values for parameters for which we wish to modify \code{defaults}}
+contain values for parameters for which we wish to modify \code{defaults}. If we
+want to be able to auto-run off the saved param metadata, the names of the
+spatial agg levels need to match the objects, e.g. basin: basin}
 
 \item{passed_args}{character, in yaml format, e.g. ""scenario_dir:
 'project_dir/hydrographs'". Likely possible to pass more than one, but
@@ -29,7 +31,8 @@ parameterised quarto notebook, which pre-parses yaml into a list}
 modified}
 }
 \value{
-runs the toolkit, returns NULL invisibly, or the aggregated output if the params have \code{aggReturn: TRUE}
+runs the toolkit, returns NULL invisibly, or the aggregated output if
+the params have \code{aggReturn: TRUE}
 }
 \description{
 The plan is for this to make scripting easier, and be able to change single

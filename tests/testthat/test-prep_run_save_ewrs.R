@@ -305,3 +305,6 @@ test_that('Single scenario among many, no access to the outer directory', {
   # Tear down
   destroy_temp_hydro(temp_parent_dir)
 })
+
+destroy_temp_hydro(temp_parent_dir)
+destroy_temp_multifile(temp_parent_multi)

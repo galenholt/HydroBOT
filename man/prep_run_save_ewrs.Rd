@@ -2,7 +2,7 @@
 % Please edit documentation in R/prep_run_save_ewrs.R
 \name{prep_run_save_ewrs}
 \alias{prep_run_save_ewrs}
-\title{Title}
+\title{Set up, run, and (possibly) save EWR outputs}
 \usage{
 prep_run_save_ewrs(
   hydro_dir,
@@ -16,13 +16,17 @@ prep_run_save_ewrs(
   MAXT = (100 + 0)/100,
   DUR = (100 - 0)/100,
   DRAW = (100 - 0)/100,
+  extrameta = NULL,
   datesuffix = FALSE
 )
 }
 \arguments{
-\item{hydro_dir}{Directory containing hydrographs. Can be an outer directory, e.g. \code{hydrographs} that splits into scenario subdirs, or can be a single scenario subdir.}
+\item{hydro_dir}{Directory containing hydrographs. Can be an outer directory,
+e.g. \code{hydrographs} that splits into scenario subdirs, or can be a single
+scenario subdir.}
 
-\item{output_parent_dir}{parent directory for the outputs. Can be anything, but two typical cases:
+\item{output_parent_dir}{parent directory for the outputs. Can be anything,
+but two typical cases:
 \itemize{
 \item The directory containing \code{hydro_dir}, which puts the \code{module_outputs} at the same level as the hydrographs
 \item If running in batches for single scenarios, may be \code{hydro_dir}, which just puts the \code{module_outputs} in \code{hydro_dir}
@@ -47,7 +51,8 @@ prep_run_save_ewrs(
 \item 'NSW 10,000 year climate sequence' (not categorised, just a blank csv for 10,000 years that allows it to run)
 }}
 
-\item{outputType}{list of strings or character vector defining what to save to disk. One or more of:
+\item{outputType}{list of strings or character vector defining what to save
+to disk. One or more of:
 \itemize{
 \item 'none' (default), do not save outputs- ignored if in a list with others
 \item 'summary' saves the EWR outcomes summarised over the whole period
@@ -55,7 +60,8 @@ prep_run_save_ewrs(
 \item 'annual' does not work with current EWR
 }}
 
-\item{returnType}{list of strings or character vector defining what to return to the active R session. Same options as \code{outputType}}
+\item{returnType}{list of strings or character vector defining what to return
+to the active R session. Same options as \code{outputType}}
 
 \item{MINT}{see EWR}
 
@@ -65,11 +71,15 @@ prep_run_save_ewrs(
 
 \item{DRAW}{see EWR}
 
-\item{datesuffix}{logical. whether to add a suffix to saved filenames to provide a datestamp. Should be deprecated in favour of metadata files.}
+\item{datesuffix}{logical. whether to add a suffix to saved filenames to
+provide a datestamp. Should be deprecated in favour of metadata files.}
 }
 \value{
 a list of dataframe(s) if \code{returnType} is not 'none', otherwise, NULL
 }
 \description{
-Title
+This does some directory setup and parsing, runs the EWR tool and, if asked,
+saves the output. If the output saves, it also auto-saves both yaml and json
+metadata files with all parameters needed to run this part of the toolkit
+with parameters. Scenario metadata is prepended, if found.
 }

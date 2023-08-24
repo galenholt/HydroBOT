@@ -29,13 +29,15 @@ bare anonymous function, e.g. \code{~mean(., na.rm = T)} is not supported
 because we need a name. Use a named list if using anonymous functions, e.g.
 \code{list(mean = ~mean(., na.rm = T))}. \emph{If using functions with a
 data-variable argument}, e.g. weighted.mean with a column of weights, we
-now (as of {dplyr} 1.1) have some major restrictions. If specified \emph{as a
-function argument}, the function can just go in as a bare name or
-anonymous. If specified elsewhere, it \emph{has} to be wrapped in
-\code{\link[rlang:defusing-advanced]{rlang::quo()}}, e.g. \code{agglist <- rlang::quo(list(mean = mean, wm = ~weighted.mean(., weight_column_name, na.rm = T)))}. And if building custom
-aggregation functions (not-anonymous), the argument has to be exposed, it
-can't be hardcoded into the function body. The error checks for names do
-not work for quosures, so make sure you name the list.}
+now (as of {dplyr} 1.1) have some workarounds. One option is if specified
+\emph{as a function argument}, the function can just go in as a bare name or
+anonymous. If specified elsewhere, it can be wrapped in \code{\link[rlang:defusing-advanced]{rlang::quo()}},
+e.g. \code{agglist <- rlang::quo(list(mean = mean, wm = ~weighted.mean(., weight_column_name, na.rm = T)))}. If it isn't, there is now an internal
+workaround to add that on that seems to be stable but may cause unforeseen
+issues. This workaround also allows building custom aggregation functions
+(not-anonymous) with the data-variable argument either exposed or hardcoded
+(see \code{\link[=SpatialWeightedMean]{SpatialWeightedMean()}}). The error checks for names do not work for
+quosures, so make sure you name the list if using \code{\link[rlang:defusing-advanced]{rlang::quo()}}.}
 
 \item{prefix}{character prefix for the column name. Default \code{"agg_"}, but
 often better to use the aggregation step. Typically set by particular

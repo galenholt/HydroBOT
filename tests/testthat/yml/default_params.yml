@@ -1,0 +1,48 @@
+# Those things defined as paths can be input as NULL to build a default project structure
+
+# Outer directory for project
+output_parent_dir: 'toolkit_project'
+
+# aggregation sequences defined in R- either NULL to define here or a path to a .R file
+aggregation_def: NULL
+
+# These allow defining funs internally as lists. if aggregation_def is NULL, these need to have values and vice versa
+aggregation_sequence: NULL
+
+aggregation_funsequence: NULL
+
+# Preexisting data
+# Hydrographs (expected to exist already)
+hydro_dir: NULL
+
+# Generated data
+# Often the path the EWRs were saved to, but needs to be variable with more modules (will be created here in controller, read from here in aggregator)
+agg_input_path: NULL
+
+# outputs of aggregator. There may be multiple modules
+# NULL doesn't save it, but holds in memory.
+agg_results: NULL
+
+# Model type
+model_format: 'IQQM - NSW 10,000 years'
+
+# Climate
+climate: 'Standard - 1911 to 2018 climate categorisation'
+
+# output and return
+outputType:
+  - summary
+
+returnType: none
+
+# What to aggregate
+aggType: summary
+
+# Aggregation settings
+agg_groups: scenario
+agg_var: ewr_achieved
+aggReturn: FALSE
+namehistory: FALSE
+keepAllPolys: TRUE
+
+# we could expose more defaults in `prep_run_save_ewrs` to `param_runner`, but that's so open-ended let's wait.

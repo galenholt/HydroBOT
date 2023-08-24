@@ -1,7 +1,6 @@
 
 # helper functions to make temp copies of the hydrographs directory to test with
 
-
 # single csvs, each with several gauges -----------------------------------
 
 
@@ -49,3 +48,14 @@ make_temp_multifile <- function(temp_hydro_multi = '_test_data/temp_multi/hydrog
 destroy_temp_multifile <- function(temp_parent_dir = '_test_data/temp_multi') {
   unlink(temp_parent_dir, recursive = TRUE)
 }
+
+
+# Copy over inst/yml ------------------------------------------------------
+
+# This avoids some goofy issues with working directory
+if (grepl("testthat", getwd())) {
+  if (!dir.exists('yml')) {dir.create('yml')}
+  file.copy(list.files(system.file("yml", package = 'werptoolkitr'), full.names = TRUE),
+            to = 'yml', overwrite = TRUE)
+}
+

@@ -114,11 +114,11 @@ general_aggregate <- function(data, groupers,
     if (is.character(funlist)) {
       charfun <- funlist
     } else {
-      charfun <- deparse(funlist)
+      charfun <- paste0(deparse(funlist), collapse = '')
     }
 
-    # if charfun already has rlang::quo on it, don't add it
-    if(!grepl("quo", charfun)) {
+    # add rlang::quo unless it's already there.
+    if (!grepl("quo", charfun)) {
       charfun <- paste0(c("rlang::quo(", charfun, ")"), collapse = '')
     }
     charfun <- stringr::str_remove_all(charfun, 'return\\([A-z]\\)')

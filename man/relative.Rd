@@ -11,7 +11,7 @@ relative(x, y, add_eps = 0)
 
 \item{y}{reference data}
 
-\item{add_eps}{default 0. epsilon to add to prevent divide-by-zero infs}
+\item{add_eps}{default 0. epsilon to add to prevent divide-by-zero infs. Can be \code{'auto'} to use half of the minimum nonzero value}
 }
 \description{
 Easily-callable wrapper for \code{/}, with ability to avoid divide-by-0
