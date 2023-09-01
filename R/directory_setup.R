@@ -124,6 +124,12 @@ fix_file_scenarios <- function(hydro_paths, scenarios) {
     new_paths <- lapply(rename_path, \(x) paste0(x, collapse = '/'))
     file.rename(from = unlist(hydro_paths), to = unlist(new_paths))
 
+    rlang::inform("Due to duplicate input files across scenario directories,
+                  they have been made unique. The resulting `scenario` column
+                  in the EWR tool will include both `scenario` and `filename`,
+                  separated by '_DIRECTORYAPPEND_'. You will likely need to adjust by splitting
+                  on '_DIRECTORYAPPEND_' and only keeping the scenario.")
+
     hydro_paths <- new_paths
   }
 
@@ -132,6 +138,6 @@ fix_file_scenarios <- function(hydro_paths, scenarios) {
 
 # silly helper
 end_paster <- function(x, npastes) {
-  x[length(x)] <- paste0(x[(length(x)-(npastes-1)):length(x)], collapse = '_')
+  x[length(x)] <- paste0(x[(length(x)-(npastes-1)):length(x)], collapse = '_DIRECTORYAPPEND_')
   return(x)
 }

@@ -68,6 +68,9 @@ test_that('csv per gauge works', {
   expect_equal(length(ewr_out), 2)
   expect_true(all(c('summary', 'all') %in% names(ewr_out)))
 
+  # These come in with directory_gauge. Split gauge off and should be left with scenarios.
+  ewr_out$summary <- ewr_out$summary |>
+    dplyr::mutate(scenario = purrr::map_chr(scenario, \(x) stringr::str_split_1(x, '_')[1]))
   expect_equal(unique(ewr_out$summary$scenario), c('base', 'down4', 'up4'))
   # 'scenario' here gets the csv name. That happens inside the EWR tool- the
   # `_get_file_names` function does a `.split('/')` on the filepath to name the

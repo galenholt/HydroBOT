@@ -3,7 +3,7 @@ import os
 import copy
 
 
-def clean_ewrs(ewr_results):
+def clean_ewrs(ewr_results, scenario_filename_split):
   # There are some case issues between the types. Some variables have camelCase, so I don't want to goof that up, but I want 'gauge' and 'scenario' in particular to be lower. So just change the first letter
     firstlower = lambda s: s[:1].lower() + s[1:] if s else ''
     ewr_results = ewr_results.rename(columns = firstlower)
@@ -15,8 +15,11 @@ def clean_ewrs(ewr_results):
     
     # This assumes a naming convention of either scenarioname.csv or
     # scenarioname_gauge.csv. The R portion of the toolkit cleans up the
-    # situation of scenarioname/gauge.csv, but that's best to avoid anyway
-    ewr_results["scenario"] = ewr_results["scenario"].str.split('_').str[0]
+    # situation of scenarioname/gauge.csv, but that's best to avoid anyway 
+    
+    # I think this is a bad assumption, and we should let the user deal with
+    # whatever their naming convention is in the output.
+    ewr_results["scenario"] = ewr_results["scenario"].str.split(scenario_filename_split).str[0]
     
     return(ewr_results)
 
@@ -45,7 +48,7 @@ def save_ewrs(ewr_results, ewr_type, output_path, datesuffix = True):
 
 
 # Main function to run and save the EWRs
-def run_save_ewrs(pathlist, output_path, model_format, allowance, climate, outputType = 'none', returnType = 'none', datesuffix = False):
+def run_save_ewrs(pathlist, output_path, model_format, allowance, climate, outputType = 'none', returnType = 'none', scenario_filename_split = '_DIRECTORYAPPEND_', datesuffix = False):
     thisewr = ScenarioHandler(scenario_files = pathlist, 
                          model_format = model_format, 
                          allowance = allowance, 
@@ -56,13 +59,13 @@ def run_save_ewrs(pathlist, output_path, model_format, allowance, climate, outpu
     # Only calculate those parts we need
     if (('summary' in bothType) | ('everything' in bothType)):
         ewr_sum = thisewr.get_ewr_results()
-        ewr_sum = clean_ewrs(ewr_sum)
+        ewr_sum = clean_ewrs(ewr_sum, scenario_filename_split)
     if (('annual' in bothType) | ('everything' in bothType)):
         ewr_yr = thisewr.get_yearly_ewr_results()
-        ewr_yr = clean_ewrs(ewr_sum)
+        ewr_yr = clean_ewrs(ewr_sum, scenario_filename_split)
     if (('all' in bothType) | ('everything' in bothType)):
         ewr_all = thisewr.get_all_events()
-        ewr_all = clean_ewrs(ewr_all)
+        ewr_all = clean_ewrs(ewr_all, scenario_filename_split)
 
     # only save the parts we want
     if ('summary' in outputType) | ('everything' in outputType):

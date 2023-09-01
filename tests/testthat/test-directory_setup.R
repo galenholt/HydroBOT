@@ -67,24 +67,24 @@ test_that("scenario paths and the name fixer works for multiple csvs in each", {
   # check they changed
   scenario_paths <- find_scenario_paths(temp_hydro_multi)
 
-  expected_vector <- c('_test_data/temp_multi/hydrographs/base/base_412002.csv',
-                       '_test_data/temp_multi/hydrographs/base/base_412005.csv',
-                       '_test_data/temp_multi/hydrographs/base/base_412038.csv',
-                       '_test_data/temp_multi/hydrographs/base/base_421001.csv',
-                       '_test_data/temp_multi/hydrographs/base/base_421004.csv',
-                       '_test_data/temp_multi/hydrographs/base/base_421011.csv',
-                       '_test_data/temp_multi/hydrographs/down4/down4_412002.csv',
-                       '_test_data/temp_multi/hydrographs/down4/down4_412005.csv',
-                       '_test_data/temp_multi/hydrographs/down4/down4_412038.csv',
-                       '_test_data/temp_multi/hydrographs/down4/down4_421001.csv',
-                       '_test_data/temp_multi/hydrographs/down4/down4_421004.csv',
-                       '_test_data/temp_multi/hydrographs/down4/down4_421011.csv',
-                       '_test_data/temp_multi/hydrographs/up4/up4_412002.csv',
-                       '_test_data/temp_multi/hydrographs/up4/up4_412005.csv',
-                       '_test_data/temp_multi/hydrographs/up4/up4_412038.csv',
-                       '_test_data/temp_multi/hydrographs/up4/up4_421001.csv',
-                       '_test_data/temp_multi/hydrographs/up4/up4_421004.csv',
-                       '_test_data/temp_multi/hydrographs/up4/up4_421011.csv')
+  expected_vector <- c('_test_data/temp_multi/hydrographs/base/base_DIRECTORYAPPEND_412002.csv',
+                       '_test_data/temp_multi/hydrographs/base/base_DIRECTORYAPPEND_412005.csv',
+                       '_test_data/temp_multi/hydrographs/base/base_DIRECTORYAPPEND_412038.csv',
+                       '_test_data/temp_multi/hydrographs/base/base_DIRECTORYAPPEND_421001.csv',
+                       '_test_data/temp_multi/hydrographs/base/base_DIRECTORYAPPEND_421004.csv',
+                       '_test_data/temp_multi/hydrographs/base/base_DIRECTORYAPPEND_421011.csv',
+                       '_test_data/temp_multi/hydrographs/down4/down4_DIRECTORYAPPEND_412002.csv',
+                       '_test_data/temp_multi/hydrographs/down4/down4_DIRECTORYAPPEND_412005.csv',
+                       '_test_data/temp_multi/hydrographs/down4/down4_DIRECTORYAPPEND_412038.csv',
+                       '_test_data/temp_multi/hydrographs/down4/down4_DIRECTORYAPPEND_421001.csv',
+                       '_test_data/temp_multi/hydrographs/down4/down4_DIRECTORYAPPEND_421004.csv',
+                       '_test_data/temp_multi/hydrographs/down4/down4_DIRECTORYAPPEND_421011.csv',
+                       '_test_data/temp_multi/hydrographs/up4/up4_DIRECTORYAPPEND_412002.csv',
+                       '_test_data/temp_multi/hydrographs/up4/up4_DIRECTORYAPPEND_412005.csv',
+                       '_test_data/temp_multi/hydrographs/up4/up4_DIRECTORYAPPEND_412038.csv',
+                       '_test_data/temp_multi/hydrographs/up4/up4_DIRECTORYAPPEND_421001.csv',
+                       '_test_data/temp_multi/hydrographs/up4/up4_DIRECTORYAPPEND_421004.csv',
+                       '_test_data/temp_multi/hydrographs/up4/up4_DIRECTORYAPPEND_421011.csv')
 
   expect_equal(scenario_paths, expected_vector)
 

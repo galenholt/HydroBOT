@@ -42,6 +42,8 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @param DRAW see EWR
 #' @param datesuffix logical. whether to add a suffix to saved filenames to
 #'   provide a datestamp. Should be deprecated in favour of metadata files.
+#' @param scenario_filename_split character (including regex) to split the scenario filenames in the 'scenario' column of the EWR outputs. Mostly for handling the situation of gauge-named csvs with the scenario name appended to the front. When auto-appended, '_DIRECTORYAPPEND_' is used. If the appending has been done by the user, will need to pass in the split. The 'scenario' is given the first piece of the split, so do not use a split pattern in the scenario name, e.g. do not name scenarios a_1 and then append csvs with "_" like a_1_401234.csv, or the _1 will be lost..
+#' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
@@ -53,6 +55,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                                outputType = 'none', returnType = 'none',
                                MINT = (100 - 0)/100, MAXT = (100 + 0 )/100,
                                DUR = (100 - 0 )/100, DRAW = (100 -0 )/100,
+                               scenario_filename_split = '_DIRECTORYAPPEND_',
                                extrameta = NULL,
                                datesuffix = FALSE) {
 
@@ -97,6 +100,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                                                 model_format, allowance, climate,
                                                 outputType = outputType,
                                                 returnType = returnType,
+                                                scenario_filename_split = scenario_filename_split,
                                                 datesuffix = datesuffix)
 
 

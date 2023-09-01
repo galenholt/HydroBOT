@@ -16,7 +16,7 @@
 /data-raw/downloaded/
 
 # Ignore some auto-generated data from tests
-*tests/testthat/_test_data
+*_test_data
 
 # dev/testing that's not worth tracking
 inst/doc
