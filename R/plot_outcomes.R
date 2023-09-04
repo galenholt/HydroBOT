@@ -429,7 +429,7 @@ plot_outcomes <- function(outdf,
     # `scale_fill_manual` method works, but is hackier. I might have to make
     # `plot_prep` more general at some point in the future if we do want a
     # cleaner, more consistent approach.
-    if (all(sf::st_is(prepped$data, c("POINT", "LINESTRING")))) {
+    if (all(sf::st_is(prepped$data, c("POINT", "LINESTRING", "MULTIPOINT")))) {
       outcome_plot <- outcome_plot +
         ggplot2::geom_sf(data = prepped$data |>
                            dplyr::filter(scenario %in% prepped$scenariofilter),
