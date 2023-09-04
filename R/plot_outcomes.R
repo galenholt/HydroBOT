@@ -48,6 +48,7 @@
 #'   or fits ([ggplot2::geom_smooth()])?
 #' @param smooth_method `method` argument to [ggplot2::geom_smooth()]. Ignored
 #'   if not smoothing
+#' @param smooth_args `method.args` argument to [ggplot2::stat_smooth()]. Ignored if not smoothing.
 #' @param smooth_se `se` argument to [ggplot2::geom_smooth()]. Ignored if not
 #'   smoothing
 #' @param underlay_list default NULL, named list (or list of named lists for
@@ -243,7 +244,9 @@ plot_outcomes <- function(outdf,
       if (smooth) {
         outcome_plot <- outcome_plot +
           ggplot2::geom_smooth(mapping = ggplot2::aes(color = .data$color),
-                               method = smooth_method, linewidth = 0.1,
+                               method = smooth_method,
+                               method.args = smooth_args,
+                               linewidth = 0.1,
                                se = smooth_se)
       }
       if (!smooth) {
