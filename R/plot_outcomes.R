@@ -93,6 +93,7 @@ plot_outcomes <- function(outdf,
                                   smooth = FALSE,
                                   smooth_method = NULL,
                                   smooth_se = TRUE,
+                                  smooth_args = NULL,
                                   underlay_list = NULL,
                                   overlay_list = NULL,
                                   setLimits = NULL,
@@ -281,11 +282,11 @@ plot_outcomes <- function(outdf,
       overplot_test <- overplot_test |>
         dplyr::group_by(.data[[facet_wrapper]], .add = TRUE)
     }
-    if (!is.null(facet_row) & facet_row != '.') {
+    if (!is.null(facet_row) && facet_row != '.') {
       overplot_test <- overplot_test |>
         dplyr::group_by(.data[[facet_row]], .add = TRUE)
     }
-    if (!is.null(facet_col) & facet_col != '.') {
+    if (!is.null(facet_col) && facet_col != '.') {
       overplot_test <- overplot_test |>
         dplyr::group_by(.data[[facet_col]], .add = TRUE)
     }

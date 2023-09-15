@@ -69,6 +69,11 @@ multi_aggregate <- function(dat,
                             keepAllPolys = FALSE,
                             failmissing = TRUE) {
 
+  # Check for common sources of errors
+  if (!inherits(aggsequence, 'list') || !inherits(funsequence, 'list')) {
+    rlang::abort('aggsequence and funsequence should both be lists, even if there is only one item. Otherwise iterating over their length causes unexpected behaviour.')
+  }
+
   # start with the input data
   # Name the starting data- best is to name it to match the first theme level,
   # but otherwise it gets named as the incoming object

@@ -114,6 +114,13 @@ test_that("gauge to poly works", {
   sumspat <- gauge2geo(summary_ewr_output,
                        gaugelocs = bom_basin_gauges)
 
+  # should error if not list, to keep from iterating over sdl_units itself
+  expect_error(multi_aggregate(sumspat,
+                             aggsequence = sdl_units,
+                             groupers = 'scenario',
+                             aggCols = 'ewr_achieved',
+                             funsequence = list('mean')))
+
   spatagg <- multi_aggregate(sumspat,
                              aggsequence = list(sdl_units = sdl_units),
                              groupers = 'scenario',
