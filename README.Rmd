@@ -23,15 +23,21 @@ This R package forms the core of the WERP climate adaptation toolkit, ingesting 
 
 ## Installation
 
-You should be able to install the development version of werptoolkitr from [GitHub](https://github.com/MDBAuth/WERP_toolkit) with `devtools::install_git`. For `devtools::install_git()` to work with SSH, first install the {git2r} package (though even this doesn't work in R 4.3).
+You should be able to install the development version of werptoolkitr from [GitHub](https://github.com/MDBAuth/WERP_toolkit) with `devtools::install_git`. For `devtools::install_git()` to work with SSH, there are two methods, depending on R version. The easiest is if R < 4.3, in which case install the {git2r} package, and then if you have SSH keys set up, this will work:
 
 ``` r
 # install.packages("devtools", "git2r")
 devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask')
 ```
 
-But, if using R 4.3, the {git2r} package does not support ssh, and so you have to clone the directory, and use
+If using R 4.3, the {git2r} package does not support ssh, and so you have to use external (system) git. R uses a different Home directory than standard (typically `~/Documents`), and so for this to work, you need to [set up SSH keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) in that location as well (e.g. in `~/Documents/.ssh/`) and [connect them to github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). Then this should work:
 
+``` r
+# install.packages("devtools")
+devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask', git = 'external')
+```
+
+If all else fails, clone the repo locally, and install from there.
 ``` r
 `devtools::install_local('path/to/repo', force = TRUE, upgrade = 'ask')`
 ```
