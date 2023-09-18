@@ -24,7 +24,8 @@ test_that("multi-palette and facetting", {
     dplyr::arrange(env_group, env_obj)
 
   # Create a palette list
-  grouplist = list(EF = 'grDevices::Purp',
+  grouplist = list(EB = 'grDevices::Grays',
+                   EF = 'grDevices::Purp',
                    NF = 'grDevices::Mint',
                    NV = 'grDevices::Burg',
                    OS = 'grDevices::Blues',

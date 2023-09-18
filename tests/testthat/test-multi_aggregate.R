@@ -676,8 +676,8 @@ test_that("single functions at each step, called in different ways", {
   expect_equal(names(spatagg_c), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_c, 'list')
   expect_s3_class(spatagg_c[[length(spatagg_c)]], 'sf')
-  expect_equal(nrow(spatagg_c$sdl_units), 189)
-  expect_equal(sum(is.na(spatagg_c$sdl_units)), 3)
+  expect_equal(nrow(spatagg_c$sdl_units), 195)
+  expect_equal(sum(is.na(spatagg_c$sdl_units)), 6)
 
   # bare
   funseq_b <- list(ArithmeticMean,
@@ -706,8 +706,8 @@ test_that("single functions at each step, called in different ways", {
   expect_equal(names(spatagg_b), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_b, 'list')
   expect_s3_class(spatagg_b[[length(spatagg_b)]], 'sf')
-  expect_equal(nrow(spatagg_b$sdl_units), 189)
-  expect_equal(sum(is.na(spatagg_b$sdl_units)), 3)
+  expect_equal(nrow(spatagg_b$sdl_units), 195)
+  expect_equal(sum(is.na(spatagg_b$sdl_units)), 6)
 
   # list
   funseq_l <- list(list(~ArithmeticMean(.)),
@@ -725,8 +725,8 @@ test_that("single functions at each step, called in different ways", {
   expect_equal(names(spatagg_l), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_l, 'list')
   expect_s3_class(spatagg_l[[length(spatagg_l)]], 'sf')
-  expect_equal(nrow(spatagg_l$sdl_units), 189)
-  expect_equal(sum(is.na(spatagg_l$sdl_units)), 3)
+  expect_equal(nrow(spatagg_l$sdl_units), 195)
+  expect_equal(sum(is.na(spatagg_l$sdl_units)), 6)
 
 })
 
@@ -754,9 +754,9 @@ test_that("multiple functions at each step", {
   expect_equal(names(spatagg_c), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_c, 'list')
   expect_s3_class(spatagg_c[[length(spatagg_c)]], 'sf')
-  expect_equal(nrow(spatagg_c$sdl_units), 189)
+  expect_equal(nrow(spatagg_c$sdl_units), 195)
   expect_equal(ncol(spatagg_c$sdl_units), 15)
-  expect_equal(sum(is.na(spatagg_c$sdl_units)), 3)
+  expect_equal(sum(is.na(spatagg_c$sdl_units)), 6)
 
   # bare
   # funseq_b <- list(c(ArithmeticMean, LimitingFactor),
@@ -776,9 +776,9 @@ test_that("multiple functions at each step", {
   expect_equal(names(spatagg_b), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_b, 'list')
   expect_s3_class(spatagg_b[[length(spatagg_b)]], 'sf')
-  expect_equal(nrow(spatagg_b$sdl_units), 189)
+  expect_equal(nrow(spatagg_b$sdl_units), 195)
   expect_equal(ncol(spatagg_c$sdl_units), 15)
-  expect_equal(sum(is.na(spatagg_b$sdl_units)), 3)
+  expect_equal(sum(is.na(spatagg_b$sdl_units)), 6)
 
   # list
   funseq_l <- list(list(ArithmeticMean = ~ArithmeticMean(.), LimitingFactor = ~LimitingFactor(.)),
@@ -796,9 +796,9 @@ test_that("multiple functions at each step", {
   expect_equal(names(spatagg_l), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_l, 'list')
   expect_s3_class(spatagg_l[[length(spatagg_l)]], 'sf')
-  expect_equal(nrow(spatagg_l$sdl_units), 189)
+  expect_equal(nrow(spatagg_l$sdl_units), 195)
   expect_equal(ncol(spatagg_c$sdl_units), 15)
-  expect_equal(sum(is.na(spatagg_l$sdl_units)), 3)
+  expect_equal(sum(is.na(spatagg_l$sdl_units)), 6)
 })
 
 test_that("mixed functions between steps", {
@@ -837,9 +837,9 @@ test_that("mixed functions between steps", {
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg, 'list')
   expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  expect_equal(nrow(spatagg$sdl_units), 189)
+  expect_equal(nrow(spatagg$sdl_units), 195)
   expect_equal(ncol(spatagg$sdl_units), 15)
-  expect_equal(sum(is.na(spatagg$sdl_units)), 3)
+  expect_equal(sum(is.na(spatagg$sdl_units)), 6)
 
   # a single bare to avoid that issue still fails
   funseq_1b <- list(c('ArithmeticMean', 'LimitingFactor'),
@@ -884,9 +884,9 @@ test_that("mixed functions between steps", {
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg, 'list')
   expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  expect_equal(nrow(spatagg$sdl_units), 189)
+  expect_equal(nrow(spatagg$sdl_units), 195)
   expect_equal(ncol(spatagg$sdl_units), 15)
-  expect_equal(sum(is.na(spatagg$sdl_units)), 3)
+  expect_equal(sum(is.na(spatagg$sdl_units)), 6)
 
 
   # Mixed character and list within a single level- this is no longer supported
@@ -909,9 +909,9 @@ test_that("mixed functions between steps", {
   # expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   # expect_type(spatagg, 'list')
   # expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  # expect_equal(nrow(spatagg$sdl_units), 189)
+  # expect_equal(nrow(spatagg$sdl_units), 195)
   # expect_equal(ncol(spatagg$sdl_units), 15)
-  # expect_equal(sum(is.na(spatagg$sdl_units)), 3)
+  # expect_equal(sum(is.na(spatagg$sdl_units)), 6)
 })
 
 
@@ -951,9 +951,9 @@ test_that("mixed functions between steps", {
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg, 'list')
   expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  expect_equal(nrow(spatagg$sdl_units), 189)
+  expect_equal(nrow(spatagg$sdl_units), 195)
   expect_equal(ncol(spatagg$sdl_units), 15)
-  expect_equal(sum(is.na(spatagg$sdl_units)), 3)
+  expect_equal(sum(is.na(spatagg$sdl_units)), 6)
 
   # a single bare to avoid that issue still fails
   funseq_1b <- list(c('ArithmeticMean', 'LimitingFactor'),
@@ -998,9 +998,9 @@ test_that("mixed functions between steps", {
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg, 'list')
   expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  expect_equal(nrow(spatagg$sdl_units), 189)
+  expect_equal(nrow(spatagg$sdl_units), 195)
   expect_equal(ncol(spatagg$sdl_units), 15)
-  expect_equal(sum(is.na(spatagg$sdl_units)), 3)
+  expect_equal(sum(is.na(spatagg$sdl_units)), 6)
 
 
   # Mixed character and list within a single level- this is no longer supported
@@ -1023,9 +1023,9 @@ test_that("mixed functions between steps", {
   # expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   # expect_type(spatagg, 'list')
   # expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  # expect_equal(nrow(spatagg$sdl_units), 189)
+  # expect_equal(nrow(spatagg$sdl_units), 195)
   # expect_equal(ncol(spatagg$sdl_units), 15)
-  # expect_equal(sum(is.na(spatagg$sdl_units)), 3)
+  # expect_equal(sum(is.na(spatagg$sdl_units)), 6)
 })
 
 test_that("mixed functions including quosures, singles, multiples, and characters", {
@@ -1064,9 +1064,9 @@ test_that("mixed functions including quosures, singles, multiples, and character
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg, 'list')
   expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  expect_equal(nrow(spatagg$sdl_units), 189)
+  expect_equal(nrow(spatagg$sdl_units), 195)
   expect_equal(ncol(spatagg$sdl_units), 8)
-  expect_equal(sum(is.na(spatagg$sdl_units)), 3)
+  expect_equal(sum(is.na(spatagg$sdl_units)), 6)
   expect_equal(nrow(spatagg$target_5_year_2024), 228)
   expect_equal(ncol(spatagg$target_5_year_2024), 11)
   expect_equal(sum(is.na(spatagg$target_5_year_2024)), 3)

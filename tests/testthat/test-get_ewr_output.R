@@ -3,7 +3,7 @@ test_that("summary works", {
   sumdat <- get_ewr_output(ewrpath, type = 'summary')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
-  namestring <- c('scenario_path', 'scenario', 'gauge', 'planning_unit',
+  namestring <- c('scenario', 'gauge', 'planning_unit',
                   'ewr_code', 'ewr_code_timing', 'multigauge', 'event_years',
                   'frequency', 'target_frequency', 'achievement_count',
                   'achievement_per_year', 'event_count', 'event_count_all',

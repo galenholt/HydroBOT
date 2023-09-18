@@ -1,0 +1,22 @@
+scenario_name:
+- down4
+- base
+- up4
+flow_multiplier:
+- 0.25
+- 1.0
+- 4.0
+output_parent_dir: inst/extdata/testsmall
+hydro_dir: inst/extdata/testsmall/hydrographs
+ewr_results: inst/extdata/testsmall/module_output/EWR
+model_format: IQQM - NSW 10,000 years
+climate: Standard - 1911 to 2018 climate categorisation
+outputType:
+- summary
+- all
+returnType:
+- summary
+- all
+ewr_finish_time: 2023-09-18 13:05:31 AEST
+ewr_status: yes
+ewr_git_commit: ec03610dc49d82809460842ccc046015b2cc440d

@@ -27,8 +27,8 @@ test_that("multi-step theme and spatial works", {
 
   spatagg <- read_and_agg(datpath = ewr_results,
                           type = 'summary',
-                          geopath = werptoolkitr::bom_basin_gauges,
-                          causalpath = werptoolkitr::causal_ewr,
+                          geopath = bom_basin_gauges,
+                          causalpath = causal_ewr,
                           groupers = 'scenario',
                           aggCols = 'ewr_achieved',
                           aggsequence = aggseq,
@@ -78,8 +78,8 @@ test_that("parsing geo and char work for aggsequence", {
 
   spatagg <- read_and_agg(datpath = ewr_results,
                           type = 'summary',
-                          geopath = werptoolkitr::bom_basin_gauges,
-                          causalpath = werptoolkitr::causal_ewr,
+                          geopath = bom_basin_gauges,
+                          causalpath = causal_ewr,
                           groupers = 'scenario',
                           aggCols = 'ewr_achieved',
                           aggsequence = aggseq,
@@ -116,8 +116,8 @@ test_that("parsing bare and char and rlang::quo for funsequence", {
 
   spatagg <- read_and_agg(datpath = ewr_results,
                           type = 'summary',
-                          geopath = werptoolkitr::bom_basin_gauges,
-                          causalpath = werptoolkitr::causal_ewr,
+                          geopath = bom_basin_gauges,
+                          causalpath = causal_ewr,
                           groupers = 'scenario',
                           aggCols = 'ewr_achieved',
                           aggsequence = aggseq,

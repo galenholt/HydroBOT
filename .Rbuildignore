@@ -3,13 +3,15 @@
 ^werptoolkitr\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
-^.venv$
-^data-raw/downloaded.*
+^.venv/
+data-raw/
+data-creation/
 .*quarto.*
 ^poetry
 ^pyproject
 .Rprofile
+_quarto_output/
 
-
+^._test_data/
 ^\.github$
 ^LICENSE\.md$

@@ -1,30 +1,30 @@
 # defaults work
 
     {
-      "#516888FF": 60,
-      "#F3AE6DFF": 177,
-      "#FBE697FF": 296
+      "#516888FF": 58,
+      "#F3AE6DFF": 175,
+      "#FBE697FF": 541
     }
 
 ---
 
     {
       "#14232AFF": 83,
-      "#516888FF": 60,
+      "#516888FF": 58,
       "#C9DACAFF": 5,
-      "#F3AE6DFF": 56,
+      "#F3AE6DFF": 47,
       "#FBE697FF": 24
     }
 
 # scalar colors work and font switching
 
     {
-      "forestgreen": 533
+      "forestgreen": 774
     }
 
 ---
 
     {
-      "cornflowerblue": 228
+      "cornflowerblue": 217
     }
 

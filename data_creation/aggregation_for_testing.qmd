@@ -13,14 +13,6 @@ params:
 
 Rebuilding data is done with params. To rebuild, at the terminal run `quarto render data_creation/aggregation_for_testing.qmd -P REBUILD_DATA:TRUE` or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
 
-```{r}
-if ("params" %in% ls()) {
-  REBUILD_DATA <- params$REBUILD_DATA
-} else {
-  REBUILD_DATA <- FALSE
-}
-```
-
 ```{r setup}
 #| warning: false
 #| message: false
@@ -53,7 +45,7 @@ ewrpath <- file.path("inst/extdata/testsmall/module_output/EWR")
 
 summary_ewr_output <- get_ewr_output(ewrpath, type = 'summary')
 
-  usethis::use_data(summary_ewr_output, overwrite = REBUILD_DATA)
+  usethis::use_data(summary_ewr_output, overwrite = params$REBUILD_DATA)
   
 ```
 
@@ -98,7 +90,7 @@ agg_theme_space <- multi_aggregate(sumspat,
 ```
 
 ```{r}
-  usethis::use_data(agg_theme_space, overwrite = REBUILD_DATA)
+  usethis::use_data(agg_theme_space, overwrite = params$REBUILD_DATA)
 ```
 
 ```{r}
@@ -124,5 +116,5 @@ names(agg_theme_space_colsequence$mdb)
 ```
 
 ```{r}
-  usethis::use_data(agg_theme_space_colsequence, overwrite = REBUILD_DATA)
+  usethis::use_data(agg_theme_space_colsequence, overwrite = params$REBUILD_DATA)
 ```
