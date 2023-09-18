@@ -22,10 +22,10 @@ clean_obj_target <- function(ewrobjs,
                              saveout = FALSE,
                              outdir, savename) {
 
-  # There are several gauges per planning unit. This cuts to only a single row per planning unit/objective pair and drops the ewrs
+  # This cuts to only a single row per planning unit/objective pair and drops the ewrs
   objpu <- ewrobjs %>%
-    dplyr::distinct(PlanningUnitID, LTWPShortName, env_obj)
-
+    dplyr::select(tidyselect::any_of(c('PlanningUnitID', 'LTWPShortName')), env_obj) |>
+    dplyr::distinct()
 
   # This csv has the relationships from objectives to a few other things- target groups, species and other things like refugia, 'Objectives'
   targets <- readr::read_csv(targetpath, col_types = readr::cols())
@@ -63,35 +63,35 @@ clean_obj_target <- function(ewrobjs,
   # THe provenance of these files is unknown. It doesn't make sense we
   # need to do this weird multi-level joining just to get the names?
   # warnings suppressed because there's an annoying first column that gets a new name
-  suppressWarnings(qc_fix <- readr::read_csv(qcfiles[1], col_types = readr::cols()) %>%
+  qc_fix <- readr::read_csv(qcfiles[1], col_types = readr::cols(), col_select = -1) %>%
     dplyr::rename(Specific_goal = Target.species,
            env_obj = Env_obj) %>%
-    dplyr::select(-NodeType))
+    dplyr::select(-NodeType)
 
-  PUs_names <- suppressWarnings(readr::read_csv(qcfiles[2], col_types = readr::cols())) #the names didnt match the way i was doing it before
-  PUs_names$X1 <- NULL
-  qc_fix$X1 <- NULL
+  PUs_names <- readr::read_csv(qcfiles[2], col_types = readr::cols(), col_select = -1)
+
   qc_fix <- dplyr::left_join(qc_fix, PUs_names, by = "PU", relationship = 'many-to-many')
   #need to check with Renee - these are not objective specific but macquarie seem to be.
 
   # This is crazy how much re-joining we're doing. Need to find where all this
   # came from and just build it cleanly
-  pu2ltwp <- ewrobjs %>%
-    dplyr::distinct(PlanningUnitID, LTWPShortName)
+  pu2ltwp <- objpu %>%
+    dplyr::select(-env_obj) |>
+    dplyr::distinct()
 
   qc_fix <- dplyr::left_join(qc_fix, pu2ltwp, by = 'LTWPShortName', relationship = 'many-to-many')
 
-  qc_fix <- qc_fix %>%
-    dplyr::filter(link != 0) %>% #watch out for the 2s = Renee changes
-    dplyr::select(-c(link, PU, PlanningUnitName)) # get rid of extra cols not in the main data
+  qc_fix <- qc_fix |>
+    dplyr::filter(link != 0 & !is.na(LTWPShortName)) |>  #watch out for the 2s = Renee changes
+    dplyr::select(-c(link, PU, PlanningUnitName)) |>  # get rid of extra cols not in the main data
+    dplyr::distinct()
 
   obj2target <- dplyr::bind_rows(obj2target, qc_fix)
 
   # cleanup column ordering
-  obj2target <- obj2target %>%
-    dplyr::select(PlanningUnitID, LTWPShortName,
-           env_obj,
-           Specific_goal, Objective, Target)
+  obj2target <- obj2target |>
+    dplyr::select(any_of('PlanningUnitID'),
+                  LTWPShortName, env_obj, Specific_goal, Objective, Target)
 
   # final cleanup of weird characters and dplyr::rename to standard
   suppressWarnings(obj2target <- obj2target %>%
@@ -99,6 +99,11 @@ clean_obj_target <- function(ewrobjs,
     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'\032', '-'))) %>%
     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'-$', ''))) %>%
     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_squish(.))))
+
+  obj2target <- obj2target |>
+    dplyr::filter(!is.na(env_obj)) |>
+    dplyr::distinct()
+
 
   # save
   if (saveout == 'r') {

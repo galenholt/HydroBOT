@@ -44,12 +44,6 @@ First, do we actually want to rebuild the `data/` directory, or just use this to
 Set with params. But that doesn't work with interactive running, so deal with that.
 
 ```{r}
-if ("params" %in% ls()) {
-  REBUILD_DATA <- params$REBUILD_DATA
-} else {
-  REBUILD_DATA <- FALSE
-}
-
 # `saver` is for individual functions. Probably shouldn't use it.
 saver <- FALSE
 ```
@@ -91,18 +85,11 @@ if (!dir.exists(dataoutdir)) {dir.create(dataoutdir, recursive = TRUE)}
 
 Known file sources- the ewr definitions and the ltwp table.
 
-**UPDATE** 12/12/22: The data stream from MDBA has changed format and no longer can be matched against the table. Reverting to an old version. No guarantees about completeness.
-
-**UPDATE** 20/12/22: A better solution is the NSW version that Lara has just sent. Get that included soon.
+**UPDATE** Changed to the NSW mapping from Lara.
 
 ```{r}
 # Get ewr defs from MDBA- This is a cached version, since WatReqID has gone
-ewrs <- file.path(datarawdir, 'ewr_cache', 'NSWEWR_LIVE.csv')
-  
-# ewrs <- 'https://az3mdbastg001.blob.core.windows.net/mdba-public-data/NSWEWR_LIVE.csv'
-
-# The links to objectives come from here (as do the ewrs themselves)
-objtable <- file.path(datarawdir, 'tbl10', "tbl10a_WatRequirements5.4.csv")
+ewrs <- file.path(datarawdir, 'ewr_obj_codes_nsw/obj_codes_dec22.csv')
 ```
 
 Unknown file sources- these give nearly all links above environmental objectives (Theme group, Species, yearly targets). Some incorporate manual QC by Renee, but it's still not clear where the originals came from either sometimes.
@@ -126,15 +113,12 @@ The resulting dataframes provide links among different outcomes at different the
 
 I've gone back and forth on a saving default. I think I'll default to not save to avoid clutter, but assume that we will save when we have a real new updated version that other bits need to access (the plotting, the theme aggregator).
 
-Links between EWRs and environmental objectives. This can be returned long or wide. Wide is basically a matrix of matches (plus info columns), while long is easier to actually use later on.
-
-Question- should we be separating the EWR codes like CF1_H and CF1_C into columns for the main code and modifiers? I assume there was a reason for that?
+Links between EWRs and environmental objectives. I'm returning at the gauge scale, but we could also map at the LTWP areas only if we wanted (that's the scale of the NSW mapping).
 
 ```{r}
 
-ewr2obj <- clean_ewr_obj(ewrpath = ewrs,
-               objtablepath = objtable,
-               returnformat = 'long',
+ewr2obj <- clean_ewr_obj(ewrobjpath = ewrs,
+               gaugescale = TRUE,
                saveout = saver,
                outdir = datout,
                savename = "ewr_to_objectives_")
@@ -168,7 +152,7 @@ In analysis code, we should use saveRDS, but in the package the standard is rda 
 ```{r}
 causal_ewr <- list(ewr2obj = ewr2obj, obj2target = obj2target, obj2yrtarget = yrtarget)
 
-if (REBUILD_DATA) {
+if (params$REBUILD_DATA) {
   usethis::use_data(causal_ewr, overwrite = TRUE)
   # saveRDS(causal_ewr,
   #    file = file.path(datout, 'causal_ewr.rds'))

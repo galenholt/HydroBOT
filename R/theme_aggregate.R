@@ -78,7 +78,7 @@ theme_aggregate <- function(dat,
   }
 
   # may not need this, but too many conditionals
-  g2p <- gauge_pu(causal_edges)
+  g2p <- extract_gauge_pu(causal_edges)
 
   # clean up the edges to only relevant
   # auto-generate the edges if a full list has been passed in
