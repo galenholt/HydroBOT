@@ -72,9 +72,11 @@ make_edges <- function(dflist,
   # them all together
 
 
-  # I think iter() would let us send only the matching df (i.e.
-  # do the thisdf bit right in the call). Deal with that later if it's an issue.
-  alledges <- foreach::foreach (p = fromtos, i = iterators::icount(), .combine = dplyr::bind_rows) %do% {
+  #
+  counter <- 0
+  alledges <- foreach::foreach (p = fromtos, .combine = dplyr::bind_rows) %do% {
+
+    counter <- counter + 1
 
     # Find the right causal sheet
     # If there are multiple sheets, use the first one (No obvious heuristic here, and the index is simpler than anything more complex.)
@@ -116,9 +118,8 @@ make_edges <- function(dflist,
       dplyr::select(tidyselect::any_of(c('gauge', 'PlanningUnitID', extrasave, 'from', 'to', 'color'))) %>%
       dplyr::mutate(fromtype = p[1],
              totype = p[2],
-             edgeorder = i) %>% # I was using this to set the nodeorder, but dropping that.
+             edgeorder = counter) %>% # I was using this to set the nodeorder, but dropping that.
       dplyr::distinct() # kill duplicates
-
 
   }
 

@@ -13,9 +13,7 @@
 #'
 #' @return A `tibble` with columns for `LTWPShortName`, `ewr_code`, `ewr_code_timing`, and `env_obj` (if `gaugescale = FALSE`), and including `PlanningUnitID` and `gauge` if `gaugescale = TRUE`)
 #' @export
-#'
-#' # I am skipping examples because this is such a specific use.
-#'
+
 clean_ewr_obj <- function(ewrobjpath,
                           gaugescale = TRUE,
                           saveout = FALSE,

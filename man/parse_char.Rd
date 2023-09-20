@@ -14,10 +14,12 @@ parse_char(x, idx)
 }
 \value{
 character vector
+
+No \code{examples} tag because we don't export this
+purrr::imap(list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+sdl_units = sdl_units),
+parse_char)
 }
 \description{
 Intended to be used with \code{\link[purrr:imap]{purrr::imap()}}.
-}
-\examples{
-purrr::imap(list(ewr_code = c('ewr_code_timing', 'ewr_code'), sdl_units = werptoolkitr::sdl_units), parse_char)
 }

@@ -31,6 +31,7 @@ plot_outcomes(
   smooth = FALSE,
   smooth_method = NULL,
   smooth_se = TRUE,
+  smooth_args = NULL,
   underlay_list = NULL,
   overlay_list = NULL,
   setLimits = NULL,
@@ -98,6 +99,13 @@ comparison. See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\l
 \item{comp_fun}{function to use in comparison. Default NULL, no comparison.
 See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}
 
+\item{zero_adjust}{numeric (default 0) or \code{"auto"}, adjustment to data to
+avoid zeros by adding \code{zero_adjust} to \code{abs(data)}, e.g shifting all data
+away from zero, either positively or negatively. Zeros themselves are
+shifted up or down randomly. Used for avoiding x/0, NaN, and Inf when
+relativiszing and taking logs, primarily. Auto shifts by
+\code{0.1*min(abs(data[data != 0]))}.}
+
 \item{position}{character or \code{position} function, \code{position} arguments from
 \code{\link[ggplot2:geom_bar]{ggplot2::geom_col()}} and \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} (depending on plot type),
 to change from stacked to dodged bars or jitter points. Can be character,
@@ -113,6 +121,8 @@ if not smoothing}
 \item{smooth_se}{\code{se} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. Ignored if not
 smoothing}
 
+\item{smooth_args}{\code{method.args} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::stat_smooth()}}. Ignored if not smoothing.}
+
 \item{underlay_list}{default NULL, named list (or list of named lists for
 multiple underlay levels) of arguments to plot a map underlying the main
 map data. Names define arguments, \code{underlay} is required, either character
@@ -124,6 +134,8 @@ palettes for underlay fill and main data fill, for example, but can if the
 underlay is fill (polygons) and the main data is points.}
 
 \item{overlay_list}{as \code{underlay_list}, but names \code{"overlay_*"}}
+
+\item{setLimits}{sets user-supplied color/fill limits for maps. Should be extended to y generally.}
 
 \item{...}{}
 }

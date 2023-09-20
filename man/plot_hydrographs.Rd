@@ -21,18 +21,13 @@ plot_hydrographs(
 \arguments{
 \item{hydrolong}{hydrograph data in long format}
 
-\item{y_col}{character, column name for what's plotted on the y-axis. Default
-'flow', but will need to change if fed data with a different name}
-
-\item{gaugefilter}{set of gauges to plot, default \code{NULL} plots all of them}
+\item{y_col}{character, name of column for the y-axis}
 
 \item{scenariofilter}{set of scenarios to plot, default \code{NULL} plots all of
 them}
 
-\item{colors}{a named \code{colors} object or character vector giving a
-{paletteer} \code{palette} argument. Typically the former using \code{make_pal} to
-keep scenarios with consistent colours throughout, likely with a reference
-level.}
+\item{sceneorder}{character or factor giving the order to present scenario
+levels}
 
 \item{scales}{facet scales, as in \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if gauges have very different flows.}
 

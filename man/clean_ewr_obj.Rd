@@ -4,26 +4,12 @@
 \alias{clean_ewr_obj}
 \title{Pair EWR indicators to environmental objectives}
 \usage{
-clean_ewr_obj(
-  ewrpath =
-    "https://az3mdbastg001.blob.core.windows.net/mdba-public-data/NSWEWR_LIVE.csv",
-  objtablepath,
-  returnformat = "long",
-  saveout = FALSE,
-  outdir,
-  savename
-)
+clean_ewr_obj(ewrobjpath, gaugescale = TRUE, saveout = FALSE, outdir, savename)
 }
 \arguments{
-\item{ewrpath}{path to the EWR database. Defaults to the online version also hit by the EWR tool}
+\item{ewrobjpath}{path to the ewr-obj mapping.}
 
-\item{objtablepath}{path to the LTWP table}
-
-\item{returnformat}{one of "long" or "wide", controls the shape of the output.
-\itemize{
-\item \code{long} (the default): columns for EWR indicators and environmental objectives, with each combination existing in the dataset as a row
-\item \code{wide}: rows of EWR indicators, columns of environmental objectives, with T/F indicating matching
-}}
+\item{gaugescale}{logical, whether to return data at the gauge scale by remapping from LTWPShortName to gauge (\code{TRUE}), or to just leave at the LTWPShortName (e.g. sdl unit) scale as NSW now defines the relationships (\code{FALSE})}
 
 \item{saveout}{one of FALSE, 'r', or 'csv', controls saving and type.
 \itemize{
@@ -37,12 +23,8 @@ clean_ewr_obj(
 \item{savename}{character for the filename to save. the date and time gets appended to avoid overwriting}
 }
 \value{
-A \code{tibble} with columns for \code{WatReqID}, \code{PlanningUnitID}, \code{gauge}, \code{ewr_code}, \code{ewr_code_timing}, \code{LTWPShortName}, and \code{env_obj} (if \code{returnformat == 'long'}) or columns for each env obj (if \code{returnformat == 'wide'})
+A \code{tibble} with columns for \code{LTWPShortName}, \code{ewr_code}, \code{ewr_code_timing}, and \code{env_obj} (if \code{gaugescale = FALSE}), and including \code{PlanningUnitID} and \code{gauge} if \code{gaugescale = TRUE})
 }
 \description{
 Bespoke function to clean the EWR table and LTWP table, extract environmental objectives, and pair them. Will need to change or at least extensively retest if those datasets change
-}
-\examples{
-# I am skipping examples because this is such a specific use.
-
 }

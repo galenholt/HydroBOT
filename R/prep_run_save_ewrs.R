@@ -121,7 +121,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                        ewr_git_commit = gitcom)
 
     # add any passed metadata info
-    if (is.list(extrameta)) {ewr_params <- modifyList(ewr_params, extrameta)}
+    if (is.list(extrameta)) {ewr_params <- utils::modifyList(ewr_params, extrameta)}
 
     # append any scenario metadata, so it all stays together
     ymlscenepath <- list.files(hydro_dir, pattern = "*.yml")

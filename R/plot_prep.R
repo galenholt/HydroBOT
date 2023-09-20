@@ -8,6 +8,8 @@
 #'
 #' @param data dataframe to prep
 #' @param gaugefilter set of gauges to plot, default `NULL` plots all of them
+#' @param sceneorder character or factor giving the order to present scenario
+#'   levels
 #' @param scenariofilter set of scenarios to plot, default `NULL` plots all of
 #'   them
 #' @param colors a named `colors` object or character vector giving a

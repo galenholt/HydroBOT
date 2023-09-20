@@ -23,8 +23,6 @@
 #'   functions are used, the rows are stacked (long format).
 #' @export
 #'
-#' @examples
-#'
 agg_names_to_cols <-
   function(aggdf, aggsequence, funsequence, aggCols) {
     # suppressWarnings probably a bad idea, but there's a lot of really
@@ -92,7 +90,7 @@ agg_names_to_cols <-
 #'
 #' @return aggregation sequence, with length-1 character vectors attempted to `get`
 #'
-#' @examples
+#' No `examples` tag here because we don't export this
 #' purrr::map(list(ewr_code = c('ewr_code_timing', 'ewr_code'), sdl_units = "sdl_units"), parse_geo)
 parse_geo <- function(x) {
   if (length(x) == 1 & is.character(x)) {
@@ -112,8 +110,11 @@ parse_geo <- function(x) {
 #'
 #' @return character vector
 #'
-#' @examples
-#' purrr::imap(list(ewr_code = c('ewr_code_timing', 'ewr_code'), sdl_units = werptoolkitr::sdl_units), parse_char)
+#' No `examples` tag because we don't export this
+#' purrr::imap(list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+#' sdl_units = sdl_units),
+#' parse_char)
+#'
 parse_char <- function(x, idx) {
   if (inherits(x, 'data.frame')) {
     return(idx)

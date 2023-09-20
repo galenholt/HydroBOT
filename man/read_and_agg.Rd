@@ -104,6 +104,8 @@ should include only the directory structure.  If \code{NULL}, does not save. If
 \code{savepath = NULL} and \code{returnList = FALSE}, the function errors to avoid
 wasting resources.}
 
+\item{extrameta}{list, extra information to include in saved metadata documentation for the run. Default NULL.}
+
 \item{...}{}
 }
 \value{

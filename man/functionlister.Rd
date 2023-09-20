@@ -8,6 +8,8 @@ functionlister(funs, forcenames = NULL)
 }
 \arguments{
 \item{funs}{a function to evaluate inside something else, could be character, bare name, or list}
+
+\item{forcenames}{force-name the functions. Often used if the names don't auto-populate correctly}
 }
 \description{
 Function cleanup to allow passing character, bare names, and list-formatted functions

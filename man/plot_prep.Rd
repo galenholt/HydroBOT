@@ -28,6 +28,9 @@ plot_prep(
 keep scenarios with consistent colours throughout, likely with a reference
 level.}
 
+\item{sceneorder}{character or factor giving the order to present scenario
+levels}
+
 \item{gaugefilter}{set of gauges to plot, default \code{NULL} plots all of them}
 
 \item{scenariofilter}{set of scenarios to plot, default \code{NULL} plots all of

@@ -26,6 +26,8 @@ baseline_compare(
 
 \item{values_col}{column containing the values. Can be character or tidyselect or bare names, though the last are fragile.}
 
+\item{group_cols}{character, columns to group the baselining by. Often spatial or env_obj or similar.}
+
 \item{comp_fun}{function to use for comparison comparing the first two arguments (\code{difference} and \code{relative} included here as wrappers for \code{-} and \code{/}). Can be character, or list-format, (both safe) or bare name (brittle)}
 
 \item{...}{additional arguments to \code{\link[=create_base]{create_base()}}}

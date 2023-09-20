@@ -53,14 +53,14 @@ make_pal <- function(levels, palette,
   }
   # cols <- paletteer::paletteer_d(palette, length(levels))
 
-  if (returnUnref & includeRef) {unref <- setNames(cols, levels)}
+  if (returnUnref & includeRef) {unref <- stats::setNames(cols, levels)}
 
   # delete the reference levels out of the vectors
   whichlevs <- which(!(levels %in% refvals))
   nonrefs <- levels[whichlevs]
   nonrefcols <- cols[whichlevs]
 
-  namedcols <- setNames(c(refcols, nonrefcols), c(refvals, nonrefs))
+  namedcols <- stats::setNames(c(refcols, nonrefcols), c(refvals, nonrefs))
   class(namedcols) <- 'colors'
 
   if (returnUnref & includeRef) {

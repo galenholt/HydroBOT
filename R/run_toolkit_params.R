@@ -38,16 +38,16 @@ run_toolkit_params <- function(yamlpath = NULL,
   # Read in yaml params file from user
   useryml <- yaml::read_yaml(yamlpath)
 
-  arglist <- modifyList(arglist, useryml)
+  arglist <- utils::modifyList(arglist, useryml)
 
   # Allow user to pass yaml at the command line
   comargs <- yaml::yaml.load(passed_args)
 
   # Replace the arglist vals with passed args from command line
-  if (is.list(comargs)) {arglist <- modifyList(arglist, comargs)}
+  if (is.list(comargs)) {arglist <- utils::modifyList(arglist, comargs)}
 
   # bring in list-args (especially useful for parameterised quarto notebook)
-  if (is.list(list_args)) {arglist <- modifyList(arglist, list_args)}
+  if (is.list(list_args)) {arglist <- utils::modifyList(arglist, list_args)}
 
   # R file allows aggregation definition with R types and expressions. This is
   # the most general, but also requires extra files and makes handling metadata

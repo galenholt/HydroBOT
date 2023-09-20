@@ -5,7 +5,7 @@
 ^README\.Rmd$
 ^.venv/
 data-raw/
-data-creation/
+data_creation/
 .*quarto.*
 ^poetry
 ^pyproject
@@ -15,3 +15,7 @@ _quarto_output/
 ^._test_data/
 ^\.github$
 ^LICENSE\.md$
+.luarc.json
+WERP_toolkit.qmd
+_environment
+developer.md

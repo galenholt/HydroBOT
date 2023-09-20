@@ -7,7 +7,7 @@
 #' The user can always `+ theme(legend.position = 'none')` to the returned
 #' object.
 #'
-#' @inheritParams plot_hydrographs
+#' @inheritParams plot_prep
 #'
 #' @param outdf dataframe of outcomes, needs a `scenario` column
 #' @param y_col character, name of column for the y-axis
@@ -35,6 +35,12 @@
 #' @param sceneorder character or factor giving the order to present scenario
 #'   levels
 #' @param scene_pal named palette for scenarios, only used if `scene_x = FALSE`
+#' @param scales facet scales, as in [ggplot2::facet_wrap()]. Default `scales =
+#'   'fixed'` holds them the same, most common change will be to `scales =
+#'   'free_y'` if gauges have very different flows.
+#' @param transy transformation for y axis as in [ggplot2::scale_y_continuous()].
+#'   Default `transy = 'identity'` just uses the data. Most common change likely
+#'   `transy = 'log10`
 #' @param transx transformation for x axis as in
 #'   [ggplot2::scale_x_continuous()]. Default `transx = 'identity'` just uses
 #'   the data. Most common change likely `transx = 'log10`
@@ -61,6 +67,7 @@
 #'   palettes for underlay fill and main data fill, for example, but can if the
 #'   underlay is fill (polygons) and the main data is points.
 #' @param overlay_list as `underlay_list`, but names `"overlay_*"`
+#' @param setLimits sets user-supplied color/fill limits for maps. Should be extended to y generally.
 #'
 #' @return a ggplot stacked bar plot with standard formatting and coloring,
 #'   stacking either scenarios or colorset
@@ -374,7 +381,7 @@ plot_outcomes <- function(outdf,
           u$underlay_pal = NA
         }
 
-        if (u$underlay_pal %in% colors() |
+        if (u$underlay_pal %in% grDevices::colors() |
             is.na(u$underlay_pal) |
             grepl("#", u$underlay_pal)) {
 
@@ -463,7 +470,7 @@ plot_outcomes <- function(outdf,
     if (!is.null(facet_row) & !is.null(facet_col)) {
       outcome_plot <- outcome_plot +
         # ahhh. reformulate is (RHS, LHS) - so, backwards to what we want.
-        ggplot2::facet_grid(reformulate(facet_col,facet_row))
+        ggplot2::facet_grid(stats::reformulate(facet_col,facet_row))
     }
 
 
@@ -565,7 +572,7 @@ plot_outcomes <- function(outdf,
 
       outcome_plot <- outcome_plot +
         # ahhh. reformulate is (RHS, LHS) - so, backwards to what we want.
-        ggplot2::facet_grid(reformulate(facet_col,facet_row),
+        ggplot2::facet_grid(stats::reformulate(facet_col,facet_row),
                             # Good in theory, but often too long and blocks the plot, so not using
                             # labeller = ggplot2::label_wrap_gen(),
                             scales = scales)

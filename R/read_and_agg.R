@@ -26,6 +26,7 @@
 #'   should include only the directory structure.  If `NULL`, does not save. If
 #'   `savepath = NULL` and `returnList = FALSE`, the function errors to avoid
 #'   wasting resources.
+#' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
 #' @param ...
 #'
 #' @export
@@ -121,7 +122,7 @@ read_and_agg <- function(datpath,
                        agg_git_commit = gitcom)
 
     # add any passed metadata info
-    if (is.list(extrameta)) {agg_params <- modifyList(agg_params, extrameta)}
+    if (is.list(extrameta)) {agg_params <- utils::modifyList(agg_params, extrameta)}
 
     # append any module metadata, so it all stays together
     ymlmodpath <- list.files(datpath, pattern = "*.yml")

@@ -11,6 +11,7 @@
 #' @param failmissing logical, default TRUE. Use `tidyselect::any_of` or `tidyselect::all_of` when `values_col` or `compare_col` are character. see [selectcreator()]
 #' @param names_to character, as in [tidyr::pivot_longer()], used for auto-pivotting
 #' @param values_to character, as in [tidyr::pivot_longer()], used for auto-pivotting
+#' @param group_cols character, columns to group the baselining by. Often spatial or env_obj or similar.
 #'
 #' @return a tibble matching `val_df` (or a long version thereof if `val_df` is wide), with an added column for the reference level (named `ref_values_col`) and a column of the compared values (named `comp_fun_values_col`)
 #' @export

@@ -24,6 +24,8 @@ create_base(
 
 \item{values_col}{column containing the values. Can be character or tidyselect or bare names, though the last are fragile.}
 
+\item{group_cols}{character, columns to group the baselining by. Often spatial or env_obj or similar.}
+
 \item{failmissing}{logical, default TRUE. Use \code{tidyselect::any_of} or \code{tidyselect::all_of} when \code{values_col} or \code{compare_col} are character. see \code{\link[=selectcreator]{selectcreator()}}}
 
 \item{names_to}{character, as in \code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}}, used for auto-pivotting}
