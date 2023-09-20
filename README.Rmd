@@ -43,7 +43,7 @@ If all else fails, clone the repo locally, and install from there.
 ```
 
 ## Use
-Can be run piecemeal or all at once, scripted. Point at a directory of hydrologic scenarios, and the toolkit will run them through the modules, aggregate the outputs, and present results, with control by the user through function arguments. See the [WERP_toolkit_demo](https://special-disco-eyonrvy.pages.github.io/) for a full demonstration
+Can be run piecemeal or all at once, scripted. Point at a directory of hydrologic scenarios, and the toolkit will run them through the modules, aggregate the outputs, and present results, with control by the user through function arguments. See the [WERP_toolkit_demo](https://mdbauth.github.io/WERP_toolkit_demo/) for a full demonstration
 
 ## Developement 
 [see developer page](developer.md)
@@ -53,7 +53,7 @@ To run, this needs a Python environment containing `py_ewr` (currently 1.0.6). O
 
 ## Example
 
-See the [WERP_toolkit_demo](https://special-disco-eyonrvy.pages.github.io/) for a full demonstration.
+See the [WERP_toolkit_demo](https://mdbauth.github.io/WERP_toolkit_demo/) for a full demonstration.
 
 ## Who do I talk to? ##
 

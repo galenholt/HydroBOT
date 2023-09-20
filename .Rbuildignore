@@ -19,3 +19,5 @@ _quarto_output/
 WERP_toolkit.qmd
 _environment
 developer.md
+^doc$
+^Meta$

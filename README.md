@@ -59,8 +59,8 @@ Can be run piecemeal or all at once, scripted. Point at a directory of
 hydrologic scenarios, and the toolkit will run them through the modules,
 aggregate the outputs, and present results, with control by the user
 through function arguments. See the
-[WERP_toolkit_demo](https://special-disco-eyonrvy.pages.github.io/) for
-a full demonstration
+[WERP_toolkit_demo](https://mdbauth.github.io/WERP_toolkit_demo/) for a
+full demonstration
 
 ## Developement
 
@@ -78,8 +78,8 @@ desired.
 ## Example
 
 See the
-[WERP_toolkit_demo](https://special-disco-eyonrvy.pages.github.io/) for
-a full demonstration.
+[WERP_toolkit_demo](https://mdbauth.github.io/WERP_toolkit_demo/) for a
+full demonstration.
 
 ## Who do I talk to?
 
