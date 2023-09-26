@@ -37,8 +37,14 @@ def save_ewrs(ewr_results, ewr_type, output_path, datesuffix = True):
     ewr_scenarionames = ewr_results['scenario'].unique()
 
     for i in ewr_scenarionames:
-
-        outfile = os.path.join(output_path, i, ewr_type, (i + suff + '.csv'))
+        scene_outpath = os.path.join(output_path, i, ewr_type)
+        
+        # This is a workaround for the case where we only have access to the
+        # results directory and its name is not the same as the scenarios.
+        if not os.path.exists(scene_outpath):
+          os.makedirs(scene_outpath)
+          
+        outfile = os.path.join(scene_outpath, (i + suff + '.csv'))
         # outfile = Output_path + "/" + gscol + "_" + time.strftime("%Y%m%d-%H%M%S") + '.csv'
         
         # Tried chaining the methods but didn't work well- some want to save, and others operate in place  

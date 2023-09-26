@@ -309,5 +309,46 @@ test_that('Single scenario among many, no access to the outer directory', {
   destroy_temp_hydro(temp_parent_dir)
 })
 
+test_that('Single scenario among many, no access to the outer directory, different names', {
+
+  # create dir so building makes sense
+  make_temp_hydro(temp_hydro_dir)
+
+  # Now, let's assume all we have is a path to the specific scenario
+
+
+  # make the results dir name not match the file name of the results. so now
+  # this has hydrographs/results/base.csv instead of hydrographs/base/base.csv
+  file.rename(file.path(temp_hydro_dir, 'base'), file.path(temp_hydro_dir, 'results'))
+  scenario_path <- file.path(temp_hydro_dir, 'results')
+
+  # So far, assuming we can read and write to the outer 'hydrographs' directory, this is all standard.
+
+  # The test here is whether we can send the `output_parent_dir` the same value as `hydro_dir` to put the output inside the hydro scenario
+  ewr_out <- prep_run_save_ewrs(hydro_dir = scenario_path,
+                                output_parent_dir = scenario_path,
+                                outputType = list('summary'),
+                                datesuffix = FALSE,
+                                returnType = list('summary'))
+
+
+
+  # Expect only the single output, not for all the scenarios
+  expected_structure <- c('base.csv', 'base.json',
+                          'module_output/EWR/base/summary/base.csv',
+                          "module_output/EWR/ewr_metadata.json",
+                          "module_output/EWR/ewr_metadata.yml")
+  expect_equal(list.files(scenario_path, recursive = TRUE), expected_structure)
+
+  # Tear down
+  destroy_temp_hydro(temp_parent_dir)
+})
+
 destroy_temp_hydro(temp_parent_dir)
 destroy_temp_multifile(temp_parent_multi)
+
+
+destroy_temp_hydro(temp_parent_dir)
+destroy_temp_multifile(temp_parent_multi)
+
+
