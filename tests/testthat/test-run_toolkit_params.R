@@ -74,5 +74,76 @@ test_that("re-running from self-defined params works", {
 
 })
 
+# some unusual directory structures
+test_that('Single scenario among many, no access to the outer directory', {
+  destroy_temp_hydro(temp_parent_dir)
+  # create dir so building makes sense
+  make_temp_hydro(temp_hydro_dir)
+
+  # Now, let's assume all we have is a path to the specific scenario
+  scenario_path <- file.path(temp_hydro_dir, 'base')
+
+  test <- run_toolkit_params(list_args = list(output_parent_dir = '_test_data/temp_one/hydrographs/base',
+                                              hydro_dir = '_test_data/temp_one/hydrographs/base',
+                                              aggregation_def = 'yml/params.R'))
+
+  # kind of silly- the main thing is that the above doesn't fail
+  expect_null(test)
+
+  # Expect only the single output, not for all the scenarios
+  expected_structure <- c('aggregator_output/agg_metadata.json',
+                          'aggregator_output/agg_metadata.yml',
+                          'aggregator_output/summary_aggregated.rds',
+                          'base.csv',
+                          'base.json',
+                          'module_output/EWR/base/summary/base.csv',
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml')
+  expect_equal(list.files('_test_data/temp_one/hydrographs/base', recursive = TRUE), expected_structure)
+
+  # Tear down
+  destroy_temp_hydro(temp_parent_dir)
+})
+
+test_that('Single scenario among many, no access to the outer directory, different names', {
+
+  # create dir so building makes sense
+  make_temp_hydro(temp_hydro_dir)
+
+  # Now, let's assume all we have is a path to the specific scenario
+
+
+  # make the results dir name not match the file name of the results. so now
+  # this has hydrographs/results/base.csv instead of hydrographs/base/base.csv
+  file.rename(file.path(temp_hydro_dir, 'base'), file.path(temp_hydro_dir, 'results'))
+  scenario_path <- file.path(temp_hydro_dir, 'results')
+
+  # So far, assuming we can read and write to the outer 'hydrographs' directory, this is all standard.
+
+  # The test here is whether we can send the `output_parent_dir` the same value as `hydro_dir` to put the output inside the hydro scenario
+
+  test <- run_toolkit_params(list_args = list(output_parent_dir = scenario_path,
+                                              hydro_dir = scenario_path,
+                                              aggregation_def = 'yml/params.R'))
+
+  # kind of silly- the main thing is that the above doesn't fail
+  expect_null(test)
+
+  # Expect only the single output, not for all the scenarios
+  expected_structure <- c('aggregator_output/agg_metadata.json',
+                          'aggregator_output/agg_metadata.yml',
+                          'aggregator_output/summary_aggregated.rds',
+                          'base.csv',
+                          'base.json',
+                          'module_output/EWR/base/summary/base.csv',
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml')
+  expect_equal(list.files('_test_data/temp_one/hydrographs/results', recursive = TRUE), expected_structure)
+
+  # Tear down
+  destroy_temp_hydro(temp_parent_dir)
+
+})
+
 destroy_temp_hydro(temp_parent_dir)
 destroy_temp_multifile(temp_parent_multi)

@@ -36,9 +36,12 @@ run_toolkit_params <- function(yamlpath = NULL,
   arglist <- yaml::read_yaml(defaults)
 
   # Read in yaml params file from user
-  useryml <- yaml::read_yaml(yamlpath)
+  if (!is.null(yamlpath)) {
+    useryml <- yaml::read_yaml(yamlpath)
 
-  arglist <- utils::modifyList(arglist, useryml)
+    arglist <- utils::modifyList(arglist, useryml)
+  }
+
 
   # Allow user to pass yaml at the command line
   comargs <- yaml::yaml.load(passed_args)
