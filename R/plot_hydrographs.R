@@ -3,6 +3,9 @@
 #' @inheritParams plot_outcomes
 #'
 #' @param hydrolong hydrograph data in long format
+#' @param gaugefilter set of gauges to filter
+#' @param colors name of palette. Will change in future to match plot_outcomes color defining
+#' @param ... passed to [plot_prep()]
 #'
 #'
 #' @return ggplot object

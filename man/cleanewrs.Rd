@@ -7,7 +7,7 @@
 cleanewrs(ewrdf)
 }
 \arguments{
-\item{ewrdf}{}
+\item{ewrdf}{ewr dataframe of any type}
 }
 \value{
 a tibble of EWR outputs with cleaned up names, separated ewr_code_timing, and gauges as characters

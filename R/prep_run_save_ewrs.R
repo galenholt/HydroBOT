@@ -63,6 +63,10 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   if (!is.list(outputType)) {outputType <- as.list(outputType)}
   if (!is.list(returnType)) {returnType <- as.list(returnType)}
 
+  # ensure the spellings and calls are consistent
+  outputType <- make_ewr_consistent(outputType)
+  returnType <- make_ewr_consistent(returnType)
+
   # dicts in py come from named lists in R
   allowance <- list(minThreshold = MINT, maxThreshold = MAXT,
                     duration = DUR, drawdown = DRAW)
@@ -85,7 +89,8 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   if (length(outputType) == 1 && outputType == 'none') {
     output_path <- '' # This shouldn't do anything
   } else {
-    output_path <- make_output_dir(output_parent_dir, scenarios = scenarios, module_name = 'EWR')
+    output_path <- make_output_dir(output_parent_dir, scenarios = scenarios,
+                                   module_name = 'EWR', ewr_outtypes = unlist(outputType))
     # set up flags for the metadata in case the ewr fails partway
     init_params <- list(meta_message = "Started run, has not finished. New metadata file will write when it does. If this metadata entry persists, the run failed.",
                         ewr_status = FALSE,
@@ -148,4 +153,16 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
 
 
   return(ewr_out)
+}
+
+make_ewr_consistent <- function(typearg) {
+  typearg <- unlist(typearg)
+  typearg <- dplyr::case_when(typearg == 'all' ~ 'all_events',
+                              typearg == 'annual' ~ 'yearly',
+                              typearg == 'successful' ~ 'all_successful_events',
+                              typearg == 'all_interevents' ~ 'all_interEvents',
+                              typearg == 'all_successful_interevents' ~ 'all_successful_interEvents',
+                              .default = typearg)
+  typearg <- as.list(typearg)
+
 }

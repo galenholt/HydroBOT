@@ -7,7 +7,7 @@
 make_default_args(arglist)
 }
 \arguments{
-\item{arglist}{}
+\item{arglist}{list of arguments}
 }
 \description{
 Helper to allow making the directory structure programatically from the base directory

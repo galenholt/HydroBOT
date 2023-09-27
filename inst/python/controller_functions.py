@@ -62,35 +62,60 @@ def run_save_ewrs(pathlist, output_path, model_format, allowance, climate, outpu
     
     bothType = copy.deepcopy(outputType)
     bothType.extend(returnType)
-    # Only calculate those parts we need
+    # Only calculate those parts we need. Should be able to do this with a list
+    # comprehension instead of a million ifs
     if (('summary' in bothType) | ('everything' in bothType)):
         ewr_sum = thisewr.get_ewr_results()
         ewr_sum = clean_ewrs(ewr_sum, scenario_filename_split)
-    if (('annual' in bothType) | ('everything' in bothType)):
+    if (('annual' in bothType) | ('everything' in bothType) | ('yearly' in bothType)):
         ewr_yr = thisewr.get_yearly_ewr_results()
         ewr_yr = clean_ewrs(ewr_sum, scenario_filename_split)
-    if (('all' in bothType) | ('everything' in bothType)):
+    if (('all' in bothType) | ('everything' in bothType) | ('all_events' in bothType)):
         ewr_all = thisewr.get_all_events()
         ewr_all = clean_ewrs(ewr_all, scenario_filename_split)
+    if (('all_successful_events' in bothType) | ('everything' in bothType) | ('successful' in bothType)):
+        ewr_success = thisewr.get_all_successful_events()
+        ewr_success = clean_ewrs(ewr_success, scenario_filename_split)
+    if (('all_interEvents' in bothType) | ('everything' in bothType)):
+        ewr_inter = thisewr.get_all_interEvents()
+        ewr_inter = clean_ewrs(ewr_inter, scenario_filename_split)
+    if (('all_successful_interEvents' in bothType) | ('everything' in bothType)):
+        ewr_successInter = thisewr.get_all_successful_interEvents()
+        ewr_successInter = clean_ewrs(ewr_successInter, scenario_filename_split)
+    
 
     # only save the parts we want
     if ('summary' in outputType) | ('everything' in outputType):
         save_ewrs(ewr_sum, 'summary', output_path, datesuffix = datesuffix)
-    if ('annual' in outputType) | ('everything' in outputType):
-        save_ewrs(ewr_yr, 'annual', output_path, datesuffix = datesuffix)
-    if ('all' in outputType) | ('everything' in outputType):
-        save_ewrs(ewr_all, 'allevents', output_path, datesuffix = datesuffix)
+    if (('annual' in outputType) | ('everything' in outputType) | ('yearly' in outputType)):
+        save_ewrs(ewr_yr, 'yearly', output_path, datesuffix = datesuffix)
+    if ('all' in outputType) | ('everything' in outputType) | ('all_events' in outputType):
+        save_ewrs(ewr_all, 'all_events', output_path, datesuffix = datesuffix)
+    if (('all_successful_events' in outputType) | ('everything' in outputType) | ('successful' in outputType)):
+        save_ewrs(ewr_success, 'all_successful_events', output_path, datesuffix = datesuffix)
+    if (('all_interEvents' in outputType) | ('everything' in outputType)):
+        save_ewrs(ewr_inter, 'all_interEvents', output_path, datesuffix = datesuffix)
+    if (('all_successful_interEvents' in outputType) | ('everything' in outputType)):
+        save_ewrs(ewr_successInter, 'all_successful_interEvents', output_path, datesuffix = datesuffix)
+    
 
-    # Only return the parts we want
+    # Only return the parts we want. also should be list comprehension or at
+    # least piggyback the conditional logic
     if 'none' in returnType:
         return None
     
     returndict = {}
-    if 'summary' in returnType:
+    if ('summary' in returnType) | ('everything' in returnType):
         returndict.update({ "summary" : ewr_sum})
-    if 'annual' in returnType:
-        returndict.update({ "annual" : ewr_yr})
-    if 'all' in returnType:
-        returndict.update({ "all" : ewr_all})
+    if (('annual' in returnType) | ('everything' in returnType) | ('yearly' in returnType)):
+        returndict.update({ "yearly" : ewr_yr})
+    if ('all' in returnType) | ('everything' in returnType) | ('all_events' in returnType):
+        returndict.update({ "all_events" : ewr_all})
+    if (('all_successful_events' in returnType) | ('everything' in returnType) | ('successful' in returnType)):
+        returndict.update({ "all_successful_events" : ewr_success})
+    if (('all_interEvents' in returnType) | ('everything' in returnType)):
+        returndict.update({ "all_interEvents" : ewr_inter})
+    if (('all_successful_interEvents' in returnType) | ('everything' in returnType)):
+        returndict.update({ "all_successful_interEvents" : ewr_successInter})
     
     return(returndict)

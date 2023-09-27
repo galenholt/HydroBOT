@@ -23,8 +23,12 @@ plot_hydrographs(
 
 \item{y_col}{character, name of column for the y-axis}
 
+\item{gaugefilter}{set of gauges to filter}
+
 \item{scenariofilter}{set of scenarios to plot, default \code{NULL} plots all of
 them}
+
+\item{colors}{name of palette. Will change in future to match plot_outcomes color defining}
 
 \item{sceneorder}{character or factor giving the order to present scenario
 levels}
@@ -41,7 +45,7 @@ comparison. See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\l
 \item{comp_fun}{function to use in comparison. Default NULL, no comparison.
 See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}
 
-\item{...}{}
+\item{...}{passed to \code{\link[=plot_prep]{plot_prep()}}}
 }
 \value{
 ggplot object

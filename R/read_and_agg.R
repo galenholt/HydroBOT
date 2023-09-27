@@ -27,7 +27,7 @@
 #'   `savepath = NULL` and `returnList = FALSE`, the function errors to avoid
 #'   wasting resources.
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
-#' @param ...
+#' @param ... passed to [prep_ewr_agg()]
 #'
 #' @export
 #'

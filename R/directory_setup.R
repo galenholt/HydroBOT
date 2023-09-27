@@ -23,11 +23,19 @@ find_scenario_paths <- function(hydro_dir, type = 'csv') {
 #' @param parent_dir parent directory- typically for a project, but could be a single scenario
 #' @param scenarios names of the scenarios (character vector)
 #' @param module_name default 'EWR', sets up different directories for different modules
+#' @param ewr_outtypes character vector, names of EWR outputs to return. Options include
+#'  * 'summary': outputs summarised to the period
+#'  * 'yearly': outputs summarised to year
+#'  * 'all_events'
+#'  * 'all_successful_events'
+#'  * 'all_interEvents': currently fails in EWR tool, and so not supported
+#'  * 'all_successful_interEvents'
 #'
 #' @return path to output directory
 #'
 #' @examples
-make_output_dir <- function(parent_dir, scenarios, module_name = 'EWR') {
+make_output_dir <- function(parent_dir, scenarios, module_name = 'EWR',
+                            ewr_outtypes = c('summary', 'annual', 'all_events')) {
   output_path <- file.path(parent_dir, 'module_output', module_name)
 
   # if parent_dir is the scenario dir (we're in a single run), use `scenarios = ''` to not make a subdir
@@ -42,9 +50,8 @@ make_output_dir <- function(parent_dir, scenarios, module_name = 'EWR') {
   # This will have to be built for each module, since they will return different things.
   # We could do this in the loop above, but that will just get hard to read.
   if (module_name == 'EWR') {
-    outtypes <- c('summary', 'annual', 'allevents')
     for (i in sceneout) {
-      for (j in outtypes) {
+      for (j in ewr_outtypes) {
         if (!dir.exists(file.path(i, j))) {dir.create(file.path(i,j), recursive = TRUE)}
       }
     }

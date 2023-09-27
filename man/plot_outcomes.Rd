@@ -137,7 +137,7 @@ underlay is fill (polygons) and the main data is points.}
 
 \item{setLimits}{sets user-supplied color/fill limits for maps. Should be extended to y generally.}
 
-\item{...}{}
+\item{...}{passed to \code{\link[=plot_prep]{plot_prep()}}}
 }
 \value{
 a ggplot stacked bar plot with standard formatting and coloring,

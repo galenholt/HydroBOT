@@ -1,3 +1,4 @@
+
 test_that("basin works with single color palette", {
   basin_to_plot <- agg_theme_space$mdb %>%
     dplyr::rename(allArith = 4, oneLimiting = 5) %>% # for readability

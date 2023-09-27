@@ -142,7 +142,7 @@ run_toolkit_params <- function(yamlpath = NULL,
 #
 #' Helper to allow making the directory structure programatically from the base directory
 #'
-#' @param arglist
+#' @param arglist list of arguments
 #'
 #' @examples
 make_default_args <- function(arglist) {
@@ -164,7 +164,7 @@ make_default_args <- function(arglist) {
 #
 #' Sometimes single values come in as characters instead of lists
 #'
-#' @param arglist
+#' @param arglist list of arguments
 #'
 #' @examples
 type_cleanup <- function(arglist) {

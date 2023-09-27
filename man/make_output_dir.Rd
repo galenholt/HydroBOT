@@ -4,7 +4,12 @@
 \alias{make_output_dir}
 \title{Set up the output directory structure based on parent directory and module}
 \usage{
-make_output_dir(parent_dir, scenarios, module_name = "EWR")
+make_output_dir(
+  parent_dir,
+  scenarios,
+  module_name = "EWR",
+  ewr_outtypes = c("summary", "annual", "all_events")
+)
 }
 \arguments{
 \item{parent_dir}{parent directory- typically for a project, but could be a single scenario}
@@ -12,6 +17,16 @@ make_output_dir(parent_dir, scenarios, module_name = "EWR")
 \item{scenarios}{names of the scenarios (character vector)}
 
 \item{module_name}{default 'EWR', sets up different directories for different modules}
+
+\item{ewr_outtypes}{character vector, names of EWR outputs to return. Options include
+\itemize{
+\item 'summary': outputs summarised to the period
+\item 'yearly': outputs summarised to year
+\item 'all_events'
+\item 'all_successful_events'
+\item 'all_interEvents': currently fails in EWR tool, and so not supported
+\item 'all_successful_interEvents'
+}}
 }
 \value{
 path to output directory

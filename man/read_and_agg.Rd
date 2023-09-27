@@ -106,7 +106,7 @@ wasting resources.}
 
 \item{extrameta}{list, extra information to include in saved metadata documentation for the run. Default NULL.}
 
-\item{...}{}
+\item{...}{passed to \code{\link[=prep_ewr_agg]{prep_ewr_agg()}}}
 }
 \value{
 either a tibble or sf of aggregated values at the final level (if

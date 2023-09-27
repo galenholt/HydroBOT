@@ -21,8 +21,14 @@ get_ewr_output <- function(dir, type,
   gaugefiles <- list.files(dir, pattern = '.csv',
                            full.names = TRUE, recursive = TRUE)
 
-  # separate into annual and summary files
-  relevantfiles <- gaugefiles[stringr::str_which(gaugefiles, pattern = type)]
+  # only get the relevant type of ewr output
+  if (type != 'everything') {
+    relevantfiles <- gaugefiles[stringr::str_which(gaugefiles, pattern = type)]
+  }
+  if (type == 'everything') {
+    relevantfiles <- gaugefiles
+  }
+
 
   # cut to requested gauges or scenarios
   if (!is.null(gaugefilter)) {
@@ -48,17 +54,14 @@ get_ewr_output <- function(dir, type,
   ewrdata <- ewrdata %>%
     dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric))
 
-  # cleanup names and structure
-  if (type == 'annual') {
-    ewrdata <- suppressWarnings(cleanewrs(ewrdata))
-  } else if (type == 'summary') {
+  # cleanup names and structure this should really just incorporate a more
+  # flexible cleaner function that assesses achievement for all data types. Or
+  # has something like cleanewrs for all of them, and then runs a new
+  # assess_achievement() function on the cleaned data
+  if (type == 'summary') {
     ewrdata <- suppressWarnings(cleanSummary(ewrdata))
-  } else if (type == 'both') {
-    ewrsum <- suppressWarnings(cleanSummary(ewrdata))
-    ewrann <- suppressWarnings(cleanewrs(ewrdata))
-    ewrdata <- list(summary = ewrsum, annual = ewrann)
   } else {
-    stop('unsupported `type` argument')
+    ewrdata <- suppressWarnings(cleanewrs(ewrdata))
   }
 
 
@@ -74,7 +77,7 @@ get_ewr_output <- function(dir, type,
 #'
 #' The new format of the EWR output makes this much lighter than previously.
 #'
-#' @param ewrdf
+#' @param ewrdf ewr dataframe of any type
 #'
 #' @return a tibble of EWR outputs with cleaned up names, separated ewr_code_timing, and gauges as characters
 #' @export
@@ -123,6 +126,10 @@ nameclean <- function(charvec) {
     tolower() %>%
     stringr::str_replace_all(pattern = ' ', replacement = '_') %>%
     stringr::str_replace_all(pattern = '-', replacement = '')
+
+  # sometimes the ewr names are ewr_code and sometimes just ewr
+  cleannames[cleannames == 'ewr'] <- 'ewr_code'
+  return(cleannames)
 
 
 }

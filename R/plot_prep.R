@@ -28,7 +28,7 @@
 #'   shifted up or down randomly. Used for avoiding x/0, NaN, and Inf when
 #'   relativiszing and taking logs, primarily. Auto shifts by
 #'   `0.1*min(abs(data[data != 0]))`.
-#' @param ...
+#' @param ... passed to [baseline_compare()]
 #'
 #' @return a list with prepped versions of `data`, `y_col`, `colors`,
 #'   `gaugefilter`, `scenariofilter`, `base_lev`, `comp_fun`, `ylab_append` to

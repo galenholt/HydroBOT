@@ -49,7 +49,7 @@ shifted up or down randomly. Used for avoiding x/0, NaN, and Inf when
 relativiszing and taking logs, primarily. Auto shifts by
 \code{0.1*min(abs(data[data != 0]))}.}
 
-\item{...}{}
+\item{...}{passed to \code{\link[=baseline_compare]{baseline_compare()}}}
 }
 \value{
 a list with prepped versions of \code{data}, \code{y_col}, \code{colors},

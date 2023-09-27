@@ -68,6 +68,7 @@
 #'   underlay is fill (polygons) and the main data is points.
 #' @param overlay_list as `underlay_list`, but names `"overlay_*"`
 #' @param setLimits sets user-supplied color/fill limits for maps. Should be extended to y generally.
+#' @param ... passed to [plot_prep()]
 #'
 #' @return a ggplot stacked bar plot with standard formatting and coloring,
 #'   stacking either scenarios or colorset

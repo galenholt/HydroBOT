@@ -66,7 +66,7 @@ aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
 and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
 \code{tidyselect::any_of()} in \code{tidyselect}}
 
-\item{...}{}
+\item{...}{passed to \code{\link[=general_aggregate]{general_aggregate()}}}
 }
 \value{
 a dataframe in the same format as read-in (sf or tibble), aggregated

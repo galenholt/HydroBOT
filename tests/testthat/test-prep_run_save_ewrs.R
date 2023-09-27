@@ -29,7 +29,9 @@ test_that('returns one result, no saving', {
                                 returnType = list('summary'))
   expect_equal(length(ewr_out), 1)
   expect_equal(names(ewr_out), 'summary')
-  expect_equal(unique(ewr_out$summary$scenario), c('base', 'down4', 'up4'))
+  expect_equal(unique(ewr_out$summary$scenario), c('base',
+'down4',
+'up4'))
   # Test it didn't create anything since outputType = 'none'
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
 
@@ -48,7 +50,7 @@ test_that('returns list', {
                                 datesuffix = FALSE,
                                 returnType = list('summary', 'all'))
   expect_equal(length(ewr_out), 2)
-  expect_true(all(c('summary', 'all') %in% names(ewr_out)))
+  expect_true(all(c('summary','all_events') %in% names(ewr_out)))
   expect_equal(unique(ewr_out$summary$scenario), c('base', 'down4', 'up4'))
 
   destroy_temp_hydro(temp_parent_dir)
@@ -65,13 +67,16 @@ test_that('csv per gauge works', {
                                 outputType = list('none'),
                                 datesuffix = FALSE,
                                 returnType = list('summary', 'all'))
+
   expect_equal(length(ewr_out), 2)
-  expect_true(all(c('summary', 'all') %in% names(ewr_out)))
+  expect_true(all(c('summary', 'all_events') %in% names(ewr_out)))
 
   # These come in with directory_gauge. Split gauge off and should be left with scenarios.
   ewr_out$summary <- ewr_out$summary |>
     dplyr::mutate(scenario = purrr::map_chr(scenario, \(x) stringr::str_split_1(x, '_')[1]))
-  expect_equal(unique(ewr_out$summary$scenario), c('base', 'down4', 'up4'))
+  expect_equal(unique(ewr_out$summary$scenario), c('base',
+'down4',
+'up4'))
   # 'scenario' here gets the csv name. That happens inside the EWR tool- the
   # `_get_file_names` function does a `.split('/')` on the filepath to name the
   # scenario. I had basically tricked it previously by using `os.sep`, which
@@ -125,22 +130,17 @@ test_that('saving works for one', {
                           'module_output',
                           'module_output/EWR',
                           'module_output/EWR/base',
-                          'module_output/EWR/base/allevents',
-                          'module_output/EWR/base/annual',
                           'module_output/EWR/base/summary',
                           'module_output/EWR/base/summary/base.csv',
                           'module_output/EWR/down4',
-                          'module_output/EWR/down4/allevents',
-                          'module_output/EWR/down4/annual',
                           'module_output/EWR/down4/summary',
                           'module_output/EWR/down4/summary/down4.csv',
-                          "module_output/EWR/ewr_metadata.json",
-                          "module_output/EWR/ewr_metadata.yml",
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml',
                           'module_output/EWR/up4',
-                          'module_output/EWR/up4/allevents',
-                          'module_output/EWR/up4/annual',
                           'module_output/EWR/up4/summary',
                           'module_output/EWR/up4/summary/up4.csv')
+
   expect_equal(realised_structure, expected_structure)
   destroy_temp_hydro(temp_parent_dir)
 })
@@ -152,11 +152,11 @@ test_that('saving and returning works for multiple', {
 
   ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
                                 output_parent_dir = temp_parent_dir,
-                                outputType = list('summary', 'all'),
+                                outputType = list('summary','all'),
                                 datesuffix = FALSE,
-                                returnType = list('summary', 'all'))
+                                returnType = list('summary','all'))
   expect_equal(length(ewr_out), 2)
-  expect_equal(names(ewr_out), c('summary', 'all'))
+  expect_equal(names(ewr_out), c('summary', 'all_events'))
 
   # Test it created the expected structure
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
@@ -176,29 +176,107 @@ test_that('saving and returning works for multiple', {
                           'module_output',
                           'module_output/EWR',
                           'module_output/EWR/base',
-                          'module_output/EWR/base/allevents',
-                          'module_output/EWR/base/allevents/base.csv',
-                          'module_output/EWR/base/annual',
+                          'module_output/EWR/base/all_events',
+                          'module_output/EWR/base/all_events/base.csv',
                           'module_output/EWR/base/summary',
                           'module_output/EWR/base/summary/base.csv',
                           'module_output/EWR/down4',
-                          'module_output/EWR/down4/allevents',
-                          'module_output/EWR/down4/allevents/down4.csv',
-                          'module_output/EWR/down4/annual',
+                          'module_output/EWR/down4/all_events',
+                          'module_output/EWR/down4/all_events/down4.csv',
                           'module_output/EWR/down4/summary',
                           'module_output/EWR/down4/summary/down4.csv',
-                          "module_output/EWR/ewr_metadata.json",
-                          "module_output/EWR/ewr_metadata.yml",
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml',
                           'module_output/EWR/up4',
-                          'module_output/EWR/up4/allevents',
-                          'module_output/EWR/up4/allevents/up4.csv',
-                          'module_output/EWR/up4/annual',
+                          'module_output/EWR/up4/all_events',
+                          'module_output/EWR/up4/all_events/up4.csv',
                           'module_output/EWR/up4/summary',
                           'module_output/EWR/up4/summary/up4.csv')
 
   expect_equal(realised_structure, expected_structure)
   destroy_temp_hydro(temp_parent_dir)
 })
+
+test_that('saving and returning works for all (or nearly all) ewr outputs', {
+
+  # create dir so building makes sense
+  make_temp_hydro(temp_hydro_dir)
+
+  # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
+
+  ewroutlist <- list('summary',
+       'yearly',
+       'all_events',
+       'all_successful_events',
+       # 'all_interEvents',
+       'all_successful_interEvents')
+
+  ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
+                                output_parent_dir = temp_parent_dir,
+                                outputType = ewroutlist,
+                                datesuffix = FALSE,
+                                returnType = ewroutlist)
+
+  expect_equal(length(ewr_out), length(ewroutlist))
+  expect_equal(names(ewr_out), unlist(ewroutlist))
+
+  # Test it created the expected structure
+  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+
+  expected_structure <- c('hydrographs',
+                          'hydrographs/base',
+                          'hydrographs/base/base.csv',
+                          'hydrographs/base/base.json',
+                          'hydrographs/down4',
+                          'hydrographs/down4/down4.csv',
+                          'hydrographs/down4/down4.json',
+                          'hydrographs/scenario_metadata.json',
+                          'hydrographs/scenario_metadata.yml',
+                          'hydrographs/up4',
+                          'hydrographs/up4/up4.csv',
+                          'hydrographs/up4/up4.json',
+                          'module_output',
+                          'module_output/EWR',
+                          'module_output/EWR/base',
+                          'module_output/EWR/base/all_events',
+                          'module_output/EWR/base/all_events/base.csv',
+                          'module_output/EWR/base/all_successful_events',
+                          'module_output/EWR/base/all_successful_events/base.csv',
+                          'module_output/EWR/base/all_successful_interEvents',
+                          'module_output/EWR/base/all_successful_interEvents/base.csv',
+                          'module_output/EWR/base/summary',
+                          'module_output/EWR/base/summary/base.csv',
+                          'module_output/EWR/base/yearly',
+                          'module_output/EWR/base/yearly/base.csv',
+                          'module_output/EWR/down4',
+                          'module_output/EWR/down4/all_events',
+                          'module_output/EWR/down4/all_events/down4.csv',
+                          'module_output/EWR/down4/all_successful_events',
+                          'module_output/EWR/down4/all_successful_events/down4.csv',
+                          'module_output/EWR/down4/all_successful_interEvents',
+                          'module_output/EWR/down4/all_successful_interEvents/down4.csv',
+                          'module_output/EWR/down4/summary',
+                          'module_output/EWR/down4/summary/down4.csv',
+                          'module_output/EWR/down4/yearly',
+                          'module_output/EWR/down4/yearly/down4.csv',
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml',
+                          'module_output/EWR/up4',
+                          'module_output/EWR/up4/all_events',
+                          'module_output/EWR/up4/all_events/up4.csv',
+                          'module_output/EWR/up4/all_successful_events',
+                          'module_output/EWR/up4/all_successful_events/up4.csv',
+                          'module_output/EWR/up4/all_successful_interEvents',
+                          'module_output/EWR/up4/all_successful_interEvents/up4.csv',
+                          'module_output/EWR/up4/summary',
+                          'module_output/EWR/up4/summary/up4.csv',
+                          'module_output/EWR/up4/yearly',
+                          'module_output/EWR/up4/yearly/up4.csv')
+
+  expect_equal(realised_structure, expected_structure)
+  destroy_temp_hydro(temp_parent_dir)
+})
+
 
 test_that('specifying *Type as character instead of list', {
 
@@ -207,11 +285,12 @@ test_that('specifying *Type as character instead of list', {
 
   ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
                                 output_parent_dir = temp_parent_dir,
-                                outputType = c('summary', 'all'),
+                                outputType = c('summary',
+                                                'all'),
                                 datesuffix = FALSE,
-                                returnType = c('summary', 'all'))
+                                returnType = c('summary','all'))
   expect_equal(length(ewr_out), 2)
-  expect_equal(names(ewr_out), c('summary', 'all'))
+  expect_equal(names(ewr_out), c('summary','all_events'))
 
   # Test it created the expected structure
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
@@ -231,23 +310,20 @@ test_that('specifying *Type as character instead of list', {
                           'module_output',
                           'module_output/EWR',
                           'module_output/EWR/base',
-                          'module_output/EWR/base/allevents',
-                          'module_output/EWR/base/allevents/base.csv',
-                          'module_output/EWR/base/annual',
+                          'module_output/EWR/base/all_events',
+                          'module_output/EWR/base/all_events/base.csv',
                           'module_output/EWR/base/summary',
                           'module_output/EWR/base/summary/base.csv',
                           'module_output/EWR/down4',
-                          'module_output/EWR/down4/allevents',
-                          'module_output/EWR/down4/allevents/down4.csv',
-                          'module_output/EWR/down4/annual',
+                          'module_output/EWR/down4/all_events',
+                          'module_output/EWR/down4/all_events/down4.csv',
                           'module_output/EWR/down4/summary',
                           'module_output/EWR/down4/summary/down4.csv',
-                          "module_output/EWR/ewr_metadata.json",
-                          "module_output/EWR/ewr_metadata.yml",
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml',
                           'module_output/EWR/up4',
-                          'module_output/EWR/up4/allevents',
-                          'module_output/EWR/up4/allevents/up4.csv',
-                          'module_output/EWR/up4/annual',
+                          'module_output/EWR/up4/all_events',
+                          'module_output/EWR/up4/all_events/up4.csv',
                           'module_output/EWR/up4/summary',
                           'module_output/EWR/up4/summary/up4.csv')
 
@@ -299,7 +375,8 @@ test_that('Single scenario among many, no access to the outer directory', {
 
 
   # Expect only the single output, not for all the scenarios
-  expected_structure <- c('base.csv', 'base.json',
+  expected_structure <- c('base.csv',
+                          'base.json',
                           'module_output/EWR/base/summary/base.csv',
                           "module_output/EWR/ewr_metadata.json",
                           "module_output/EWR/ewr_metadata.yml")
@@ -334,7 +411,8 @@ test_that('Single scenario among many, no access to the outer directory, differe
 
 
   # Expect only the single output, not for all the scenarios
-  expected_structure <- c('base.csv', 'base.json',
+  expected_structure <- c('base.csv',
+'base.json',
                           'module_output/EWR/base/summary/base.csv',
                           "module_output/EWR/ewr_metadata.json",
                           "module_output/EWR/ewr_metadata.yml")

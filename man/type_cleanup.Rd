@@ -7,7 +7,7 @@
 type_cleanup(arglist)
 }
 \arguments{
-\item{arglist}{}
+\item{arglist}{list of arguments}
 }
 \description{
 Sometimes single values come in as characters instead of lists

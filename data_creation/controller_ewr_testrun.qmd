@@ -135,13 +135,14 @@ This works, but there's an issue with `outputType = 'annual'` - I'm getting an e
 To make a `list` in python, need to have unnamed lists in R
 
 ```{r}
-if (!params$REBUILD_DATA) {
-  outputType = list('none')
-}
-if (params$REBUILD_DATA) {
-  outputType = list('summary', 'all')
-}
+# if (!params$REBUILD_DATA) {
+#   outputType = list('none')
+# }
+# if (params$REBUILD_DATA) {
+#   outputType = list('summary', 'all')
+# }
 
+outputType <- list('none')
 
 ewr_out = prep_run_save_ewrs(hydro_dir = hydro_dir, 
                              output_parent_dir = project_dir, 
@@ -164,4 +165,3 @@ ewr_out = prep_run_save_ewrs(hydro_dir = hydro_dir,
 -   new ewr output formats
 
 -   parallelise? here or in EWR or both?
-

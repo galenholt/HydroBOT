@@ -25,7 +25,7 @@
 #'   aggregation. Cannot change with the main `groupers`. Developed to persist
 #'   information about polygons through subsequent theme aggregations, but could
 #'   be more general
-#' @param ...
+#' @param ... passed to [general_aggregate()]
 #'
 #' @return a dataframe in the same format as read-in (sf or tibble), aggregated
 #'   to the `to_theme` level and retaining desired geographic information if

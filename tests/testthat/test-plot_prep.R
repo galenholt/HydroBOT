@@ -1,3 +1,5 @@
+# build the aggregated data so we don't have to include it in the package
+
 obj_sdl <- agg_theme_space$sdl_units %>%
   dplyr::rename(allArith = 4)
 
