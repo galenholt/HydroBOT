@@ -525,7 +525,7 @@ plot_outcomes <- function(outdf,
 
         }
 
-        if (o$overlay_pal %in% colors() |
+        if (o$overlay_pal %in% grDevices::colors() |
             is.na(o$overlay_pal) |
             grepl("#", o$overlay_pal)) {
 

@@ -109,7 +109,7 @@ data_load('downloaded/sw_rpa', datarawdir, "https://data.gov.au/data/dataset/7b0
 ```{r}
 rpa <- read_sf(file.path(datarawdir, 'downloaded',
                          'sw_rpa', 
-                         'Surface Water Water Resource Plan Areas.shp')) %>% 
+                         'Surface Water Water Resource Plan Areas.shp')) |> 
   st_make_valid()
 ```
 
@@ -122,7 +122,7 @@ print(vertcount(rpa))
 Simplify it. The obvious route `sf::st_simplify` is easiest, but doesn't preserve touchingness of adjoining polygons. That may not actually matter if we then scale up more, but it will if this is the final level. So use `rmapshaper::ms_simplify()` (https://github.com/r-spatial/sf/issues/1011) to set up a default polygon set and keep adjoining topology. For now, just pick a level crudely. `sf::st_simplify` does the simplification in meters, but `ms_simplify` is in proportion. A bit harder to judge. Maybe 0.01? The default of 0.05?
 
 ```{r}
-resource_plan_areas <- rpa %>% 
+resource_plan_areas <- rpa |> 
   rmapshaper::ms_simplify(keep = 0.01)
 
 print(vertcount(resource_plan_areas))
@@ -149,7 +149,7 @@ data_load('downloaded/sw_sdl', datarawdir, "https://data.gov.au/data/dataset/4af
 ```{r}
 sdls <- read_sf(file.path(datarawdir, 'downloaded',
                          'sw_sdl', 
-                         'Surface Water SDL Resource Units.shp')) %>% 
+                         'Surface Water SDL Resource Units.shp')) |> 
   st_make_valid()
 ```
 
@@ -162,7 +162,7 @@ print(vertcount(sdls))
 again, too many vertices
 
 ```{r}
-sdl_units <- sdls %>% 
+sdl_units <- sdls |> 
   rmapshaper::ms_simplify(keep = 0.01)
 
 print(vertcount(sdl_units))
@@ -199,13 +199,13 @@ bomg <- readr::read_csv(file.path(datarawdir, 'bom_gauge_locations', 'bom_gauge_
 Make BOM geographic
 
 ```{r}
-bomg <- bomg %>% 
-    dplyr::rename(site = 'site name', gauge = 'gauge number') %>%
+bomg <- bomg |> 
+    dplyr::rename(site = 'site name', gauge = 'gauge number') |>
     # lat an long come in as chr because there is a line for 'undefined'
-    dplyr::filter(site != 'undefined') %>%
+    dplyr::filter(site != 'undefined') |>
     dplyr::mutate(lat = as.numeric(lat),
-           lon = as.numeric(lon)) %>% 
-  st_as_sf(coords = c('lon', 'lat'), crs = 4326) %>% 
+           lon = as.numeric(lon)) |> 
+  st_as_sf(coords = c('lon', 'lat'), crs = 4326) |> 
   st_transform(crs = st_crs(basin))
 ```
 
@@ -262,10 +262,10 @@ A bit of cleanup to match crs to the MDBA data, and discard unused cols.
 ```{r}
 cewo_valleys <- read_sf(dsn = file.path(datarawdir, 'downloaded',
                                         'cewo_valleys',
-                                        'CEWO_MDB_Valleys.shp')) %>%
-  st_transform(st_crs(rpa)) %>%
-  st_make_valid() %>%
-  dplyr::select(ValleyName, ValleyID, ValleyCode) %>%
+                                        'CEWO_MDB_Valleys.shp')) |>
+  st_transform(st_crs(rpa)) |>
+  st_make_valid() |>
+  dplyr::select(ValleyName, ValleyID, ValleyCode) |>
   dplyr::filter(ValleyName != 'Northern Unregulated')
 
 ```

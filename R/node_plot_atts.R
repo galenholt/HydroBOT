@@ -17,7 +17,7 @@
 node_plot_atts <- function(nodedf) {
 
   # The way I'm getting x is crude, and likely will fail once we have more complex networks
-  nodedf <- nodedf %>%
+  nodedf <- nodedf |>
     dplyr::mutate(shape = 'rectangle',
            tooltip = Name,
            # Name = stringr::str_wrap(Name, 40),
@@ -30,25 +30,25 @@ node_plot_atts <- function(nodedf) {
            height = (stringr::str_count(Name, '\\n') + 1)/2)
 
   # If we want things centered, need to get y with grouping
-  nodedf <- nodedf %>%
-    dplyr::group_by(NodeType) %>%
+  nodedf <- nodedf |>
+    dplyr::group_by(NodeType) |>
     # This sets everything to have a midpoint at 0
     # Trying something less crude. This works to separate the boxes, but gets way too tall
     # dplyr::mutate(num = dplyr::n(),
     #        toth = sum(height, na.rm = TRUE)*2,
     #        mid = toth/2,
     #        rown = cumsum(height*2)-height*2,
-    #        y = rown-mid) %>%
+    #        y = rown-mid) |>
     # Double columns are a bit better?
   dplyr::mutate(num = dplyr::n(),
          mid = num/2,
          rown = dplyr::row_number(),
-         y = rown-mid) %>% # Kinda silly this way instead of mid-rown, but it keeps things from flipping
+         y = rown-mid) |> # Kinda silly this way instead of mid-rown, but it keeps things from flipping
     dplyr::mutate(basex = nodeorder*15,
            devx = width/1.8,
            plusminus = rlang::rep_along(devx, c(1, -1)) * devx,
-           x = basex + plusminus) %>%
-    dplyr::ungroup() %>%
+           x = basex + plusminus) |>
+    dplyr::ungroup() |>
     dplyr::select(-num, -mid, -rown, basex, devx, plusminus)
 
 

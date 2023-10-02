@@ -61,8 +61,8 @@ make_edges <- function(dflist,
 
   # We can use that to try to generate a matching gauge-pu if there wasn't one passed
   if (is.null(gaugeplanmatch) & any(dfgauge & dfpu)) {
-    gaugeplanmatch <- dflist[[which(dfgauge & dfpu)[1]]] %>%
-      dplyr::select(gauge, PlanningUnitID) %>%
+    gaugeplanmatch <- dflist[[which(dfgauge & dfpu)[1]]] |>
+      dplyr::select(gauge, PlanningUnitID) |>
       dplyr::distinct()
   }
 
@@ -101,24 +101,24 @@ make_edges <- function(dflist,
     # these ifs are annoying, needed to filter to the gauge and planning unit only if
     # the columns exist
     if (dfgauge[dfindex]) {
-      thisdf <- thisdf %>%
+      thisdf <- thisdf |>
         dplyr::filter(gauge %in% filterlist$gaugefilter)
     }
 
     if (dfpu[dfindex]) {
-      thisdf <- thisdf %>%
+      thisdf <- thisdf |>
         dplyr::filter(PlanningUnitID %in% filterlist$pufilter)
     }
 
     # we can assume the fromto exist
-    thisdf <- thisdf %>%
-      dplyr::filter(.data[[p[1]]] %in% filterlist$fromfilter) %>%
-      dplyr::filter(.data[[p[2]]] %in% filterlist$tofilter) %>%
-      dplyr::rename(from = p[1], to = p[2]) %>%
-      dplyr::select(tidyselect::any_of(c('gauge', 'PlanningUnitID', extrasave, 'from', 'to', 'color'))) %>%
+    thisdf <- thisdf |>
+      dplyr::filter(.data[[p[1]]] %in% filterlist$fromfilter) |>
+      dplyr::filter(.data[[p[2]]] %in% filterlist$tofilter) |>
+      dplyr::rename(from = p[1], to = p[2]) |>
+      dplyr::select(tidyselect::any_of(c('gauge', 'PlanningUnitID', extrasave, 'from', 'to', 'color'))) |>
       dplyr::mutate(fromtype = p[1],
              totype = p[2],
-             edgeorder = counter) %>% # I was using this to set the nodeorder, but dropping that.
+             edgeorder = counter) |> # I was using this to set the nodeorder, but dropping that.
       dplyr::distinct() # kill duplicates
 
   }
@@ -140,28 +140,28 @@ filtergroups <- function(edgedf,
 
   # These don't enforce column names, so use select to allow accepting a character
   if (is.null(fromfilter)) {
-    fromfilter <- edgedf %>% dplyr::select(tidyselect::all_of(fromcol)) %>% dplyr::distinct() %>% dplyr::pull()
+    fromfilter <- edgedf |> dplyr::select(tidyselect::all_of(fromcol)) |> dplyr::distinct() |> dplyr::pull()
   }
 
   if (is.null(tofilter)) {
-    tofilter <- edgedf %>% dplyr::select(tidyselect::all_of(tocol)) %>% dplyr::distinct() %>% dplyr::pull()
+    tofilter <- edgedf |> dplyr::select(tidyselect::all_of(tocol)) |> dplyr::distinct() |> dplyr::pull()
   }
 
   # Gauges and planning units
   # Get matching values if a matching df is passed in as an argument
   if (!is.null(gaugefilter) & !is.null(gaugeplanmatch)) {
-    pfromg <- gaugeplanmatch %>%
-      dplyr::filter(gauge %in% gaugefilter) %>%
-      dplyr::select(PlanningUnitID) %>%
-      dplyr::distinct() %>%
+    pfromg <- gaugeplanmatch |>
+      dplyr::filter(gauge %in% gaugefilter) |>
+      dplyr::select(PlanningUnitID) |>
+      dplyr::distinct() |>
       dplyr::pull()
   }
 
   if (!is.null(pufilter) & !is.null(gaugeplanmatch)) {
-    gfromp <- gaugeplanmatch %>%
-      dplyr::filter(PlanningUnitID %in% pufilter) %>%
-      dplyr::select(gauge) %>%
-      dplyr::distinct() %>%
+    gfromp <- gaugeplanmatch |>
+      dplyr::filter(PlanningUnitID %in% pufilter) |>
+      dplyr::select(gauge) |>
+      dplyr::distinct() |>
       dplyr::pull()
   }
 

@@ -34,15 +34,15 @@ extract_gauge_pu <- function(rellist) {
 
   # handle dataframes/tibbles or a list
   if (is.data.frame(rellist)) {
-    g2p <- rellist %>%
-      dplyr::select(gauge, PlanningUnitID) %>%
+    g2p <- rellist |>
+      dplyr::select(gauge, PlanningUnitID) |>
       dplyr::distinct()
 
   } else {
     for (i in rellist) {
       if ('gauge' %in% names(i) & 'PlanningUnitID' %in% names(i)) {
-        g2p <- i %>%
-          dplyr::select(gauge, PlanningUnitID) %>%
+        g2p <- i |>
+          dplyr::select(gauge, PlanningUnitID) |>
           dplyr::distinct()
 
         break()

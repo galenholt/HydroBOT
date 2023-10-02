@@ -27,28 +27,28 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
 
   if (!('polyID' %in% names(from_geo))) {
     # we expect there may be duplicates here
-    from_geo <- from_geo %>%
+    from_geo <- from_geo |>
       add_polyID(failduplicate = FALSE)
   }
 
-  from_poly <- from_geo %>%
-    dplyr::select(polyID_f = polyID) %>%
-    dplyr::group_by(polyID_f) %>%
-    dplyr::slice(1) %>% # usual use of dplyr::distinct() checks the polys factorially. slice just indexes.
-    dplyr::ungroup() %>%
+  from_poly <- from_geo |>
+    dplyr::select(polyID_f = polyID) |>
+    dplyr::group_by(polyID_f) |>
+    dplyr::slice(1) |> # usual use of dplyr::distinct() checks the polys factorially. slice just indexes.
+    dplyr::ungroup() |>
     # Do the cleaning here to avoid duplication
-    crs_clean(whichcrs) %>%
+    crs_clean(whichcrs) |>
     sf::st_make_valid()
 
-  to_poly <- to_geo  %>%
-    dplyr::select(polyID_t = polyID) %>%
-    dplyr::group_by(polyID_t) %>%
-    dplyr::slice(1) %>% # usual use of dplyr::distinct() checks the polys factorially. slice just indexes.
+  to_poly <- to_geo  |>
+    dplyr::select(polyID_t = polyID) |>
+    dplyr::group_by(polyID_t) |>
+    dplyr::slice(1) |> # usual use of dplyr::distinct() checks the polys factorially. slice just indexes.
     dplyr::ungroup()
 
-  from_data <- sf::st_drop_geometry(from_geo) %>%
+  from_data <- sf::st_drop_geometry(from_geo) |>
     dplyr::rename(polyID_f = polyID)
-  to_data <- sf::st_drop_geometry(to_geo) %>%
+  to_data <- sf::st_drop_geometry(to_geo) |>
     dplyr::rename(polyID_t = polyID)
 
 
@@ -56,7 +56,7 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
   # it's much slower. And this also lets us auto-calculate area only when needed
   # (e.g. when the input scale *has* area)
   if (all(sf::st_is(from_geo, 'POINT'))) {
-    fromto_pair <- sf::st_join(from_poly, to_poly) %>%
+    fromto_pair <- sf::st_join(from_poly, to_poly) |>
       sf::st_drop_geometry()
   } else {
     # The complexity of the polygons makes a huge difference in the timing, and
@@ -96,15 +96,14 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
     }
 
     # calculate area and drop geometry
-    fromto_pair <- fromto_pair %>%
-      dplyr::mutate(area = as.numeric(sf::st_area(.))) %>%
-      sf::st_drop_geometry()
+    fromto_pair$area <- as.numeric(sf::st_area(fromto_pair))
+    fromto_pair <- sf::st_drop_geometry(fromto_pair)
   }
 
     # join the data back on from the relevant polyIDs
-    fromto_data <- from_data %>%
-      dplyr::left_join(fromto_pair, by = 'polyID_f', relationship = "many-to-many") %>%
-      dplyr::left_join(to_data, by = 'polyID_t', relationship = "many-to-many") %>%
+    fromto_data <- from_data |>
+      dplyr::left_join(fromto_pair, by = 'polyID_f', relationship = "many-to-many") |>
+      dplyr::left_join(to_data, by = 'polyID_t', relationship = "many-to-many") |>
       dplyr::select(everything(), polyID = polyID_t, -polyID_f)
 
   return(fromto_data)

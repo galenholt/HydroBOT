@@ -20,12 +20,12 @@ gauge2geo <- function(gaugedf, gaugelocs, whichcrs = 4283) {
     if (grepl('*.shp', gaugelocs)) {filetype <- 'shp'}
 
     if (filetype == 'csv') {
-      gaugelocs <- readr::read_csv(gaugelocs) %>%
-        dplyr::rename(site = 'site name', gauge = 'gauge number') %>%
+      gaugelocs <- readr::read_csv(gaugelocs) |>
+        dplyr::rename(site = 'site name', gauge = 'gauge number') |>
         # lat an long come in as chr because there is a line for 'undefined'
-        dplyr::filter(.data$site != 'undefined') %>%
+        dplyr::filter(.data$site != 'undefined') |>
         dplyr::mutate(lat = as.numeric(.data$lat),
-                      lon = as.numeric(.data$lon)) %>%
+                      lon = as.numeric(.data$lon)) |>
         sf::st_as_sf(coords = c('lon', 'lat'), crs = 4326)
     }
 
@@ -38,12 +38,12 @@ gauge2geo <- function(gaugedf, gaugelocs, whichcrs = 4283) {
   # # handle either an sf of gauge locations or a character filepath.
   # if (!inherits(gaugelocs, 'sf')) {
   #   if (grepl('*.csv', gaugelocs)) {
-  #     gaugelocs <- readr::read_csv(gaugelocs) %>%
-  #       dplyr::rename(site = 'site name', gauge = 'gauge number') %>%
+  #     gaugelocs <- readr::read_csv(gaugelocs) |>
+  #       dplyr::rename(site = 'site name', gauge = 'gauge number') |>
   #       # lat an long come in as chr because there is a line for 'undefined'
-  #       dplyr::filter(.data$site != 'undefined') %>%
+  #       dplyr::filter(.data$site != 'undefined') |>
   #       dplyr::mutate(lat = as.numeric(.data$lat),
-  #                     lon = as.numeric(.data$lon)) %>%
+  #                     lon = as.numeric(.data$lon)) |>
   #       sf::st_as_sf(coords = c('lon', 'lat'), crs = 4326)
   #   }
   #
@@ -52,8 +52,8 @@ gauge2geo <- function(gaugedf, gaugelocs, whichcrs = 4283) {
   #   }
   # }
 
-  gaugedf <- dplyr::left_join(gaugedf, gaugelocs, by = 'gauge') %>%
-    sf::st_as_sf() %>%
+  gaugedf <- dplyr::left_join(gaugedf, gaugelocs, by = 'gauge') |>
+    sf::st_as_sf() |>
     sf::st_transform(whichcrs)
 }
 

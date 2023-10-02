@@ -28,8 +28,8 @@ agg_names_to_cols <-
     # suppressWarnings probably a bad idea, but there's a lot of really
     # pointless warnings that get thrown
     suppressWarnings(
-      aggincols <- aggdf %>%
-        tidyr::pivot_longer(tidyselect::ends_with(aggCols)) %>%
+      aggincols <- aggdf |>
+        tidyr::pivot_longer(tidyselect::ends_with(aggCols)) |>
         # This removes the aggregation level name ('ewr_code', 'catchment', etc)
         dplyr::mutate(
           allfuns = stringr::str_remove_all(name,
@@ -38,32 +38,32 @@ agg_names_to_cols <-
                                               collapse = '|'
                                             )),
           allfuns = stringr::str_remove(allfuns, '^_')
-        ) %>%
+        ) |>
         tidyr::separate(
           allfuns,
           into = paste0('aggfun_', length(funsequence):1),
           sep = '__'
-        ) %>%
+        ) |>
         tidyr::separate(
           aggfun_1,
           into = c('aggfun_1', 'original'),
           sep = '_',
           extra = 'merge'
-        ) %>%
+        ) |>
         dplyr::mutate(alllevs = stringr::str_remove_all(
           name,
           stringr::str_flatten(stringr::str_c('(', unlist(funsequence), ')'),
                                collapse = '|')
-        )) %>%
+        )) |>
         tidyr::separate(
           alllevs,
           into = paste0('aggLevel_', length(funsequence):1),
           sep = '__'
-        ) %>%
-        dplyr::select(-name) %>%
+        ) |>
+        dplyr::select(-name) |>
         # sf seems to be behind tidyverse, and needs characters here instead of bare
         # names. Both seem to work for normal df/tibbles
-        tidyr::pivot_wider(names_from = 'original', values_from = 'value') %>%
+        tidyr::pivot_wider(names_from = 'original', values_from = 'value') |>
         dplyr::select(
           !tidyselect::ends_with(stringr::str_c('_', as.character(
             1:length(funsequence)

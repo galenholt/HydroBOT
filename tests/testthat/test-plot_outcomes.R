@@ -1,7 +1,7 @@
 
 test_that("basin works with single color palette", {
-  basin_to_plot <- agg_theme_space$mdb %>%
-    dplyr::rename(allArith = 4, oneLimiting = 5) %>% # for readability
+  basin_to_plot <- agg_theme_space$mdb |>
+    dplyr::rename(allArith = 4, oneLimiting = 5) |> # for readability
     dplyr::filter(!is.na(Objective))
 
   basin_plot <- plot_outcomes(basin_to_plot,
@@ -15,7 +15,7 @@ test_that("basin works with single color palette", {
 })
 
 test_that("multi-palette and facetting", {
-  obj_sdl_to_plot <- agg_theme_space$sdl_units %>%
+  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
     dplyr::rename(allArith = 4) # for readability
 
   # Create a grouping variable
@@ -73,7 +73,7 @@ test_that("flipped", {
   # What I want to do is just swap the x and fill arguments and pass in the
   # scenario palette. Can I do that easily?
 
-  obj_sdl_to_plot <- agg_theme_space$sdl_units %>%
+  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
     dplyr::rename(allArith = 4) # for readability
 
   # Create a grouping variable
@@ -739,11 +739,11 @@ test_that("maps", {
 })
 
 test_that("ewr works as in `plot_outcomes_bar`", {
-  ewr_to_bar_data <- summary_ewr_output %>%
+  ewr_to_bar_data <- summary_ewr_output |>
     # just grab the first code_timing
-    dplyr::group_by(ewr_code, gauge, scenario) %>%
-    dplyr::slice(1) %>%
-    dplyr::ungroup() %>%
+    dplyr::group_by(ewr_code, gauge, scenario) |>
+    dplyr::slice(1) |>
+    dplyr::ungroup() |>
     dplyr::filter(ewr_code %in% c('BF1', 'LF1', "OB5") &
                     gauge %in% c("412002", "412005", "412038"))
 
@@ -763,8 +763,8 @@ test_that("ewr works as in `plot_outcomes_bar`", {
 })
 
 test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better aggregated)", {
-  basin_to_plot <- agg_theme_space$mdb %>%
-    dplyr::rename(allArith = 4, oneLimiting = 5) %>% # for readability
+  basin_to_plot <- agg_theme_space$mdb |>
+    dplyr::rename(allArith = 4, oneLimiting = 5) |> # for readability
     dplyr::filter(!is.na(Objective))
 
   scene_pal <- make_pal(levels = unique(basin_to_plot$scenario), palette = 'calecopal::superbloom3')

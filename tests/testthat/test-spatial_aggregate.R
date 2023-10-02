@@ -188,9 +188,9 @@ test_that("multiple functions", {
 
 
   # vector arguments (e.g. weighting)
-  wtgauge <- sumspat %>%
-    dplyr::group_by(scenario, gauge) %>%
-    dplyr::mutate(wt = dplyr::n()) %>%
+  wtgauge <- sumspat |>
+    dplyr::group_by(scenario, gauge) |>
+    dplyr::mutate(wt = dplyr::n()) |>
     dplyr::ungroup()
 
   fnlistw <- rlang::quo(list(mean = ~mean(., na.rm = TRUE),
@@ -215,9 +215,9 @@ test_that("multiple functions", {
   sumdat <- prep_ewr_agg(summary_ewr_output, type = 'summary',
                          geopath = bom_basin_gauges)
 
-  wtgauge2 <- sumdat %>%
-    dplyr::group_by(scenario, gauge) %>%
-    dplyr::mutate(wt = dplyr::n()) %>%
+  wtgauge2 <- sumdat |>
+    dplyr::group_by(scenario, gauge) |>
+    dplyr::mutate(wt = dplyr::n()) |>
     dplyr::ungroup()
 
   spataggsumdat_lw <- spatial_aggregate(dat = wtgauge2,

@@ -63,14 +63,14 @@ theme_aggregate <- function(dat,
     if (!all(sf::st_is(dat, 'POINT'))) {polyflag <- TRUE}
 
     if (!('polyID' %in% names(dat))) {
-      dat <- dat %>%
+      dat <- dat |>
         add_polyID(failduplicate = FALSE)
     }
 
-    geodat <- dat %>%
-      dplyr::select(polyID, tidyselect::all_of(geonames)) %>%
-      dplyr::group_by(polyID) %>%
-      dplyr::slice(1) %>% # usual use of dplyr::distinct() checks the polys factorially. slice just indexes.
+    geodat <- dat |>
+      dplyr::select(polyID, tidyselect::all_of(geonames)) |>
+      dplyr::group_by(polyID) |>
+      dplyr::slice(1) |> # usual use of dplyr::distinct() checks the polys factorially. slice just indexes.
       dplyr::ungroup()
 
     dat <- sf::st_drop_geometry(dat)
@@ -85,8 +85,8 @@ theme_aggregate <- function(dat,
   if (!inherits(causal_edges, 'data.frame') & inherits(causal_edges, 'list')) {
     causal_edges <- make_edges(causal_edges, list(c(from_theme, to_theme)))
   }
-  causal_edges <- causal_edges %>%
-    dplyr::filter(fromtype == from_theme & totype == to_theme) %>%
+  causal_edges <- causal_edges |>
+    dplyr::filter(fromtype == from_theme & totype == to_theme) |>
     dplyr::select(tidyselect::where(~!all(is.na(.))))
 
   # check and dplyr::rename
@@ -103,11 +103,11 @@ theme_aggregate <- function(dat,
   # is really ugly though
 
   if (spatialflag && polyflag) {
-    pairdat <- dat %>%
+    pairdat <- dat |>
       dplyr::left_join(causal_edges, relationship = "many-to-many")
   } else {
-    pairdat <- dat %>%
-      dplyr::left_join(g2p, relationship = "many-to-many") %>%
+    pairdat <- dat |>
+      dplyr::left_join(g2p, relationship = "many-to-many") |>
       dplyr::left_join(causal_edges, relationship = "many-to-many")
   }
 
@@ -124,7 +124,7 @@ theme_aggregate <- function(dat,
                            ...)
 
   if (spatialflag) {
-    dat <- dplyr::left_join(agged, geodat, by = 'polyID') %>%
+    dat <- dplyr::left_join(agged, geodat, by = 'polyID') |>
       sf::st_as_sf()
   } else {
     dat <- agged

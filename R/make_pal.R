@@ -16,13 +16,13 @@ make_pal <- function(levels, palette,
                      includeRef = FALSE, returnUnref = FALSE) {
 
   # need some name references to know what function to use
-  cnames <- paletteer::palettes_c_names %>%
-    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) %>%
-    dplyr::select(formatted) %>% dplyr::pull()
+  cnames <- paletteer::palettes_c_names |>
+    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) |>
+    dplyr::select(formatted) |> dplyr::pull()
 
-  dnames <- paletteer::palettes_d_names %>%
-    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) %>%
-    dplyr::select(formatted) %>% dplyr::pull()
+  dnames <- paletteer::palettes_d_names |>
+    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) |>
+    dplyr::select(formatted) |> dplyr::pull()
 
   if (returnUnref) {
     if (!includeRef) {

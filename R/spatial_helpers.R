@@ -2,11 +2,11 @@
 
 # st_intersection is super slow with complex polygons. Let's at least warn and arrange the order
 vertcount <- function(polyg) {
-  verts <- polyg %>%
-    sf::st_geometry() %>%
-    sf::st_cast("MULTIPOINT") %>%
-    sapply(length) %>%
-    # purrr::map_dbl(length) %>%
+  verts <- polyg |>
+    sf::st_geometry() |>
+    sf::st_cast("MULTIPOINT") |>
+    sapply(length) |>
+    # purrr::map_dbl(length) |>
     sum()
 }
 
@@ -15,7 +15,7 @@ add_polyID <- function(geosf, failduplicate = TRUE) {
   # Make unique IDs for  the polygons being aggregated into. They probably have
   # something unique, but this ensures it rather than assumes, and gives it a
   # standard name
-  geosf <- geosf %>%
+  geosf <- geosf |>
     dplyr::mutate(polyID = lwgeom::st_geohash(geometry, precision = 11))
 
   # Check

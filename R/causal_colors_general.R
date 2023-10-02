@@ -57,11 +57,11 @@ make_colorcol <- function(df, colorset) {
 
   # deal with some options for the color column (NULL, passed defaults, or the argument)
   if (is.null(colorset)) {
-    dfgroup <- df %>%
+    dfgroup <- df |>
       dplyr::mutate(colordef = .data[[namecol]])
   } else if (colorset == 'werp') {
     # Set up a default set of groupings for werp
-    dfgroup <- df %>%
+    dfgroup <- df |>
       dplyr::mutate(colordef = case_when(.data[[typecol]] == 'ewr_code' ~ stringr::str_extract(.data[[namecol]], '^[A-Z]+'),
                                   .data[[typecol]] == 'env_obj' ~ stringr::str_extract(.data[[namecol]], '^[A-Z]+'),
                                   .data[[typecol]] == 'Specific_goal' ~ .data[[namecol]],
@@ -70,7 +70,7 @@ make_colorcol <- function(df, colorset) {
 
   } else {
     # This is silly to dplyr::rename the col, but safer
-    dfgroup <- df %>%
+    dfgroup <- df |>
       dplyr::mutate(dplyr::across(tidyselect::all_of(colorset), identity, .names = 'colordef'))
   }
 
@@ -95,8 +95,8 @@ propor <- function(x) {
 # If nodes, change name and add a fontcolor
 # annoying that Diagrammer uses different color attribute names for nodes and edges
 tweak_node_color <- function(df) {
-    df <- df %>%
-      dplyr::rename(fillcolor = color) %>%
+    df <- df |>
+      dplyr::rename(fillcolor = color) |>
       # create the fontcolor
       dplyr::mutate(fontcolor = fontcol(fillcolor))
 }

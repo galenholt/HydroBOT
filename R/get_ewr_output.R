@@ -51,7 +51,7 @@ get_ewr_output <- function(dir, type,
   # There are sometimes wholly-blank columns that are read as NA, but should be
   # numeric. We can't pre-set them with readr because they may be in different
   # places for different gauges
-  ewrdata <- ewrdata %>%
+  ewrdata <- ewrdata |>
     dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric))
 
   # cleanup names and structure this should really just incorporate a more
@@ -89,7 +89,7 @@ cleanewrs <- function(ewrdf) {
 
   names(ewrdf) <- nameclean(names(ewrdf))
 
-  ewrdf <- ewrdf %>%
+  ewrdf <- ewrdf |>
     tidyr::separate(ewr_code, into = c("ewr_code", "ewr_code_timing"), sep = "_", remove = FALSE)
 
   return(ewrdf)
@@ -113,7 +113,7 @@ cleanSummary <- function(summarydf) {
 
   summarydf <- cleanewrs(summarydf)
 
-  summarydf <- summarydf %>%
+  summarydf <- summarydf |>
     dplyr::mutate(ewr_achieved = target_frequency <= frequency)
 }
 
@@ -121,10 +121,10 @@ cleanSummary <- function(summarydf) {
 
 # Helper to sort the names
 nameclean <- function(charvec) {
-  cleannames <- charvec %>%
-    stringr::str_replace_all('([A-Z])', '_\\1') %>%
-    tolower() %>%
-    stringr::str_replace_all(pattern = ' ', replacement = '_') %>%
+  cleannames <- charvec |>
+    stringr::str_replace_all('([A-Z])', '_\\1') |>
+    tolower() |>
+    stringr::str_replace_all(pattern = ' ', replacement = '_') |>
     stringr::str_replace_all(pattern = '-', replacement = '')
 
   # sometimes the ewr names are ewr_code and sometimes just ewr

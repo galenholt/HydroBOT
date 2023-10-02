@@ -58,7 +58,7 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
 
                               for (j in 1:(i-1)) {
                                 aggcol <- glue::glue("aggfun_{j}")
-                                simpledf <- simpledf %>%
+                                simpledf <- simpledf |>
                                   # FIX THIS so it grabs the right aggfuns- noting that step 1 isn't agged. so there's a step-1
                                   dplyr::filter(dplyr::across(tidyselect::all_of(aggcol)) == whichaggs[j])
                               }
@@ -67,10 +67,10 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
 
                             # Get just the relevant columns- scenario, gauge, the aggregation units, and the values
                             # Don't assume scenario and gauge exist though
-                            simpledf <- simpledf %>%
+                            simpledf <- simpledf |>
                               dplyr::select(tidyselect::any_of(c('scenario', 'gauge')),
-                                            tidyselect::all_of(c(thesenodes, valcol))) %>%
-                              dplyr::rename(Name = tidyselect::all_of(thesenodes)) %>%
+                                            tidyselect::all_of(c(thesenodes, valcol))) |>
+                              dplyr::rename(Name = tidyselect::all_of(thesenodes)) |>
                               dplyr::mutate(NodeType = tidyselect::all_of(thesenodes))
 
                             simpledf

@@ -61,8 +61,8 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
       s1g <- selectvals
 
       # touching it again breaks the quosures, so get s1g here, I guess, and overwrite later if needed.
-      # s1g <- s1g %>%
-      #   tidyselect::eval_select(data, strict = failmissing) %>%
+      # s1g <- s1g |>
+      #   tidyselect::eval_select(data, strict = failmissing) |>
       #   names()
 
       charvec <- tryCatch(rlang::eval_tidy(selectvals), error = function(c) FALSE)
@@ -102,8 +102,8 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
   # each other for the tidyselect case. I could probably work around it with a
   # different order of operations, but the check whether it evals to character
   # is necessary and does it.
-  suppressWarnings(s1g <- s1g %>%
-                     tidyselect::eval_select(data, strict = failmissing) %>%
+  suppressWarnings(s1g <- s1g |>
+                     tidyselect::eval_select(data, strict = failmissing) |>
                      names())
 
   return(s1g)

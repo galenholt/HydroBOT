@@ -4,9 +4,9 @@ dummyfun <- function(groupers, aggers, fa = T) {
   g2 <- selectcreator(rlang::enquo(groupers), mtcars, failmissing = fa)
   a2 <- selectcreator(rlang::enquo(aggers), mtcars, failmissing = fa)
 
-  dataagg <- mtcars %>%
-    dplyr::group_by(dplyr::across({{g2}})) %>%
-    dplyr::summarise(dplyr::across({{a2}}, mean)) %>%
+  dataagg <- mtcars |>
+    dplyr::group_by(dplyr::across({{g2}})) |>
+    dplyr::summarise(dplyr::across({{a2}}, mean)) |>
     dplyr::ungroup()
 }
 

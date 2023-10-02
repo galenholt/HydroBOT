@@ -20,7 +20,6 @@ Imports:
     grDevices,
     jsonlite,
     lwgeom,
-    magrittr,
     paletteer,
     purrr,
     readr,

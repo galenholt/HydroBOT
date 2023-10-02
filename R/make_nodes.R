@@ -33,7 +33,7 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
 
   # typeorder could be a df or a character vector
   if (is.character(typeorder)) {
-    nodetib <- tibble::tibble(NodeType = typeorder) %>%
+    nodetib <- tibble::tibble(NodeType = typeorder) |>
       dplyr::mutate(nodeorder = dplyr::row_number())
   } else if (is.data.frame(typeorder)) {
     nodetib <- typeorder
@@ -43,36 +43,36 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
 
 
 
-  fromnodes <- edgedf %>%
+  fromnodes <- edgedf |>
     dplyr::select(tidyselect::any_of(groupers), Name = from, NodeType = fromtype)
 
-  tonodes <- edgedf %>%
-    dplyr::mutate(nodeorder = edgeorder + 1) %>%
+  tonodes <- edgedf |>
+    dplyr::mutate(nodeorder = edgeorder + 1) |>
     dplyr::select(tidyselect::any_of(groupers), Name = to, NodeType = totype)
 
-  allnodes <- dplyr::bind_rows(fromnodes, tonodes) %>%
-    dplyr::group_by(Name, NodeType) %>%
-    dplyr::ungroup() %>%
-    dplyr::group_by(dplyr::across(tidyselect::any_of(groupers))) %>%
-    dplyr::distinct() %>%
+  allnodes <- dplyr::bind_rows(fromnodes, tonodes) |>
+    dplyr::group_by(Name, NodeType) |>
+    dplyr::ungroup() |>
+    dplyr::group_by(dplyr::across(tidyselect::any_of(groupers))) |>
+    dplyr::distinct() |>
     dplyr::ungroup()
 
   # order the nodes
 
   # deal with missing levels- using tibble not vectors because need to join
   # based on nodetype
-  realisedorders <- nodetib %>%
-    dplyr::filter(NodeType %in% unique(allnodes$NodeType)) %>%
+  realisedorders <- nodetib |>
+    dplyr::filter(NodeType %in% unique(allnodes$NodeType)) |>
     dplyr::mutate(shiftorders = (nodeorder - min(nodeorder)) + 1,
            ordersteps = cumsum(c(0, (diff(shiftorders)-1))),
-           neworders = shiftorders - ordersteps) %>%
+           neworders = shiftorders - ordersteps) |>
     dplyr::select(NodeType, nodeorder = neworders)
 
   # Join o get the orders set
   allnodes <- dplyr::left_join(allnodes, realisedorders, by = 'NodeType')
 
   # Remove nodes with NA names- that's not usable
-  allnodes <- allnodes %>%
+  allnodes <- allnodes |>
     dplyr::filter(!is.na(Name))
 
   return(allnodes)

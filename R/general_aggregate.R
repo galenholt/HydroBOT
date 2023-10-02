@@ -70,10 +70,10 @@ general_aggregate <- function(data, groupers,
 
   # if a quosure, just do the processing and return
   if (rlang::is_quosure(funlist)) {
-    data_agg <- data %>%
-      dplyr::group_by(dplyr::across(all_of(groupers))) %>%
+    data_agg <- data |>
+      dplyr::group_by(dplyr::across(all_of(groupers))) |>
       dplyr::summarise(dplyr::across(all_of(aggCols), !!funlist, ...,
-                                     .names = nameparser)) %>%
+                                     .names = nameparser)) |>
       dplyr::ungroup()
 
     return(data_agg)
@@ -101,10 +101,10 @@ general_aggregate <- function(data, groupers,
 
 
   # Try, and if fail, force with characters. Should I just go straight for characters? It seems so clunky I'd rather not.
-  data_agg <- try(data %>%
-    dplyr::group_by(dplyr::across(all_of(groupers))) %>%
+  data_agg <- try(data |>
+    dplyr::group_by(dplyr::across(all_of(groupers))) |>
     dplyr::summarise(dplyr::across(all_of(aggCols), {{funlist}}, ...,
-                                   .names = nameparser)) %>%
+                                   .names = nameparser)) |>
     dplyr::ungroup(),
     silent = TRUE)
 
@@ -126,10 +126,10 @@ general_aggregate <- function(data, groupers,
     FUNS_quo <- rlang::eval_tidy(rlang::parse_expr(charfun)) # rlang claims to be faster?
 
     # go again
-    data_agg <- data %>%
-      dplyr::group_by(dplyr::across(all_of(groupers))) %>%
+    data_agg <- data |>
+      dplyr::group_by(dplyr::across(all_of(groupers))) |>
       dplyr::summarise(dplyr::across(all_of(aggCols), {{FUNS_quo}}, ...,
-                                     .names = nameparser)) %>%
+                                     .names = nameparser)) |>
       dplyr::ungroup()
   }
 

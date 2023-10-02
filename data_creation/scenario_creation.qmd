@@ -153,7 +153,7 @@ ltv
 The Macquarie shapefile from David is the Macquarie-Castlereagh from `rps`. I want a few catchments to play with for demos, so let's use the Macquarie, Castlereagh, Namoi, Lachlan. That might be a LOT of gauges, though.
 
 ```{r}
-catch_demo = rps %>% 
+catch_demo = rps |> 
   dplyr::filter(SWWRPANAME %in% c('Macquarie-Castlereagh', 'Lachlan', 'Namoi'))
 ```
 
@@ -175,7 +175,7 @@ demo_gauges = st_intersection(gaugegeo, catch_demo)
 How many are we talking?
 
 ```{r}
-demo_gauges %>% nrow()
+demo_gauges |> nrow()
 ```
 
 295 rows is a lot, but unlikely they'll all be in the EWR.
@@ -265,21 +265,21 @@ demo_levs$VALUE = as.numeric(demo_levs$VALUE)
 # 
 # # Really slow. furrr is actually slower.
 # # MUCH faster to just make the dates characters in python, and back to dates here.
-# rdates <- purrr::map(demodates, py_to_r) %>% 
-#   tibble(.name_repair = ~'Date') %>%  
+# rdates <- purrr::map(demodates, py_to_r) |> 
+#   tibble(.name_repair = ~'Date') |>  
 #   unnest(cols = Date)
 # 
 # demo_levs <- bind_cols(rdates, demo_levs)
-demo_levs <- dplyr::select(demo_levs, -DATETIME) %>% 
+demo_levs <- dplyr::select(demo_levs, -DATETIME) |> 
   dplyr::mutate(Date = lubridate::ymd(Date))
 ```
 
 ### Map the gauges
 
 ```{r}
-# gaugegeo <- gaugegeo %>% 
+# gaugegeo <- gaugegeo |> 
 #   dplyr::rename(gauge = `gauge number`)
-demo_geo = gaugegeo %>% dplyr::filter(gauge %in% py$demo_ids)
+demo_geo = gaugegeo |> dplyr::filter(gauge %in% py$demo_ids)
 ```
 
 Looks reasonable. Probably overkill for testing, but can do a cut down version too.
@@ -346,16 +346,16 @@ for (x in scenenames) {
 Create clean dataframes to save.
 
 ```{r}
-base <- demo_levs %>% 
-  dplyr::select(Date, VALUE, SITEID) %>% 
+base <- demo_levs |> 
+  dplyr::select(Date, VALUE, SITEID) |> 
   tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE)
 
-up4 <- up4 %>% 
-  dplyr::select(Date, VALUE, SITEID) %>% 
+up4 <- up4 |> 
+  dplyr::select(Date, VALUE, SITEID) |> 
   tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE)
 
-down4 <- down4 %>% 
-  dplyr::select(Date, VALUE, SITEID) %>% 
+down4 <- down4 |> 
+  dplyr::select(Date, VALUE, SITEID) |> 
   tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE) 
 ```
 
@@ -377,9 +377,9 @@ I also want a very limited set of test data that runs faster through the EWR too
 Which gauges?
 
 ```{r}
-mac = rps %>% 
+mac = rps |> 
   dplyr::filter(SWWRPANAME %in% c('Macquarie-Castlereagh'))
-lach = rps %>% 
+lach = rps |> 
   dplyr::filter(SWWRPANAME %in% 'Lachlan')
 
 macgauge = st_intersection(demo_geo, mac)
@@ -389,9 +389,9 @@ lachgauge = st_intersection(demo_geo, lach)
 I'll just choose three of each
 
 ```{r}
-macsub = macgauge %>% 
+macsub = macgauge |> 
   dplyr::filter(gauge %in% c('421004', '421001', '421011'))
-lachsub = lachgauge %>% 
+lachsub = lachgauge |> 
   dplyr::filter(gauge %in% c('412005', '412002', '412038'))
 
 minigauge = dplyr::bind_rows(macsub, lachsub)
@@ -413,19 +413,19 @@ Write out the scenarios, including metadata to check that that is working (and t
 if (REBUILD_DATA) {
   start15 = lubridate::ymd(20150101)
 
-    base %>% 
-      dplyr::filter(Date > start15) %>% 
-      dplyr::select(Date, tidyselect::all_of(minigauges)) %>% 
+    base |> 
+      dplyr::filter(Date > start15) |> 
+      dplyr::select(Date, tidyselect::all_of(minigauges)) |> 
       readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'base', 'base.csv'))
     
-    down4 %>% 
-      dplyr::filter(Date > start15) %>% 
-      dplyr::select(Date, tidyselect::all_of(minigauges)) %>%  
+    down4 |> 
+      dplyr::filter(Date > start15) |> 
+      dplyr::select(Date, tidyselect::all_of(minigauges)) |>  
       readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'down4', 'down4.csv'))
     
-    up4 %>% 
-      dplyr::filter(Date > start15) %>% 
-      dplyr::select(Date, tidyselect::all_of(minigauges)) %>%  
+    up4 |> 
+      dplyr::filter(Date > start15) |> 
+      dplyr::select(Date, tidyselect::all_of(minigauges)) |>  
       readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'up4', 'up4.csv'))
     
     # make JSON metadata

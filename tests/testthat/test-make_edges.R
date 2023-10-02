@@ -6,4 +6,5 @@ test_that("making edges works", {
                  c('Objective', 'target_5_year_2024'))
 
   edges <- make_edges(causal_ewr, aggseq)
+  expect_equal(names(edges), c('gauge', 'PlanningUnitID', 'from', 'to', 'fromtype', 'totype', 'edgeorder'))
 })

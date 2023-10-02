@@ -4,7 +4,6 @@
 ## usethis namespace: start
 #' @importFrom foreach %do%
 #' @importFrom foreach %dopar%
-#' @importFrom magrittr %>%
 #' @importFrom rlang .data
 ## usethis namespace: end
 NULL

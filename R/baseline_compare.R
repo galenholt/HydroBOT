@@ -42,7 +42,7 @@ baseline_compare <- function(val_df, compare_col, base_lev, values_col,
   # The new deal where lists of anonymous functions have to be quosures
   if (rlang::is_quosure(comp_fun)) {
     nameparser = paste0('{.fn}_{.col}')
-    val_df <- val_df %>%
+    val_df <- val_df |>
       dplyr::mutate(dplyr::across({{valcols}},
                                   !!comp_fun, ...,
                                   .names = nameparser))
@@ -52,7 +52,7 @@ baseline_compare <- function(val_df, compare_col, base_lev, values_col,
     # make comp_fun a named list whether it comes in that way or as a character vector
     comp_fun <- functionlister(comp_fun)
     nameparser = paste0('{.fn}_{.col}')
-    val_df <- val_df %>%
+    val_df <- val_df |>
       dplyr::mutate(dplyr::across({{valcols}},
                                   comp_fun, ...,
                                   .names = nameparser))
@@ -65,7 +65,7 @@ baseline_compare <- function(val_df, compare_col, base_lev, values_col,
     # this assumes a single function to solve the across dots deprecation
     # simply. We were making that assumption anyway, but this may not
     # generalise.
-    val_df <- val_df %>%
+    val_df <- val_df |>
       dplyr::mutate(dplyr::across({{valcols}},
                                   \(x) comp_fun[[1]](x, y = .data[[stringr::str_c('ref_', valcols)]], ...),
                                   .names = nameparser))
@@ -77,7 +77,7 @@ baseline_compare <- function(val_df, compare_col, base_lev, values_col,
     funname <- as.character(substitute(comp_fun))
     # https://cran.r-project.org/web/packages/dplyr/vignettes/programming.html
     nameparser <- paste0(funname,'_{.col}')
-    val_df <- val_df %>%
+    val_df <- val_df |>
       dplyr::mutate(dplyr::across({{valcols}},
                                   \(x) comp_fun(x, y = .data[[stringr::str_c('ref_', valcols)]], ...),
                                   .names = nameparser))
@@ -117,7 +117,7 @@ create_base <- function(val_df, compare_col, base_lev, values_col, group_cols = 
   # just use the default "name" and "value" to keep general
   if (length(valcols) > 1) {
     rlang::warn("data with multiple values columns. Making long and will return long with column names in 'name' column")
-    val_df <- val_df %>% tidyr::pivot_longer({{valcols}}, names_to = names_to, values_to = values_to)
+    val_df <- val_df |> tidyr::pivot_longer({{valcols}}, names_to = names_to, values_to = values_to)
     valcols <- values_to
   }
 
@@ -156,9 +156,9 @@ create_base <- function(val_df, compare_col, base_lev, values_col, group_cols = 
   if (is.character(base_lev) &&
       length(compcols) == 1 &&
       (base_lev %in% dplyr::pull(val_df, var = {{compcols}}))) {
-    refdf <- dplyr::filter(val_df, .data[[compcols]] == base_lev) %>%
+    refdf <- dplyr::filter(val_df, .data[[compcols]] == base_lev) |>
       dplyr::rename_with(.fn = ~stringr::str_c('ref_', .),
-                         .cols = tidyselect::all_of(valcols)) %>%
+                         .cols = tidyselect::all_of(valcols)) |>
       dplyr::select({{groupcols}}, tidyselect::starts_with('ref_')) |>
       sf::st_drop_geometry()
 
@@ -173,8 +173,8 @@ create_base <- function(val_df, compare_col, base_lev, values_col, group_cols = 
 
   # The easiest thing to do is if base_lev is a scalar
   if ((length(base_lev) == 1) & (is.numeric(base_lev))) {
-    val_df <- val_df %>%
-      dplyr::mutate(refcol = base_lev) %>%
+    val_df <- val_df |>
+      dplyr::mutate(refcol = base_lev) |>
       dplyr::rename_with(.fn = ~stringr::str_c('ref_', valcols),
                          .cols = refcol)
   }
@@ -191,14 +191,14 @@ create_base <- function(val_df, compare_col, base_lev, values_col, group_cols = 
   if ((((length(orig_valcols) > 1) &
         (length(base_lev) == length(orig_valcols)))) &
       (is.numeric(base_lev))) {
-    refdf <- tibble::tibble(name = orig_valcols, refcol = base_lev) %>%
+    refdf <- tibble::tibble(name = orig_valcols, refcol = base_lev) |>
       dplyr::rename_with(.fn = ~stringr::str_c('ref_', valcols),
-                         .cols = refcol)  %>%
+                         .cols = refcol)  |>
       dplyr::rename_with(.fn = ~names_to,
                          .cols = name) |>
       sf::st_drop_geometry()
 
-    val_df <- val_df %>%
+    val_df <- val_df |>
       dplyr::left_join(refdf, by = names_to)
   }
 

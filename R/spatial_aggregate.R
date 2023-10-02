@@ -45,9 +45,9 @@ spatial_aggregate <- function(dat, to_geo, groupers,
   # polygons, not here. I need the to_geo again later, but not the dat. And
   # the from_ is more likely to have a ton of duplication, so do it's cleaning
   # after cutting to unique polys in spatial_joiner
-  to_geo <- to_geo %>%
-    crs_clean(whichcrs) %>%
-    sf::st_make_valid() %>%
+  to_geo <- to_geo |>
+    crs_clean(whichcrs) |>
+    sf::st_make_valid() |>
     add_polyID()
 
   # make the intersected df for aggregating
@@ -66,7 +66,7 @@ spatial_aggregate <- function(dat, to_geo, groupers,
 
     if (nrow(unusedPolys) > 0) {
       # need to save for each combo of grouping variable
-      allgroups <- fromto_pair %>% dplyr::distinct(dplyr::across({{groupers}}))
+      allgroups <- fromto_pair |> dplyr::distinct(dplyr::across({{groupers}}))
       # combine
       unusedPolys <- dplyr::cross_join(unusedPolys, allgroups)
     }
@@ -103,7 +103,7 @@ spatial_aggregate <- function(dat, to_geo, groupers,
   # The original polys get added with a join using polyID so it doesn't matter if
   # the dataframe gets shuffled or if there were lost areas in the intersection
   # step.
-  aggPoly <- dplyr::left_join(agged, to_geo, by = 'polyID') %>%
+  aggPoly <- dplyr::left_join(agged, to_geo, by = 'polyID') |>
     sf::st_as_sf()
 
   # add the NAs on if we want

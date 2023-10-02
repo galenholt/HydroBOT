@@ -46,22 +46,22 @@ grouped_colours <- function(df, pal_list,
   }
 
   # need some name references to know what function to use
-  cnames <- paletteer::palettes_c_names %>%
-    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) %>%
-    dplyr::select(formatted) %>% dplyr::pull()
+  cnames <- paletteer::palettes_c_names |>
+    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) |>
+    dplyr::select(formatted) |> dplyr::pull()
 
-  dnames <- paletteer::palettes_d_names %>%
-    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) %>%
-    dplyr::select(formatted) %>% dplyr::pull()
+  dnames <- paletteer::palettes_d_names |>
+    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) |>
+    dplyr::select(formatted) |> dplyr::pull()
 
   # For consistency, rename the column to a fixed name `colordef`
-  df <- df %>%
+  df <- df |>
     dplyr::mutate(dplyr::across(tidyselect::all_of(colorset), identity, .names = 'colordef'))
 
   # Make a df without dups and dplyr::left_join
-  dfcols <- df %>%
-    dplyr::group_by(dplyr::across(tidyselect::any_of(colorgroups))) %>%
-    dplyr::distinct(colordef) %>%
+  dfcols <- df |>
+    dplyr::group_by(dplyr::across(tidyselect::any_of(colorgroups))) |>
+    dplyr::distinct(colordef) |>
     dplyr::mutate(palname = ifelse(is.null(colorgroups),
                                    unlist(pal_list),
                                    pal_list[[.data[[colorgroups]][1]]]))
@@ -74,11 +74,11 @@ grouped_colours <- function(df, pal_list,
   if (is.numeric(dfcols$colordef)) {
     # The funny indexing here is because propor has x-min(x) on top, yielding
     # 0-indexed values, so we need to shift and add.
-    dfcols <- dfcols %>%
+    dfcols <- dfcols |>
       dplyr::mutate(pallength = 1000,
                     palindex = round(propor(colordef)*(pallength-1))+1)
   } else {
-    dfcols <- dfcols %>%
+    dfcols <- dfcols |>
       dplyr::mutate(pallength = dplyr::n(),
                     palindex = dplyr::row_number())
   }
@@ -110,7 +110,7 @@ grouped_colours <- function(df, pal_list,
 
 
   # column arrangement
-  dfcols <- dplyr::bind_cols(dfcols, color = as.character(colmap)) %>%
+  dfcols <- dplyr::bind_cols(dfcols, color = as.character(colmap)) |>
     dplyr::select(-c(palname, pallength, palindex))
 
   # join back to the main data by the color column. Don't use a by, because the group is set wth {{}}

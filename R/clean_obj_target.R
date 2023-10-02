@@ -23,7 +23,7 @@ clean_obj_target <- function(ewrobjs,
                              outdir, savename) {
 
   # This cuts to only a single row per planning unit/objective pair and drops the ewrs
-  objpu <- ewrobjs %>%
+  objpu <- ewrobjs |>
     dplyr::select(tidyselect::any_of(c('PlanningUnitID', 'LTWPShortName')), env_obj) |>
     dplyr::distinct()
 
@@ -32,16 +32,16 @@ clean_obj_target <- function(ewrobjs,
 
   # minor cleanup
   names(targets)[which(names(targets) == "Target species")] <- 'Specific_goal'
-  names(targets) <- names(targets) %>%
-    stringr::str_replace_all(' ', '_') %>%
+  names(targets) <- names(targets) |>
+    stringr::str_replace_all(' ', '_') |>
     stringr::str_replace_all('-', '_')
 
 
   # annoying that there are special characters, but since I don't know where the
   # data comes from I can't clean it on that side
-  targets <- targets %>%
-    dplyr::mutate(Objective = stringr::str_remove_all(Objective, '\'')) %>%
-    dplyr::rename(env_obj = Env_obj) %>%
+  targets <- targets |>
+    dplyr::mutate(Objective = stringr::str_remove_all(Objective, '\'')) |>
+    dplyr::rename(env_obj = Env_obj) |>
     dplyr::select(-NodeType)
 
 
@@ -51,10 +51,10 @@ clean_obj_target <- function(ewrobjs,
   # adjust for manual QC from Renee This is separate because it's not ideal way
   # to do the QC adjustment.
 
-  obj2target <- obj2target %>%
-    dplyr::filter(!LTWPShortName == "Murray Lower Darling")%>% #REmove the Murray to add in the data that Renee has already checked
-    dplyr::filter(!(LTWPShortName == "Macquarie-Castlereagh" & Macquarie_Castlereagh == 0))%>%
-    dplyr::filter(!(LTWPShortName == "Murrumbidgee" & Murrumbidgee == 0)) %>%
+  obj2target <- obj2target |>
+    dplyr::filter(!LTWPShortName == "Murray Lower Darling")|> #REmove the Murray to add in the data that Renee has already checked
+    dplyr::filter(!(LTWPShortName == "Macquarie-Castlereagh" & Macquarie_Castlereagh == 0))|>
+    dplyr::filter(!(LTWPShortName == "Murrumbidgee" & Murrumbidgee == 0)) |>
     dplyr::select(-c(Murray_Lower_Darling,	Macquarie_Castlereagh,	Murrumbidgee))
 
   #add in the data that Renee has already checked these have already been
@@ -63,9 +63,9 @@ clean_obj_target <- function(ewrobjs,
   # THe provenance of these files is unknown. It doesn't make sense we
   # need to do this weird multi-level joining just to get the names?
   # warnings suppressed because there's an annoying first column that gets a new name
-  qc_fix <- readr::read_csv(qcfiles[1], col_types = readr::cols(), col_select = -1) %>%
+  qc_fix <- readr::read_csv(qcfiles[1], col_types = readr::cols(), col_select = -1) |>
     dplyr::rename(Specific_goal = Target.species,
-           env_obj = Env_obj) %>%
+           env_obj = Env_obj) |>
     dplyr::select(-NodeType)
 
   PUs_names <- readr::read_csv(qcfiles[2], col_types = readr::cols(), col_select = -1)
@@ -75,7 +75,7 @@ clean_obj_target <- function(ewrobjs,
 
   # This is crazy how much re-joining we're doing. Need to find where all this
   # came from and just build it cleanly
-  pu2ltwp <- objpu %>%
+  pu2ltwp <- objpu |>
     dplyr::select(-env_obj) |>
     dplyr::distinct()
 
@@ -94,10 +94,10 @@ clean_obj_target <- function(ewrobjs,
                   LTWPShortName, env_obj, Specific_goal, Objective, Target)
 
   # final cleanup of weird characters and dplyr::rename to standard
-  suppressWarnings(obj2target <- obj2target %>%
-    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringi::stri_enc_toascii(.))) %>%
-    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'\032', '-'))) %>%
-    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'-$', ''))) %>%
+  suppressWarnings(obj2target <- obj2target |>
+    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringi::stri_enc_toascii(.))) |>
+    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'\032', '-'))) |>
+    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'-$', ''))) |>
     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_squish(.))))
 
   obj2target <- obj2target |>

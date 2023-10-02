@@ -22,20 +22,20 @@ clean_long_term <- function(yrpath,
   obj2yrtargets <- readr::read_csv(yrpath, col_types = readr::cols())
 
   # make the names usable
-  names(obj2yrtargets) <- names(obj2yrtargets) %>%
-    stringr::str_remove_all('target') %>%
-    stringr::str_remove_all(' \\(|\\)') %>%
-    stringr::str_replace_all('(^[0-9]+)', 'target_\\1') %>%
-    stringr::str_replace_all(' ', '_') %>%
-    stringr::str_replace_all('years', 'year') %>%
+  names(obj2yrtargets) <- names(obj2yrtargets) |>
+    stringr::str_remove_all('target') |>
+    stringr::str_remove_all(' \\(|\\)') |>
+    stringr::str_replace_all('(^[0-9]+)', 'target_\\1') |>
+    stringr::str_replace_all(' ', '_') |>
+    stringr::str_replace_all('years', 'year') |>
     stringr::str_replace('Env_obj', 'env_obj')
 
   # clean up weird characters
-  suppressWarnings(obj2yrtargets <- obj2yrtargets %>%
-                     dplyr::select(-c(NodeType, env_obj_main, env_obj_number)) %>% # Why was this here?
-                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringi::stri_enc_toascii(.))) %>%
-                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'\032', '-'))) %>%
-                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'-$', ''))) %>%
+  suppressWarnings(obj2yrtargets <- obj2yrtargets |>
+                     dplyr::select(-c(NodeType, env_obj_main, env_obj_number)) |> # Why was this here?
+                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringi::stri_enc_toascii(.))) |>
+                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'\032', '-'))) |>
+                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'-$', ''))) |>
                      dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_squish(.))))
 
   # save

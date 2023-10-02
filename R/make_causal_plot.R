@@ -67,30 +67,30 @@ make_causal_plot <- function(nodes, edges,
   # looking like the call
 
   # Make sure no duplicate nodes
-  nodes <- nodes %>%
+  nodes <- nodes |>
     dplyr::distinct(Name, .keep_all = TRUE)
 
   # IF WE"RE GOING TO WRAP NAMES IT NEEDS TO HAPPEN BY HERE or the rest of this doesn't match
   if (wrap_names) {
-    edges <- edges %>%
+    edges <- edges |>
       dplyr::mutate(from = stringr::str_wrap(from, 40),
              to = stringr::str_wrap(to, 40))
-    nodes <- nodes %>%
+    nodes <- nodes |>
       dplyr::mutate(Name = stringr::str_wrap(Name, 40))
   }
 
   # Cut both to the desired nodeset
   relevantnodes <- find_related_nodes(edges, focalnodes)
 
-  nodes <- nodes %>%
+  nodes <- nodes |>
     dplyr::filter(Name %in% relevantnodes)
 
-  edges <- edges %>%
+  edges <- edges |>
     dplyr::filter(from %in% relevantnodes | to %in% relevantnodes)
 
   # drop nodes with no edges?
   if (drop_unused_nodes) {
-    nodes <- nodes %>%
+    nodes <- nodes |>
       dplyr::filter(Name %in% edges$from | Name %in% edges$to)
   }
 
@@ -117,16 +117,16 @@ make_causal_plot <- function(nodes, edges,
 
   # Cryptic errors here related to `c.c` and extra rows seem to be caused by having rows that are duplicated over the Name and NodeType columns (even if there are differences elsewhere)
   causalnetwork <-
-    DiagrammeR::create_graph() %>%
+    DiagrammeR::create_graph() |>
     DiagrammeR::add_nodes_from_table(
       table = nodes,
       label_col = Name,
-      type_col = NodeType) %>%
+      type_col = NodeType) |>
     DiagrammeR::add_edges_from_table(
       table = edges,
       from_col = from,
       to_col = to,
-      from_to_map = label) %>%
+      from_to_map = label) |>
 
     DiagrammeR::add_global_graph_attrs(
       attr = c("layout", "splines"),
@@ -134,18 +134,18 @@ make_causal_plot <- function(nodes, edges,
       attr_type = c("graph", "graph"))
 
   if (render) {
-    print(causalnetwork %>%
+    print(causalnetwork |>
             DiagrammeR::render_graph())
   }
 
   if (save) {
-    causalnetwork %>%
+    causalnetwork |>
       DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(savename,
                                                         format(Sys.time(), "%Y%m%d%H%M"),
                                                         '.png')))
 
 
-    causalnetwork %>%
+    causalnetwork |>
       DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(savename,
                                                         format(Sys.time(), "%Y%m%d%H%M"),
                                                         '.pdf')))
