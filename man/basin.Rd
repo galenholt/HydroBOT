@@ -5,9 +5,8 @@
 \alias{basin}
 \title{Murray-Darling Basin Polygon}
 \format{
-\subsection{\code{basin}}{
+\subsection{\code{basin} An {sf} object with one polygon:}{
 
-An {sf} object with one polygon:
 \describe{
 \item{DDIV_NAME}{Polygon name}
 \item{AREA_HA, SHAPE_AREA, SHAPE_LEN}{basic descriptions}
@@ -21,6 +20,7 @@ An {sf} object with one polygon:
 basin
 }
 \description{
-Polygon defining the Murray-Darling Basin boundary
+Polygon defining the Murray-Darling Basin boundary. Sourced from \href{https://www.mdba.gov.au/publications-and-data/maps-and-spatial-data/spatial-data}{MDBA data website},
+with direct link given below.
 }
 \keyword{datasets}
