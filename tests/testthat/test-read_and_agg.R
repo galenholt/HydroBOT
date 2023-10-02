@@ -1,18 +1,10 @@
-# Just use one of the multi_aggregate tests with the read-in bit too
-proj_dir <- system.file("extdata/testsmall", package = 'werptoolkitr')
-hydro_dir <- system.file("extdata/testsmall/hydrographs", package = 'werptoolkitr')
 
-temp_hydro_dir = '_test_data/temp_one/hydrographs'
-temp_parent_dir = '_test_data/temp_one'
-
-temp_hydro_multi = '_test_data/temp_multi/hydrographs'
-
-# Make sure the test dirs are blank
-destroy_temp_hydro(temp_parent_dir)
+temp_hydro_dir = '_test_data/temp/hydrographs'
+temp_parent_dir = '_test_data/temp'
 
 # build a test set
 # create dir so building makes sense
-make_temp_hydro(temp_hydro_dir)
+make_temp_hydro()
 
 # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
 

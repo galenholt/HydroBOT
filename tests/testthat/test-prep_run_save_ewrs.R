@@ -1,23 +1,14 @@
 # Set up some base directory structures
+temp_hydro_dir = '_test_data/temp/hydrographs'
+temp_parent_dir = '_test_data/temp'
 
-proj_dir <- system.file("extdata/testsmall", package = 'werptoolkitr')
-hydro_dir <- system.file("extdata/testsmall/hydrographs", package = 'werptoolkitr')
-
-temp_hydro_dir = '_test_data/temp_one/hydrographs'
-temp_parent_dir = '_test_data/temp_one'
-
-temp_hydro_multi = '_test_data/temp_multi/hydrographs'
-temp_parent_multi = '_test_data/temp_multi'
-
-# Make sure the test dirs are blank
-destroy_temp_hydro(temp_parent_dir)
-destroy_temp_multifile(temp_parent_multi)
-
+temp_hydro_multi = '_test_data/temp/hydrographs'
+temp_parent_multi = '_test_data/temp'
 
 test_that('returns one result, no saving', {
 
   # create dir so building makes sense
-  make_temp_hydro(temp_hydro_dir)
+  make_temp_hydro()
 
   # Test it didn't create anything since outputType = 'none'
   start_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
@@ -36,13 +27,12 @@ test_that('returns one result, no saving', {
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
 
   expect_equal(start_structure, realised_structure)
-  destroy_temp_hydro(temp_parent_dir)
 })
 
 # test multiple returns- use the next one once EWR is debugged.
 test_that('returns list', {
   # create dir so building makes sense
-  make_temp_hydro(temp_hydro_dir)
+  make_temp_hydro()
 
   ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
                                 output_parent_dir = temp_parent_dir,
@@ -53,14 +43,14 @@ test_that('returns list', {
   expect_true(all(c('summary','all_events') %in% names(ewr_out)))
   expect_equal(unique(ewr_out$summary$scenario), c('base', 'down4', 'up4'))
 
-  destroy_temp_hydro(temp_parent_dir)
+
 })
 
 # Does the read-in and run work for singe gauges per csv?
 test_that('csv per gauge works', {
   # First, generate temporary hydrograph files
 
-  make_temp_multifile(temp_hydro_multi = temp_hydro_multi)
+  make_temp_multifile()
 
   ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_multi,
                                 output_parent_dir = '',
@@ -96,13 +86,13 @@ test_that('csv per gauge works', {
   # files per scenario, and if not, filenames that have the scenario name in
   # them with the gauge name.
 
-  destroy_temp_multifile(temp_parent_multi)
+
 })
 
 test_that('saving works for one', {
 
   # create dir so building makes sense
-  make_temp_hydro(temp_hydro_dir)
+  make_temp_hydro()
 
   ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
                                 output_parent_dir = temp_parent_dir,
@@ -142,13 +132,13 @@ test_that('saving works for one', {
                           'module_output/EWR/up4/summary/up4.csv')
 
   expect_equal(realised_structure, expected_structure)
-  destroy_temp_hydro(temp_parent_dir)
+
 })
 
 test_that('saving and returning works for multiple', {
 
   # create dir so building makes sense
-  make_temp_hydro(temp_hydro_dir)
+  make_temp_hydro()
 
   ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
                                 output_parent_dir = temp_parent_dir,
@@ -194,13 +184,13 @@ test_that('saving and returning works for multiple', {
                           'module_output/EWR/up4/summary/up4.csv')
 
   expect_equal(realised_structure, expected_structure)
-  destroy_temp_hydro(temp_parent_dir)
+
 })
 
 test_that('saving and returning works for all (or nearly all) ewr outputs', {
 
   # create dir so building makes sense
-  make_temp_hydro(temp_hydro_dir)
+  make_temp_hydro()
 
   # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
 
@@ -274,14 +264,14 @@ test_that('saving and returning works for all (or nearly all) ewr outputs', {
                           'module_output/EWR/up4/yearly/up4.csv')
 
   expect_equal(realised_structure, expected_structure)
-  destroy_temp_hydro(temp_parent_dir)
+
 })
 
 
 test_that('specifying *Type as character instead of list', {
 
   # create dir so building makes sense
-  make_temp_hydro(temp_hydro_dir)
+  make_temp_hydro()
 
   ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
                                 output_parent_dir = temp_parent_dir,
@@ -328,13 +318,13 @@ test_that('specifying *Type as character instead of list', {
                           'module_output/EWR/up4/summary/up4.csv')
 
   expect_equal(realised_structure, expected_structure)
-  destroy_temp_hydro(temp_parent_dir)
+
 })
 
 test_that('Single scenario among many, with access to the outer directory', {
 
   # create dir so building makes sense
-  make_temp_hydro(temp_hydro_dir)
+  make_temp_hydro()
 
   # So far, assuming we can read and write to the outer 'hydrographs' directory, this is all standard.
 
@@ -352,13 +342,13 @@ test_that('Single scenario among many, with access to the outer directory', {
                c("base/summary/base.csv", "ewr_metadata.json", "ewr_metadata.yml"))
 
   # Tear down
-  destroy_temp_hydro(temp_parent_dir)
+
 })
 
 test_that('Single scenario among many, no access to the outer directory', {
 
   # create dir so building makes sense
-  make_temp_hydro(temp_hydro_dir)
+  make_temp_hydro()
 
   # Now, let's assume all we have is a path to the specific scenario
   scenario_path <- file.path(temp_hydro_dir, 'base')
@@ -383,13 +373,13 @@ test_that('Single scenario among many, no access to the outer directory', {
   expect_equal(list.files(scenario_path, recursive = TRUE), expected_structure)
 
   # Tear down
-  destroy_temp_hydro(temp_parent_dir)
+
 })
 
 test_that('Single scenario among many, no access to the outer directory, different names', {
 
   # create dir so building makes sense
-  make_temp_hydro(temp_hydro_dir)
+  make_temp_hydro()
 
   # Now, let's assume all we have is a path to the specific scenario
 
@@ -419,14 +409,14 @@ test_that('Single scenario among many, no access to the outer directory, differe
   expect_equal(list.files(scenario_path, recursive = TRUE), expected_structure)
 
   # Tear down
-  destroy_temp_hydro(temp_parent_dir)
+
 })
 
-destroy_temp_hydro(temp_parent_dir)
-destroy_temp_multifile(temp_parent_multi)
 
 
-destroy_temp_hydro(temp_parent_dir)
-destroy_temp_multifile(temp_parent_multi)
+
+
+
+
 
 

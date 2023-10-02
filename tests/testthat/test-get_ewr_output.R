@@ -1,17 +1,7 @@
-proj_dir <- system.file("extdata/testsmall", package = 'werptoolkitr')
-hydro_dir <- system.file("extdata/testsmall/hydrographs", package = 'werptoolkitr')
 
-temp_hydro_dir = '_test_data/temp_one/hydrographs'
-temp_parent_dir = '_test_data/temp_one'
-
-temp_hydro_multi = '_test_data/temp_multi/hydrographs'
-
-# Make sure the test dirs are blank
-destroy_temp_hydro(temp_parent_dir)
-
-# build a test set
+temp_parent_dir <- '_test_data/temp'
 # create dir so building makes sense
-make_temp_hydro(temp_hydro_dir)
+make_temp_hydro()
 
 # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
 
@@ -22,7 +12,7 @@ ewroutlist <- list('summary',
                    # 'all_interEvents',
                    'all_successful_interEvents')
 
-ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
+ewr_out <- prep_run_save_ewrs(hydro_dir = file.path(temp_parent_dir, 'hydrographs'),
                               output_parent_dir = temp_parent_dir,
                               outputType = ewroutlist,
                               datesuffix = FALSE,

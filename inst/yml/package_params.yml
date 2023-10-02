@@ -1,7 +1,7 @@
 # Because this gets used in testing, and my testthat::test_path() is 'tests/testthat', I have to use paths relative to that.
 
 # Outer directory for project
-output_parent_dir: '_test_data/temp_one'
+output_parent_dir: '_test_data/temp'
 
 # aggregation sequences (need to be defined in R)
 # the two levels of stepups are because testthat uses tests/testthat as working directory, and we want to access inst/yml
