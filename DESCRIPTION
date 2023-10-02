@@ -2,7 +2,7 @@ Package: werptoolkitr
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
-    person("Galen", "Holt", , "g.holt@deakin.edu.au", role = c("aut", "cre"),
+    person("Galen", "Holt", "g.holt@deakin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7455-9275"))
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
@@ -15,10 +15,8 @@ Imports:
     forcats,
     foreach,
     ggplot2,
-    git2r,
     glue,
     grDevices,
-    jsonlite,
     lwgeom,
     paletteer,
     purrr,
@@ -43,7 +41,9 @@ Suggests:
     scico,
     testthat (>= 3.0.0),
     vdiffr,
-    withr
+    withr,
+    git2r,
+    jsonlite
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)

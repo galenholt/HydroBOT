@@ -64,8 +64,13 @@ read_and_agg <- function(datpath,
                         time = format(Sys.time(), digits = 0, usetz = TRUE))
     yaml::write_yaml(init_params,
                      file = file.path(savepath, 'agg_metadata.yml'))
-    jsonlite::write_json(init_params,
+    if (rlang::is_installed('jsonlite')) {
+      jsonlite::write_json(init_params,
                          path = file.path(savepath, 'agg_metadata.json'))
+    } else {
+      rlang::inform('json metadata not saved. If desired, install `jsonlite`',
+                    .frequency = 'regularly', .frequency_id = 'jsoncheck')
+    }
   }
 
   data <- prep_ewr_agg(datpath, type = type, geopath = geopath, ...)
@@ -100,8 +105,15 @@ read_and_agg <- function(datpath,
     if (!dir.exists(savepath)) {dir.create(savepath, recursive = TRUE)}
     saveRDS(aggout, file.path(savepath, paste0(type, '_aggregated.rds')))
 
-    gitcom <- try(git2r::sha(git2r::commits()[[1]]), silent = TRUE)
-    if (inherits(gitcom, 'try-error')) {gitcom <- NULL}
+    if (!rlang::is_installed('git2r')) {
+      rlang::inform('git sha not available. Install `git2r`',
+                    .frequency = 'regularly', .frequency_id = 'git2rcheck')
+      gitcom <- NULL
+    }
+    if (rlang::is_installed('git2r')) {
+      gitcom <- try(git2r::sha(git2r::commits()[[1]]), silent = TRUE)
+      if (inherits(gitcom, 'try-error')) {gitcom <- NULL}
+    }
 
     char_aggsequence <- purrr::imap(aggsequence, parse_char)
     char_funsequence <- purrr::map(funsequence, parse_char_funs)
@@ -136,15 +148,21 @@ read_and_agg <- function(datpath,
     yaml::write_yaml(c(ymlmods, agg_params),
                      file = file.path(savepath, 'agg_metadata.yml'))
 
-    jsonmodpath <- list.files(datpath, pattern = "*.json")
-    if (length(jsonmodpath) != 0) {
-      jsonmods <- file.path(datpath, jsonmodpath) |>
-        jsonlite::read_json()
+    if (rlang::is_installed('jsonlite')) {
+      jsonmodpath <- list.files(datpath, pattern = "*.json")
+      if (length(jsonmodpath) != 0) {
+        jsonmods <- file.path(datpath, jsonmodpath) |>
+          jsonlite::read_json()
+      } else {
+        jsonmods <- NULL
+      }
+      jsonlite::write_json(c(jsonmods, agg_params),
+                           path = file.path(savepath, 'agg_metadata.json'))
     } else {
-      jsonmods <- NULL
+      rlang::inform('json metadata not saved. If desired, install `jsonlite`',
+                    .frequency = 'regularly', .frequency_id = 'jsoncheck')
     }
-    jsonlite::write_json(c(jsonmods, agg_params),
-                         path = file.path(savepath, 'agg_metadata.json'))
+
   }
 
   if (returnList) {return(aggout)} else {return(NULL)}

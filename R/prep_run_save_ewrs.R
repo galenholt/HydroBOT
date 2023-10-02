@@ -97,8 +97,14 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                         time = format(Sys.time(), digits = 0, usetz = TRUE))
     yaml::write_yaml(init_params,
                      file = file.path(output_path, 'ewr_metadata.yml'))
-    jsonlite::write_json(init_params,
-                     path = file.path(output_path, 'ewr_metadata.json'))
+    if (rlang::is_installed('jsonlite')) {
+      jsonlite::write_json(init_params,
+                           path = file.path(output_path, 'ewr_metadata.json'))
+    } else {
+      rlang::inform('json metadata not saved. If desired, install `jsonlite`',
+                    .frequency = 'regularly', .frequency_id = 'jsoncheck')
+    }
+
   }
 
   ewr_out <- controller_functions$run_save_ewrs(hydro_paths, output_path,
@@ -112,8 +118,17 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   # auto-build metadata- this builds the data needed to run from params
   # And do it *after* the ewrs get processed so it only happens if the run works
   if (output_path != '') {
-    gitcom <- try(git2r::sha(git2r::commits()[[1]]), silent = TRUE)
-    if (inherits(gitcom, 'try-error')) {gitcom <- NULL}
+    if (!rlang::is_installed('git2r')) {
+      rlang::inform('git sha not available. Install `git2r`',
+                    .frequency = 'regularly', .frequency_id = 'git2rcheck')
+      gitcom <- NULL
+    }
+    if (rlang::is_installed('git2r')) {
+      gitcom <- try(git2r::sha(git2r::commits()[[1]]), silent = TRUE)
+      if (inherits(gitcom, 'try-error')) {gitcom <- NULL}
+    }
+
+
     ewr_params <- list(output_parent_dir = output_parent_dir,
                        hydro_dir = hydro_dir,
                        ewr_results = output_path,
@@ -140,15 +155,21 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
     yaml::write_yaml(c(ymlscenes, ewr_params),
                      file = file.path(output_path, 'ewr_metadata.yml'))
 
-    jsonscenepath <- list.files(hydro_dir, pattern = "*.json")
-    if (length(jsonscenepath) != 0) {
-      jsonscenes <- file.path(hydro_dir, jsonscenepath) |>
-        jsonlite::read_json()
+    if (rlang::is_installed('jsonlite')) {
+      jsonscenepath <- list.files(hydro_dir, pattern = "*.json")
+      if (length(jsonscenepath) != 0) {
+        jsonscenes <- file.path(hydro_dir, jsonscenepath) |>
+          jsonlite::read_json()
+      } else {
+        jsonscenes <- NULL
+      }
+      jsonlite::write_json(c(jsonscenes, ewr_params),
+                           path = file.path(output_path, 'ewr_metadata.json'))
     } else {
-      jsonscenes <- NULL
+      rlang::inform('json metadata not saved. If desired, install `jsonlite`',
+                    .frequency = 'regularly', .frequency_id = 'jsoncheck')
     }
-    jsonlite::write_json(c(jsonscenes, ewr_params),
-                     path = file.path(output_path, 'ewr_metadata.json'))
+
   }
 
 
