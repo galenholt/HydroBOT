@@ -10,7 +10,6 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
-    colorspace,
     DiagrammeR,
     dplyr,
     forcats,
@@ -40,6 +39,7 @@ Suggests:
     knitr,
     patchwork,
     rmapshaper (>= 0.4.6),
+    colorspace,
     rmarkdown,
     scico,
     testthat (>= 3.0.0),

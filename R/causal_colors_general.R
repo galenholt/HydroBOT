@@ -81,11 +81,8 @@ make_colorcol <- function(df, colorset) {
 fontcol <- function(boxcol) {
   # replace failures with white
   boxcol[boxcol == 'character(0)'] <- '#FFFFFFFF'
-    # colorspace defines rgb differently to base. this was
-    # colorspace::hex2RGB(boxcol), but that didn't handle named colors.
-  r <- colorspace::sRGB(t(grDevices::col2rgb(boxcol))/255)
-  pl <- as(r, 'polarLUV')
-  l <- colorspace::coords(pl)[,1]
+  pl <- grDevices::convertColor(t(grDevices::col2rgb(boxcol))/255, from = 'sRGB', to = 'Luv')
+  l <- pl[,1]
   fc <- ifelse(l > 50, 'black', 'white')
 }
 
