@@ -46,12 +46,13 @@ test_that("yearly works", {
   ewrdat <- get_ewr_output(ewrpath, type = 'yearly')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
-  namestring <- c('scenario', 'gauge', 'planning_unit', 'ewr_code',
-                  'ewr_code_timing', 'multigauge', 'event_years', 'frequency',
-                  'target_frequency', 'achievement_count', 'achievement_per_year',
-                  'event_count', 'event_count_all', 'events_per_year',
-                  'events_per_year_all', 'average_event_length', 'threshold_days',
-                  'max_inter_event_years', 'no_data_days', 'total_days')
+  namestring <- c('year', 'event_years', 'num_achieved', 'num_events',
+                  'num_events_all', 'event_length', 'event_length_achieved',
+                  'total_event_days', 'total_event_days_achieved',
+                  'max_event_days', 'max_rolling_events', 'max_rolling_achievement',
+                  'missing_days', 'total_possible_days', 'ewr_code',
+                  'ewr_code_timing', 'scenario', 'gauge', 'pu', 'multigauge',
+                  'rolling_max_inter_event', 'rolling_max_inter_event_achieved')
   expect_equal(names(ewrdat), namestring)
   # a couple critical checks of the bits we use
   expect_true(is.character(ewrdat$scenario))

@@ -69,7 +69,7 @@ def run_save_ewrs(pathlist, output_path, model_format, allowance, climate, outpu
         ewr_sum = clean_ewrs(ewr_sum, scenario_filename_split)
     if (('annual' in bothType) | ('everything' in bothType) | ('yearly' in bothType)):
         ewr_yr = thisewr.get_yearly_ewr_results()
-        ewr_yr = clean_ewrs(ewr_sum, scenario_filename_split)
+        ewr_yr = clean_ewrs(ewr_yr, scenario_filename_split)
     if (('all' in bothType) | ('everything' in bothType) | ('all_events' in bothType)):
         ewr_all = thisewr.get_all_events()
         ewr_all = clean_ewrs(ewr_all, scenario_filename_split)
