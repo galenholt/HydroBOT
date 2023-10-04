@@ -24,7 +24,7 @@ ewrpath <- file.path(temp_parent_dir, 'module_output', 'EWR')
 test_that("summary works", {
 
 
-  sumdat <- get_ewr_output(ewrpath, type = 'summary')
+  sumdat <- get_any_ewr_output(ewrpath, type = 'summary')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
   namestring <- c('scenario', 'gauge', 'planning_unit',
@@ -43,7 +43,7 @@ test_that("summary works", {
 })
 
 test_that("yearly works", {
-  ewrdat <- get_ewr_output(ewrpath, type = 'yearly')
+  ewrdat <- get_any_ewr_output(ewrpath, type = 'yearly')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
   namestring <- c('year', 'event_years', 'num_achieved', 'num_events',
@@ -60,7 +60,7 @@ test_that("yearly works", {
 })
 
 test_that("all_events works", {
-  ewrdat <- get_ewr_output(ewrpath, type = 'all_events')
+  ewrdat <- get_any_ewr_output(ewrpath, type = 'all_events')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
   namestring <- c('scenario', 'gauge', 'pu', 'ewr_code', 'ewr_code_timing',
@@ -73,7 +73,7 @@ test_that("all_events works", {
 })
 
 test_that("all_successful_events works", {
-  ewrdat <- get_ewr_output(ewrpath, type = 'all_successful_events')
+  ewrdat <- get_any_ewr_output(ewrpath, type = 'all_successful_events')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
   namestring <- c('scenario', 'gauge', 'pu', 'ewr_code', 'ewr_code_timing',
@@ -86,7 +86,7 @@ test_that("all_successful_events works", {
 })
 
 test_that("all_successful_interEvents works", {
-  ewrdat <- get_ewr_output(ewrpath, type = 'all_successful_interEvents')
+  ewrdat <- get_any_ewr_output(ewrpath, type = 'all_successful_interEvents')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
   namestring <- c('scenario', 'gauge', 'pu', 'ewr_code', 'ewr_code_timing',
@@ -95,4 +95,24 @@ test_that("all_successful_interEvents works", {
   # a couple critical checks of the bits we use
   expect_true(is.character(ewrdat$scenario))
   expect_true(is.character(ewrdat$gauge))
+})
+
+
+test_that("assessment works", {
+  yeardat <- get_any_ewr_output(ewrpath, type = 'yearly')
+  sumdat <- get_any_ewr_output(ewrpath, type = 'summary')
+
+  assessed <- assess_ewr_achievement(yeardat, sumdat)
+
+  expect_equal(names(assessed), c('ewr_code', 'ewr_code_timing', 'gauge',
+                                  'scenario', 'planning_unit', 'ewr_achieved'))
+})
+
+
+
+test_that("making tibble works", {
+  assessed <- get_ewr_output(ewrpath)
+
+  expect_equal(names(assessed), c('ewr_code', 'ewr_code_timing', 'gauge',
+                                  'scenario', 'planning_unit', 'ewr_achieved'))
 })
