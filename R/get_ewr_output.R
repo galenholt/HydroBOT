@@ -106,8 +106,7 @@ cleanewrs <- function(ewrdf) {
   names(ewrdf) <- nameclean(names(ewrdf))
 
   ewrdf <- ewrdf |>
-    tidyr::separate(ewr_code, into = c("ewr_code", "ewr_code_timing"), sep = "_", remove = FALSE)
-
+    tidyr::separate(ewr_code, into = c("ewr_code", "ewr_code_timing"), sep = "_(?!W)", extra = "merge")
   return(ewrdf)
 }
 
