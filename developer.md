@@ -48,7 +48,7 @@ If starting for the first time you will need to have `renv` installed. Typically
 Typically, we would next run `renv::restore()` which will use the local `renv.lock` file to build a local R environment for this project. Note if a `.Rprofile` is not present it will be created. If new packages are added (`renv::install('packagename')`) and want to be kept, add to the lockfile with `renv::snapshot()`.
 
 ### Python environments
-Use [pyenv](https://github.com/pyenv/pyenv) to manage python versions.
+Use [pyenv](https://github.com/pyenv/pyenv) to manage python versions. *Use the [windows fork](https://github.com/pyenv-win/pyenv-win) on Windows!*.
 Use [poetry](https://python-poetry.org/docs/) to build python environments. Set `poetry config virtualenvs.in-project true` to get the `.venv` in the right place.
 Use the `poetry.lock` to build the python environment with poetry. The needed python packages get auto-installed when *using* the package, but developers will need to maintain them here for dev.
 
