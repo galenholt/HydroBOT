@@ -2,13 +2,23 @@
 #' Make EWR results with achievement for ongoing use
 #'
 #' @param dir path to directory with the EWR output for all gauges and scenarios
-#' @param year_roll
+#' @param year_roll character 'best' or number, specific number of years to check assessment for. 'Best' uses 10-year windows if possible. 1 uses the NSW method.
+#' @param type character, one of:
+#'  * 'achievement' (default)- gets the yearly summarised to the period with calculated EWR achievement
+#'  * 'summary',
+#'  * 'yearly',
+#'  * 'all_events',
+#'  * 'all_successful_events',
+#'  * 'all_interEvents', # Does not work with current EWR tool
+#'  * 'all_successful_interEvents'
+#' @param gaugefilter subset of gauges, default NULL
+#' @param scenariofilter subset of scenarios, default NULL
 #'
 #' @return a tibble with ewr_achieved
 #' @export
 #'
 #' @examples
-get_ewr_output <- function(dir, type = 'achievement', year_roll = 1,
+get_ewr_output <- function(dir, type = 'achievement', year_roll = 'best',
                            gaugefilter = NULL, scenariofilter = NULL) {
 
   if (type != 'achievement') {
@@ -18,6 +28,12 @@ get_ewr_output <- function(dir, type = 'achievement', year_roll = 1,
   if (type == 'achievement') {
     yeardat <- get_any_ewr_output(dir, type = 'yearly', gaugefilter = gaugefilter, scenariofilter = scenariofilter)
     sumdat <- get_any_ewr_output(dir, type = 'summary', gaugefilter = gaugefilter, scenariofilter = scenariofilter)
+
+    if (year_roll == 'best') {
+      year_roll <- ifelse(nrow(yeardat) >= 10, 10, 1)
+    } else {
+      year_roll <- year_roll
+    }
 
     outdf <- assess_ewr_achievement(yeardat, sumdat, year_roll = year_roll)
   }
@@ -37,7 +53,13 @@ get_ewr_output <- function(dir, type = 'achievement', year_roll = 1,
 #' change now that `py-ewr` has changed some things.
 #'
 #' @param dir path to directory with the EWR output for all gauges and scenarios
-#' @param type "annual" or "summary" or "both" do we want the summary results or the annual? If "both", returns a named list of two tibbles instead of a tibble
+#' @param type character, one of
+#'  * 'summary',
+#'  * 'yearly',
+#'  * 'all_events',
+#'  * 'all_successful_events',
+#'  * 'all_interEvents', # Does not work with current EWR tool
+#'  * 'all_successful_interEvents'
 #' @param gaugefilter character vector of gauge numbers to include. Default `NULL` includes all
 #' @param scenariofilter character vector of scenario names to include. Default `NULL` includes all
 #'
@@ -181,7 +203,7 @@ nameclean <- function(charvec) {
 #' @return tibble reformatted and cleaned for ongoing analysis
 #' @export
 #' @examples
-assess_ewr_achievement <- function(annualdf, summarydf,  year_roll = 1) {
+assess_ewr_achievement <- function(annualdf, summarydf,  year_roll = ifelse(nrow(annualdf) >= 10, 10, 1)) {
 
   #GET Target frequencies from NSWEWR (could also use NSWEWR from EWR tool?)
   Target_frequencies <- summarydf |>

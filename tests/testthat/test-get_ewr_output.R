@@ -24,7 +24,7 @@ ewrpath <- file.path(temp_parent_dir, 'module_output', 'EWR')
 test_that("summary works", {
 
 
-  sumdat <- get_any_ewr_output(ewrpath, type = 'achievement')
+  sumdat <- get_any_ewr_output(ewrpath, type = 'summary')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
   namestring <- c('scenario', 'gauge', 'planning_unit',
@@ -98,7 +98,7 @@ test_that("all_successful_interEvents works", {
 
 test_that("assessment works", {
   yeardat <- get_any_ewr_output(ewrpath, type = 'yearly')
-  sumdat <- get_any_ewr_output(ewrpath, type = 'achievement')
+  sumdat <- get_any_ewr_output(ewrpath, type = 'summary')
 
   assessed <- assess_ewr_achievement(yeardat, sumdat)
 

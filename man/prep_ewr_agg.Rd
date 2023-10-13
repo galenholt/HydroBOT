@@ -4,13 +4,21 @@
 \alias{prep_ewr_agg}
 \title{Prepare ewr results from the EWR tool for use in aggregation}
 \usage{
-prep_ewr_agg(ewrpath, type = "summary", geopath, whichcrs = 4283, ...)
+prep_ewr_agg(ewrpath, type = "achievement", geopath, whichcrs = 4283, ...)
 }
 \arguments{
 \item{ewrpath}{path to the EWR results output by the EWR tool (with toolkit
 modifications to format)}
 
-\item{type}{character, default \code{'summary'}, or \code{'annual'}.}
+\item{type}{character, one of:
+\itemize{
+\item 'summary',
+\item 'yearly',
+\item 'all_events',
+\item 'all_successful_events',
+\item 'all_interEvents', # Does not work with current EWR tool
+\item 'all_successful_interEvents'
+}}
 
 \item{geopath}{path to the file with gauge locations in lat/long (assumes BOM
 currently)}

@@ -56,9 +56,12 @@ but two typical cases:
 to disk. One or more of:
 \itemize{
 \item 'none' (default), do not save outputs- ignored if in a list with others
-\item 'summary' saves the EWR outcomes summarised over the whole period
-\item 'all' saves the EWR all events
-\item 'annual' does not work with current EWR
+\item 'summary',
+\item 'yearly',
+\item 'all_events',
+\item 'all_successful_events',
+\item 'all_interEvents', # Does not work with current EWR tool
+\item 'all_successful_interEvents'
 }}
 
 \item{returnType}{list of strings or character vector defining what to return

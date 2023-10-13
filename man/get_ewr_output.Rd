@@ -4,12 +4,33 @@
 \alias{get_ewr_output}
 \title{Make EWR results with achievement for ongoing use}
 \usage{
-get_ewr_output(dir, year_roll = 1)
+get_ewr_output(
+  dir,
+  type = "achievement",
+  year_roll = "best",
+  gaugefilter = NULL,
+  scenariofilter = NULL
+)
 }
 \arguments{
 \item{dir}{path to directory with the EWR output for all gauges and scenarios}
 
-\item{year_roll}{}
+\item{type}{character, one of:
+\itemize{
+\item 'achievement' (default)- gets the yearly summarised to the period with calculated EWR achievement
+\item 'summary',
+\item 'yearly',
+\item 'all_events',
+\item 'all_successful_events',
+\item 'all_interEvents', # Does not work with current EWR tool
+\item 'all_successful_interEvents'
+}}
+
+\item{year_roll}{character 'best' or number, specific number of years to check assessment for. 'Best' uses 10-year windows if possible. 1 uses the NSW method.}
+
+\item{gaugefilter}{subset of gauges, default NULL}
+
+\item{scenariofilter}{subset of scenarios, default NULL}
 }
 \value{
 a tibble with ewr_achieved

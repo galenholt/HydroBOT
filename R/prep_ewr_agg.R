@@ -5,7 +5,13 @@
 #'
 #' @param ewrpath path to the EWR results output by the EWR tool (with toolkit
 #'   modifications to format)
-#' @param type character, default `'summary'`, or `'annual'`.
+#' @param type character, one of:
+#'  * 'summary',
+#'  * 'yearly',
+#'  * 'all_events',
+#'  * 'all_successful_events',
+#'  * 'all_interEvents', # Does not work with current EWR tool
+#'  * 'all_successful_interEvents'
 #' @param geopath path to the file with gauge locations in lat/long (assumes BOM
 #'   currently)
 #' @param whichcrs desired crs for the output

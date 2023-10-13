@@ -31,9 +31,12 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @param outputType list of strings or character vector defining what to save
 #'   to disk. One or more of:
 #'  * 'none' (default), do not save outputs- ignored if in a list with others
-#'  * 'summary' saves the EWR outcomes summarised over the whole period
-#'  * 'all' saves the EWR all events
-#'  * 'annual' does not work with current EWR
+#'  * 'summary',
+#'  * 'yearly',
+#'  * 'all_events',
+#'  * 'all_successful_events',
+#'  * 'all_interEvents', # Does not work with current EWR tool
+#'  * 'all_successful_interEvents'
 #' @param returnType list of strings or character vector defining what to return
 #'   to the active R session. Same options as `outputType`
 #' @param MINT see EWR

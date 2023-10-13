@@ -4,7 +4,11 @@
 \alias{assess_ewr_achievement}
 \title{EWR logic test on incoming Annual EWRs}
 \usage{
-assess_ewr_achievement(annualdf, summarydf, year_roll = 1)
+assess_ewr_achievement(
+  annualdf,
+  summarydf,
+  year_roll = ifelse(nrow(annualdf) >= 10, 10, 1)
+)
 }
 \arguments{
 \item{annualdf}{incoming tibble of EWRs after read-in}

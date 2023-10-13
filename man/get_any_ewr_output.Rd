@@ -9,7 +9,15 @@ get_any_ewr_output(dir, type, gaugefilter = NULL, scenariofilter = NULL)
 \arguments{
 \item{dir}{path to directory with the EWR output for all gauges and scenarios}
 
-\item{type}{"annual" or "summary" or "both" do we want the summary results or the annual? If "both", returns a named list of two tibbles instead of a tibble}
+\item{type}{character, one of
+\itemize{
+\item 'summary',
+\item 'yearly',
+\item 'all_events',
+\item 'all_successful_events',
+\item 'all_interEvents', # Does not work with current EWR tool
+\item 'all_successful_interEvents'
+}}
 
 \item{gaugefilter}{character vector of gauge numbers to include. Default \code{NULL} includes all}
 

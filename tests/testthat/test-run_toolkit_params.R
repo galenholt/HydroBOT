@@ -85,12 +85,16 @@ test_that('Single scenario among many, no access to the outer directory', {
   expect_null(test)
 
   # Expect only the single output, not for all the scenarios
-  expected_structure <- c('aggregator_output/agg_metadata.json',
+  expected_structure <- c('aggregator_output/achievement_aggregated.rds',
+                          'aggregator_output/agg_metadata.json',
                           'aggregator_output/agg_metadata.yml',
-                          'aggregator_output/summary_aggregated.rds',
                           'base.csv',
                           'base.json',
+                          'module_output/EWR/base/all_events/base.csv',
+                          'module_output/EWR/base/all_successful_events/base.csv',
+                          'module_output/EWR/base/all_successful_interEvents/base.csv',
                           'module_output/EWR/base/summary/base.csv',
+                          'module_output/EWR/base/yearly/base.csv',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml')
   expect_equal(list.files('_test_data/temp/hydrographs/base', recursive = TRUE), expected_structure)
@@ -124,12 +128,16 @@ test_that('Single scenario among many, no access to the outer directory, differe
   expect_null(test)
 
   # Expect only the single output, not for all the scenarios
-  expected_structure <- c('aggregator_output/agg_metadata.json',
+  expected_structure <- c('aggregator_output/achievement_aggregated.rds',
+                          'aggregator_output/agg_metadata.json',
                           'aggregator_output/agg_metadata.yml',
-                          'aggregator_output/summary_aggregated.rds',
                           'base.csv',
                           'base.json',
+                          'module_output/EWR/base/all_events/base.csv',
+                          'module_output/EWR/base/all_successful_events/base.csv',
+                          'module_output/EWR/base/all_successful_interEvents/base.csv',
                           'module_output/EWR/base/summary/base.csv',
+                          'module_output/EWR/base/yearly/base.csv',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml')
   expect_equal(list.files('_test_data/temp/hydrographs/results', recursive = TRUE), expected_structure)
