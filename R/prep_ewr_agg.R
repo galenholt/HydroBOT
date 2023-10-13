@@ -19,7 +19,7 @@
 #' @export
 #'
 #' @examples
-prep_ewr_agg <- function(ewrpath, type = 'summary', geopath, whichcrs = 4283, ...) {
+prep_ewr_agg <- function(ewrpath, type = 'achievement', geopath, whichcrs = 4283, ...) {
   # Dots pass gaugefilter and scenariofilter
 
   # If there's a path to the data instead of a dataframe, go get the ewrs

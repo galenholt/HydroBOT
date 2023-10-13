@@ -46,7 +46,7 @@ test_that("multi-step theme and spatial works", {
                  'ArithmeticMean')
 
   spatagg <- read_and_agg(datpath = ewr_results,
-                          type = 'summary',
+                          type = 'achievement',
                           geopath = bom_basin_gauges,
                           causalpath = causal_ewr,
                           groupers = 'scenario',
@@ -97,7 +97,7 @@ test_that("parsing geo and char work for aggsequence", {
                  'ArithmeticMean')
 
   spatagg <- read_and_agg(datpath = ewr_results,
-                          type = 'summary',
+                          type = 'achievement',
                           geopath = bom_basin_gauges,
                           causalpath = causal_ewr,
                           groupers = 'scenario',
@@ -135,7 +135,7 @@ test_that("parsing bare and char and rlang::quo for funsequence", {
                  c('ArithmeticMean', 'LimitingFactor'))
 
   spatagg <- read_and_agg(datpath = ewr_results,
-                          type = 'summary',
+                          type = 'achievement',
                           geopath = bom_basin_gauges,
                           causalpath = causal_ewr,
                           groupers = 'scenario',

@@ -212,7 +212,7 @@ test_that("multiple functions", {
   fnlistw <- rlang::quo(list(mean = ~mean(., na.rm = TRUE),
                              wm = ~weighted.mean(., wt, na.rm = TRUE)))
 
-  sumdat <- prep_ewr_agg(summary_ewr_output, type = 'summary',
+  sumdat <- prep_ewr_agg(summary_ewr_output, type = 'achievement',
                          geopath = bom_basin_gauges)
 
   wtgauge2 <- sumdat |>

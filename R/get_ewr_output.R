@@ -8,13 +8,22 @@
 #' @export
 #'
 #' @examples
-get_ewr_output <- function(dir, year_roll = 1) {
-  yeardat <- get_any_ewr_output(dir, type = 'yearly')
-  sumdat <- get_any_ewr_output(dir, type = 'summary')
+get_ewr_output <- function(dir, type = 'achievement', year_roll = 1,
+                           gaugefilter = NULL, scenariofilter = NULL) {
 
-  assessed <- assess_ewr_achievement(yeardat, sumdat, year_roll = year_roll)
+  if (type != 'achievement') {
+    outdf <- get_any_ewr_output(dir, type = type, gaugefilter = gaugefilter, scenariofilter = scenariofilter)
+  }
 
-  return(assessed)
+  if (type == 'achievement') {
+    yeardat <- get_any_ewr_output(dir, type = 'yearly', gaugefilter = gaugefilter, scenariofilter = scenariofilter)
+    sumdat <- get_any_ewr_output(dir, type = 'summary', gaugefilter = gaugefilter, scenariofilter = scenariofilter)
+
+    outdf <- assess_ewr_achievement(yeardat, sumdat, year_roll = year_roll)
+  }
+
+
+  return(outdf)
 }
 
 

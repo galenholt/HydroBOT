@@ -24,7 +24,7 @@ ewrpath <- file.path(temp_parent_dir, 'module_output', 'EWR')
 test_that("summary works", {
 
 
-  sumdat <- get_any_ewr_output(ewrpath, type = 'summary')
+  sumdat <- get_any_ewr_output(ewrpath, type = 'achievement')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
   namestring <- c('scenario', 'gauge', 'planning_unit',
@@ -33,13 +33,11 @@ test_that("summary works", {
                   'achievement_per_year', 'event_count', 'event_count_all',
                   'events_per_year', 'events_per_year_all',
                   'average_event_length', 'threshold_days',
-                  'max_inter_event_years', 'no_data_days', 'total_days',
-                  'ewr_achieved')
+                  'max_inter_event_years', 'no_data_days', 'total_days')
   expect_equal(names(sumdat), namestring)
   # a couple critical checks of the bits we use
   expect_true(is.character(sumdat$scenario))
   expect_true(is.character(sumdat$gauge))
-  expect_true(is.logical(sumdat$ewr_achieved))
 })
 
 test_that("yearly works", {
@@ -51,7 +49,7 @@ test_that("yearly works", {
                   'total_event_days', 'total_event_days_achieved',
                   'max_event_days', 'max_rolling_events', 'max_rolling_achievement',
                   'missing_days', 'total_possible_days', 'ewr_code',
-                  'ewr_code_timing', 'scenario', 'gauge', 'pu', 'multigauge',
+                  'ewr_code_timing', 'scenario', 'gauge', 'planning_unit', 'multigauge',
                   'rolling_max_inter_event', 'rolling_max_inter_event_achieved')
   expect_equal(names(ewrdat), namestring)
   # a couple critical checks of the bits we use
@@ -63,7 +61,7 @@ test_that("all_events works", {
   ewrdat <- get_any_ewr_output(ewrpath, type = 'all_events')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
-  namestring <- c('scenario', 'gauge', 'pu', 'ewr_code', 'ewr_code_timing',
+  namestring <- c('scenario', 'gauge', 'planning_unit', 'ewr_code', 'ewr_code_timing',
                   'water_year', 'start_date', 'end_date', 'event_duration',
                   'event_length', 'multigauge')
   expect_equal(names(ewrdat), namestring)
@@ -76,7 +74,7 @@ test_that("all_successful_events works", {
   ewrdat <- get_any_ewr_output(ewrpath, type = 'all_successful_events')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
-  namestring <- c('scenario', 'gauge', 'pu', 'ewr_code', 'ewr_code_timing',
+  namestring <- c('scenario', 'gauge', 'planning_unit', 'ewr_code', 'ewr_code_timing',
                   'water_year', 'start_date', 'end_date', 'event_duration',
                   'event_length', 'multigauge')
   expect_equal(names(ewrdat), namestring)
@@ -89,7 +87,7 @@ test_that("all_successful_interEvents works", {
   ewrdat <- get_any_ewr_output(ewrpath, type = 'all_successful_interEvents')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
-  namestring <- c('scenario', 'gauge', 'pu', 'ewr_code', 'ewr_code_timing',
+  namestring <- c('scenario', 'gauge', 'planning_unit', 'ewr_code', 'ewr_code_timing',
                   'start_date', 'end_date', 'inter_event_length')
   expect_equal(names(ewrdat), namestring)
   # a couple critical checks of the bits we use
@@ -100,19 +98,19 @@ test_that("all_successful_interEvents works", {
 
 test_that("assessment works", {
   yeardat <- get_any_ewr_output(ewrpath, type = 'yearly')
-  sumdat <- get_any_ewr_output(ewrpath, type = 'summary')
+  sumdat <- get_any_ewr_output(ewrpath, type = 'achievement')
 
   assessed <- assess_ewr_achievement(yeardat, sumdat)
 
   expect_equal(names(assessed), c('ewr_code', 'ewr_code_timing', 'gauge',
-                                  'scenario', 'planning_unit', 'ewr_achieved'))
+                                  'scenario', 'planning_unit', 'ewr_achieved', 'ewr_achieved_timeframe'))
 })
 
 
 
-test_that("making tibble works", {
+test_that("making assessment tibble works", {
   assessed <- get_ewr_output(ewrpath)
 
   expect_equal(names(assessed), c('ewr_code', 'ewr_code_timing', 'gauge',
-                                  'scenario', 'planning_unit', 'ewr_achieved'))
+                                  'scenario', 'planning_unit', 'ewr_achieved', 'ewr_achieved_timeframe'))
 })
