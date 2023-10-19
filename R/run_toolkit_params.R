@@ -50,7 +50,13 @@ run_toolkit_params <- function(yamlpath = NULL,
   if (is.list(comargs)) {arglist <- utils::modifyList(arglist, comargs)}
 
   # bring in list-args (especially useful for parameterised quarto notebook)
-  if (is.list(list_args)) {arglist <- utils::modifyList(arglist, list_args)}
+  if (is.list(list_args)) {
+    # remove class from quarto list so later functions know how to use it
+    if (inherits(list_args, 'knit_param_list')) {list_args <- unclass(list_args)}
+
+    arglist <- utils::modifyList(arglist, list_args)
+
+  }
 
   # R file allows aggregation definition with R types and expressions. This is
   # the most general, but also requires extra files and makes handling metadata
