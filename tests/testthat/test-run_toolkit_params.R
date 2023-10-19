@@ -49,6 +49,35 @@ test_that("passing from command works", {
 
 })
 
+test_that("list args work", {
+  # Make sure the dir package_params asks for is gone
+
+  # create the new dir
+  make_temp_multifile()
+
+  # The yaml here becomes a pain if it needs to pass more than one item.
+  test <- run_toolkit_params(yamlpath = system.file('yml/package_params.yml',
+                                                    package = 'werptoolkitr'),
+                             list_args = list(output_parent_dir =  '_test_data/temp'))
+
+  # kind of silly- the main thing is that the above doesn't fail
+  expect_null(test)
+
+
+  # There's a weird thing where the params lists in quarto have a special class, and that breaks json
+  qlist <- list(output_parent_dir =  '_test_data/temp')
+  class(qlist) <- "knit_param_list"
+
+  # The yaml here becomes a pain if it needs to pass more than one item.
+  test2 <- run_toolkit_params(yamlpath = system.file('yml/package_params.yml',
+                                                    package = 'werptoolkitr'),
+                             list_args = qlist)
+
+  # kind of silly- the main thing is that the above doesn't fail
+  expect_null(test2)
+
+})
+
 
 test_that("re-running from self-defined params works", {
 
@@ -102,6 +131,8 @@ test_that('Single scenario among many, no access to the outer directory', {
   # Tear down
 
 })
+
+
 
 test_that('Single scenario among many, no access to the outer directory, different names', {
 
