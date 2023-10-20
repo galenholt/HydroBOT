@@ -30,7 +30,7 @@ get_ewr_output <- function(dir, type = 'achievement', year_roll = 'best',
     sumdat <- get_any_ewr_output(dir, type = 'summary', gaugefilter = gaugefilter, scenariofilter = scenariofilter)
 
     if (year_roll == 'best') {
-      year_roll <- ifelse(nrow(yeardat) >= 10, 10, 1)
+      year_roll <- ifelse(length(unique(yeardat$year)) >= 10, 10, 1)
     } else {
       year_roll <- year_roll
     }
