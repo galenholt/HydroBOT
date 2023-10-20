@@ -18,7 +18,8 @@ prep_run_save_ewrs(
   DRAW = (100 - 0)/100,
   scenario_filename_split = "_DIRECTORYAPPEND_",
   extrameta = NULL,
-  datesuffix = FALSE
+  datesuffix = FALSE,
+  rparallel = FALSE
 )
 }
 \arguments{
@@ -81,6 +82,8 @@ to the active R session. Same options as \code{outputType}}
 
 \item{datesuffix}{logical. whether to add a suffix to saved filenames to
 provide a datestamp. Should be deprecated in favour of metadata files.}
+
+\item{rparallel}{logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using \code{furrr}. To use, install \code{furrr} and set a \code{\link[future:plan]{future::plan()}} (likely \code{multisession} or \code{multicore})}
 }
 \value{
 a list of dataframe(s) if \code{returnType} is not 'none', otherwise, NULL

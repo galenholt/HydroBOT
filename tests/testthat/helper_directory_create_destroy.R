@@ -26,6 +26,12 @@ make_temp_hydro <- function(testdir = '_test_data/temp',
 #   unlink(temp_parent_dir, recursive = TRUE)
 # }
 
+# temporarily change the future plan
+set_future_multi <- function() {
+  future::plan(future::multisession)
+
+  withr::defer_parent(future::plan('default'))
+}
 
 
 # multiple csvs, each with one gauge ---------------------------------------

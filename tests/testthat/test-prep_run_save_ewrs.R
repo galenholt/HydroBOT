@@ -5,6 +5,8 @@ temp_parent_dir = '_test_data/temp'
 temp_hydro_multi = '_test_data/temp/hydrographs'
 temp_parent_multi = '_test_data/temp'
 
+set_future_multi()
+
 test_that('returns one result, no saving', {
 
   # create dir so building makes sense
@@ -413,10 +415,166 @@ test_that('Single scenario among many, no access to the outer directory, differe
 })
 
 
+test_that('parallel works for two', {
+
+  print(future::plan())
+  # create dir so building makes sense
+  make_temp_hydro()
+
+  ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
+                                output_parent_dir = temp_parent_dir,
+                                outputType = list('summary', 'yearly'),
+                                datesuffix = FALSE,
+                                returnType = list('summary', 'yearly'),
+                                rparallel = TRUE)
 
 
+  expect_equal(length(ewr_out), 2)
+  expect_equal(names(ewr_out), c('summary', 'yearly'))
+
+  # Test it created the expected structure
+  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+
+  expected_structure <- c('hydrographs',
+                            'hydrographs/base',
+                            'hydrographs/base/base.csv',
+                            'hydrographs/base/base.json',
+                            'hydrographs/down4',
+                            'hydrographs/down4/down4.csv',
+                            'hydrographs/down4/down4.json',
+                            'hydrographs/scenario_metadata.json',
+                            'hydrographs/scenario_metadata.yml',
+                            'hydrographs/up4',
+                            'hydrographs/up4/up4.csv',
+                            'hydrographs/up4/up4.json',
+                            'module_output',
+                            'module_output/EWR',
+                            'module_output/EWR/base',
+                            'module_output/EWR/base/summary',
+                            'module_output/EWR/base/summary/base.csv',
+                            'module_output/EWR/base/yearly',
+                            'module_output/EWR/base/yearly/base.csv',
+                            'module_output/EWR/down4',
+                            'module_output/EWR/down4/summary',
+                            'module_output/EWR/down4/summary/down4.csv',
+                            'module_output/EWR/down4/yearly',
+                            'module_output/EWR/down4/yearly/down4.csv',
+                            'module_output/EWR/ewr_metadata.json',
+                            'module_output/EWR/ewr_metadata.yml',
+                            'module_output/EWR/up4',
+                            'module_output/EWR/up4/summary',
+                            'module_output/EWR/up4/summary/up4.csv',
+                            'module_output/EWR/up4/yearly',
+                            'module_output/EWR/up4/yearly/up4.csv')
+
+  expect_equal(realised_structure, expected_structure)
+
+})
 
 
+test_that('parallel works for one', {
 
+  print(future::plan())
+
+  # create dir so building makes sense
+  make_temp_hydro()
+
+  ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
+                                output_parent_dir = temp_parent_dir,
+                                outputType = list('summary'),
+                                datesuffix = FALSE,
+                                returnType = list('summary'),
+                                rparallel = TRUE)
+
+  expect_equal(length(ewr_out), 1)
+  expect_equal(names(ewr_out), 'summary')
+
+  # Test it created the expected structure
+  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+
+  expected_structure <- c('hydrographs',
+                          'hydrographs/base',
+                          'hydrographs/base/base.csv',
+                          'hydrographs/base/base.json',
+                          'hydrographs/down4',
+                          'hydrographs/down4/down4.csv',
+                          'hydrographs/down4/down4.json',
+                          'hydrographs/scenario_metadata.json',
+                          'hydrographs/scenario_metadata.yml',
+                          'hydrographs/up4',
+                          'hydrographs/up4/up4.csv',
+                          'hydrographs/up4/up4.json',
+                          'module_output',
+                          'module_output/EWR',
+                          'module_output/EWR/base',
+                          'module_output/EWR/base/summary',
+                          'module_output/EWR/base/summary/base.csv',
+                          'module_output/EWR/down4',
+                          'module_output/EWR/down4/summary',
+                          'module_output/EWR/down4/summary/down4.csv',
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml',
+                          'module_output/EWR/up4',
+                          'module_output/EWR/up4/summary',
+                          'module_output/EWR/up4/summary/up4.csv')
+
+  expect_equal(realised_structure, expected_structure)
+
+})
+
+test_that('parallel works for no return', {
+
+  print(future::plan())
+
+  # create dir so building makes sense
+  make_temp_hydro()
+
+  ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
+                                output_parent_dir = temp_parent_dir,
+                                outputType = list('summary', 'yearly'),
+                                datesuffix = FALSE,
+                                returnType = list('none'),
+                                rparallel = TRUE)
+
+  expect_equal(length(ewr_out), 0)
+
+  # Test it created the expected structure
+  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+
+  expected_structure <- c('hydrographs',
+                          'hydrographs/base',
+                          'hydrographs/base/base.csv',
+                          'hydrographs/base/base.json',
+                          'hydrographs/down4',
+                          'hydrographs/down4/down4.csv',
+                          'hydrographs/down4/down4.json',
+                          'hydrographs/scenario_metadata.json',
+                          'hydrographs/scenario_metadata.yml',
+                          'hydrographs/up4',
+                          'hydrographs/up4/up4.csv',
+                          'hydrographs/up4/up4.json',
+                          'module_output',
+                          'module_output/EWR',
+                          'module_output/EWR/base',
+                          'module_output/EWR/base/summary',
+                          'module_output/EWR/base/summary/base.csv',
+                          'module_output/EWR/base/yearly',
+                          'module_output/EWR/base/yearly/base.csv',
+                          'module_output/EWR/down4',
+                          'module_output/EWR/down4/summary',
+                          'module_output/EWR/down4/summary/down4.csv',
+                          'module_output/EWR/down4/yearly',
+                          'module_output/EWR/down4/yearly/down4.csv',
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml',
+                          'module_output/EWR/up4',
+                          'module_output/EWR/up4/summary',
+                          'module_output/EWR/up4/summary/up4.csv',
+                          'module_output/EWR/up4/yearly',
+                          'module_output/EWR/up4/yearly/up4.csv')
+
+  expect_equal(realised_structure, expected_structure)
+
+})
 
 

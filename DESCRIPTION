@@ -43,7 +43,8 @@ Suggests:
     vdiffr,
     withr,
     git2r,
-    jsonlite
+    jsonlite,
+    furrr
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)

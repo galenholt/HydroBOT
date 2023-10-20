@@ -47,6 +47,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'   provide a datestamp. Should be deprecated in favour of metadata files.
 #' @param scenario_filename_split character (including regex) to split the scenario filenames in the 'scenario' column of the EWR outputs. Mostly for handling the situation of gauge-named csvs with the scenario name appended to the front. When auto-appended, '_DIRECTORYAPPEND_' is used. If the appending has been done by the user, will need to pass in the split. The 'scenario' is given the first piece of the split, so do not use a split pattern in the scenario name, e.g. do not name scenarios a_1 and then append csvs with "_" like a_1_401234.csv, or the _1 will be lost..
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
+#' @param rparallel logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using `furrr`. To use, install `furrr` and set a [future::plan()] (likely `multisession` or `multicore`)
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
@@ -60,7 +61,8 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                                DUR = (100 - 0 )/100, DRAW = (100 -0 )/100,
                                scenario_filename_split = '_DIRECTORYAPPEND_',
                                extrameta = NULL,
-                               datesuffix = FALSE) {
+                               datesuffix = FALSE,
+                               rparallel = FALSE) {
 
   # allow sloppy outputTypes and returnTypes
   if (!is.list(outputType)) {outputType <- as.list(outputType)}
@@ -110,12 +112,33 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
 
   }
 
-  ewr_out <- controller_functions$run_save_ewrs(hydro_paths, output_path,
-                                                model_format, allowance, climate,
-                                                outputType = outputType,
-                                                returnType = returnType,
-                                                scenario_filename_split = scenario_filename_split,
-                                                datesuffix = datesuffix)
+  if (rparallel && !rlang::is_installed('furrr')) {
+    rlang::warn("parallel processing over num_restarts requires furrr. Please install it. Setting `parallel = FALSE` and proceeding")
+    rparallel <- FALSE
+  }
+
+  if (rparallel) {
+    ewr_out <- furrr::future_map(hydro_paths, \(x) controller_functions$run_save_ewrs(list(x), output_path,
+                                                                           model_format, allowance, climate,
+                                                                           outputType = outputType,
+                                                                           returnType = returnType,
+                                                                           scenario_filename_split = scenario_filename_split,
+                                                                           datesuffix = datesuffix),
+                                 .options = furrr::furrr_options(seed = TRUE))
+
+    ewr_out <- purrr::list_transpose(ewr_out) |>
+      purrr::map(dplyr::bind_rows)
+
+  } else {
+    ewr_out <- controller_functions$run_save_ewrs(hydro_paths, output_path,
+                                                  model_format, allowance, climate,
+                                                  outputType = outputType,
+                                                  returnType = returnType,
+                                                  scenario_filename_split = scenario_filename_split,
+                                                  datesuffix = datesuffix)
+  }
+
+
 
 
   # auto-build metadata- this builds the data needed to run from params
