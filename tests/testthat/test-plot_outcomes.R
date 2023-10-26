@@ -366,22 +366,6 @@ test_that("maps", {
 
   vdiffr::expect_doppelganger("sdl_map_simple", sdl_map)
 
-  # control the limits- typically this would be done over several plots
-  # Make a minimal map
-  sdl_mapL <- obj_sdl_to_plot |>
-    dplyr::filter(env_group == 'EF') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
-                  colorgroups = NULL,
-                  colorset = 'allArith',
-                  pal_list = list('scico::berlin'),
-                  facet_col = 'env_obj',
-                  facet_row = 'scenario',
-                  scene_pal = scene_pal,
-                  sceneorder = c('down4', 'base', 'up4'),
-                  setLimits = c(0, 2))
-  vdiffr::expect_doppelganger("sdl_map_limits", sdl_mapL)
-
 
   # put the basin in the background
   sdl_basin_background <- obj_sdl_to_plot |>
@@ -740,6 +724,86 @@ test_that("maps", {
   vdiffr::expect_doppelganger("sdl_basin_background_rel", sdl_basin_background_rel)
 })
 
+test_that("setLimits works", {
+
+  # Bar plots
+  basin_to_plot <- agg_theme_space$mdb |>
+    dplyr::rename(allArith = 4, oneLimiting = 5) |> # for readability
+    dplyr::filter(!is.na(Objective))
+
+  basin_plot20 <- plot_outcomes(basin_to_plot,
+                                y_col = 'allArith',
+                                colorset = 'Objective',
+                                pal_list = list("scico::oslo"),
+                                sceneorder = c('down4', 'base', 'up4'),
+                                setLimits = c(0,20)) +
+    ggplot2::theme(legend.position = 'none')
+
+  vdiffr::expect_doppelganger("stacked bar 20", basin_plot20)
+
+  basin_plot10 <- plot_outcomes(basin_to_plot,
+                                y_col = 'allArith',
+                                colorset = 'Objective',
+                                pal_list = list("scico::oslo"),
+                                sceneorder = c('down4', 'base', 'up4'),
+                                setLimits = c(0,10)) +
+    ggplot2::theme(legend.position = 'none')
+
+  vdiffr::expect_doppelganger("stacked bar 10", basin_plot10)
+
+  # Line plots
+  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
+    dplyr::rename(allArith = 4) # for readability
+
+  # create a quant description of scenarios
+  scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+
+  # Create a grouping variable
+  obj_sdl_to_plot <- obj_sdl_to_plot |>
+    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+    dplyr::filter(!is.na(env_group)) |>
+    dplyr::arrange(env_group, env_obj) |>
+    # and join the quant descriptions
+    dplyr::left_join(scenarios, by = 'scenario')
+
+  scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
+                        palette = 'calecopal::superbloom3')
+
+  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$env_group),
+                      palette = 'scico::berlin')
+
+  # need to facet by space sdl unit and create a group col to take multiple palettes
+  sdl_line_75 <- obj_sdl_to_plot |>
+    plot_outcomes(y_col = 'allArith',
+                  x_col = 'delta',
+                  colorgroups = NULL,
+                  colorset = 'env_obj',
+                  pal_list = list('scico::berlin'),
+                  facet_row = 'SWSDLName',
+                  facet_col = '.',
+                  scene_pal = scene_pal,
+                  sceneorder = c('down4', 'base', 'up4'),
+                  setLimits = c(0, 0.75))
+  vdiffr::expect_doppelganger("line_75", sdl_line_75)
+
+  # Maps
+  # Make a minimal map
+  sdl_mapL <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == 'EF') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                  x_col = 'map',
+                  colorgroups = NULL,
+                  colorset = 'allArith',
+                  pal_list = list('scico::berlin'),
+                  facet_col = 'env_obj',
+                  facet_row = 'scenario',
+                  scene_pal = scene_pal,
+                  sceneorder = c('down4', 'base', 'up4'),
+                  setLimits = c(0, 2))
+  vdiffr::expect_doppelganger("sdl_map_limits", sdl_mapL)
+
+})
+
 test_that("ewr works as in `plot_outcomes_bar`", {
   ewr_to_bar_data <- summary_ewr_output |>
     # just grab the first code_timing
@@ -791,3 +855,76 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
   vdiffr::expect_doppelganger("bar_basin_lab", basin_plot_L)
 })
 
+
+test_that("facet addition works", {
+
+  # It turns out this is actually about leaving out rows or cols
+  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
+    dplyr::rename(allArith = 4) # for readability
+
+  # Create a grouping variable
+  obj_sdl_to_plot <- obj_sdl_to_plot |>
+    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+    dplyr::filter(!is.na(env_group)) |>
+    dplyr::arrange(env_group, env_obj)
+
+  sdl_colors_row <- obj_sdl_to_plot |>
+    # dplyr::summarise(allArith = mean(allArith, na.rm = TRUE),
+    #                  .by = c(SWSDLName, scenario, geometry)) |>
+    plot_outcomes(y_col = 'allArith',
+                  y_lab = 'Proportion\nEWR achieved',
+                  x_col = 'SWSDLName',
+                  facet_row = 'env_group + SWSDLName',
+                  colorset = 'SWSDLName',
+                  pal_list = SDL_pal,
+                  position = 'dodge',
+                  setLimits = c(0,1))
+
+  sdl_colors_col <- obj_sdl_to_plot |>
+    # dplyr::summarise(allArith = mean(allArith, na.rm = TRUE),
+    #                  .by = c(SWSDLName, scenario, geometry)) |>
+    plot_outcomes(y_col = 'allArith',
+                  y_lab = 'Proportion\nEWR achieved',
+                  x_col = 'SWSDLName',
+                  facet_col = 'env_group + SWSDLName',
+                  colorset = 'SWSDLName',
+                  pal_list = SDL_pal,
+                  position = 'dodge',
+                  setLimits = c(0,1))
+
+  vdiffr::expect_doppelganger(" sdl_colors_row",  sdl_colors_row)
+  vdiffr::expect_doppelganger(" sdl_colors_col",  sdl_colors_col)
+
+})
+
+
+# work in progress --------------------------------------------------------
+
+test_that("scenarios aren't special", {
+
+  # This is a strange example, because scenario can easily be special here. But
+  # roll with it to solve the more general issue.
+  SDL_pal <- make_pal(unique(agg_theme_space$sdl_units$SWSDLName),
+                      palette = "ggsci::nrc_npg")
+
+  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
+    dplyr::rename(allArith = 4) # for readability
+
+  # Create a grouping variable
+  obj_sdl_to_plot <- obj_sdl_to_plot |>
+    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+    dplyr::filter(!is.na(env_group)) |>
+    dplyr::arrange(env_group, env_obj)
+
+  sdl_colors <- obj_sdl_to_plot |>
+    dplyr::summarise(allArith = mean(allArith, na.rm = TRUE),
+                     .by = c(SWSDLName, scenario, geometry)) |>
+    plot_outcomes(y_col = 'allArith',
+                  y_lab = 'Proportion\nEWR achieved',
+                  x_col = 'SWSDLName',
+                  facet_row = 'scenario',
+                  colorset = 'SWSDLName',
+                  pal_list = SDL_pal,
+                  position = 'dodge',
+                  setLimits = c(0,1))
+})

@@ -90,7 +90,7 @@ plot_outcomes <- function(outdf,
                                   point_group = NULL,
                                   pal_list = "scico::berlin",
                                   sceneorder = NULL,
-                                  scene_pal = "scico::oslo",
+                                  scene_pal = "scico::bamako",
                                   scales = 'fixed',
                                   transy = 'identity',
                                   transx = 'identity',
@@ -114,11 +114,43 @@ plot_outcomes <- function(outdf,
     rlang::abort("asking for facet_wrap and facet_grid. Make up your mind.")
   }
 
+  # auto-fill '.' when only rows or cols initialised
+  if (is.null(facet_col) & !is.null(facet_row)) {facet_col <- '.'}
+  if (is.null(facet_row) & !is.null(facet_col)) {facet_row <- '.'}
+
   # Bare names get lost as we go down into further functions, so use characters
   # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
   if (is.function(comp_fun) || (is.list(comp_fun) & is.function(comp_fun[[1]]))) {
     comp_fun <- as.character(substitute(comp_fun))
     if(comp_fun[1] == "c") {comp_fun <- comp_fun[2:length(comp_fun)]}
+  }
+
+  # Find limits for the color scale- allows centering diverging palettes with baseline comparisons
+  # by defining this in here, it inherits comp_fun and other values
+  # x is typically prepped$data[[prepped$y_col]] (because `prepped$y_col` is
+  # the new y_col name if baselined). Should I just use that? Or can I call it from inside the `scale`
+  # x here is a length-2 default set of limits.
+  findlimits <- function(x) {
+    # use hard-set user-supplied limits
+    if (!is.null(setLimits)) {
+      return(setLimits)
+    }
+    # use default limits
+    if (is.null(comp_fun) || (!comp_fun %in% c('difference', 'relative')) &
+        is.null(setLimits)) {return(x)}
+    # Set limits to make midpoint 0 if difference
+    if (comp_fun == 'difference') {
+      limits <- max(abs(x), na.rm = TRUE) * c(-1, 1)
+    }
+    # setting midpoint at 1 for multiplicative is trickier
+    if (comp_fun == 'relative') {
+      logvals <- log(x)
+      loglims <- max(abs(logvals), na.rm = TRUE) * c(-1, 1)
+      limits <- exp(loglims)
+    }
+
+    return(limits)
+
   }
 
   # use `grouped_colors` to set colour groups
@@ -187,7 +219,7 @@ plot_outcomes <- function(outdf,
       ggplot2::geom_col(position = position) +
       ggplot2::labs(y = paste0(y_lab, prepped$ylab_append), x = x_lab,
                     color = colorset) +
-      ggplot2::scale_y_continuous(trans = transy) +
+      ggplot2::scale_y_continuous(trans = transy, limits = findlimits) +
       ggplot2::scale_fill_identity(guide = 'legend',
                                    labels = labfind,
                                    name = color_lab) +
@@ -206,7 +238,7 @@ plot_outcomes <- function(outdf,
                                    fill = scenario)) +
       ggplot2::geom_col(position = position) +
       ggplot2::labs(y = paste0(y_lab, prepped$ylab_append)) +
-      ggplot2::scale_y_continuous(trans = transy) +
+      ggplot2::scale_y_continuous(trans = transy, limits = findlimits) +
       ggplot2::scale_fill_manual(values = prepped$colors) +
       ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 45)) +
       # ggplot2::scale_color_identity() +
@@ -242,7 +274,7 @@ plot_outcomes <- function(outdf,
                             position = position) +
         ggplot2::labs(y = paste0(y_lab, prepped$ylab_append),
                       x = x_lab) +
-        ggplot2::scale_y_continuous(trans = transy) +
+        ggplot2::scale_y_continuous(trans = transy, limits = findlimits) +
         ggplot2::scale_x_continuous(trans = transx) +
         ggplot2::scale_fill_manual(values = prepped$colors) +
         ggplot2::scale_color_identity(guide = 'legend',
@@ -304,38 +336,10 @@ plot_outcomes <- function(outdf,
       dplyr::ungroup()
 
     if (!all(overplot_test$nrows == 1)) {
-      rlang::abort("Trying to plot multiple values
+      rlang::abort(glue::glue("Trying to plot multiple values
                    (up to {max(overplot_test$nrows)}) in single polygons.
                    Something is duplicated-
-                   do you need more facetting or filtering?")
-    }
-
-    # Find limits for the color scale- allows centering diverging palettes with baseline comparisons
-    # by defining this in here, it inherits comp_fun and other values
-    # x is typically prepped$data[[prepped$y_col]] (because `prepped$y_col` is
-    # the new y_col name if baselined). Should I just use that? Or can I call it from inside the `scale`
-    # x here is a length-2 default set of limits.
-    findlimits <- function(x) {
-      # use hard-set user-supplied limits
-      if (!is.null(setLimits)) {
-        return(setLimits)
-      }
-      # use default limits
-      if (is.null(comp_fun) || (!comp_fun %in% c('difference', 'relative')) &
-          is.null(setLimits)) {return(x)}
-      # Set limits to make midpoint 0 if difference
-      if (comp_fun == 'difference') {
-        limits <- max(abs(x), na.rm = TRUE) * c(-1, 1)
-      }
-      # setting midpoint at 1 for multiplicative is trickier
-      if (comp_fun == 'relative') {
-        logvals <- log(x)
-        loglims <- max(abs(logvals), na.rm = TRUE) * c(-1, 1)
-        limits <- exp(loglims)
-      }
-
-      return(limits)
-
+                   do you need more facetting or filtering?"))
     }
 
     ## START BUILDING THE PLOT
