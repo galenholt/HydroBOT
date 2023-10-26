@@ -53,6 +53,11 @@ make_edges <- function(dflist,
     dflist <- readRDS(dflist)
   }
 
+  # if it's a bare single dataframe, wrap it in a list so the purrrs etc work.
+  if (inherits(dflist, 'data.frame')) {
+    dflist <- list(dflist)
+  }
+
   # Get names
   dfnames <- purrr::map(dflist, names)
   # Get whether each df has a gauge or planning unit column
