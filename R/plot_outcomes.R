@@ -67,7 +67,7 @@
 #'   palettes for underlay fill and main data fill, for example, but can if the
 #'   underlay is fill (polygons) and the main data is points.
 #' @param overlay_list as `underlay_list`, but names `"overlay_*"`
-#' @param setLimits sets user-supplied color/fill limits for maps. Should be extended to y generally.
+#' @param setLimits sets user-supplied color/fill limits for maps or y limits for other plots. Also sets `underlay` and `overlay` limits for consistency.
 #' @param ... passed to [plot_prep()]
 #'
 #' @return a ggplot stacked bar plot with standard formatting and coloring,
@@ -198,7 +198,7 @@ plot_outcomes <- function(outdf,
     if (inherits(data, 'sf')) {data <- sf::st_drop_geometry(data)}
     matched_vals <- unique(data[,c('colordef', 'color')])
     # make sure everything lines up
-    m_ind <- match(matched_vals$color, breaks)
+    m_ind <- match(breaks, matched_vals$color)
     return(dplyr::pull(matched_vals[, 'colordef'])[m_ind])
   }
 
@@ -284,11 +284,14 @@ plot_outcomes <- function(outdf,
 
       if (smooth) {
         outcome_plot <- outcome_plot +
-          ggplot2::geom_smooth(mapping = ggplot2::aes(color = .data$color),
+          ggplot2::geom_smooth(mapping = ggplot2::aes(color = .data$color, fill = .data$color),
                                method = smooth_method,
                                method.args = smooth_args,
                                linewidth = 0.1,
-                               se = smooth_se)
+                               se = smooth_se) +
+          ggplot2::scale_fill_identity(guide = 'legend',
+                                        labels = labfind,
+                                        name = color_lab)
       }
       if (!smooth) {
         outcome_plot <- outcome_plot +
@@ -407,7 +410,13 @@ plot_outcomes <- function(outdf,
             outcome_plot <- outcome_plot +
               ggplot2::geom_sf(data = u$underlay,
                                ggplot2::aes(fill = .data[[u$underlay_ycol]])) +
-              paletteer::scale_fill_paletteer_c(palette = u$underlay_pal)
+              paletteer::scale_fill_paletteer_c(palette = u$underlay_pal,
+                                                trans = transy, limit = findlimits)
+            if (u$underlay_ycol == y_col) {
+              outcome_plot <- outcome_plot +
+                ggplot2::labs(fill = paste0(y_lab, prepped$ylab_append))
+            }
+
           } else {
             undercols <- make_pal(unique(dplyr::pull(sf::st_drop_geometry(u$underlay[,u$underlay_ycol]))), palette = u$underlay_pal)
             outcome_plot <- outcome_plot +
@@ -552,6 +561,12 @@ plot_outcomes <- function(outdf,
               ggplot2::geom_sf(data = o$overlay,
                                ggplot2::aes(color = .data[[o$overlay_ycol]]), fill = NA) +
               paletteer::scale_color_paletteer_c(palette = o$overlay_pal)
+
+            if (o$overlay_ycol == y_col) {
+              outcome_plot <- outcome_plot +
+                ggplot2::labs(color = paste0(y_lab, prepped$ylab_append))
+            }
+
           } else {
             overcols <- make_pal(unique(dplyr::pull(sf::st_drop_geometry(o$overlay[,o$overlay_ycol]))),
                                  palette = o$overlay_pal)
