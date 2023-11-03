@@ -70,12 +70,19 @@ plot_prep <- function(data, y_col,
     zero_adjust <- min(abs(data[[y_col]])[data[[y_col]] != 0], na.rm = TRUE)*0.1
   }
   # move data away from zero
+
+  # if the data doesn't span 0, only move in the direction of the data. This is especially important if we'll be logging
+  adjust_dir <- dplyr::case_when(all(data[[y_col]] >= 0, na.rm = TRUE) ~ 'pos',
+                                 all(data[[y_col]] <= 0, na.rm = TRUE) ~ 'neg',
+                                 .default = 'both')
+
   data <- data |>
-    dplyr::mutate("{y_col}" := ifelse(.data[[y_col]] == 0,
-                                      .data[[y_col]] + sample(c(zero_adjust, -1*zero_adjust), 1),
-                                      ifelse(.data[[y_col]] > 0,
-                                             .data[[y_col]] + zero_adjust,
-                                             .data[[y_col]] - zero_adjust)))
+    dplyr::mutate("{y_col}" := dplyr::case_when(.data[[y_col]] > 0 ~ .data[[y_col]] + zero_adjust,
+                                         .data[[y_col]] < 0 ~ .data[[y_col]] - zero_adjust,
+                                         .data[[y_col]] == 0  & adjust_dir == 'pos' ~ .data[[y_col]] + zero_adjust,
+                                         .data[[y_col]] == 0  & adjust_dir == 'neg' ~ .data[[y_col]] - zero_adjust,
+                                         .data[[y_col]] == 0  & adjust_dir == 'both' ~ .data[[y_col]] + sample(c(zero_adjust, -1*zero_adjust), 1)))
+
 
   gaugefilter <- if(is.null(gaugefilter) & ('gauge' %in% names(data))) {unique(data$gauge)} else {gaugefilter}
   scenariofilter <- if(is.null(scenariofilter)) {unique(data$scenario)} else  {scenariofilter}
