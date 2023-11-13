@@ -12,6 +12,13 @@
 #' @param names_to character, as in [tidyr::pivot_longer()], used for auto-pivotting
 #' @param values_to character, as in [tidyr::pivot_longer()], used for auto-pivotting
 #' @param group_cols character, columns to group the baselining by. Often spatial or env_obj or similar.
+#' @param zero_adjust numeric (default 0) or `"auto"`, adjustment to data to
+#'   avoid zeros by adding `zero_adjust` to `abs(data)`, e.g shifting all data
+#'   away from zero, either positively or negatively. Zeros themselves are
+#'   shifted up or down randomly. Used for avoiding x/0, NaN, and Inf when
+#'   relativiszing and taking logs, primarily. Auto shifts by
+#'   `0.1*min(abs(data[data != 0]))`.
+#' @param onlyzeros logical, default `FALSE`. Should all values be adjusted away from zero (`TRUE`) or only adjust zero values (`FALSE`)?
 #'
 #' @return a tibble matching `val_df` (or a long version thereof if `val_df` is wide), with an added column for the reference level (named `ref_values_col`) and a column of the compared values (named `comp_fun_values_col`)
 #' @export
@@ -20,7 +27,11 @@
 baseline_compare <- function(val_df, compare_col, base_lev, values_col,
                              group_cols = NULL, comp_fun, ...,
                              failmissing = TRUE,
-                             names_to = 'name', values_to = 'value') {
+                             names_to = 'name', values_to = 'value',
+                             zero_adjust = 0, onlyzeros = FALSE) {
+
+  # move data away from zero if desired
+  val_df <- adjust_zeros(val_df, values_col, zero_adjust, onlyzeros)
 
   # generate the standard format with the reference
   val_df <- create_base(val_df = val_df, compare_col = compare_col,

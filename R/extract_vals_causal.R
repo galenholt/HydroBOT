@@ -1,9 +1,9 @@
 #' Extracts and arranges the aggregated values for use in causal network plots.
 #'
-#' This takes the aggregations at each stage along the theme axis,
-#' extracts the aggregated values for a given aggregation history (ie the
-#' sequence of aggregation functions), and returns in a form that can be added
-#' to edges or nodes dfs.
+#' This takes the aggregations at each stage along the theme axis, extracts the
+#' aggregated values for a given aggregation history (ie the sequence of
+#' aggregation functions), and returns in a form that can be added to edges or
+#' nodes dfs.
 #'
 #' @param agglist a list of tibbles of each step in the theme aggregation
 #'   (output of `theme_agg_multi` with `saveintermediate = TRUE`). Currently
@@ -11,14 +11,15 @@
 #'   `theme_agg_multi` with `namehistory = FALSE` or have run
 #'   `agg_names_to_cols`). Would be fairly easy to detect and add a call to
 #'   `agg_names_to_cols` if this becomes an issue.
-#' @param whichaggs a character vector of the desired sequence of aggregation
-#'   functions. This has to have only values used in the aggregation used to
-#'   create `agglist`, and can have only one entry per step (unlike in the
-#'   creation of `agglist`). If different aggregation histories are required,
-#'   this should be run again, because it is not appropriate to mix histories in
-#'   a causal plot.
+#' @param whichaggs a character vector or list with one string per list item of
+#'   the desired sequence of aggregation functions. This has to have only values
+#'   used in the aggregation used to create `agglist`, and can have only one
+#'   entry per step (unlike in the creation of `agglist`). If different
+#'   aggregation histories are required, this should be run again, because it is
+#'   not appropriate to mix histories in a causal plot.
 #' @param valcol character, name of the column with the aggregated values.
-#' @param targetlevels character, names of levels to include. Defaults to `names(agglist)`. Any subset of those names can be used.
+#' @param targetlevels character, names of levels to include. Defaults to
+#'   `names(agglist)`. Any subset of those names can be used.
 #'
 #' @return a tibble with grouping variables for scenario and gauge, a column for
 #'   values named the same as `valcol`, and `Name` and `NodeType` columns to

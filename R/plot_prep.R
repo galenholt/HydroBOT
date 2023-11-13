@@ -28,7 +28,8 @@
 #'   shifted up or down randomly. Used for avoiding x/0, NaN, and Inf when
 #'   relativiszing and taking logs, primarily. Auto shifts by
 #'   `0.1*min(abs(data[data != 0]))`.
-#' @param ... passed to [baseline_compare()]
+#' @param onlyzeros logical, default `FALSE`. Should all values be adjusted away from zero (`TRUE`) or only adjust zero values (`FALSE`)?
+#' @param ... passed to [baseline_compare()]. Note, `zero_adjust` and `onlyzeros` are *not* passed, but handled by [plot_prep()] itself since they are done to the data prior in order to adjust zeros for other purposes as well (logging, plotting).
 #'
 #' @return a list with prepped versions of `data`, `y_col`, `colors`,
 #'   `gaugefilter`, `scenariofilter`, `base_lev`, `comp_fun`, `ylab_append` to
@@ -70,18 +71,7 @@ plot_prep <- function(data, y_col,
     zero_adjust <- min(abs(data[[y_col]])[data[[y_col]] != 0], na.rm = TRUE)*0.1
   }
   # move data away from zero
-
-  # if the data doesn't span 0, only move in the direction of the data. This is especially important if we'll be logging
-  adjust_dir <- dplyr::case_when(all(data[[y_col]] >= 0, na.rm = TRUE) ~ 'pos',
-                                 all(data[[y_col]] <= 0, na.rm = TRUE) ~ 'neg',
-                                 .default = 'both')
-
-  data <- data |>
-    dplyr::mutate("{y_col}" := dplyr::case_when(.data[[y_col]] > 0 ~ .data[[y_col]] + zero_adjust,
-                                         .data[[y_col]] < 0 ~ .data[[y_col]] - zero_adjust,
-                                         .data[[y_col]] == 0  & adjust_dir == 'pos' ~ .data[[y_col]] + zero_adjust,
-                                         .data[[y_col]] == 0  & adjust_dir == 'neg' ~ .data[[y_col]] - zero_adjust,
-                                         .data[[y_col]] == 0  & adjust_dir == 'both' ~ .data[[y_col]] + sample(c(zero_adjust, -1*zero_adjust), 1)))
+  data <- adjust_zeros(data, y_col, zero_adjust, onlyzeros)
 
 
   gaugefilter <- if(is.null(gaugefilter) & ('gauge' %in% names(data))) {unique(data$gauge)} else {gaugefilter}
@@ -91,7 +81,7 @@ plot_prep <- function(data, y_col,
   if (!is.null(comp_fun) & !is.null(base_lev)) {
     data <- data |>
       baseline_compare(compare_col = 'scenario', base_lev = base_lev,
-                       values_col = y_col, comp_fun = comp_fun, ...)
+                       values_col = y_col, comp_fun = comp_fun, zero_adjust = 0, onlyzeros = TRUE, ...)
 
     if (is.character(comp_fun)) {
       comp_fun_name <- comp_fun

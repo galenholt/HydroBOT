@@ -13,7 +13,8 @@
 #'   * character (scalar or vector): short-circuits the palette finding and creates a color column with the given colors.
 #' @param colorgroups NULL (the default) or length-1 character vector specifying a grouping column, with different palettes applied to the different groups. If NULL, one palette is applied across all of the rows
 #' @param colorset a length-1 character vector specifying the column to use to define colour. Type doesn't matter, but behaviour differs. If numeric it will space the colours for each row according to value, if not numeric, colours for each row are spaced evenly along the palette.
-#'
+#' @param setLimits NULL (default) or length-2 numeric vector to force limits of the color scale.
+
 #' @return an edge tibble with a `color` column or a node tibble with `fillcolor` and `fontcolor`
 #' @export
 #'
@@ -21,14 +22,15 @@
 #'
 causal_colors_general <- function(df, pal_list,
                                   colorgroups = NULL,
-                                  colorset = NULL) {
+                                  colorset = NULL,
+                                  setLimits = NULL) {
 
   # Auto-create some colordefs in specific ways for causal networks
   df <- make_colorcol(df, colorset)
   # and change the colorset to 'colordef' since we just auto-set
 
   # Then call the general `grouped_colours`
-  dfcolor <- grouped_colours(df, pal_list, colorgroups, 'colordef')
+  dfcolor <- grouped_colours(df, pal_list, colorgroups, 'colordef', setLimits = setLimits)
 
   # names have to be different for nodes and edges. and nodes need text color
   # This is annoying we need the switch, and I don't like making it depend on column names
@@ -88,8 +90,8 @@ fontcol <- function(boxcol) {
 
 
 # Get the proportional position in the range
-propor <- function(x) {
-  (x-min(x))/(max(x)-min(x))
+propor <- function(x, minx = min(x), maxx = max(x)) {
+  (x-minx)/(maxx-minx)
 }
 
 # If nodes, change name and add a fontcolor

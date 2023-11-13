@@ -4,14 +4,16 @@
 #' @param pal_list list of palettes, or color name or color object that maps to `colorgroups`, `colorset`, or `scenario`. Typically a list of names of {palletteer} palettes of the same length as unique values in `colorgroups`
 #' @param colorgroups character column name of column defining the groups that define different palettes to use
 #' @param colorset  character column name of the values to assign colors from those palettes
-#'
+#' @param setLimits NULL (default) or length-2 numeric vector to force limits of the color scale.
+
 #' @return a dataframe with new column `color` with hex colors
 #' @export
 #'
 #' @examples
 grouped_colours <- function(df, pal_list,
                             colorgroups = NULL,
-                            colorset = NULL) {
+                            colorset = NULL,
+                            setLimits = NULL) {
 
 
 
@@ -72,11 +74,32 @@ grouped_colours <- function(df, pal_list,
   # If colordef is numeric, we want to make a long palette and then grab the
   # color in the right spot.
   if (is.numeric(dfcols$colordef)) {
+
+    if (is.null(setLimits)) {
+      setLimits <- c(min(dfcols$colordef), max(dfcols$colordef))
+    }
     # The funny indexing here is because propor has x-min(x) on top, yielding
     # 0-indexed values, so we need to shift and add.
-    dfcols <- dfcols |>
-      dplyr::mutate(pallength = 1000,
-                    palindex = round(propor(colordef)*(pallength-1))+1)
+
+    # simple case with two limits, or complex with 3 (middle is centerpoint for diverging)
+    if (length(setLimits) == 2) {
+      dfcols <- dfcols |>
+        dplyr::mutate(pallength = 1000,
+                      palindex = round(propor(colordef, minx = setLimits[1], maxx = setLimits[2])*(pallength-1))+1)
+    } else if (length(setLimits) == 3) {
+      dfcols <- dfcols |>
+        dplyr::mutate(pallength = 1000,
+                      palindex = dplyr::case_when(colordef == setLimits[2] ~ pallength/2,
+                                                  colordef < setLimits[2] ~ round(propor(colordef,
+                                                                                         minx = setLimits[1],
+                                                                                         maxx = setLimits[2]) * ((pallength/2)-1)) + 1,
+                                                  colordef > setLimits[2] ~ round(propor(colordef,
+                                                                                         minx = setLimits[2],
+                                                                                         maxx = setLimits[3]) * ((pallength/2)-1)) + (pallength/2) + 1
+                                                  ))
+
+    }
+
   } else {
     dfcols <- dfcols |>
       dplyr::mutate(pallength = dplyr::n(),

@@ -32,6 +32,7 @@
 #'   See \code{\link{causal_colors_general}}
 #' @param node_colorset a column name (character) giving the column to define
 #'   node colour. See \code{\link{causal_colors_general}}
+#' @param setLimits NULL (default) or length-2 numeric vector to force limits of the color scale.
 #' @param wrap_names logical, default `TRUE`, should long node names be wrapped
 #'   to multiple lines
 #' @param render logical, default `TRUE`, should the network be rendered to the
@@ -58,6 +59,7 @@ make_causal_plot <- function(nodes, edges,
                              node_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
                              node_colorgroups = NULL,
                              node_colorset = 'NodeType',
+                             setLimits = NULL,
                              wrap_names = TRUE,
                              render = TRUE,
                              returnnetwork = TRUE,
@@ -98,12 +100,14 @@ make_causal_plot <- function(nodes, edges,
   edges <- causal_colors_general(edges,
                                  edge_pal,
                                  edge_colorgroups,
-                                 edge_colorset)
+                                 edge_colorset,
+                                 setLimits = setLimits)
 
   nodes <- causal_colors_general(nodes,
                                  node_pal,
                                  node_colorgroups,
-                                 node_colorset)
+                                 node_colorset,
+                                 setLimits = setLimits)
 
   # deal with names, position, shape etc
   nodes <- node_plot_atts(nodes)
