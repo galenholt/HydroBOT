@@ -14,16 +14,17 @@ assumes the aggregation history is already in columns (either
 \code{agg_names_to_cols}). Would be fairly easy to detect and add a call to
 \code{agg_names_to_cols} if this becomes an issue.}
 
-\item{whichaggs}{a character vector of the desired sequence of aggregation
-functions. This has to have only values used in the aggregation used to
-create \code{agglist}, and can have only one entry per step (unlike in the
-creation of \code{agglist}). If different aggregation histories are required,
-this should be run again, because it is not appropriate to mix histories in
-a causal plot.}
+\item{whichaggs}{a character vector or list with one string per list item of
+the desired sequence of aggregation functions. This has to have only values
+used in the aggregation used to create \code{agglist}, and can have only one
+entry per step (unlike in the creation of \code{agglist}). If different
+aggregation histories are required, this should be run again, because it is
+not appropriate to mix histories in a causal plot.}
 
 \item{valcol}{character, name of the column with the aggregated values.}
 
-\item{targetlevels}{character, names of levels to include. Defaults to \code{names(agglist)}. Any subset of those names can be used.}
+\item{targetlevels}{character, names of levels to include. Defaults to
+\code{names(agglist)}. Any subset of those names can be used.}
 }
 \value{
 a tibble with grouping variables for scenario and gauge, a column for
@@ -31,8 +32,8 @@ values named the same as \code{valcol}, and \code{Name} and \code{NodeType} colu
 allow joining to the node df.
 }
 \description{
-This takes the aggregations at each stage along the theme axis,
-extracts the aggregated values for a given aggregation history (ie the
-sequence of aggregation functions), and returns in a form that can be added
-to edges or nodes dfs.
+This takes the aggregations at each stage along the theme axis, extracts the
+aggregated values for a given aggregation history (ie the sequence of
+aggregation functions), and returns in a form that can be added to edges or
+nodes dfs.
 }

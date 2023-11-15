@@ -45,6 +45,7 @@ plot_prep <- function(data, y_col,
                       base_lev = NULL,
                       comp_fun = NULL,
                       zero_adjust = 0,
+                      onlyzeros = FALSE,
                       ...) {
 
   # This probably needs more thought to handle continuous palettes if it is to
@@ -79,6 +80,7 @@ plot_prep <- function(data, y_col,
 
   ylab_append <- ''
   if (!is.null(comp_fun) & !is.null(base_lev)) {
+    # We've already handled the zero-shifts, so don't do it again
     data <- data |>
       baseline_compare(compare_col = 'scenario', base_lev = base_lev,
                        values_col = y_col, comp_fun = comp_fun, zero_adjust = 0, onlyzeros = TRUE, ...)

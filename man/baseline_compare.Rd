@@ -14,7 +14,9 @@ baseline_compare(
   ...,
   failmissing = TRUE,
   names_to = "name",
-  values_to = "value"
+  values_to = "value",
+  zero_adjust = 0,
+  onlyzeros = FALSE
 )
 }
 \arguments{
@@ -37,6 +39,15 @@ baseline_compare(
 \item{names_to}{character, as in \code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}}, used for auto-pivotting}
 
 \item{values_to}{character, as in \code{\link[tidyr:pivot_longer]{tidyr::pivot_longer()}}, used for auto-pivotting}
+
+\item{zero_adjust}{numeric (default 0) or \code{"auto"}, adjustment to data to
+avoid zeros by adding \code{zero_adjust} to \code{abs(data)}, e.g shifting all data
+away from zero, either positively or negatively. Zeros themselves are
+shifted up or down randomly. Used for avoiding x/0, NaN, and Inf when
+relativiszing and taking logs, primarily. Auto shifts by
+\code{0.1*min(abs(data[data != 0]))}.}
+
+\item{onlyzeros}{logical, default \code{FALSE}. Should all values be adjusted away from zero (\code{TRUE}) or only adjust zero values (\code{FALSE})?}
 }
 \value{
 a tibble matching \code{val_df} (or a long version thereof if \code{val_df} is wide), with an added column for the reference level (named \code{ref_values_col}) and a column of the compared values (named \code{comp_fun_values_col})

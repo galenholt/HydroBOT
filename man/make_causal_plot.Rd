@@ -15,6 +15,7 @@ make_causal_plot(
   node_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
   node_colorgroups = NULL,
   node_colorset = "NodeType",
+  setLimits = NULL,
   wrap_names = TRUE,
   render = TRUE,
   returnnetwork = TRUE,
@@ -58,6 +59,8 @@ See \code{\link{causal_colors_general}}}
 
 \item{node_colorset}{a column name (character) giving the column to define
 node colour. See \code{\link{causal_colors_general}}}
+
+\item{setLimits}{NULL (default) or length-2 numeric vector to force limits of the color scale.}
 
 \item{wrap_names}{logical, default \code{TRUE}, should long node names be wrapped
 to multiple lines}

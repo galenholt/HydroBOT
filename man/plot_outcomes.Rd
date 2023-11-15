@@ -20,7 +20,7 @@ plot_outcomes(
   point_group = NULL,
   pal_list = "scico::berlin",
   sceneorder = NULL,
-  scene_pal = "scico::oslo",
+  scene_pal = "scico::bamako",
   scales = "fixed",
   transy = "identity",
   transx = "identity",
@@ -135,7 +135,7 @@ underlay is fill (polygons) and the main data is points.}
 
 \item{overlay_list}{as \code{underlay_list}, but names \code{"overlay_*"}}
 
-\item{setLimits}{sets user-supplied color/fill limits for maps. Should be extended to y generally.}
+\item{setLimits}{sets user-supplied color/fill limits for maps or y limits for other plots. Also sets \code{underlay} and \code{overlay} limits for consistency.}
 
 \item{...}{passed to \code{\link[=plot_prep]{plot_prep()}}}
 }

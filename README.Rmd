@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/MDBAuth/WERP_toolkit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MDBAuth/WERP_toolkit/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-This R package forms the core of the WERP climate adaptation toolkit, ingesting hydrological scenarios representing historical or future climates or adaptation options, and processing those through various response models (currently [MDBA EWR tool](https://github.com/MDBAuth/EWR_tool), with intention to include other tools in future). Subsequent processing of outcomes along spatial, theme, and temporal axes are available or underdevelopment, as well as control over outputs and comparisons between scenarios. Causal networks defining relationships in the response models are included.
+This R package forms the core of the WERP climate adaptation toolkit, ingesting hydrological scenarios representing historical or future climates or adaptation options, and processing those through various response models (currently [MDBA EWR tool](https://github.com/MDBAuth/EWR_tool), with intention to include other tools in future). Subsequent processing of outcomes along spatial, theme, and temporal axes are available or under development, as well as control over outputs and comparisons between scenarios. Causal networks defining relationships in the response models are included.
 
 ## Installation
 
@@ -42,14 +42,16 @@ If all else fails, clone the repo locally, and install from there.
 `devtools::install_local('path/to/repo', force = TRUE, upgrade = 'ask')`
 ```
 
+### Python dependency
+To run, this needs a Python environment containing `py_ewr` (currently 2.0.0). On first use, the package checks the environment and either uses an existing python environment or builds one with that dependency when the package is loaded. There are `poetry.lock` and `pyproject.toml` files in the repo that allow for dev work and building the venv manually if desired.
+
+
 ## Use
 Can be run piecemeal or all at once, scripted. Point at a directory of hydrologic scenarios, and the toolkit will run them through the modules, aggregate the outputs, and present results, with control by the user through function arguments. See the [WERP_toolkit_demo](https://mdbauth.github.io/WERP_toolkit_demo/) for a full demonstration
 
 ## Developement 
 [see developer page](developer.md)
 
-### Python dependency
-To run, this needs a Python environment containing `py_ewr` (currently 1.0.6). On first use, the package checks the environment and either uses an existing python environment or builds one with that dependency when the package is loaded. There are `poetry.lock` and `pyproject.toml` files in the repo that allow for dev work and building one manually if desired.
 
 ## Example
 

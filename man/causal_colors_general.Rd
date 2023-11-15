@@ -4,7 +4,13 @@
 \alias{causal_colors_general}
 \title{Set colours of nodes or edges}
 \usage{
-causal_colors_general(df, pal_list, colorgroups = NULL, colorset = NULL)
+causal_colors_general(
+  df,
+  pal_list,
+  colorgroups = NULL,
+  colorset = NULL,
+  setLimits = NULL
+)
 }
 \arguments{
 \item{df}{a tibble or dataframe, nodes or edges}
@@ -18,6 +24,8 @@ causal_colors_general(df, pal_list, colorgroups = NULL, colorset = NULL)
 \item{colorgroups}{NULL (the default) or length-1 character vector specifying a grouping column, with different palettes applied to the different groups. If NULL, one palette is applied across all of the rows}
 
 \item{colorset}{a length-1 character vector specifying the column to use to define colour. Type doesn't matter, but behaviour differs. If numeric it will space the colours for each row according to value, if not numeric, colours for each row are spaced evenly along the palette.}
+
+\item{setLimits}{NULL (default) or length-2 numeric vector to force limits of the color scale.}
 }
 \value{
 an edge tibble with a \code{color} column or a node tibble with \code{fillcolor} and \code{fontcolor}

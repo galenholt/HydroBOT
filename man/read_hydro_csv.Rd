@@ -4,10 +4,12 @@
 \alias{read_hydro_csv}
 \title{Read csv hydrographs in the standard directory structure}
 \usage{
-read_hydro_csv(hydropath, long)
+read_hydro_csv(hydropath, scenariofilter, long)
 }
 \arguments{
 \item{hydropath}{path to the hydrographs}
+
+\item{scenariofilter}{character vector of scenario names to include. Default \code{NULL} includes all}
 
 \item{long}{logical, default TRUE. Do we want the data long (with a column for gauge number) or wide (FALSE, with gauge numbers as columns)}
 }

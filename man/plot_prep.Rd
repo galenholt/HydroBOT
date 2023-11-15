@@ -14,6 +14,7 @@ plot_prep(
   base_lev = NULL,
   comp_fun = NULL,
   zero_adjust = 0,
+  onlyzeros = FALSE,
   ...
 )
 }
@@ -49,7 +50,9 @@ shifted up or down randomly. Used for avoiding x/0, NaN, and Inf when
 relativiszing and taking logs, primarily. Auto shifts by
 \code{0.1*min(abs(data[data != 0]))}.}
 
-\item{...}{passed to \code{\link[=baseline_compare]{baseline_compare()}}}
+\item{onlyzeros}{logical, default \code{FALSE}. Should all values be adjusted away from zero (\code{TRUE}) or only adjust zero values (\code{FALSE})?}
+
+\item{...}{passed to \code{\link[=baseline_compare]{baseline_compare()}}. Note, \code{zero_adjust} and \code{onlyzeros} are \emph{not} passed, but handled by \code{\link[=plot_prep]{plot_prep()}} itself since they are done to the data prior in order to adjust zeros for other purposes as well (logging, plotting).}
 }
 \value{
 a list with prepped versions of \code{data}, \code{y_col}, \code{colors},

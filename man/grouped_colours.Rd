@@ -4,7 +4,13 @@
 \alias{grouped_colours}
 \title{Sets up colors within groups according to separate palettes}
 \usage{
-grouped_colours(df, pal_list, colorgroups = NULL, colorset = NULL)
+grouped_colours(
+  df,
+  pal_list,
+  colorgroups = NULL,
+  colorset = NULL,
+  setLimits = NULL
+)
 }
 \arguments{
 \item{df}{input dataframe}
@@ -14,6 +20,8 @@ grouped_colours(df, pal_list, colorgroups = NULL, colorset = NULL)
 \item{colorgroups}{character column name of column defining the groups that define different palettes to use}
 
 \item{colorset}{character column name of the values to assign colors from those palettes}
+
+\item{setLimits}{NULL (default) or length-2 numeric vector to force limits of the color scale.}
 }
 \value{
 a dataframe with new column \code{color} with hex colors
