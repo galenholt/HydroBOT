@@ -145,13 +145,11 @@ make_causal_plot <- function(nodes, edges,
   if (save) {
     causalnetwork |>
       DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(savename,
-                                                        format(Sys.time(), "%Y%m%d%H%M"),
                                                         '.png')))
 
 
     causalnetwork |>
       DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(savename,
-                                                        format(Sys.time(), "%Y%m%d%H%M"),
                                                         '.pdf')))
   }
 
