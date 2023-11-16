@@ -197,3 +197,19 @@ Having the top level of the workspace be the repo is much nicer than the Users d
 	Seems to work to click on the Open Folder link in the middle, and then in the toolbar popup navigage to the repo.
 
 Then I git checkout the branch I want, and off to setting up environments.
+
+# Installing the package
+
+You should be able to install the development version of werptoolkitr from [GitHub](https://github.com/MDBAuth/WERP_toolkit) with `devtools::install_git`. For `devtools::install_git()` to work with SSH, there are two methods, depending on R version. The easiest is if R < 4.3, in which case install the {git2r} package, and then if you have SSH keys set up, this will work:
+
+``` r
+# install.packages("devtools", "git2r")
+devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask')
+```
+
+If using R 4.3, the {git2r} package does not support ssh, and so you have to use external (system) git. That's uglier, but more robust, and so is what is in the Readme. R uses a different Home directory than standard (typically `~/Documents`), and so for this to work, you need to [set up SSH keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) in that location as well (e.g. in `~/Documents/.ssh/`) and [connect them to github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
+
+If all else fails, clone the repo locally, and install from there.
+``` r
+`devtools::install_local('path/to/repo', force = TRUE, upgrade = 'ask')`
+```

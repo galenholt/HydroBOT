@@ -21,33 +21,29 @@ knitr::opts_chunk$set(
 
 This R package forms the core of the WERP climate adaptation toolkit, ingesting hydrological scenarios representing historical or future climates or adaptation options, and processing those through various response models (currently [MDBA EWR tool](https://github.com/MDBAuth/EWR_tool), with intention to include other tools in future). Subsequent processing of outcomes along spatial, theme, and temporal axes are available or under development, as well as control over outputs and comparisons between scenarios. Causal networks defining relationships in the response models are included.
 
+The [template repo](https://github.com/MDBAuth/toolkit_use) can be helpful for establishing project structure to use the toolkit and automating the setup process, particularly if you are on Linux or want to manage your python environments.
+
 ## Installation
 
-You should be able to install the development version of werptoolkitr from [GitHub](https://github.com/MDBAuth/WERP_toolkit) with `devtools::install_git`. For `devtools::install_git()` to work with SSH, there are two methods, depending on R version. The easiest is if R < 4.3, in which case install the {git2r} package, and then if you have SSH keys set up, this will work:
-
-``` r
-# install.packages("devtools", "git2r")
-devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask')
-```
-
-If using R 4.3, the {git2r} package does not support ssh, and so you have to use external (system) git. R uses a different Home directory than standard (typically `~/Documents`), and so for this to work, you need to [set up SSH keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) in that location as well (e.g. in `~/Documents/.ssh/`) and [connect them to github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). Then this should work:
+Install the development version of werptoolkitr from [GitHub](https://github.com/MDBAuth/WERP_toolkit) with 
 
 ``` r
 # install.packages("devtools")
 devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask', git = 'external')
 ```
 
-If all else fails, clone the repo locally, and install from there.
-``` r
-`devtools::install_local('path/to/repo', force = TRUE, upgrade = 'ask')`
-```
+R uses a different Home directory than standard (typically `~/Documents`), and so if this fails, try to [set up SSH keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) in that location as well.
+
+There are slightly slicker ways to do it, but they don't work well currently. See [developer docs](developer.md) for details or if the above doesn't work.
 
 ### Python dependency
-To run, this needs a Python environment containing `py_ewr` (currently 2.0.0). On first use, the package checks the environment and either uses an existing python environment or builds one with that dependency when the package is loaded. There are `poetry.lock` and `pyproject.toml` files in the repo that allow for dev work and building the venv manually if desired.
+To run, this needs a Python environment containing `py_ewr` (currently 2.0.0). The package will manage that for you if you just start using it- on first use, the package checks the environment and either uses an existing python environment or builds one with that dependency when the package is loaded. 
+
+There are `poetry.lock` and `pyproject.toml` files in the repo that allow for dev work and building the venv manually if more control over python is desired.
 
 
 ## Use
-Can be run piecemeal or all at once, scripted. Point at a directory of hydrologic scenarios, and the toolkit will run them through the modules, aggregate the outputs, and present results, with control by the user through function arguments. See the [WERP_toolkit_demo](https://mdbauth.github.io/WERP_toolkit_demo/) for a full demonstration
+Can be run piecemeal or all at once, scripted. Point at a directory of hydrologic scenarios, and the toolkit will run them through the modules, aggregate the outputs, and present results, with control by the user through function arguments. See the [WERP_toolkit_demo](https://mdbauth.github.io/WERP_toolkit_demo/) for a full demonstration and the [template repo](https://github.com/MDBAuth/toolkit_use) for a bare-bones project structure.
 
 ## Developement 
 [see developer page](developer.md)
