@@ -44,7 +44,7 @@
 #' @param savedir path to directory for saving outputs. Only needed if `save =
 #'   TRUE`
 #' @param savename character, filename for the output plots.
-#'   YearMonthDayHourMinute and .pdf and .png are automatically appended.
+#'    .pdf and .png are automatically appended.
 #'
 #' @return
 #' @export

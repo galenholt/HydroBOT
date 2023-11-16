@@ -45,7 +45,9 @@ Suggests:
     git2r,
     jsonlite,
     furrr,
-    future
+    future,
+    rich-iannone/DiagrammeRsvg,
+    rsvg
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)

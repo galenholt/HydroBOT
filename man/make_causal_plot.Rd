@@ -77,7 +77,7 @@ produced by \code{DiagrammeR} be returned?}
 \item{savedir}{path to directory for saving outputs. Only needed if \code{save = TRUE}}
 
 \item{savename}{character, filename for the output plots.
-YearMonthDayHourMinute and .pdf and .png are automatically appended.}
+.pdf and .png are automatically appended.}
 }
 \description{
 Takes node and edges dfs, along with arguments to specify attributes
