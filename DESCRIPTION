@@ -46,7 +46,7 @@ Suggests:
     jsonlite,
     furrr,
     future,
-    rich-iannone/DiagrammeRsvg,
+    DiagrammeRsvg,
     rsvg
 Config/testthat/edition: 3
 Depends: 

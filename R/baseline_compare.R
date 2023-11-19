@@ -30,6 +30,10 @@ baseline_compare <- function(val_df, compare_col, base_lev, values_col,
                              names_to = 'name', values_to = 'value',
                              zero_adjust = 0, onlyzeros = FALSE) {
 
+
+  # need to get the values_col into characters as soon as possible
+  values_col <- selectcreator(rlang::enquo(values_col), val_df, failmissing)
+
   # move data away from zero if desired
   val_df <- adjust_zeros(val_df, values_col, zero_adjust, onlyzeros)
 
@@ -42,6 +46,8 @@ baseline_compare <- function(val_df, compare_col, base_lev, values_col,
   # We have to generate valcols both in create_base and here, unfortunately.And
   # Deal with the expected change to multiple valcols
   if (length(values_col) > 1) {values_col <- values_to}
+
+  # Not actually sure we need this again, except the edge case where values_to might be tidyselect
   valcols <- selectcreator(rlang::enquo(values_col), val_df, failmissing)
 
 

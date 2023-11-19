@@ -359,11 +359,11 @@
 <rect x='646.11' y='331.25' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
 <circle cx='654.75' cy='339.89' r='1.95' style='stroke-width: 0.71; stroke: #FFACAC; fill: #FFACAC;' />
 <line x1='647.84' y1='339.89' x2='661.66' y2='339.89' style='stroke-width: 1.07; stroke: #FFACAC; stroke-linecap: butt;' />
-<text x='668.37' y='256.24' style='font-size: 8.00px; font-family: sans;' textLength='11.56px' lengthAdjust='spacingAndGlyphs'>OS</text>
+<text x='668.37' y='256.24' style='font-size: 8.00px; font-family: sans;' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>NF</text>
 <text x='668.37' y='273.52' style='font-size: 8.00px; font-family: sans;' textLength='10.22px' lengthAdjust='spacingAndGlyphs'>EF</text>
-<text x='668.37' y='290.80' style='font-size: 8.00px; font-family: sans;' textLength='10.68px' lengthAdjust='spacingAndGlyphs'>EB</text>
-<text x='668.37' y='308.08' style='font-size: 8.00px; font-family: sans;' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>NF</text>
-<text x='668.37' y='325.36' style='font-size: 8.00px; font-family: sans;' textLength='11.12px' lengthAdjust='spacingAndGlyphs'>NV</text>
+<text x='668.37' y='290.80' style='font-size: 8.00px; font-family: sans;' textLength='11.12px' lengthAdjust='spacingAndGlyphs'>NV</text>
+<text x='668.37' y='308.08' style='font-size: 8.00px; font-family: sans;' textLength='11.56px' lengthAdjust='spacingAndGlyphs'>OS</text>
+<text x='668.37' y='325.36' style='font-size: 8.00px; font-family: sans;' textLength='10.68px' lengthAdjust='spacingAndGlyphs'>EB</text>
 <text x='668.37' y='342.64' style='font-size: 8.00px; font-family: sans;' textLength='12.89px' lengthAdjust='spacingAndGlyphs'>WB</text>
 <text x='45.50' y='13.24' style='font-size: 12.00px; font-family: sans;' textLength='142.09px' lengthAdjust='spacingAndGlyphs'>line with scaling and labels</text>
 </g>

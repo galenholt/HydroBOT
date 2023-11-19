@@ -1,6 +1,9 @@
 
 agg_theme_space <- make_test_agg()
 
+SDL_pal <- make_pal(unique(agg_theme_space$sdl_units$SWSDLName),
+                    palette = "ggsci::nrc_npg")
+
 test_that("basin works with single color palette", {
   basin_to_plot <- agg_theme_space$mdb |>
     dplyr::rename(allArith = 4, oneLimiting = 5) |> # for readability
@@ -784,6 +787,7 @@ test_that("setLimits works", {
                   scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   setLimits = c(0, 0.75))
+
   vdiffr::expect_doppelganger("line_75", sdl_line_75)
 
   # Maps
@@ -800,6 +804,7 @@ test_that("setLimits works", {
                   scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   setLimits = c(0, 2))
+
   vdiffr::expect_doppelganger("sdl_map_limits", sdl_mapL)
 
 })
@@ -904,8 +909,6 @@ test_that("scenarios aren't special", {
 
   # This is a strange example, because scenario can easily be special here. But
   # roll with it to solve the more general issue.
-  SDL_pal <- make_pal(unique(agg_theme_space$sdl_units$SWSDLName),
-                      palette = "ggsci::nrc_npg")
 
   obj_sdl_to_plot <- agg_theme_space$sdl_units |>
     dplyr::rename(allArith = 4) # for readability

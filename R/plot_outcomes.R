@@ -219,11 +219,15 @@ plot_outcomes <- function(outdf,
       ggplot2::geom_col(position = position) +
       ggplot2::labs(y = paste0(y_lab, prepped$ylab_append), x = x_lab,
                     color = colorset) +
-      ggplot2::scale_y_continuous(trans = transy, limits = findlimits) +
+      ggplot2::scale_y_continuous(trans = transy) +
       ggplot2::scale_fill_identity(guide = 'legend',
                                    labels = labfind,
                                    name = color_lab) +
       theme_werp_toolkit()
+
+    if (!is.null(setLimits)) {
+      outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
+    }
   }
 
   # Something else on x, scenario as fill. bar
@@ -238,11 +242,15 @@ plot_outcomes <- function(outdf,
                                    fill = scenario)) +
       ggplot2::geom_col(position = position) +
       ggplot2::labs(y = paste0(y_lab, prepped$ylab_append)) +
-      ggplot2::scale_y_continuous(trans = transy, limits = findlimits) +
+      ggplot2::scale_y_continuous(trans = transy) +
       ggplot2::scale_fill_manual(values = prepped$colors) +
       ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 45)) +
       # ggplot2::scale_color_identity() +
       theme_werp_toolkit()
+
+    if (!is.null(setLimits)) {
+      outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
+    }
   }
 
   # Some quantitative x, typically a quant representation of scenario
@@ -274,13 +282,17 @@ plot_outcomes <- function(outdf,
                             position = position) +
         ggplot2::labs(y = paste0(y_lab, prepped$ylab_append),
                       x = x_lab) +
-        ggplot2::scale_y_continuous(trans = transy, limits = findlimits) +
+        ggplot2::scale_y_continuous(trans = transy) +
         ggplot2::scale_x_continuous(trans = transx) +
         ggplot2::scale_fill_manual(values = prepped$colors) +
         ggplot2::scale_color_identity(guide = 'legend',
                                       labels = labfind,
                                       name = color_lab) +
         theme_werp_toolkit()
+
+      if (!is.null(setLimits)) {
+        outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
+      }
 
       if (smooth) {
         outcome_plot <- outcome_plot +

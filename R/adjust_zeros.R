@@ -15,26 +15,29 @@ adjust_zeros <- function(data, adjust_col, amount, onlyzeros = FALSE) {
     amount <- min(abs(data[[adjust_col]])[data[[adjust_col]] != 0], na.rm = TRUE)*0.1
   }
 
+  # a function to do the adjust in a mutate
+  adjfun <- function(x) {
+    adjust_dir <- dplyr::case_when(all(x >= 0, na.rm = TRUE) ~ 'pos',
+                                   all(x <= 0, na.rm = TRUE) ~ 'neg',
+                                   .default = 'both')
+    if (onlyzeros) {
+      zeroamount <- 0
+    } else {
+        zeroamount <- amount
+    }
 
-  # if the data doesn't span 0, only move in the direction of the data. This is especially important if we'll be logging
-  adjust_dir <- dplyr::case_when(all(data[[adjust_col]] >= 0, na.rm = TRUE) ~ 'pos',
-                                 all(data[[adjust_col]] <= 0, na.rm = TRUE) ~ 'neg',
-                                 .default = 'both')
-
-  if (onlyzeros) {
-    data <- data |>
-      dplyr::mutate("{adjust_col}" := dplyr::case_when(.data[[adjust_col]] != 0 ~ .data[[adjust_col]],
-                                                       .data[[adjust_col]] == 0  & adjust_dir == 'pos' ~ .data[[adjust_col]] + amount,
-                                                       .data[[adjust_col]] == 0  & adjust_dir == 'neg' ~ .data[[adjust_col]] - amount,
-                                                       .data[[adjust_col]] == 0  & adjust_dir == 'both' ~ .data[[adjust_col]] + sample(c(amount, -1*amount), 1)))
-  } else {
-    data <- data |>
-      dplyr::mutate("{adjust_col}" := dplyr::case_when(.data[[adjust_col]] > 0 ~ .data[[adjust_col]] + amount,
-                                                       .data[[adjust_col]] < 0 ~ .data[[adjust_col]] - amount,
-                                                       .data[[adjust_col]] == 0  & adjust_dir == 'pos' ~ .data[[adjust_col]] + amount,
-                                                       .data[[adjust_col]] == 0  & adjust_dir == 'neg' ~ .data[[adjust_col]] - amount,
-                                                       .data[[adjust_col]] == 0  & adjust_dir == 'both' ~ .data[[adjust_col]] + sample(c(amount, -1*amount), 1)))
+    adjx <- dplyr::case_when(x > 0 ~ x + zeroamount,
+                             x < 0 ~ x - zeroamount,
+                             x == 0  & adjust_dir == 'pos' ~ x + amount,
+                             x == 0  & adjust_dir == 'neg' ~ x - amount,
+                             x == 0  & adjust_dir == 'both' ~ x + sample(c(amount, -1*amount), 1))
   }
+
+  # mutate
+  data <- data |>
+    dplyr::mutate(dplyr::across(tidyselect::all_of(adjust_col), adjfun))
+
+  return(data)
 
 
 }
