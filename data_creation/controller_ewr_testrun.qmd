@@ -73,9 +73,10 @@ model_format = 'IQQM - NSW 10,000 years'
 
 To have an R object that works as a `dict` in python, use a named list. The names can be quoted or unquoted; keep quoted to be most like python specs.
 
-This is handled by default inside `prep_run_save_ewrs` now, though it could be passed in.
+These have been deprecated in `py-ewr` as of 2.1
 
 ```{r}
+#| eval: false
 MINT = (100 - 0)/100
 MAXT = (100 + 0 )/100
 DUR = (100 - 0 )/100
@@ -95,7 +96,7 @@ Once we have the directory and set any other needed params (e.g. point at a conf
 
 ## Set up output directories
 
-This will typically be hidden in `prep_run_save_ewrs_R`, but I'm exposing the steps here for easier viewing and testing, especially as the formats change. see the Vignette for the wrapped version.
+This will typically be hidden in `prep_run_save_ewrs`, but I'm exposing the steps here for easier viewing and testing, especially as the formats change. see the Vignette for the wrapped version.
 
 This was assuming there would be gauge-files, and now there's not. Still seems to basically work, and not really worth spending too much time until we know the actual structure we want to use. We get the information about the directory structure and files as a dict with `make_scenario_info`- if there are multiple gauges within each, they enter the dict as a 'gauge' value. If not, the 'gauge' value is confusingly just the filename, but otherwise this works. The output directory and subdirs for scenarios is created by `make_project_dir`, which also returns that outer directory location. The EWR tool needs the paths to the gauge data as a list, so `paths_gauges` just unfolds the dict to give that.
 

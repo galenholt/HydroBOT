@@ -20,6 +20,7 @@ test_that('returns one result, no saving', {
                                 outputType = list('none'),
                                 datesuffix = FALSE,
                                 returnType = list('summary'))
+
   expect_equal(length(ewr_out), 1)
   expect_equal(names(ewr_out), 'summary')
   expect_equal(unique(ewr_out$summary$scenario), c('base',
@@ -414,7 +415,9 @@ test_that('Single scenario among many, no access to the outer directory, differe
 
 })
 
-
+## NOTE: the python `import`s from system.file, and so while developing won't pick up
+## new versions without `install`ing the package. The `future` uses seem most
+## sensitive to this- I think maybe test shims don't work right?
 test_that('parallel works for two', {
 
   print(future::plan())
