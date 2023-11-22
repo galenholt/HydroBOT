@@ -19,7 +19,7 @@ def clean_ewrs(ewr_results, scenario_filename_split):
     
     # I think this is a bad assumption, and we should let the user deal with
     # whatever their naming convention is in the output.
-    ewr_results["scenario"] = ewr_results["scenario"].str.split(scenario_filename_split).str[0]
+    ewr_results["scenario"] = scenario_filename_split
     
     return(ewr_results)
 

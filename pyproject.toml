@@ -9,7 +9,7 @@ packages = [{include = "werp_toolkit"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-py-ewr = "^2.0.0"
+py-ewr = {path = "../EWR_tool"}
 
 
 [build-system]

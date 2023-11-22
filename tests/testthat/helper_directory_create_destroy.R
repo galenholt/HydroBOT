@@ -43,15 +43,20 @@ make_temp_multifile <- function(testdir = '_test_data/temp',
 
   full_hydro_path <- file.path(testdir, temp_hydro_dir)
   # Make the directories
-  scenenames <- scenario_names_from_hydro(orig_hydro_dir)
+  scenepaths <- find_scenario_paths(orig_hydro_dir)
+
+  scenenames <- names(scenepaths) |>
+    stringr::str_remove('_.*')
+
+  # scenenames <- scenario_names_from_hydro(orig_hydro_dir)
 
     purrr::map(scenenames, \(x) dir.create(file.path(full_hydro_path, x), recursive = TRUE))
 
-    scenepaths <- find_scenario_paths(orig_hydro_dir)
+
 
     for (s in 1:length(scenenames)) {
 
-      multigauges <- readr::read_csv(scenepaths[s])
+      multigauges <- readr::read_csv(scenepaths[[s]])
       for (i in 2:ncol(multigauges)) {
         readr::write_csv(multigauges[, c(1, i)],
                          file = file.path(full_hydro_path, scenenames[s],

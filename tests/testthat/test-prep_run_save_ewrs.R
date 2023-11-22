@@ -23,9 +23,8 @@ test_that('returns one result, no saving', {
 
   expect_equal(length(ewr_out), 1)
   expect_equal(names(ewr_out), 'summary')
-  expect_equal(unique(ewr_out$summary$scenario), c('base',
-'down4',
-'up4'))
+  expect_equal(unique(ewr_out$summary$scenario),
+               c('base_base', 'down4_down4', 'up4_up4'))
   # Test it didn't create anything since outputType = 'none'
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
 
@@ -44,7 +43,91 @@ test_that('returns list', {
                                 returnType = list('summary', 'all'))
   expect_equal(length(ewr_out), 2)
   expect_true(all(c('summary','all_events') %in% names(ewr_out)))
-  expect_equal(unique(ewr_out$summary$scenario), c('base', 'down4', 'up4'))
+  expect_equal(unique(ewr_out$summary$scenario),
+               c('base_base', 'down4_down4', 'up4_up4'))
+
+
+})
+
+# Test complex directory scednario extraction.
+test_that('complex dir structure', {
+  # create dir so building makes sense
+  make_temp_hydro()
+
+  dir.create(file.path(temp_hydro_dir, 'S1'))
+  dir.create(file.path(temp_hydro_dir, 'S2'))
+  file.copy(file.path(temp_hydro_dir, 'base'), file.path(temp_hydro_dir, 'S1'), recursive = TRUE)
+  file.copy(file.path(temp_hydro_dir, 'up4'), file.path(temp_hydro_dir, 'S2'), recursive = TRUE)
+
+  ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
+                                output_parent_dir = temp_parent_dir,
+                                # scenarios = c('S1', 'S2', 'S3'),
+                                outputType = list('summary', 'all'),
+                                datesuffix = FALSE,
+                                returnType = list('summary', 'all'))
+  expect_equal(length(ewr_out), 2)
+  expect_true(all(c('summary','all_events') %in% names(ewr_out)))
+  expect_equal(unique(ewr_out$summary$scenario),
+               c('base_base', 'down4_down4', 'S1_base_base', 'S2_up4_up4', 'up4_up4'))
+
+
+})
+
+test_that('manual scenario naming', {
+  # create dir so building makes sense
+  make_temp_hydro()
+
+  # The user would supply this
+  scenelist <- list(S1 = 'base/base.csv', S2 = 'down4/down4.csv', S3 = 'up4/up4.csv')
+
+  ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
+                                output_parent_dir = temp_parent_dir,
+                                scenarios = scenelist,
+                                outputType = list('summary', 'all'),
+                                datesuffix = FALSE,
+                                returnType = list('summary', 'all'))
+  expect_equal(length(ewr_out), 2)
+  expect_true(all(c('summary','all_events') %in% names(ewr_out)))
+  expect_equal(unique(ewr_out$summary$scenario),
+               c('S1', 'S2', 'S3'))
+
+
+  # Test it created the expected structure
+  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+
+  expected_structure <- c('hydrographs',
+                          'hydrographs/base',
+                          'hydrographs/base/base.csv',
+                          'hydrographs/base/base.json',
+                          'hydrographs/down4',
+                          'hydrographs/down4/down4.csv',
+                          'hydrographs/down4/down4.json',
+                          'hydrographs/scenario_metadata.json',
+                          'hydrographs/scenario_metadata.yml',
+                          'hydrographs/up4',
+                          'hydrographs/up4/up4.csv',
+                          'hydrographs/up4/up4.json',
+                          'module_output',
+                          'module_output/EWR',
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml',
+                          'module_output/EWR/S1',
+                          'module_output/EWR/S1/all_events',
+                          'module_output/EWR/S1/all_events/S1.csv',
+                          'module_output/EWR/S1/summary',
+                          'module_output/EWR/S1/summary/S1.csv',
+                          'module_output/EWR/S2',
+                          'module_output/EWR/S2/all_events',
+                          'module_output/EWR/S2/all_events/S2.csv',
+                          'module_output/EWR/S2/summary',
+                          'module_output/EWR/S2/summary/S2.csv',
+                          'module_output/EWR/S3',
+                          'module_output/EWR/S3/all_events',
+                          'module_output/EWR/S3/all_events/S3.csv',
+                          'module_output/EWR/S3/summary',
+                          'module_output/EWR/S3/summary/S3.csv')
+
+  expect_equal(realised_structure, expected_structure)
 
 
 })
@@ -70,24 +153,8 @@ test_that('csv per gauge works', {
   expect_equal(unique(ewr_out$summary$scenario), c('base',
 'down4',
 'up4'))
-  # 'scenario' here gets the csv name. That happens inside the EWR tool- the
-  # `_get_file_names` function does a `.split('/')` on the filepath to name the
-  # scenario. I had basically tricked it previously by using `os.sep`, which
-  # uses `'\\'` on windows, and so the split didnt pick it up and we got the
-  # whole path, which i then later split on to get just the scenario name. That
-  # feesl *really* unstable and reliant on very system-specific behaviour.
 
-  # The catch is, I need to NOT name scenarios by just gauge, and the EWR tool
-  # is auto-naming. So I'll have to figure out how to trick it. I just need to
-  # do it in a more consistent way than using funny paths that are os-dependent.
-
-  # One option would be to loop over scenarios, and replace the scenario column
-  # with the loopname, but that's clunky and error-prone and gets rid of the
-  # advantages of the internal loops in EWR
-
-  # I think probably the best way to do this is to encourage the use of single
-  # files per scenario, and if not, filenames that have the scenario name in
-  # them with the gauge name.
+  # I'm now controlling the scenario names in the toolkit, so this should work.
 
 
 })
@@ -265,6 +332,57 @@ test_that('saving and returning works for all (or nearly all) ewr outputs', {
                           'module_output/EWR/up4/summary/up4.csv',
                           'module_output/EWR/up4/yearly',
                           'module_output/EWR/up4/yearly/up4.csv')
+
+  expect_equal(realised_structure, expected_structure)
+
+})
+
+test_that('NETCDF saving and returning works for all (or nearly all) ewr outputs', {
+
+  # create dir so building makes sense
+  make_temp_hydro(temp_hydro_dir = 'nchydros',
+                  orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = 'werptoolkitr'))
+
+  # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
+
+  ewroutlist <- list('summary',
+                     'yearly',
+                     'all_events',
+                     'all_successful_events',
+                     # 'all_interEvents',
+                     'all_successful_interEvents')
+
+  ewr_out <- prep_run_save_ewrs(hydro_dir = '_test_data/temp/nchydros',
+                                output_parent_dir = temp_parent_dir,
+                                model_format = 'IQQM - netcdf',
+                                outputType = ewroutlist,
+                                datesuffix = FALSE,
+                                returnType = ewroutlist)
+
+  expect_equal(length(ewr_out), length(ewroutlist))
+  expect_equal(names(ewr_out), unlist(ewroutlist))
+  expect_equal(unique(ewr_out$summary$scenario), 'werp_ncdf')
+
+  # Test it created the expected structure
+  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+
+  expected_structure <- c('module_output',
+                          'module_output/EWR',
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml',
+                          'module_output/EWR/werp_ncdf',
+                          'module_output/EWR/werp_ncdf/all_events',
+                          'module_output/EWR/werp_ncdf/all_events/werp_ncdf.csv',
+                          'module_output/EWR/werp_ncdf/all_successful_events',
+                          'module_output/EWR/werp_ncdf/all_successful_events/werp_ncdf.csv',
+                          'module_output/EWR/werp_ncdf/all_successful_interEvents',
+                          'module_output/EWR/werp_ncdf/all_successful_interEvents/werp_ncdf.csv',
+                          'module_output/EWR/werp_ncdf/summary',
+                          'module_output/EWR/werp_ncdf/summary/werp_ncdf.csv',
+                          'module_output/EWR/werp_ncdf/yearly',
+                          'module_output/EWR/werp_ncdf/yearly/werp_ncdf.csv',
+                          'nchydros',
+                          'nchydros/werp_ncdf.nc')
 
   expect_equal(realised_structure, expected_structure)
 

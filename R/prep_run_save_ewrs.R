@@ -22,9 +22,9 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'   but two typical cases:
 #'  * The directory containing `hydro_dir`, which puts the `module_outputs` at the same level as the hydrographs
 #'  * If running in batches for single scenarios, may be `hydro_dir`, which just puts the `module_outputs` in `hydro_dir`
-#' @param scenarios `NULL` (default) or character.
+#' @param scenarios `NULL` (default) or named list.
 #'  * `NULL`- finds scenario names by parsing directory names in `hydro_dir`. If no internal directories, just stays in `hydro_dir`. This captures the two typical situations discussed for `output_parent_dir`. If there are other directories in `hydro_dir` that do not contain hydrological scenarios, should use a character vector.
-#'  * character vector of scenario names. This allows unusual directory structures.
+#'  * named list of paths to files. names become scenario names, paths should be relative to `hydro_dir`. This allows unusual directory structures.
 #' @param model_format see EWR tool. One of:
 #'  * 'IQQM - NSW 10,000 years' (default, among other things accepts a csv with a Date column followed by gauge columns)
 #'  * 'Bigmod - MDBA'
@@ -46,6 +46,11 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @param scenario_filename_split character (including regex) to split the scenario filenames in the 'scenario' column of the EWR outputs. Mostly for handling the situation of gauge-named csvs with the scenario name appended to the front. When auto-appended, '_DIRECTORYAPPEND_' is used. If the appending has been done by the user, will need to pass in the split. The 'scenario' is given the first piece of the split, so do not use a split pattern in the scenario name, e.g. do not name scenarios a_1 and then append csvs with "_" like a_1_401234.csv, or the _1 will be lost..
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
 #' @param rparallel logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using `furrr`. To use, install `furrr` and set a [future::plan()] (likely `multisession` or `multicore`)
+#' @param climate deprecated, included to let old calls pass
+#' @param MINT deprecated, included to let old calls pass
+#' @param MAXT deprecated, included to let old calls pass
+#' @param DUR deprecated, included to let old calls pass
+#' @param DRAW deprecated, included to let old calls pass
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
@@ -57,7 +62,10 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                                scenario_filename_split = '_DIRECTORYAPPEND_',
                                extrameta = NULL,
                                datesuffix = FALSE,
-                               rparallel = FALSE) {
+                               rparallel = FALSE,
+                               climate = NULL,
+                               MINT = NULL, MAXT = NULL,
+                               DUR = NULL, DRAW = NULL) {
 
   # Version checking is slow. Should we just immediately drop support?
   # users won't actually get here anyway since the arguments are changing
@@ -69,6 +77,24 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   #
   #   rlang::abort("py-ewr updates have caused breaking changes that are no longer supported in this function. Please update py-ewr to > 2.1. If you need to use the old version, call `prep_run_save_ewrs_old`, but this will not be maintained.")
   # }
+
+  # Maybe this is an intermediate deprecation approach? if the values are there,
+  # THEN check the version. It won't catch where they were set as defaults, and
+  # the user expects the old version to work, but it's something.
+  if (any(!purrr::map_lgl(list(climate, MINT, MAXT, DUR, DRAW), is.null))) {
+    if ('py-ewr' %in% pypkgs$package) {
+      ewrversion <- pypkgs$version[which(pypkgs$package == 'py-ewr')] |>
+        stringr::str_extract("[0-9]*\\.[0-9]*") |>
+        as.numeric()
+
+      if (ewrversion >= 2.1) {
+        rlang::inform("New py-ewr (>= 2.1) does not use `climate` or the allowance params (MINT, MAXT, DUR, DRAW). They will be ignored for now and support dropped in the future.")
+      } else {
+        rlang::abort("py-ewr updates have caused breaking changes that are no longer supported in this function. Please update py-ewr to > 2.1. If you need to use the old version, call `prep_run_save_ewrs_old`, but this will not be maintained.")
+
+      }
+    }
+  }
 
 
   # allow sloppy outputTypes and returnTypes
@@ -82,16 +108,25 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   # get the paths to all the hydrographs. python used to need a list, and though
   # that's no longer true, it makes the now-required loops easier to use one in
   # R
-  hydro_paths <- as.list(find_scenario_paths(hydro_dir))
-
-  # allow passing in a vector of scenario names or getting them from hydro if NULL
   if (is.null(scenarios)) {
-    scenarios <- scenario_names_from_hydro(hydro_dir)
+    if (model_format == 'IQQM - NSW 10,000 years') {filetype <- 'csv'}
+    if (grepl('netcdf', model_format)) {filetype <- 'nc'}
+    hydro_paths <- find_scenario_paths(hydro_dir, type = filetype)
+  } else {
+    hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
   }
+  # # allow passing in a vector of scenario names or getting them from hydro if NULL
+  # if (is.null(scenarios)) {
+  #   scenarios <- scenario_names_from_hydro(hydro_dir)
+  # }
 
   # We need to check the files have unique names (and fix if not), since the EWR
   # tool makes them the 'scenario' column.
-  hydro_paths <- fix_file_scenarios(hydro_paths, scenarios)
+  # hydro_paths <- fix_file_scenarios(hydro_paths, scenarios)
+  if (any(duplicated(hydro_paths))) {
+    rlang::abort(glue::glue("The {hydro_paths[duplicated(hydro_paths)]} are duplicated. Fix your directory structure."))
+  }
+
 
 
   # output_path doesn't get used for outputType == 'none', but we don't really
@@ -99,7 +134,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   if (length(outputType) == 1 && outputType == 'none') {
     output_path <- '' # This shouldn't do anything
   } else {
-    output_path <- make_output_dir(output_parent_dir, scenarios = scenarios,
+    output_path <- make_output_dir(output_parent_dir, scenarios = names(hydro_paths),
                                    module_name = 'EWR', ewr_outtypes = unlist(outputType))
     # set up flags for the metadata in case the ewr fails partway
     init_params <- list(meta_message = "Started run, has not finished. New metadata file will write when it does. If this metadata entry persists, the run failed.",
@@ -124,13 +159,13 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
 
   # define this particular function with the current set of args, so the syntax
   # is simpler in furrr and purrr
-  ewrfun <- function(x) {
+  ewrfun <- function(x, y) {
     controller_functions$run_save_ewrs(x,
                                        output_path,
                                        model_format,
                                        outputType = outputType,
                                        returnType = returnType,
-                                       scenario_filename_split = scenario_filename_split,
+                                       scenario_filename_split = y,
                                        datesuffix = datesuffix)
   }
 
@@ -139,7 +174,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                                  .options = furrr::furrr_options(seed = TRUE))
 
   } else {
-    ewr_out <- purrr::map(hydro_paths, ewrfun)
+    ewr_out <- purrr::imap(hydro_paths, ewrfun)
   }
 
   # Clean up the list structure

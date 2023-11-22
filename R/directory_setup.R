@@ -9,10 +9,26 @@
 #'
 #' @examples
 find_scenario_paths <- function(hydro_dir, type = 'csv') {
+
+
   # get the paths relative to hydro_dir
-  hydro_paths <- list.files(hydro_dir, pattern = type, recursive = TRUE)
+  if (grepl('.zip', hydro_dir)) {
+    rlang::inform("data in zip is assumed to be 'Straight Node (Gauge).nc'. If that is not the case, will need to allow an argument to specify.")
+    hydro_paths <- unzip(hydro_dir, list = TRUE)$Name
+    hydro_paths <- hydro_paths[grepl('Straight Node \\(Gauge\\)\\.nc', hydro_paths)]
+  } else {
+    hydro_paths <- list.files(hydro_dir, pattern = type, recursive = TRUE)
+  }
+
+  unique_names <- hydro_paths |>
+    stringr::str_remove_all(paste0('\\.', type)) |>
+    stringr::str_replace_all("/", "_")
+
   # add the path to hydro_dir back on. This keeps things relative to whatever hydro_dir is relative to
   hydro_paths <- file.path(hydro_dir, hydro_paths)
+
+  hydro_paths <- as.list(hydro_paths) |>
+    setNames(unique_names)
 
   return(hydro_paths)
 }
@@ -72,8 +88,8 @@ make_output_dir <- function(parent_dir, scenarios, module_name = 'EWR',
 scenario_names_from_hydro <- function(hydro_dir) {
 
   # Remove files with extensions- we only want directories
-  scenarios <- list.files(hydro_dir)
-  only_dirs <- stringr::str_which(scenarios, '\\.', negate = TRUE)
+  scenarios <- list.files(hydro_dir, recursive = TRUE)
+  only_dirs <- stringr::str_which(scenarios, '\\.', negate = TRUE) #stringr::str_remove_all(scenarios, "\\..*")
   # If there's already module_output, ignore it
   no_modules <- stringr::str_which(scenarios, 'module_output', negate = TRUE)
 
