@@ -1482,9 +1482,9 @@ files = [
 ]
 
 [[package]]
-name = "py-ewr"
+name = "py_ewr"
 version = "2.1.0"
-description = "Environmental Water Requirement calculator"
+description = ""
 optional = false
 python-versions = "*"
 files = []
@@ -1502,8 +1502,10 @@ tqdm = "4.64.0"
 xarray = "2023.10.1"
 
 [package.source]
-type = "directory"
-url = "../EWR_tool"
+type = "git"
+url = "git@github.com:MDBAuth/EWR_tool.git"
+reference = "GalenH"
+resolved_reference = "ece7864b4fdd05aaa19ad61e2d94c5f1aba07e95"
 
 [[package]]
 name = "pycparser"
@@ -2285,4 +2287,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "1b22839d2b5ff8855a22276ff50c6d4d015d8688e66f19ead14776edc0a8a8e0"
+content-hash = "a5fc76f0f1b6d1785e7b0cd5d3703abe069cfd9352705e2100c394b1d0429241"
