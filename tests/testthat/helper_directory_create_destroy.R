@@ -22,6 +22,23 @@ make_temp_hydro <- function(testdir = '_test_data/temp',
 
 }
 
+make_temp_zip <- function(testdir = '_test_data/temp',
+                            temp_hydro_dir = 'hydrographs',
+                            orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = 'werptoolkitr')) {
+
+
+  # This will throw a warning if the dir exists, which we want, since the test
+  # isn't testing right if there's already something here.
+  full_hydro_path <- file.path(testdir, temp_hydro_dir)
+  dir.create(full_hydro_path, recursive = TRUE)
+  file.copy(orig_hydro_zip, full_hydro_path)
+
+  # This destroys it once used
+  withr::defer_parent(unlink(testdir, recursive = TRUE))
+
+
+}
+
 # destroy_temp_hydro <- function(temp_parent_dir = '_test_data/temp_one') {
 #   unlink(temp_parent_dir, recursive = TRUE)
 # }

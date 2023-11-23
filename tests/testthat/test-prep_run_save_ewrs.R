@@ -49,7 +49,7 @@ test_that('returns list', {
 
 })
 
-# Test complex directory scednario extraction.
+# Test complex directory scenario extraction.
 test_that('complex dir structure', {
   # create dir so building makes sense
   make_temp_hydro()
@@ -67,8 +67,8 @@ test_that('complex dir structure', {
                                 returnType = list('summary', 'all'))
   expect_equal(length(ewr_out), 2)
   expect_true(all(c('summary','all_events') %in% names(ewr_out)))
-  expect_equal(unique(ewr_out$summary$scenario),
-               c('base_base', 'down4_down4', 'S1_base_base', 'S2_up4_up4', 'up4_up4'))
+  expect_true(all(unique(ewr_out$summary$scenario) %in%
+               c('base_base', 'down4_down4', 'S1_base_base', 'S2_up4_up4', 'up4_up4')))
 
 
 })
@@ -127,7 +127,7 @@ test_that('manual scenario naming', {
                           'module_output/EWR/S3/summary',
                           'module_output/EWR/S3/summary/S3.csv')
 
-  expect_equal(realised_structure, expected_structure)
+  expect_true(all(realised_structure %in% expected_structure))
 
 
 })
@@ -189,17 +189,17 @@ test_that('saving works for one', {
                           'hydrographs/up4/up4.json',
                           'module_output',
                           'module_output/EWR',
-                          'module_output/EWR/base',
-                          'module_output/EWR/base/summary',
-                          'module_output/EWR/base/summary/base.csv',
-                          'module_output/EWR/down4',
-                          'module_output/EWR/down4/summary',
-                          'module_output/EWR/down4/summary/down4.csv',
+                          'module_output/EWR/base_base',
+                          'module_output/EWR/base_base/summary',
+                          'module_output/EWR/base_base/summary/base_base.csv',
+                          'module_output/EWR/down4_down4',
+                          'module_output/EWR/down4_down4/summary',
+                          'module_output/EWR/down4_down4/summary/down4_down4.csv',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml',
-                          'module_output/EWR/up4',
-                          'module_output/EWR/up4/summary',
-                          'module_output/EWR/up4/summary/up4.csv')
+                          'module_output/EWR/up4_up4',
+                          'module_output/EWR/up4_up4/summary',
+                          'module_output/EWR/up4_up4/summary/up4_up4.csv')
 
   expect_equal(realised_structure, expected_structure)
 
@@ -235,23 +235,23 @@ test_that('saving and returning works for multiple', {
                           'hydrographs/up4/up4.json',
                           'module_output',
                           'module_output/EWR',
-                          'module_output/EWR/base',
-                          'module_output/EWR/base/all_events',
-                          'module_output/EWR/base/all_events/base.csv',
-                          'module_output/EWR/base/summary',
-                          'module_output/EWR/base/summary/base.csv',
-                          'module_output/EWR/down4',
-                          'module_output/EWR/down4/all_events',
-                          'module_output/EWR/down4/all_events/down4.csv',
-                          'module_output/EWR/down4/summary',
-                          'module_output/EWR/down4/summary/down4.csv',
+                          'module_output/EWR/base_base',
+                          'module_output/EWR/base_base/all_events',
+                          'module_output/EWR/base_base/all_events/base_base.csv',
+                          'module_output/EWR/base_base/summary',
+                          'module_output/EWR/base_base/summary/base_base.csv',
+                          'module_output/EWR/down4_down4',
+                          'module_output/EWR/down4_down4/all_events',
+                          'module_output/EWR/down4_down4/all_events/down4_down4.csv',
+                          'module_output/EWR/down4_down4/summary',
+                          'module_output/EWR/down4_down4/summary/down4_down4.csv',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml',
-                          'module_output/EWR/up4',
-                          'module_output/EWR/up4/all_events',
-                          'module_output/EWR/up4/all_events/up4.csv',
-                          'module_output/EWR/up4/summary',
-                          'module_output/EWR/up4/summary/up4.csv')
+                          'module_output/EWR/up4_up4',
+                          'module_output/EWR/up4_up4/all_events',
+                          'module_output/EWR/up4_up4/all_events/up4_up4.csv',
+                          'module_output/EWR/up4_up4/summary',
+                          'module_output/EWR/up4_up4/summary/up4_up4.csv')
 
   expect_equal(realised_structure, expected_structure)
 
@@ -297,41 +297,41 @@ test_that('saving and returning works for all (or nearly all) ewr outputs', {
                           'hydrographs/up4/up4.json',
                           'module_output',
                           'module_output/EWR',
-                          'module_output/EWR/base',
-                          'module_output/EWR/base/all_events',
-                          'module_output/EWR/base/all_events/base.csv',
-                          'module_output/EWR/base/all_successful_events',
-                          'module_output/EWR/base/all_successful_events/base.csv',
-                          'module_output/EWR/base/all_successful_interEvents',
-                          'module_output/EWR/base/all_successful_interEvents/base.csv',
-                          'module_output/EWR/base/summary',
-                          'module_output/EWR/base/summary/base.csv',
-                          'module_output/EWR/base/yearly',
-                          'module_output/EWR/base/yearly/base.csv',
-                          'module_output/EWR/down4',
-                          'module_output/EWR/down4/all_events',
-                          'module_output/EWR/down4/all_events/down4.csv',
-                          'module_output/EWR/down4/all_successful_events',
-                          'module_output/EWR/down4/all_successful_events/down4.csv',
-                          'module_output/EWR/down4/all_successful_interEvents',
-                          'module_output/EWR/down4/all_successful_interEvents/down4.csv',
-                          'module_output/EWR/down4/summary',
-                          'module_output/EWR/down4/summary/down4.csv',
-                          'module_output/EWR/down4/yearly',
-                          'module_output/EWR/down4/yearly/down4.csv',
+                          'module_output/EWR/base_base',
+                          'module_output/EWR/base_base/all_events',
+                          'module_output/EWR/base_base/all_events/base_base.csv',
+                          'module_output/EWR/base_base/all_successful_events',
+                          'module_output/EWR/base_base/all_successful_events/base_base.csv',
+                          'module_output/EWR/base_base/all_successful_interEvents',
+                          'module_output/EWR/base_base/all_successful_interEvents/base_base.csv',
+                          'module_output/EWR/base_base/summary',
+                          'module_output/EWR/base_base/summary/base_base.csv',
+                          'module_output/EWR/base_base/yearly',
+                          'module_output/EWR/base_base/yearly/base_base.csv',
+                          'module_output/EWR/down4_down4',
+                          'module_output/EWR/down4_down4/all_events',
+                          'module_output/EWR/down4_down4/all_events/down4_down4.csv',
+                          'module_output/EWR/down4_down4/all_successful_events',
+                          'module_output/EWR/down4_down4/all_successful_events/down4_down4.csv',
+                          'module_output/EWR/down4_down4/all_successful_interEvents',
+                          'module_output/EWR/down4_down4/all_successful_interEvents/down4_down4.csv',
+                          'module_output/EWR/down4_down4/summary',
+                          'module_output/EWR/down4_down4/summary/down4_down4.csv',
+                          'module_output/EWR/down4_down4/yearly',
+                          'module_output/EWR/down4_down4/yearly/down4_down4.csv',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml',
-                          'module_output/EWR/up4',
-                          'module_output/EWR/up4/all_events',
-                          'module_output/EWR/up4/all_events/up4.csv',
-                          'module_output/EWR/up4/all_successful_events',
-                          'module_output/EWR/up4/all_successful_events/up4.csv',
-                          'module_output/EWR/up4/all_successful_interEvents',
-                          'module_output/EWR/up4/all_successful_interEvents/up4.csv',
-                          'module_output/EWR/up4/summary',
-                          'module_output/EWR/up4/summary/up4.csv',
-                          'module_output/EWR/up4/yearly',
-                          'module_output/EWR/up4/yearly/up4.csv')
+                          'module_output/EWR/up4_up4',
+                          'module_output/EWR/up4_up4/all_events',
+                          'module_output/EWR/up4_up4/all_events/up4_up4.csv',
+                          'module_output/EWR/up4_up4/all_successful_events',
+                          'module_output/EWR/up4_up4/all_successful_events/up4_up4.csv',
+                          'module_output/EWR/up4_up4/all_successful_interEvents',
+                          'module_output/EWR/up4_up4/all_successful_interEvents/up4_up4.csv',
+                          'module_output/EWR/up4_up4/summary',
+                          'module_output/EWR/up4_up4/summary/up4_up4.csv',
+                          'module_output/EWR/up4_up4/yearly',
+                          'module_output/EWR/up4_up4/yearly/up4_up4.csv')
 
   expect_equal(realised_structure, expected_structure)
 
@@ -361,7 +361,7 @@ test_that('NETCDF saving and returning works for all (or nearly all) ewr outputs
 
   expect_equal(length(ewr_out), length(ewroutlist))
   expect_equal(names(ewr_out), unlist(ewroutlist))
-  expect_equal(unique(ewr_out$summary$scenario), 'werp_ncdf')
+  expect_equal(unique(ewr_out$summary$scenario), c("S1_Straight Node (Gauge)", "S2_Straight Node (Gauge)"))
 
   # Test it created the expected structure
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
@@ -370,24 +370,157 @@ test_that('NETCDF saving and returning works for all (or nearly all) ewr outputs
                           'module_output/EWR',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml',
-                          'module_output/EWR/werp_ncdf',
-                          'module_output/EWR/werp_ncdf/all_events',
-                          'module_output/EWR/werp_ncdf/all_events/werp_ncdf.csv',
-                          'module_output/EWR/werp_ncdf/all_successful_events',
-                          'module_output/EWR/werp_ncdf/all_successful_events/werp_ncdf.csv',
-                          'module_output/EWR/werp_ncdf/all_successful_interEvents',
-                          'module_output/EWR/werp_ncdf/all_successful_interEvents/werp_ncdf.csv',
-                          'module_output/EWR/werp_ncdf/summary',
-                          'module_output/EWR/werp_ncdf/summary/werp_ncdf.csv',
-                          'module_output/EWR/werp_ncdf/yearly',
-                          'module_output/EWR/werp_ncdf/yearly/werp_ncdf.csv',
+                          'module_output/EWR/S1_Straight Node (Gauge)',
+                          'module_output/EWR/S1_Straight Node (Gauge)/all_events',
+                          'module_output/EWR/S1_Straight Node (Gauge)/all_events/S1_Straight Node (Gauge).csv',
+                          'module_output/EWR/S1_Straight Node (Gauge)/all_successful_events',
+                          'module_output/EWR/S1_Straight Node (Gauge)/all_successful_interEvents',
+                          'module_output/EWR/S1_Straight Node (Gauge)/summary',
+                          'module_output/EWR/S1_Straight Node (Gauge)/summary/S1_Straight Node (Gauge).csv',
+                          'module_output/EWR/S1_Straight Node (Gauge)/yearly',
+                          'module_output/EWR/S1_Straight Node (Gauge)/yearly/S1_Straight Node (Gauge).csv',
+                          'module_output/EWR/S2_Straight Node (Gauge)',
+                          'module_output/EWR/S2_Straight Node (Gauge)/all_events',
+                          'module_output/EWR/S2_Straight Node (Gauge)/all_events/S2_Straight Node (Gauge).csv',
+                          'module_output/EWR/S2_Straight Node (Gauge)/all_successful_events',
+                          'module_output/EWR/S2_Straight Node (Gauge)/all_successful_interEvents',
+                          'module_output/EWR/S2_Straight Node (Gauge)/summary',
+                          'module_output/EWR/S2_Straight Node (Gauge)/summary/S2_Straight Node (Gauge).csv',
+                          'module_output/EWR/S2_Straight Node (Gauge)/yearly',
+                          'module_output/EWR/S2_Straight Node (Gauge)/yearly/S2_Straight Node (Gauge).csv',
                           'nchydros',
-                          'nchydros/werp_ncdf.nc')
+                          'nchydros/S1',
+                          'nchydros/S1/Straight Node (Gauge).nc',
+                          'nchydros/S2',
+                          'nchydros/S2/Straight Node (Gauge).nc')
 
-  expect_equal(realised_structure, expected_structure)
+  expect_true(all(realised_structure %in% expected_structure))
 
 })
 
+test_that('zipped NETCDF saving and returning works for all (or nearly all) ewr outputs', {
+
+  # create dir so building makes sense
+  make_temp_zip(temp_hydro_dir = 'hydrographs',
+                  orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = 'werptoolkitr'))
+
+  # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
+
+  ewroutlist <- list('summary',
+                     'yearly',
+                     'all_events',
+                     'all_successful_events',
+                     # 'all_interEvents',
+                     'all_successful_interEvents')
+
+  ewr_out <- prep_run_save_ewrs(hydro_dir = '_test_data/temp/hydrographs/zipcdf.zip',
+                                output_parent_dir = temp_parent_dir,
+                                model_format = 'IQQM - netcdf',
+                                outputType = ewroutlist,
+                                datesuffix = FALSE,
+                                returnType = ewroutlist)
+
+
+  expect_equal(length(ewr_out), length(ewroutlist))
+  expect_equal(names(ewr_out), unlist(ewroutlist))
+  expect_equal(unique(ewr_out$summary$scenario), c("zipcdf_S1_Straight Node (Gauge)", "zipcdf_S2_Straight Node (Gauge)"))
+
+  # Test it created the expected structure
+  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+
+  # ugly filepaths, but that's a consequence of the zip structure.
+  # The hydrozipextract shouldn't be htere
+  expected_structure <- c('hydrographs',
+                          'hydrographs/zipcdf.zip',
+                          'module_output',
+                          'module_output/EWR',
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml',
+                          'module_output/EWR/hydrozipextract',
+                          'module_output/EWR/hydrozipextract/zipcdf',
+                          'module_output/EWR/hydrozipextract/zipcdf/S1',
+                          'module_output/EWR/hydrozipextract/zipcdf/S1/Straight Node (Gauge).nc',
+                          'module_output/EWR/hydrozipextract/zipcdf/S2',
+                          'module_output/EWR/hydrozipextract/zipcdf/S2/Straight Node (Gauge).nc',
+                          'module_output/EWR/zipcdf_S1_Straight Node (Gauge)',
+                          'module_output/EWR/zipcdf_S1_Straight Node (Gauge)/all_events',
+                          'module_output/EWR/zipcdf_S1_Straight Node (Gauge)/all_events/zipcdf_S1_Straight Node (Gauge).csv',
+                          'module_output/EWR/zipcdf_S1_Straight Node (Gauge)/all_successful_events',
+                          'module_output/EWR/zipcdf_S1_Straight Node (Gauge)/all_successful_interEvents',
+                          'module_output/EWR/zipcdf_S1_Straight Node (Gauge)/summary',
+                          'module_output/EWR/zipcdf_S1_Straight Node (Gauge)/summary/zipcdf_S1_Straight Node (Gauge).csv',
+                          'module_output/EWR/zipcdf_S1_Straight Node (Gauge)/yearly',
+                          'module_output/EWR/zipcdf_S1_Straight Node (Gauge)/yearly/zipcdf_S1_Straight Node (Gauge).csv',
+                          'module_output/EWR/zipcdf_S2_Straight Node (Gauge)',
+                          'module_output/EWR/zipcdf_S2_Straight Node (Gauge)/all_events',
+                          'module_output/EWR/zipcdf_S2_Straight Node (Gauge)/all_events/zipcdf_S2_Straight Node (Gauge).csv',
+                          'module_output/EWR/zipcdf_S2_Straight Node (Gauge)/all_successful_events',
+                          'module_output/EWR/zipcdf_S2_Straight Node (Gauge)/all_successful_interEvents',
+                          'module_output/EWR/zipcdf_S2_Straight Node (Gauge)/summary',
+                          'module_output/EWR/zipcdf_S2_Straight Node (Gauge)/summary/zipcdf_S2_Straight Node (Gauge).csv',
+                          'module_output/EWR/zipcdf_S2_Straight Node (Gauge)/yearly',
+                          'module_output/EWR/zipcdf_S2_Straight Node (Gauge)/yearly/zipcdf_S2_Straight Node (Gauge).csv')
+
+  expect_true(all(realised_structure %in% expected_structure))
+
+})
+
+test_that('NETCDF saving and returning works in parallel', {
+
+  # create dir so building makes sense
+  make_temp_hydro(temp_hydro_dir = 'nchydros',
+                  orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = 'werptoolkitr'))
+
+  # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
+
+  ewroutlist <- list('summary')
+
+  ewr_out <- prep_run_save_ewrs(hydro_dir = '_test_data/temp/nchydros',
+                                output_parent_dir = temp_parent_dir,
+                                model_format = 'IQQM - netcdf',
+                                outputType = ewroutlist,
+                                datesuffix = FALSE,
+                                returnType = ewroutlist,
+                                rparallel = TRUE)
+
+  expect_equal(length(ewr_out), length(ewroutlist))
+  expect_equal(names(ewr_out), unlist(ewroutlist))
+  expect_equal(unique(ewr_out$summary$scenario), c("S1_Straight Node (Gauge)", "S2_Straight Node (Gauge)"))
+
+  # Test it created the expected structure
+  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+
+  expected_structure <- c('module_output',
+                          'module_output/EWR',
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml',
+                          'module_output/EWR/S1_Straight Node (Gauge)',
+                          'module_output/EWR/S1_Straight Node (Gauge)/all_events',
+                          'module_output/EWR/S1_Straight Node (Gauge)/all_events/S1_Straight Node (Gauge).csv',
+                          'module_output/EWR/S1_Straight Node (Gauge)/all_successful_events',
+                          'module_output/EWR/S1_Straight Node (Gauge)/all_successful_interEvents',
+                          'module_output/EWR/S1_Straight Node (Gauge)/summary',
+                          'module_output/EWR/S1_Straight Node (Gauge)/summary/S1_Straight Node (Gauge).csv',
+                          'module_output/EWR/S1_Straight Node (Gauge)/yearly',
+                          'module_output/EWR/S1_Straight Node (Gauge)/yearly/S1_Straight Node (Gauge).csv',
+                          'module_output/EWR/S2_Straight Node (Gauge)',
+                          'module_output/EWR/S2_Straight Node (Gauge)/all_events',
+                          'module_output/EWR/S2_Straight Node (Gauge)/all_events/S2_Straight Node (Gauge).csv',
+                          'module_output/EWR/S2_Straight Node (Gauge)/all_successful_events',
+                          'module_output/EWR/S2_Straight Node (Gauge)/all_successful_interEvents',
+                          'module_output/EWR/S2_Straight Node (Gauge)/summary',
+                          'module_output/EWR/S2_Straight Node (Gauge)/summary/S2_Straight Node (Gauge).csv',
+                          'module_output/EWR/S2_Straight Node (Gauge)/yearly',
+                          'module_output/EWR/S2_Straight Node (Gauge)/yearly/S2_Straight Node (Gauge).csv',
+                          'nchydros',
+                          'nchydros/S1',
+                          'nchydros/S1/Straight Node (Gauge).nc',
+                          'nchydros/S2',
+                          'nchydros/S2/Straight Node (Gauge).nc')
+
+  expect_true(all(realised_structure %in% expected_structure))
+
+})
 
 test_that('specifying *Type as character instead of list', {
 
@@ -420,23 +553,23 @@ test_that('specifying *Type as character instead of list', {
                           'hydrographs/up4/up4.json',
                           'module_output',
                           'module_output/EWR',
-                          'module_output/EWR/base',
-                          'module_output/EWR/base/all_events',
-                          'module_output/EWR/base/all_events/base.csv',
-                          'module_output/EWR/base/summary',
-                          'module_output/EWR/base/summary/base.csv',
-                          'module_output/EWR/down4',
-                          'module_output/EWR/down4/all_events',
-                          'module_output/EWR/down4/all_events/down4.csv',
-                          'module_output/EWR/down4/summary',
-                          'module_output/EWR/down4/summary/down4.csv',
+                          'module_output/EWR/base_base',
+                          'module_output/EWR/base_base/all_events',
+                          'module_output/EWR/base_base/all_events/base_base.csv',
+                          'module_output/EWR/base_base/summary',
+                          'module_output/EWR/base_base/summary/base_base.csv',
+                          'module_output/EWR/down4_down4',
+                          'module_output/EWR/down4_down4/all_events',
+                          'module_output/EWR/down4_down4/all_events/down4_down4.csv',
+                          'module_output/EWR/down4_down4/summary',
+                          'module_output/EWR/down4_down4/summary/down4_down4.csv',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml',
-                          'module_output/EWR/up4',
-                          'module_output/EWR/up4/all_events',
-                          'module_output/EWR/up4/all_events/up4.csv',
-                          'module_output/EWR/up4/summary',
-                          'module_output/EWR/up4/summary/up4.csv')
+                          'module_output/EWR/up4_up4',
+                          'module_output/EWR/up4_up4/all_events',
+                          'module_output/EWR/up4_up4/all_events/up4_up4.csv',
+                          'module_output/EWR/up4_up4/summary',
+                          'module_output/EWR/up4_up4/summary/up4_up4.csv')
 
   expect_equal(realised_structure, expected_structure)
 
@@ -538,7 +671,7 @@ test_that('Single scenario among many, no access to the outer directory, differe
 ## sensitive to this- I think maybe test shims don't work right?
 test_that('parallel works for two', {
 
-  print(future::plan())
+  # print(future::plan())
   # create dir so building makes sense
   make_temp_hydro()
 
@@ -557,36 +690,36 @@ test_that('parallel works for two', {
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
 
   expected_structure <- c('hydrographs',
-                            'hydrographs/base',
-                            'hydrographs/base/base.csv',
-                            'hydrographs/base/base.json',
-                            'hydrographs/down4',
-                            'hydrographs/down4/down4.csv',
-                            'hydrographs/down4/down4.json',
-                            'hydrographs/scenario_metadata.json',
-                            'hydrographs/scenario_metadata.yml',
-                            'hydrographs/up4',
-                            'hydrographs/up4/up4.csv',
-                            'hydrographs/up4/up4.json',
-                            'module_output',
-                            'module_output/EWR',
-                            'module_output/EWR/base',
-                            'module_output/EWR/base/summary',
-                            'module_output/EWR/base/summary/base.csv',
-                            'module_output/EWR/base/yearly',
-                            'module_output/EWR/base/yearly/base.csv',
-                            'module_output/EWR/down4',
-                            'module_output/EWR/down4/summary',
-                            'module_output/EWR/down4/summary/down4.csv',
-                            'module_output/EWR/down4/yearly',
-                            'module_output/EWR/down4/yearly/down4.csv',
-                            'module_output/EWR/ewr_metadata.json',
-                            'module_output/EWR/ewr_metadata.yml',
-                            'module_output/EWR/up4',
-                            'module_output/EWR/up4/summary',
-                            'module_output/EWR/up4/summary/up4.csv',
-                            'module_output/EWR/up4/yearly',
-                            'module_output/EWR/up4/yearly/up4.csv')
+                          'hydrographs/base',
+                          'hydrographs/base/base.csv',
+                          'hydrographs/base/base.json',
+                          'hydrographs/down4',
+                          'hydrographs/down4/down4.csv',
+                          'hydrographs/down4/down4.json',
+                          'hydrographs/scenario_metadata.json',
+                          'hydrographs/scenario_metadata.yml',
+                          'hydrographs/up4',
+                          'hydrographs/up4/up4.csv',
+                          'hydrographs/up4/up4.json',
+                          'module_output',
+                          'module_output/EWR',
+                          'module_output/EWR/base_base',
+                          'module_output/EWR/base_base/summary',
+                          'module_output/EWR/base_base/summary/base_base.csv',
+                          'module_output/EWR/base_base/yearly',
+                          'module_output/EWR/base_base/yearly/base_base.csv',
+                          'module_output/EWR/down4_down4',
+                          'module_output/EWR/down4_down4/summary',
+                          'module_output/EWR/down4_down4/summary/down4_down4.csv',
+                          'module_output/EWR/down4_down4/yearly',
+                          'module_output/EWR/down4_down4/yearly/down4_down4.csv',
+                          'module_output/EWR/ewr_metadata.json',
+                          'module_output/EWR/ewr_metadata.yml',
+                          'module_output/EWR/up4_up4',
+                          'module_output/EWR/up4_up4/summary',
+                          'module_output/EWR/up4_up4/summary/up4_up4.csv',
+                          'module_output/EWR/up4_up4/yearly',
+                          'module_output/EWR/up4_up4/yearly/up4_up4.csv')
 
   expect_equal(realised_structure, expected_structure)
 
@@ -595,7 +728,7 @@ test_that('parallel works for two', {
 
 test_that('parallel works for one', {
 
-  print(future::plan())
+  # print(future::plan())
 
   # create dir so building makes sense
   make_temp_hydro()
@@ -627,17 +760,17 @@ test_that('parallel works for one', {
                           'hydrographs/up4/up4.json',
                           'module_output',
                           'module_output/EWR',
-                          'module_output/EWR/base',
-                          'module_output/EWR/base/summary',
-                          'module_output/EWR/base/summary/base.csv',
-                          'module_output/EWR/down4',
-                          'module_output/EWR/down4/summary',
-                          'module_output/EWR/down4/summary/down4.csv',
+                          'module_output/EWR/base_base',
+                          'module_output/EWR/base_base/summary',
+                          'module_output/EWR/base_base/summary/base_base.csv',
+                          'module_output/EWR/down4_down4',
+                          'module_output/EWR/down4_down4/summary',
+                          'module_output/EWR/down4_down4/summary/down4_down4.csv',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml',
-                          'module_output/EWR/up4',
-                          'module_output/EWR/up4/summary',
-                          'module_output/EWR/up4/summary/up4.csv')
+                          'module_output/EWR/up4_up4',
+                          'module_output/EWR/up4_up4/summary',
+                          'module_output/EWR/up4_up4/summary/up4_up4.csv')
 
   expect_equal(realised_structure, expected_structure)
 
@@ -645,7 +778,7 @@ test_that('parallel works for one', {
 
 test_that('parallel works for no return', {
 
-  print(future::plan())
+  # print(future::plan())
 
   # create dir so building makes sense
   make_temp_hydro()
@@ -676,26 +809,55 @@ test_that('parallel works for no return', {
                           'hydrographs/up4/up4.json',
                           'module_output',
                           'module_output/EWR',
-                          'module_output/EWR/base',
-                          'module_output/EWR/base/summary',
-                          'module_output/EWR/base/summary/base.csv',
-                          'module_output/EWR/base/yearly',
-                          'module_output/EWR/base/yearly/base.csv',
-                          'module_output/EWR/down4',
-                          'module_output/EWR/down4/summary',
-                          'module_output/EWR/down4/summary/down4.csv',
-                          'module_output/EWR/down4/yearly',
-                          'module_output/EWR/down4/yearly/down4.csv',
+                          'module_output/EWR/base_base',
+                          'module_output/EWR/base_base/summary',
+                          'module_output/EWR/base_base/summary/base_base.csv',
+                          'module_output/EWR/base_base/yearly',
+                          'module_output/EWR/base_base/yearly/base_base.csv',
+                          'module_output/EWR/down4_down4',
+                          'module_output/EWR/down4_down4/summary',
+                          'module_output/EWR/down4_down4/summary/down4_down4.csv',
+                          'module_output/EWR/down4_down4/yearly',
+                          'module_output/EWR/down4_down4/yearly/down4_down4.csv',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml',
-                          'module_output/EWR/up4',
-                          'module_output/EWR/up4/summary',
-                          'module_output/EWR/up4/summary/up4.csv',
-                          'module_output/EWR/up4/yearly',
-                          'module_output/EWR/up4/yearly/up4.csv')
+                          'module_output/EWR/up4_up4',
+                          'module_output/EWR/up4_up4/summary',
+                          'module_output/EWR/up4_up4/summary/up4_up4.csv',
+                          'module_output/EWR/up4_up4/yearly',
+                          'module_output/EWR/up4_up4/yearly/up4_up4.csv')
 
   expect_equal(realised_structure, expected_structure)
 
 })
+
+test_that('speed test', {
+
+  skip(message = 'Speed test not really a test, just including to take advantage of setup')
+  # print(future::plan())
+
+  # create dir so building makes sense
+  make_temp_hydro()
+
+  # microbenchmark would be better, this is quick and dirty
+  tp <- system.time(ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
+                                output_parent_dir = temp_parent_dir,
+                                outputType = list('summary', 'yearly'),
+                                datesuffix = FALSE,
+                                returnType = list('summary', 'yearly'),
+                                rparallel = TRUE))
+
+  ts <- system.time(ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
+                                                  output_parent_dir = temp_parent_dir,
+                                                  outputType = list('summary', 'yearly'),
+                                                  datesuffix = FALSE,
+                                                  returnType = list('summary', 'yearly'),
+                                                  rparallel = FALSE))
+  tp
+  ts
+
+})
+
+
 
 

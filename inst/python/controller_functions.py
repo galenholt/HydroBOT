@@ -1,9 +1,11 @@
 from py_ewr.scenario_handling import ScenarioHandler
 import os
 import copy
+import zipfile
+import shutil
 
 
-def clean_ewrs(ewr_results, scenario_filename_split):
+def clean_ewrs(ewr_results, scenario_name):
   # There are some case issues between the types. Some variables have camelCase, so I don't want to goof that up, but I want 'gauge' and 'scenario' in particular to be lower. So just change the first letter
     firstlower = lambda s: s[:1].lower() + s[1:] if s else ''
     ewr_results = ewr_results.rename(columns = firstlower)
@@ -19,7 +21,7 @@ def clean_ewrs(ewr_results, scenario_filename_split):
     
     # I think this is a bad assumption, and we should let the user deal with
     # whatever their naming convention is in the output.
-    ewr_results["scenario"] = scenario_filename_split
+    ewr_results["scenario"] = scenario_name
     
     return(ewr_results)
 
@@ -52,9 +54,35 @@ def save_ewrs(ewr_results, ewr_type, output_path, datesuffix = True):
         sceneresults = ewr_results.query('scenario == @i')
         sceneresults.to_csv(outfile, index = False)
 
+# an unzipper and change pathlist to the new directory
+def unzip_and_pathparse(pathlist, output_path):
+        splitpath = pathlist.split('.zip/')
+        splitpath[0] = splitpath[0] + '.zip'
+        extract_dir = os.path.join(output_path, 'hydrozipextract')
+        # Ensure the extraction directory exists, create if it doesn't
+        if not os.path.exists(extract_dir):
+            os.makedirs(extract_dir)
+        # Open the zip file
+        with zipfile.ZipFile(splitpath[0], 'r') as zip_ref:
+            # Extract the single file
+            zip_ref.extract(splitpath[1], path=extract_dir)
+        
+        # set pathlist to that directory
+        pathlist = os.path.join(extract_dir, splitpath[1])
+        return(pathlist)
 
 # Main function to run and save the EWRs
-def run_save_ewrs(pathlist, output_path, model_format, outputType = 'none', returnType = 'none', scenario_filename_split = '_DIRECTORYAPPEND_', datesuffix = False):
+def run_save_ewrs(pathlist, output_path, model_format, outputType = 'none', returnType = 'none', scenario_name = '_UNNAMEDSCENARIO_', datesuffix = False):
+    
+    # I'm not convinced we want to support in-function unzipping, but it would work, I guess.
+    # The goal here is to unzip only the needed file, and so paralleling does that once per process
+    # and we still only pass paths between functions, so the processes themselves don't have a ton of data thrash
+    # still, I don't really see the point of this vs unpacking the whole zip before we start. 
+    # Maybe if this were done in py-ewr, then we could read straight out of the zipped ncdf and not ever re-save it somewhere?
+    # If we do go this route, should we leave the unzipped files there for later, or trash them? My inclination is trash them
+    if ('.zip' in pathlist):
+        pathlist = unzip_and_pathparse(pathlist, output_path)
+    
     thisewr = ScenarioHandler(scenario_file = pathlist, 
                          model_format = model_format)
     
@@ -64,23 +92,26 @@ def run_save_ewrs(pathlist, output_path, model_format, outputType = 'none', retu
     # comprehension instead of a million ifs
     if (('summary' in bothType) | ('everything' in bothType)):
         ewr_sum = thisewr.get_ewr_results()
-        ewr_sum = clean_ewrs(ewr_sum, scenario_filename_split)
+        ewr_sum = clean_ewrs(ewr_sum, scenario_name)
     if (('annual' in bothType) | ('everything' in bothType) | ('yearly' in bothType)):
         ewr_yr = thisewr.get_yearly_ewr_results()
-        ewr_yr = clean_ewrs(ewr_yr, scenario_filename_split)
+        ewr_yr = clean_ewrs(ewr_yr, scenario_name)
     if (('all' in bothType) | ('everything' in bothType) | ('all_events' in bothType)):
         ewr_all = thisewr.get_all_events()
-        ewr_all = clean_ewrs(ewr_all, scenario_filename_split)
+        ewr_all = clean_ewrs(ewr_all, scenario_name)
     if (('all_successful_events' in bothType) | ('everything' in bothType) | ('successful' in bothType)):
         ewr_success = thisewr.get_all_successful_events()
-        ewr_success = clean_ewrs(ewr_success, scenario_filename_split)
+        ewr_success = clean_ewrs(ewr_success, scenario_name)
     if (('all_interEvents' in bothType) | ('everything' in bothType)):
         ewr_inter = thisewr.get_all_interEvents()
-        ewr_inter = clean_ewrs(ewr_inter, scenario_filename_split)
+        ewr_inter = clean_ewrs(ewr_inter, scenario_name)
     if (('all_successful_interEvents' in bothType) | ('everything' in bothType)):
         ewr_successInter = thisewr.get_all_successful_interEvents()
-        ewr_successInter = clean_ewrs(ewr_successInter, scenario_filename_split)
+        ewr_successInter = clean_ewrs(ewr_successInter, scenario_name)
     
+    # cleanup the extracted zips- if the user wanted them around, they'd just unzip first, I think.
+    if ('.zip' in pathlist):
+        shutil.rmtree(os.path.join(output_path, 'hydrozipextract'))
 
     # only save the parts we want
     if ('summary' in outputType) | ('everything' in outputType):
@@ -121,7 +152,7 @@ def run_save_ewrs(pathlist, output_path, model_format, outputType = 'none', retu
   
   
 # OLD, DEPRECATED function to run and save the EWRs
-def run_save_ewrs_old(pathlist, output_path, model_format, allowance, climate, outputType = 'none', returnType = 'none', scenario_filename_split = '_DIRECTORYAPPEND_', datesuffix = False):
+def run_save_ewrs_old(pathlist, output_path, model_format, allowance, climate, outputType = 'none', returnType = 'none', scenario_name = '_DIRECTORYAPPEND_', datesuffix = False):
     thisewr = ScenarioHandler(scenario_files = pathlist, 
                          model_format = model_format, 
                          allowance = allowance, 
@@ -133,22 +164,22 @@ def run_save_ewrs_old(pathlist, output_path, model_format, allowance, climate, o
     # comprehension instead of a million ifs
     if (('summary' in bothType) | ('everything' in bothType)):
         ewr_sum = thisewr.get_ewr_results()
-        ewr_sum = clean_ewrs(ewr_sum, scenario_filename_split)
+        ewr_sum = clean_ewrs(ewr_sum, scenario_name)
     if (('annual' in bothType) | ('everything' in bothType) | ('yearly' in bothType)):
         ewr_yr = thisewr.get_yearly_ewr_results()
-        ewr_yr = clean_ewrs(ewr_yr, scenario_filename_split)
+        ewr_yr = clean_ewrs(ewr_yr, scenario_name)
     if (('all' in bothType) | ('everything' in bothType) | ('all_events' in bothType)):
         ewr_all = thisewr.get_all_events()
-        ewr_all = clean_ewrs(ewr_all, scenario_filename_split)
+        ewr_all = clean_ewrs(ewr_all, scenario_name)
     if (('all_successful_events' in bothType) | ('everything' in bothType) | ('successful' in bothType)):
         ewr_success = thisewr.get_all_successful_events()
-        ewr_success = clean_ewrs(ewr_success, scenario_filename_split)
+        ewr_success = clean_ewrs(ewr_success, scenario_name)
     if (('all_interEvents' in bothType) | ('everything' in bothType)):
         ewr_inter = thisewr.get_all_interEvents()
-        ewr_inter = clean_ewrs(ewr_inter, scenario_filename_split)
+        ewr_inter = clean_ewrs(ewr_inter, scenario_name)
     if (('all_successful_interEvents' in bothType) | ('everything' in bothType)):
         ewr_successInter = thisewr.get_all_successful_interEvents()
-        ewr_successInter = clean_ewrs(ewr_successInter, scenario_filename_split)
+        ewr_successInter = clean_ewrs(ewr_successInter, scenario_name)
     
 
     # only save the parts we want

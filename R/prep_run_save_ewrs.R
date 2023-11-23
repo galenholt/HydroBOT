@@ -29,7 +29,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'  * 'IQQM - NSW 10,000 years' (default, among other things accepts a csv with a Date column followed by gauge columns)
 #'  * 'Bigmod - MDBA'
 #'  * 'Source - NSW (res.csv)'
-#'  * 'IQQM - netcdf': in development
+#'  * 'IQQM - netcdf': in development, finds all netcdf files in `hydro_dir` (and so if there are multiple nc files, you'll need to reorganise or use the .zip approach: Should also work when `hydro_dir` is a .zip with netcdfs inside, but ONLY if those netcdfs are named 'Straight Node (Gauge).nc'. This could change.
 #' @param outputType list of strings or character vector defining what to save
 #'   to disk. One or more of:
 #'  * 'none' (default), do not save outputs- ignored if in a list with others
@@ -43,7 +43,6 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'   to the active R session. Same options as `outputType`
 #' @param datesuffix logical. whether to add a suffix to saved filenames to
 #'   provide a datestamp. Should be deprecated in favour of metadata files.
-#' @param scenario_filename_split character (including regex) to split the scenario filenames in the 'scenario' column of the EWR outputs. Mostly for handling the situation of gauge-named csvs with the scenario name appended to the front. When auto-appended, '_DIRECTORYAPPEND_' is used. If the appending has been done by the user, will need to pass in the split. The 'scenario' is given the first piece of the split, so do not use a split pattern in the scenario name, e.g. do not name scenarios a_1 and then append csvs with "_" like a_1_401234.csv, or the _1 will be lost..
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
 #' @param rparallel logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using `furrr`. To use, install `furrr` and set a [future::plan()] (likely `multisession` or `multicore`)
 #' @param climate deprecated, included to let old calls pass
@@ -59,7 +58,6 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                                model_format = 'IQQM - NSW 10,000 years',
                                outputType = 'none', returnType = 'none',
-                               scenario_filename_split = '_DIRECTORYAPPEND_',
                                extrameta = NULL,
                                datesuffix = FALSE,
                                rparallel = FALSE,
@@ -160,17 +158,18 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   # define this particular function with the current set of args, so the syntax
   # is simpler in furrr and purrr
   ewrfun <- function(x, y) {
+    # x <- file.path(hydro_dir, x)
     controller_functions$run_save_ewrs(x,
                                        output_path,
                                        model_format,
                                        outputType = outputType,
                                        returnType = returnType,
-                                       scenario_filename_split = y,
+                                       scenario_name = y,
                                        datesuffix = datesuffix)
   }
 
   if (rparallel) {
-    ewr_out <- furrr::future_map(hydro_paths, ewrfun,
+    ewr_out <- furrr::future_imap(hydro_paths, ewrfun,
                                  .options = furrr::furrr_options(seed = TRUE))
 
   } else {
