@@ -1,8 +1,8 @@
 # my testthat::test_path() is 'tests/testthat', I have to use paths relative to that.
 # And I don't want to use the `system.file` method, since i need to just pass characters.
 
-temp_hydro_dir = '_test_data/temp/hydrographs'
-temp_parent_dir = '_test_data/temp'
+temp_hydro_dir = '_test_data/hydrographs'
+temp_parent_dir = '_test_data'
 
 test_that("parameter file works with params.R", {
 
@@ -40,7 +40,7 @@ test_that("passing from command works", {
   # The yaml here becomes a pain if it needs to pass more than one item.
   test <- run_toolkit_params(yamlpath = system.file('yml/package_params.yml',
                                                     package = 'werptoolkitr'),
-                             passed_args = "output_parent_dir: '_test_data/temp'")
+                             passed_args = "output_parent_dir: '_test_data'")
 
   # kind of silly- the main thing is that the above doesn't fail
   expect_null(test)
@@ -58,14 +58,14 @@ test_that("list args work", {
   # The yaml here becomes a pain if it needs to pass more than one item.
   test <- run_toolkit_params(yamlpath = system.file('yml/package_params.yml',
                                                     package = 'werptoolkitr'),
-                             list_args = list(output_parent_dir =  '_test_data/temp'))
+                             list_args = list(output_parent_dir =  '_test_data'))
 
   # kind of silly- the main thing is that the above doesn't fail
   expect_null(test)
 
 
   # There's a weird thing where the params lists in quarto have a special class, and that breaks json
-  qlist <- list(output_parent_dir =  '_test_data/temp')
+  qlist <- list(output_parent_dir =  '_test_data')
   class(qlist) <- "knit_param_list"
 
   # The yaml here becomes a pain if it needs to pass more than one item.
@@ -106,8 +106,8 @@ test_that('Single scenario among many, no access to the outer directory', {
   # Now, let's assume all we have is a path to the specific scenario
   scenario_path <- file.path(temp_hydro_dir, 'base')
 
-  test <- run_toolkit_params(list_args = list(output_parent_dir = '_test_data/temp/hydrographs/base',
-                                              hydro_dir = '_test_data/temp/hydrographs/base',
+  test <- run_toolkit_params(list_args = list(output_parent_dir = '_test_data/hydrographs/base',
+                                              hydro_dir = '_test_data/hydrographs/base',
                                               aggregation_def = 'yml/params.R'))
 
   # kind of silly- the main thing is that the above doesn't fail
@@ -126,7 +126,7 @@ test_that('Single scenario among many, no access to the outer directory', {
                           'module_output/EWR/base/yearly/base.csv',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml')
-  expect_equal(list.files('_test_data/temp/hydrographs/base', recursive = TRUE), expected_structure)
+  expect_equal(list.files('_test_data/hydrographs/base', recursive = TRUE), expected_structure)
 
   # Tear down
 
@@ -171,7 +171,7 @@ test_that('Single scenario among many, no access to the outer directory, differe
                           'module_output/EWR/base/yearly/base.csv',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml')
-  expect_equal(list.files('_test_data/temp/hydrographs/results', recursive = TRUE), expected_structure)
+  expect_equal(list.files('_test_data/hydrographs/results', recursive = TRUE), expected_structure)
 
   # Tear down
 

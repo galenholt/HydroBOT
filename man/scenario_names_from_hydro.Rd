@@ -13,5 +13,5 @@ scenario_names_from_hydro(hydro_dir)
 character vector of scenario names
 }
 \description{
-Used to auto-acquire scenario names from the hydrograph directory
+DEPRECATED, only used for the old prep_run_save_ewrs
 }

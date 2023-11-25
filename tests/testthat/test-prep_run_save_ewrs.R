@@ -1,9 +1,9 @@
 # Set up some base directory structures
-temp_hydro_dir = '_test_data/temp/hydrographs'
-temp_parent_dir = '_test_data/temp'
+temp_hydro_dir <- '_test_data/hydrographs'
+temp_parent_dir <- '_test_data'
 
-temp_hydro_multi = '_test_data/temp/hydrographs'
-temp_parent_multi = '_test_data/temp'
+temp_hydro_multi <- '_test_data/hydrographs'
+temp_parent_multi <- '_test_data'
 
 set_future_multi()
 
@@ -352,7 +352,7 @@ test_that('NETCDF saving and returning works for all (or nearly all) ewr outputs
                      # 'all_interEvents',
                      'all_successful_interEvents')
 
-  ewr_out <- prep_run_save_ewrs(hydro_dir = '_test_data/temp/nchydros',
+  ewr_out <- prep_run_save_ewrs(hydro_dir = '_test_data/nchydros',
                                 output_parent_dir = temp_parent_dir,
                                 model_format = 'IQQM - netcdf',
                                 outputType = ewroutlist,
@@ -361,7 +361,7 @@ test_that('NETCDF saving and returning works for all (or nearly all) ewr outputs
 
   expect_equal(length(ewr_out), length(ewroutlist))
   expect_equal(names(ewr_out), unlist(ewroutlist))
-  expect_equal(unique(ewr_out$summary$scenario), c("S1_Straight Node (Gauge)", "S2_Straight Node (Gauge)"))
+  expect_equal(unique(ewr_out$summary$scenario), c("S1_StraightNodeGauge", "S2_StraightNodeGauge"))
 
   # Test it created the expected structure
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
@@ -370,29 +370,33 @@ test_that('NETCDF saving and returning works for all (or nearly all) ewr outputs
                           'module_output/EWR',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml',
-                          'module_output/EWR/S1_Straight Node (Gauge)',
-                          'module_output/EWR/S1_Straight Node (Gauge)/all_events',
-                          'module_output/EWR/S1_Straight Node (Gauge)/all_events/S1_Straight Node (Gauge).csv',
-                          'module_output/EWR/S1_Straight Node (Gauge)/all_successful_events',
-                          'module_output/EWR/S1_Straight Node (Gauge)/all_successful_interEvents',
-                          'module_output/EWR/S1_Straight Node (Gauge)/summary',
-                          'module_output/EWR/S1_Straight Node (Gauge)/summary/S1_Straight Node (Gauge).csv',
-                          'module_output/EWR/S1_Straight Node (Gauge)/yearly',
-                          'module_output/EWR/S1_Straight Node (Gauge)/yearly/S1_Straight Node (Gauge).csv',
-                          'module_output/EWR/S2_Straight Node (Gauge)',
-                          'module_output/EWR/S2_Straight Node (Gauge)/all_events',
-                          'module_output/EWR/S2_Straight Node (Gauge)/all_events/S2_Straight Node (Gauge).csv',
-                          'module_output/EWR/S2_Straight Node (Gauge)/all_successful_events',
-                          'module_output/EWR/S2_Straight Node (Gauge)/all_successful_interEvents',
-                          'module_output/EWR/S2_Straight Node (Gauge)/summary',
-                          'module_output/EWR/S2_Straight Node (Gauge)/summary/S2_Straight Node (Gauge).csv',
-                          'module_output/EWR/S2_Straight Node (Gauge)/yearly',
-                          'module_output/EWR/S2_Straight Node (Gauge)/yearly/S2_Straight Node (Gauge).csv',
+                          'module_output/EWR/S1_StraightNodeGauge',
+                          'module_output/EWR/S1_StraightNodeGauge/all_events',
+                          'module_output/EWR/S1_StraightNodeGauge/all_events/S1_StraightNodeGauge.csv',
+                          'module_output/EWR/S1_StraightNodeGauge/all_successful_events',
+                          'module_output/EWR/S1_StraightNodeGauge/all_successful_events/S1_StraightNodeGauge.csv',
+                          'module_output/EWR/S1_StraightNodeGauge/all_successful_interEvents',
+                          'module_output/EWR/S1_StraightNodeGauge/all_successful_interEvents/S1_StraightNodeGauge.csv',
+                          'module_output/EWR/S1_StraightNodeGauge/summary',
+                          'module_output/EWR/S1_StraightNodeGauge/summary/S1_StraightNodeGauge.csv',
+                          'module_output/EWR/S1_StraightNodeGauge/yearly',
+                          'module_output/EWR/S1_StraightNodeGauge/yearly/S1_StraightNodeGauge.csv',
+                          'module_output/EWR/S2_StraightNodeGauge',
+                          'module_output/EWR/S2_StraightNodeGauge/all_events',
+                          'module_output/EWR/S2_StraightNodeGauge/all_events/S2_StraightNodeGauge.csv',
+                          'module_output/EWR/S2_StraightNodeGauge/all_successful_events',
+                          'module_output/EWR/S2_StraightNodeGauge/all_successful_events/S2_StraightNodeGauge.csv',
+                          'module_output/EWR/S2_StraightNodeGauge/all_successful_interEvents',
+                          'module_output/EWR/S2_StraightNodeGauge/all_successful_interEvents/S2_StraightNodeGauge.csv',
+                          'module_output/EWR/S2_StraightNodeGauge/summary',
+                          'module_output/EWR/S2_StraightNodeGauge/summary/S2_StraightNodeGauge.csv',
+                          'module_output/EWR/S2_StraightNodeGauge/yearly',
+                          'module_output/EWR/S2_StraightNodeGauge/yearly/S2_StraightNodeGauge.csv',
                           'nchydros',
                           'nchydros/S1',
-                          'nchydros/S1/Straight Node (Gauge).nc',
+                          'nchydros/S1/StraightNodeGauge.nc',
                           'nchydros/S2',
-                          'nchydros/S2/Straight Node (Gauge).nc')
+                          'nchydros/S2/StraightNodeGauge.nc')
 
   expect_true(all(realised_structure %in% expected_structure))
 
@@ -413,7 +417,7 @@ test_that('zipped NETCDF saving and returning works for all (or nearly all) ewr 
                      # 'all_interEvents',
                      'all_successful_interEvents')
 
-  ewr_out <- prep_run_save_ewrs(hydro_dir = '_test_data/temp/hydrographs/zipcdf.zip',
+  ewr_out <- prep_run_save_ewrs(hydro_dir = '_test_data/hydrographs/zipcdf.zip',
                                 output_parent_dir = temp_parent_dir,
                                 model_format = 'IQQM - netcdf',
                                 outputType = ewroutlist,
@@ -475,7 +479,7 @@ test_that('NETCDF saving and returning works in parallel', {
 
   ewroutlist <- list('summary')
 
-  ewr_out <- prep_run_save_ewrs(hydro_dir = '_test_data/temp/nchydros',
+  ewr_out <- prep_run_save_ewrs(hydro_dir = '_test_data/nchydros',
                                 output_parent_dir = temp_parent_dir,
                                 model_format = 'IQQM - netcdf',
                                 outputType = ewroutlist,
@@ -485,7 +489,7 @@ test_that('NETCDF saving and returning works in parallel', {
 
   expect_equal(length(ewr_out), length(ewroutlist))
   expect_equal(names(ewr_out), unlist(ewroutlist))
-  expect_equal(unique(ewr_out$summary$scenario), c("S1_Straight Node (Gauge)", "S2_Straight Node (Gauge)"))
+  expect_equal(unique(ewr_out$summary$scenario), c("S1_StraightNodeGauge", "S2_StraightNodeGauge"))
 
   # Test it created the expected structure
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
@@ -494,29 +498,29 @@ test_that('NETCDF saving and returning works in parallel', {
                           'module_output/EWR',
                           'module_output/EWR/ewr_metadata.json',
                           'module_output/EWR/ewr_metadata.yml',
-                          'module_output/EWR/S1_Straight Node (Gauge)',
-                          'module_output/EWR/S1_Straight Node (Gauge)/all_events',
-                          'module_output/EWR/S1_Straight Node (Gauge)/all_events/S1_Straight Node (Gauge).csv',
-                          'module_output/EWR/S1_Straight Node (Gauge)/all_successful_events',
-                          'module_output/EWR/S1_Straight Node (Gauge)/all_successful_interEvents',
-                          'module_output/EWR/S1_Straight Node (Gauge)/summary',
-                          'module_output/EWR/S1_Straight Node (Gauge)/summary/S1_Straight Node (Gauge).csv',
-                          'module_output/EWR/S1_Straight Node (Gauge)/yearly',
-                          'module_output/EWR/S1_Straight Node (Gauge)/yearly/S1_Straight Node (Gauge).csv',
-                          'module_output/EWR/S2_Straight Node (Gauge)',
-                          'module_output/EWR/S2_Straight Node (Gauge)/all_events',
-                          'module_output/EWR/S2_Straight Node (Gauge)/all_events/S2_Straight Node (Gauge).csv',
-                          'module_output/EWR/S2_Straight Node (Gauge)/all_successful_events',
-                          'module_output/EWR/S2_Straight Node (Gauge)/all_successful_interEvents',
-                          'module_output/EWR/S2_Straight Node (Gauge)/summary',
-                          'module_output/EWR/S2_Straight Node (Gauge)/summary/S2_Straight Node (Gauge).csv',
-                          'module_output/EWR/S2_Straight Node (Gauge)/yearly',
-                          'module_output/EWR/S2_Straight Node (Gauge)/yearly/S2_Straight Node (Gauge).csv',
+                          'module_output/EWR/S1_StraightNodeGauge',
+                          'module_output/EWR/S1_StraightNodeGauge/all_events',
+                          'module_output/EWR/S1_StraightNodeGauge/all_events/S1_StraightNodeGauge.csv',
+                          'module_output/EWR/S1_StraightNodeGauge/all_successful_events',
+                          'module_output/EWR/S1_StraightNodeGauge/all_successful_interEvents',
+                          'module_output/EWR/S1_StraightNodeGauge/summary',
+                          'module_output/EWR/S1_StraightNodeGauge/summary/S1_StraightNodeGauge.csv',
+                          'module_output/EWR/S1_StraightNodeGauge/yearly',
+                          'module_output/EWR/S1_StraightNodeGauge/yearly/S1_StraightNodeGauge.csv',
+                          'module_output/EWR/S2_StraightNodeGauge',
+                          'module_output/EWR/S2_StraightNodeGauge/all_events',
+                          'module_output/EWR/S2_StraightNodeGauge/all_events/S2_StraightNodeGauge.csv',
+                          'module_output/EWR/S2_StraightNodeGauge/all_successful_events',
+                          'module_output/EWR/S2_StraightNodeGauge/all_successful_interEvents',
+                          'module_output/EWR/S2_StraightNodeGauge/summary',
+                          'module_output/EWR/S2_StraightNodeGauge/summary/S2_StraightNodeGauge.csv',
+                          'module_output/EWR/S2_StraightNodeGauge/yearly',
+                          'module_output/EWR/S2_StraightNodeGauge/yearly/S2_StraightNodeGauge.csv',
                           'nchydros',
                           'nchydros/S1',
-                          'nchydros/S1/Straight Node (Gauge).nc',
+                          'nchydros/S1/StraightNodeGauge.nc',
                           'nchydros/S2',
-                          'nchydros/S2/Straight Node (Gauge).nc')
+                          'nchydros/S2/StraightNodeGauge.nc')
 
   expect_true(all(realised_structure %in% expected_structure))
 

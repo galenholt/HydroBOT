@@ -113,10 +113,6 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   } else {
     hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
   }
-  # # allow passing in a vector of scenario names or getting them from hydro if NULL
-  # if (is.null(scenarios)) {
-  #   scenarios <- scenario_names_from_hydro(hydro_dir)
-  # }
 
   # We need to check the files have unique names (and fix if not), since the EWR
   # tool makes them the 'scenario' column.
@@ -124,8 +120,6 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   if (any(duplicated(hydro_paths))) {
     rlang::abort(glue::glue("The {hydro_paths[duplicated(hydro_paths)]} are duplicated. Fix your directory structure."))
   }
-
-
 
   # output_path doesn't get used for outputType == 'none', but we don't really
   # want to build directories in that case, so skip it.

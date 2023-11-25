@@ -11,10 +11,14 @@ prep_run_save_ewrs(
   model_format = "IQQM - NSW 10,000 years",
   outputType = "none",
   returnType = "none",
-  scenario_filename_split = "_DIRECTORYAPPEND_",
   extrameta = NULL,
   datesuffix = FALSE,
-  rparallel = FALSE
+  rparallel = FALSE,
+  climate = NULL,
+  MINT = NULL,
+  MAXT = NULL,
+  DUR = NULL,
+  DRAW = NULL
 )
 }
 \arguments{
@@ -29,10 +33,10 @@ but two typical cases:
 \item If running in batches for single scenarios, may be \code{hydro_dir}, which just puts the \code{module_outputs} in \code{hydro_dir}
 }}
 
-\item{scenarios}{\code{NULL} (default) or character.
+\item{scenarios}{\code{NULL} (default) or named list.
 \itemize{
 \item \code{NULL}- finds scenario names by parsing directory names in \code{hydro_dir}. If no internal directories, just stays in \code{hydro_dir}. This captures the two typical situations discussed for \code{output_parent_dir}. If there are other directories in \code{hydro_dir} that do not contain hydrological scenarios, should use a character vector.
-\item character vector of scenario names. This allows unusual directory structures.
+\item named list of paths to files. names become scenario names, paths should be relative to \code{hydro_dir}. This allows unusual directory structures.
 }}
 
 \item{model_format}{see EWR tool. One of:
@@ -40,7 +44,7 @@ but two typical cases:
 \item 'IQQM - NSW 10,000 years' (default, among other things accepts a csv with a Date column followed by gauge columns)
 \item 'Bigmod - MDBA'
 \item 'Source - NSW (res.csv)'
-\item 'IQQM - netcdf': in development
+\item 'IQQM - netcdf': in development, finds all netcdf files in \code{hydro_dir} (and so if there are multiple nc files, you'll need to reorganise or use the .zip approach: Should also work when \code{hydro_dir} is a .zip with netcdfs inside, but ONLY if those netcdfs are named 'Straight Node (Gauge).nc'. This could change.
 }}
 
 \item{outputType}{list of strings or character vector defining what to save
@@ -58,14 +62,22 @@ to disk. One or more of:
 \item{returnType}{list of strings or character vector defining what to return
 to the active R session. Same options as \code{outputType}}
 
-\item{scenario_filename_split}{character (including regex) to split the scenario filenames in the 'scenario' column of the EWR outputs. Mostly for handling the situation of gauge-named csvs with the scenario name appended to the front. When auto-appended, '\emph{DIRECTORYAPPEND}' is used. If the appending has been done by the user, will need to pass in the split. The 'scenario' is given the first piece of the split, so do not use a split pattern in the scenario name, e.g. do not name scenarios a_1 and then append csvs with "_" like a_1_401234.csv, or the _1 will be lost..}
-
 \item{extrameta}{list, extra information to include in saved metadata documentation for the run. Default NULL.}
 
 \item{datesuffix}{logical. whether to add a suffix to saved filenames to
 provide a datestamp. Should be deprecated in favour of metadata files.}
 
 \item{rparallel}{logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using \code{furrr}. To use, install \code{furrr} and set a \code{\link[future:plan]{future::plan()}} (likely \code{multisession} or \code{multicore})}
+
+\item{climate}{deprecated, included to let old calls pass}
+
+\item{MINT}{deprecated, included to let old calls pass}
+
+\item{MAXT}{deprecated, included to let old calls pass}
+
+\item{DUR}{deprecated, included to let old calls pass}
+
+\item{DRAW}{deprecated, included to let old calls pass}
 }
 \value{
 a list of dataframe(s) if \code{returnType} is not 'none', otherwise, NULL

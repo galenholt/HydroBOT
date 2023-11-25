@@ -1,6 +1,6 @@
 
-temp_hydro_dir = '_test_data/temp/hydrographs'
-temp_parent_dir = '_test_data/temp'
+temp_hydro_dir = '_test_data/hydrographs'
+temp_parent_dir = '_test_data'
 
 # build a test set
 # create dir so building makes sense

@@ -21,32 +21,15 @@ test_that("scenario paths works for single csvs in each", {
 
 test_that("scenario paths and the name fixer works for multiple csvs in each", {
 
-  temp_hydro_multi <- '_test_data/temp/hydrographs'
+  temp_hydro_multi <- '_test_data/hydrographs'
   # If needed, build the dir. This takes a while so don't tear it down, typically
-  make_temp_multifile(testdir = '_test_data/temp',
+  make_temp_multifile(testdir = '_test_data',
                       temp_hydro = 'hydrographs')
 
   scenario_paths <- find_scenario_paths(temp_hydro_multi)
 
-  expected_vector <- c('_test_data/temp/hydrographs/base/412002.csv',
-                       '_test_data/temp/hydrographs/base/412005.csv',
-                       '_test_data/temp/hydrographs/base/412038.csv',
-                       '_test_data/temp/hydrographs/base/421001.csv',
-                       '_test_data/temp/hydrographs/base/421004.csv',
-                       '_test_data/temp/hydrographs/base/421011.csv',
-                       '_test_data/temp/hydrographs/down4/412002.csv',
-                       '_test_data/temp/hydrographs/down4/412005.csv',
-                       '_test_data/temp/hydrographs/down4/412038.csv',
-                       '_test_data/temp/hydrographs/down4/421001.csv',
-                       '_test_data/temp/hydrographs/down4/421004.csv',
-                       '_test_data/temp/hydrographs/down4/421011.csv',
-                       '_test_data/temp/hydrographs/up4/412002.csv',
-                       '_test_data/temp/hydrographs/up4/412005.csv',
-                       '_test_data/temp/hydrographs/up4/412038.csv',
-                       '_test_data/temp/hydrographs/up4/421001.csv',
-                       '_test_data/temp/hydrographs/up4/421004.csv',
-                       '_test_data/temp/hydrographs/up4/421011.csv')
-  expect_equal(scenario_paths, expected_vector)
+  # Should be a list
+  expect_snapshot(scenario_paths)
 
   # Now find the scenario names, fix non-unique naming, and check
   scenenames <- scenario_names_from_hydro(temp_hydro_multi)
@@ -58,32 +41,13 @@ test_that("scenario paths and the name fixer works for multiple csvs in each", {
   # check they changed
   scenario_paths <- find_scenario_paths(temp_hydro_multi)
 
-  expected_vector <- c('_test_data/temp/hydrographs/base/base_DIRECTORYAPPEND_412002.csv',
-                       '_test_data/temp/hydrographs/base/base_DIRECTORYAPPEND_412005.csv',
-                       '_test_data/temp/hydrographs/base/base_DIRECTORYAPPEND_412038.csv',
-                       '_test_data/temp/hydrographs/base/base_DIRECTORYAPPEND_421001.csv',
-                       '_test_data/temp/hydrographs/base/base_DIRECTORYAPPEND_421004.csv',
-                       '_test_data/temp/hydrographs/base/base_DIRECTORYAPPEND_421011.csv',
-                       '_test_data/temp/hydrographs/down4/down4_DIRECTORYAPPEND_412002.csv',
-                       '_test_data/temp/hydrographs/down4/down4_DIRECTORYAPPEND_412005.csv',
-                       '_test_data/temp/hydrographs/down4/down4_DIRECTORYAPPEND_412038.csv',
-                       '_test_data/temp/hydrographs/down4/down4_DIRECTORYAPPEND_421001.csv',
-                       '_test_data/temp/hydrographs/down4/down4_DIRECTORYAPPEND_421004.csv',
-                       '_test_data/temp/hydrographs/down4/down4_DIRECTORYAPPEND_421011.csv',
-                       '_test_data/temp/hydrographs/up4/up4_DIRECTORYAPPEND_412002.csv',
-                       '_test_data/temp/hydrographs/up4/up4_DIRECTORYAPPEND_412005.csv',
-                       '_test_data/temp/hydrographs/up4/up4_DIRECTORYAPPEND_412038.csv',
-                       '_test_data/temp/hydrographs/up4/up4_DIRECTORYAPPEND_421001.csv',
-                       '_test_data/temp/hydrographs/up4/up4_DIRECTORYAPPEND_421004.csv',
-                       '_test_data/temp/hydrographs/up4/up4_DIRECTORYAPPEND_421011.csv')
-
-  expect_equal(scenario_paths, expected_vector)
+  expect_snapshot(scenario_paths)
 
 })
 
 test_that('creating output dirs works with hydro_dir having all scenarios', {
   # In this situation, the hydrograph folder and the outputs end up at the same level, underneath a 'project_dir'
-  project_dir <- '_test_data/temp'
+  project_dir <- '_test_data'
 
   make_temp_hydro()
 
@@ -126,7 +90,7 @@ test_that('creating output dirs works with hydro_dir as a single scenario', {
 
   # Here, the outputs end up within the same folder as the hydrographs
 
-  single_hydro_scenario <- '_test_data/temp/hydrographs/base'
+  single_hydro_scenario <- '_test_data/hydrographs/base'
   make_temp_hydro()
 
   scenarios <- scenario_names_from_hydro(single_hydro_scenario)
@@ -134,7 +98,7 @@ test_that('creating output dirs works with hydro_dir as a single scenario', {
   outpath <- make_output_dir(parent_dir = single_hydro_scenario, scenarios = scenarios)
 
   # check the full structure of the parent tree to make sure we're not adding extra stuff elsewhere
-  realised_structure <- list.files('_test_data/temp', recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files('_test_data', recursive = TRUE, include.dirs = TRUE)
   expected_structure <- c('hydrographs',
                           'hydrographs/base',
                           'hydrographs/base/base.csv',

@@ -1,5 +1,5 @@
 
-temp_parent_dir <- '_test_data/temp'
+temp_parent_dir <- '_test_data'
 # create dir so building makes sense
 make_temp_hydro()
 

@@ -80,6 +80,8 @@ make_output_dir <- function(parent_dir, scenarios, module_name = 'EWR',
 
 #' Used to auto-acquire scenario names from the hydrograph directory
 #'
+#' DEPRECATED, only used for the old prep_run_save_ewrs
+#'
 #' @param hydro_dir path to hydrograph directory. Can be the outer directory with all, or potentially a single scenario
 #'
 #' @return character vector of scenario names
@@ -88,8 +90,8 @@ make_output_dir <- function(parent_dir, scenarios, module_name = 'EWR',
 scenario_names_from_hydro <- function(hydro_dir) {
 
   # Remove files with extensions- we only want directories
-  scenarios <- list.files(hydro_dir, recursive = TRUE)
-  only_dirs <- stringr::str_which(scenarios, '\\.', negate = TRUE) #stringr::str_remove_all(scenarios, "\\..*")
+  scenarios <- list.files(hydro_dir)
+  only_dirs <- stringr::str_which(scenarios, '\\.', negate = TRUE)
   # If there's already module_output, ignore it
   no_modules <- stringr::str_which(scenarios, 'module_output', negate = TRUE)
 

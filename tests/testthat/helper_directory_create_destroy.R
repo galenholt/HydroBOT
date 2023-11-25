@@ -5,7 +5,7 @@
 
 
 
-make_temp_hydro <- function(testdir = '_test_data/temp',
+make_temp_hydro <- function(testdir = '_test_data',
                             temp_hydro_dir = 'hydrographs',
                             orig_hydro_dir = system.file("extdata/testsmall/hydrographs", package = 'werptoolkitr')) {
 
@@ -22,7 +22,7 @@ make_temp_hydro <- function(testdir = '_test_data/temp',
 
 }
 
-make_temp_zip <- function(testdir = '_test_data/temp',
+make_temp_zip <- function(testdir = '_test_data',
                             temp_hydro_dir = 'hydrographs',
                             orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = 'werptoolkitr')) {
 
@@ -39,7 +39,7 @@ make_temp_zip <- function(testdir = '_test_data/temp',
 
 }
 
-# destroy_temp_hydro <- function(temp_parent_dir = '_test_data/temp_one') {
+# destroy_temp_hydro <- function(temp_parent_dir = '_test_data_one') {
 #   unlink(temp_parent_dir, recursive = TRUE)
 # }
 
@@ -54,7 +54,7 @@ set_future_multi <- function() {
 # multiple csvs, each with one gauge ---------------------------------------
 
 
-make_temp_multifile <- function(testdir = '_test_data/temp',
+make_temp_multifile <- function(testdir = '_test_data',
                                 temp_hydro_dir = 'hydrographs',
                                 orig_hydro_dir = system.file("extdata/testsmall/hydrographs", package = 'werptoolkitr')) {
 
@@ -86,7 +86,7 @@ make_temp_multifile <- function(testdir = '_test_data/temp',
 
 }
 
-# destroy_temp_multifile <- function(temp_parent_dir = '_test_data/temp_multi') {
+# destroy_temp_multifile <- function(temp_parent_dir = '_test_data_multi') {
 #   unlink(temp_parent_dir, recursive = TRUE)
 # }
 
