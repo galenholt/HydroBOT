@@ -80,17 +80,16 @@ plot_outcomes <- function(outdf,
                                   y_lab = y_col,
                                   x_col = 'scenario',
                                   x_lab = x_col,
+                          colorset = 'scenario',
+                          pal_list = "scico::berlin",
+                          colorgroups = NULL,
+                          color_lab = ifelse(is.null(colorgroups), colorset, colorgroups),
                                   facet_row = NULL,
                                   facet_col = NULL,
                                   facet_wrapper = NULL,
-                                  scenariofilter = NULL,
-                                  colorgroups = NULL,
-                                  colorset = 'scenario',
-                                  color_lab = ifelse(is.null(colorgroups), colorset, colorgroups),
+
                                   point_group = NULL,
-                                  pal_list = "scico::berlin",
-                                  sceneorder = NULL,
-                                  scene_pal = "scico::bamako",
+                          sceneorder = NULL,
                                   scales = 'fixed',
                                   transy = 'identity',
                                   transx = 'identity',
@@ -108,7 +107,7 @@ plot_outcomes <- function(outdf,
                                   ...) {
 
 
-  ## setup- this all needs to be a single prep function. Can we wrap it into plot_prep?
+  ## Cleaning inputs
 
   if ((!is.null(facet_row) || !is.null(facet_col)) & !is.null(facet_wrapper)) {
     rlang::abort("asking for facet_wrap and facet_grid. Make up your mind.")
@@ -125,7 +124,46 @@ plot_outcomes <- function(outdf,
     if(comp_fun[1] == "c") {comp_fun <- comp_fun[2:length(comp_fun)]}
   }
 
-  # Find limits for the color scale- allows centering diverging palettes with baseline comparisons
+
+  # Prep the data
+  prepped <- plot_prep(data = outdf, y_col = y_col,
+                       sceneorder = sceneorder,
+                       base_lev = base_lev,
+                       comp_fun = comp_fun,
+                       zero_adjust = zero_adjust, ...)
+
+  # Warn about conflicts with y-axis trans
+  if (!inherits(transy, 'trans') && transy %in% c('log', 'log10') & any(prepped$data[[prepped$y_col]] == 0)) {
+    rlang::warn(glue::glue("`transy` takes logs, but data has
+                           {sum(prepped$data[[prepped$y_col]] == 0)} zeros and
+                           {sum(prepped$data[[prepped$y_col]] < 0)} less than 0,
+                           which will get lost"))
+  }
+
+
+  # Handle different color options
+  color_type <- find_color_type(pal_list)
+
+  # if the data is qualitative but the palette is continuous, we need to make a named palette
+  if (color_type == 'paletteer_c' & !is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,colorset])))) {
+    pal_list <- make_pal(prepped$data[[colorset]], pal_list[[1]])
+    color_type <- 'colorobj'
+  }
+
+  # if the data is quantitative but the palette is discrete, we need to do something, but maybe just fail.
+  if (color_type == 'paletteer_c' & !is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,colorset])))) {
+    rlang::abort(glue::glue("Using discrete palette {pal_list[[1]]} for continous data {colorset}"))
+  }
+
+  # This is annoying, but having a column with the same name lets us avoid a lot of duplicated code
+  if (color_type == 'grouped') {
+    prepped$data <- grouped_colors(prepped$data, pal_list, colorgroups, colorset)
+  } else {
+    prepped$data$color <- prepped$data[[colorset]]
+  }
+
+  # Find limits for the color scale- needs to be a function, so write it here so it inherits variables.
+  # allows centering diverging palettes with baseline comparisons
   # by defining this in here, it inherits comp_fun and other values
   # x is typically prepped$data[[prepped$y_col]] (because `prepped$y_col` is
   # the new y_col name if baselined). Should I just use that? Or can I call it from inside the `scale`
@@ -153,8 +191,14 @@ plot_outcomes <- function(outdf,
 
   }
 
-  # use `grouped_colors` to set colour groups
-  outdf <- grouped_colours(outdf, pal_list, colorgroups, colorset)
+  # finds labels that match scale_color_identity
+  labfind <- function(breaks, data = prepped$data) {
+    if (inherits(data, 'sf')) {data <- sf::st_drop_geometry(data)}
+    matched_vals <- unique(data[,c('colordef', 'color')])
+    # make sure everything lines up
+    m_ind <- match(breaks, matched_vals$color)
+    return(dplyr::pull(matched_vals[, 'colordef'])[m_ind])
+  }
 
   # Deal with additional point_groups- temped to put in grouped_colors, but
   # there are too many short-circuits
@@ -166,152 +210,170 @@ plot_outcomes <- function(outdf,
       dplyr::mutate(pointgroup = interaction(.data[[colorset]], .data[[point_group]]))
   }
 
-  # I guess keep scenariofilter until it breaks something, even though this
-  # needs to be more flexible.
-  # The `colors` argument here gets returned in the list, NOT in the data, which
-  # retains the `color` column from `grouped_colours`
-  prepped <- plot_prep(data = outdf, y_col = y_col, colors = scene_pal,
-                       sceneorder = sceneorder,
-                       gaugefilter = NULL,
-                       scenariofilter = scenariofilter,
-                       base_lev = base_lev,
-                       comp_fun = comp_fun,
-                       zero_adjust = zero_adjust, ...)
 
-  # That can introduce some infs and nans, often from division by zero in the relativiser
-  new_nan_inf <- sum(is.nan(prepped$data[[prepped$y_col]])) + sum(is.infinite(prepped$data[[prepped$y_col]]))
-  old_nan_inf <- sum(is.nan(prepped$data[[y_col]])) + sum(is.infinite(prepped$data[[y_col]]))
-  if (new_nan_inf > old_nan_inf) {
-    rlang::warn(glue::glue("NaN and Inf introduced in `plot_prep`, likely due to division by zero. {new_nan_inf - old_nan_inf} values were lost."))
-  }
-
-  if (!inherits(transy, 'trans') && transy %in% c('log', 'log10') & any(prepped$data[[prepped$y_col]] == 0)) {
-    rlang::warn(glue::glue("`transy` takes logs, but data has
-                           {sum(prepped$data[[prepped$y_col]] == 0)} zeros and
-                           {sum(prepped$data[[prepped$y_col]] < 0)} less than 0,
-                           which will get lost"))
-  }
-
-
-  # finds labels that match scale_color_identity
-  labfind <- function(breaks, data = prepped$data) {
-    if (inherits(data, 'sf')) {data <- sf::st_drop_geometry(data)}
-    matched_vals <- unique(data[,c('colordef', 'color')])
-    # make sure everything lines up
-    m_ind <- match(breaks, matched_vals$color)
-    return(dplyr::pull(matched_vals[, 'colordef'])[m_ind])
-  }
 
   ## different plot types
 
-  # scenario on x, bar
-  if (x_col == 'scenario') {
-
-    # end-run a situation where we color and x by scenario- need to clean this up
-    if (all(names(pal_list) %in% prepped$data$scenario)) {
-      prepped$data <- dplyr::arrange(prepped$data, scenario)
-    }
-
-    outcome_plot <- prepped$data |>
-      dplyr::filter(scenario %in% prepped$scenariofilter) |>
-      ggplot2::ggplot(ggplot2::aes(x = scenario, y = .data[[prepped$y_col]],
-                                   fill = forcats::fct_inorder(color))) +
-      ggplot2::geom_col(position = position) +
-      ggplot2::labs(y = paste0(y_lab, prepped$ylab_append), x = x_lab,
-                    color = colorset) +
-      ggplot2::scale_y_continuous(trans = transy) +
-      ggplot2::scale_fill_identity(guide = 'legend',
-                                   labels = labfind,
-                                   name = color_lab) +
-      theme_werp_toolkit()
-
-    if (!is.null(setLimits)) {
-      outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
-    }
-  }
-
-  # Something else on x, scenario as fill. bar
-  # close to allowing a grouping aesthetic, but it's ugly with color, so not
-  # doing it now.
-  if (!(x_col %in% c('scenario', 'map')) &&
-      !is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
-    outcome_plot <- prepped$data |>
-      dplyr::filter(scenario %in% prepped$scenariofilter) |>
-      ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]], y = .data[[prepped$y_col]],
-                                   # color = color,
-                                   fill = scenario)) +
-      ggplot2::geom_col(position = position) +
-      ggplot2::labs(y = paste0(y_lab, prepped$ylab_append)) +
-      ggplot2::scale_y_continuous(trans = transy) +
-      ggplot2::scale_fill_manual(values = prepped$colors) +
-      ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 45)) +
-      # ggplot2::scale_color_identity() +
-      theme_werp_toolkit()
-
-    if (!is.null(setLimits)) {
-      outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
-    }
-  }
-
-  # Some quantitative x, typically a quant representation of scenario
+  # Maps get a different treatment than 2-d
+    # What am I going to do with heatmaps and networks? I might end up wanting a plot_type argument to just be explicit
   if (x_col != 'map') {
+    # Numeric x
     if (is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
-
-      # I was trying to get this to work to color the *points* one way and the
-      # lines another. It's kind of a mess because ggplot doesn't like that
-      # I can potentially use 'fill' if I use shapes that take that argument
-
-      # The more I think about this, I *could* force the use of filled points, but
-      # that's not really the point. The point is the scenarios give us the values
-      # on x, so let's just leave them alone, and color by whatever we're coloring
-      # by. We can revisit that decision later if we want.
-
-      if (!inherits(position, 'gg')) {
-        if (is.null(position) || position == 'stack') {
-          position = 'identity'
-        }
-      }
-
-
-      outcome_plot <- prepped$data |>
-        dplyr::filter(scenario %in% prepped$scenariofilter) |>
-        ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]],
-                                     y = .data[[prepped$y_col]],
-                                     group = .data$pointgroup)) +
-        ggplot2::geom_point(mapping = ggplot2::aes(color = .data$color),
-                            position = position) +
-        ggplot2::labs(y = paste0(y_lab, prepped$ylab_append),
-                      x = x_lab) +
-        ggplot2::scale_y_continuous(trans = transy) +
-        ggplot2::scale_x_continuous(trans = transx) +
-        ggplot2::scale_fill_manual(values = prepped$colors) +
-        ggplot2::scale_color_identity(guide = 'legend',
-                                      labels = labfind,
-                                      name = color_lab) +
-        theme_werp_toolkit()
-
-      if (!is.null(setLimits)) {
-        outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
-      }
-
-      if (smooth) {
-        outcome_plot <- outcome_plot +
-          ggplot2::geom_smooth(mapping = ggplot2::aes(color = .data$color, fill = .data$color),
-                               method = smooth_method,
-                               method.args = smooth_args,
-                               linewidth = 0.1,
-                               se = smooth_se) +
-          ggplot2::scale_fill_identity(guide = 'legend',
-                                        labels = labfind,
-                                        name = color_lab)
-      }
-      if (!smooth) {
-        outcome_plot <- outcome_plot +
-          ggplot2::geom_line(mapping = ggplot2::aes(color = .data$color))
-      }
-
+      outcome_plot <- plot_numeric(prepped, x_col, x_lab, y_lab,
+                                   color_type, pal_list,
+                                   smooth, position,
+                                   transy, transx)
     }
+    # Qualitative x
+    if (!is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
+      outcome_plot <- plot_bar(prepped, x_col, x_lab, y_lab,
+                               color_type, pal_list,
+                               position, transy)
+    }
+
+    # Adjustments to all 2d plots
+      # y limits
+    if (!is.null(setLimits)) {
+      outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
+    }
+    # labels and themes and facets. Can I really get away with doing color and
+    # fill here, or do they need to be more granular and inside the respective
+    # functions?
+    outcome_plot <- outcome_plot +
+      ggplot2::labs(y = paste0(y_lab, prepped$ylab_append),
+                    x = x_lab,
+                    color = color_lab,
+                    fill = color_lab) +
+      theme_werp_toolkit()
+
+    if (!is.null(facet_row) & !is.null(facet_col)) {
+
+      outcome_plot <- outcome_plot +
+        # ahhh. reformulate is (RHS, LHS) - so, backwards to what we want.
+        ggplot2::facet_grid(stats::reformulate(facet_col,facet_row),
+                            # Good in theory, but often too long and blocks the plot, so not using
+                            # labeller = ggplot2::label_wrap_gen(),
+                            scales = scales)
+    }
+
+    if (!is.null(facet_wrapper)) {
+      outcome_plot <- outcome_plot +
+        ggplot2::facet_wrap(facet_wrapper,
+                            # Good in theory, but often too long and blocks the plot, so not using
+                            # labeller = ggplot2::label_wrap_gen(),
+                            scales = scales)
+    }
+
   }
+
+  # # scenario on x, bar
+  # if (x_col == 'scenario') {
+  #
+  #   # end-run a situation where we color and x by scenario- need to clean this up
+  #   if (all(names(pal_list) %in% prepped$data$scenario)) {
+  #     prepped$data <- dplyr::arrange(prepped$data, scenario)
+  #   }
+  #
+  #   outcome_plot <- prepped$data |>
+  #     dplyr::filter(scenario %in% prepped$scenariofilter) |>
+  #     ggplot2::ggplot(ggplot2::aes(x = scenario, y = .data[[prepped$y_col]],
+  #                                  fill = forcats::fct_inorder(color))) +
+  #     ggplot2::geom_col(position = position) +
+  #     ggplot2::labs(y = paste0(y_lab, prepped$ylab_append), x = x_lab,
+  #                   color = colorset) +
+  #     ggplot2::scale_y_continuous(trans = transy) +
+  #     ggplot2::scale_fill_identity(guide = 'legend',
+  #                                  labels = labfind,
+  #                                  name = color_lab) +
+  #     theme_werp_toolkit()
+  #
+  #   if (!is.null(setLimits)) {
+  #     outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
+  #   }
+  # }
+  #
+  # # Something else on x, scenario as fill. bar
+  # # close to allowing a grouping aesthetic, but it's ugly with color, so not
+  # # doing it now.
+  # if (!(x_col %in% c('scenario', 'map')) &&
+  #     !is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
+  #   outcome_plot <- prepped$data |>
+  #     dplyr::filter(scenario %in% prepped$scenariofilter) |>
+  #     ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]], y = .data[[prepped$y_col]],
+  #                                  # color = color,
+  #                                  fill = scenario)) +
+  #     ggplot2::geom_col(position = position) +
+  #     ggplot2::labs(y = paste0(y_lab, prepped$ylab_append)) +
+  #     ggplot2::scale_y_continuous(trans = transy) +
+  #     ggplot2::scale_fill_manual(values = prepped$colors) +
+  #     ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 45)) +
+  #     # ggplot2::scale_color_identity() +
+  #     theme_werp_toolkit()
+  #
+  #   if (!is.null(setLimits)) {
+  #     outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
+  #   }
+  # }
+  #
+  # # Some quantitative x, typically a quant representation of scenario
+  # if (x_col != 'map') {
+  #   if (is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
+  #
+  #     # I was trying to get this to work to color the *points* one way and the
+  #     # lines another. It's kind of a mess because ggplot doesn't like that
+  #     # I can potentially use 'fill' if I use shapes that take that argument
+  #
+  #     # The more I think about this, I *could* force the use of filled points, but
+  #     # that's not really the point. The point is the scenarios give us the values
+  #     # on x, so let's just leave them alone, and color by whatever we're coloring
+  #     # by. We can revisit that decision later if we want.
+  #
+  #     if (!inherits(position, 'gg')) {
+  #       if (is.null(position) || position == 'stack') {
+  #         position = 'identity'
+  #       }
+  #     }
+  #
+  #
+  #     outcome_plot <- prepped$data |>
+  #       dplyr::filter(scenario %in% prepped$scenariofilter) |>
+  #       ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]],
+  #                                    y = .data[[prepped$y_col]],
+  #                                    group = .data$pointgroup)) +
+  #       ggplot2::geom_point(mapping = ggplot2::aes(color = .data$color),
+  #                           position = position) +
+  #       ggplot2::labs(y = paste0(y_lab, prepped$ylab_append),
+  #                     x = x_lab) +
+  #       ggplot2::scale_y_continuous(trans = transy) +
+  #       ggplot2::scale_x_continuous(trans = transx) +
+  #       ggplot2::scale_fill_manual(values = prepped$colors) +
+  #       ggplot2::scale_color_identity(guide = 'legend',
+  #                                     labels = labfind,
+  #                                     name = color_lab) +
+  #       theme_werp_toolkit()
+  #
+  #     if (!is.null(setLimits)) {
+  #       outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
+  #     }
+  #
+  #     if (smooth) {
+  #       outcome_plot <- outcome_plot +
+  #         ggplot2::geom_smooth(mapping = ggplot2::aes(color = .data$color, fill = .data$color),
+  #                              method = smooth_method,
+  #                              method.args = smooth_args,
+  #                              linewidth = 0.1,
+  #                              se = smooth_se) +
+  #         ggplot2::scale_fill_identity(guide = 'legend',
+  #                                       labels = labfind,
+  #                                       name = color_lab)
+  #     }
+  #     if (!smooth) {
+  #       outcome_plot <- outcome_plot +
+  #         ggplot2::geom_line(mapping = ggplot2::aes(color = .data$color))
+  #     }
+  #
+  #   }
+  # }
 
 
   # This is getting contrived to do all these in one function. I *really* need
@@ -598,26 +660,6 @@ plot_outcomes <- function(outdf,
   ## facetting- happens in common for all plot types *except maps*- the scales
   ## argument messes up maps. I really should just separate out the maps.
 
-
-  if (x_col != 'map') {
-    if (!is.null(facet_row) & !is.null(facet_col)) {
-
-      outcome_plot <- outcome_plot +
-        # ahhh. reformulate is (RHS, LHS) - so, backwards to what we want.
-        ggplot2::facet_grid(stats::reformulate(facet_col,facet_row),
-                            # Good in theory, but often too long and blocks the plot, so not using
-                            # labeller = ggplot2::label_wrap_gen(),
-                            scales = scales)
-    }
-
-    if (!is.null(facet_wrapper)) {
-      outcome_plot <- outcome_plot +
-        ggplot2::facet_wrap(facet_wrapper,
-                            # Good in theory, but often too long and blocks the plot, so not using
-                            # labeller = ggplot2::label_wrap_gen(),
-                            scales = scales)
-    }
-  }
 
   return(outcome_plot)
 }

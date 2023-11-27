@@ -7,15 +7,8 @@
 #' keeps those changes sandboxed
 #'
 #' @param data dataframe to prep
-#' @param gaugefilter set of gauges to plot, default `NULL` plots all of them
 #' @param sceneorder character or factor giving the order to present scenario
 #'   levels
-#' @param scenariofilter set of scenarios to plot, default `NULL` plots all of
-#'   them
-#' @param colors a named `colors` object or character vector giving a
-#'   {paletteer} `palette` argument. Typically the former using `make_pal` to
-#'   keep scenarios with consistent colours throughout, likely with a reference
-#'   level.
 #' @param y_col character, column name for what's plotted on the y-axis. Default
 #'   'flow', but will need to change if fed data with a different name
 #' @param base_lev value to use as the base for comparison. Default NULL, no
@@ -31,32 +24,20 @@
 #' @param onlyzeros logical, default `FALSE`. Should all values be adjusted away from zero (`TRUE`) or only adjust zero values (`FALSE`)?
 #' @param ... passed to [baseline_compare()]. Note, `zero_adjust` and `onlyzeros` are *not* passed, but handled by [plot_prep()] itself since they are done to the data prior in order to adjust zeros for other purposes as well (logging, plotting).
 #'
-#' @return a list with prepped versions of `data`, `y_col`, `colors`,
-#'   `gaugefilter`, `scenariofilter`, `base_lev`, `comp_fun`, `ylab_append` to
+#' @return a list with prepped versions of `data`, `y_col`, `ylab_append` to
 #'   be used in plot calls
 #' @export
 #'
 #' @examples
 plot_prep <- function(data, y_col,
-                      colors = 'ggsci::default_igv',
                       sceneorder = NULL,
-                      gaugefilter = NULL,
-                      scenariofilter = NULL,
                       base_lev = NULL,
                       comp_fun = NULL,
                       zero_adjust = 0,
                       onlyzeros = FALSE,
                       ...) {
 
-  # This probably needs more thought to handle continuous palettes if it is to
-  # be a general prep function across all plots. Causal_colors_general can
-  # probably be modified to do continuous colors. Here, though, we still might
-  # use continuous *palettes*, even if the actual scale isn't continuous.
-  if (!inherits(colors, 'colors')) {
-    rlang::inform("colors not specified per level. Trying to use the 'colors' argument as a palette name")
-    colors <- make_pal(levels = unique(data$scenario), palette = colors)
-  }
-
+  # Data adjustments
   # ensure y is numeric
   # Have to [[]] because [] yields an sf-tibble, not just the col.
   if (!is.numeric(data[[y_col]])) {
@@ -74,10 +55,7 @@ plot_prep <- function(data, y_col,
   # move data away from zero
   data <- adjust_zeros(data, y_col, zero_adjust, onlyzeros)
 
-
-  gaugefilter <- if(is.null(gaugefilter) & ('gauge' %in% names(data))) {unique(data$gauge)} else {gaugefilter}
-  scenariofilter <- if(is.null(scenariofilter)) {unique(data$scenario)} else  {scenariofilter}
-
+  # Baseline data
   ylab_append <- ''
   if (!is.null(comp_fun) & !is.null(base_lev)) {
     # We've already handled the zero-shifts, so don't do it again
@@ -107,9 +85,16 @@ plot_prep <- function(data, y_col,
       dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
   }
 
+  # That can introduce some infs and nans, often from division by zero in the relativiser
+  new_nan_inf <- sum(is.nan(data[[y_col]])) + sum(is.infinite(data[[y_col]]))
+  old_nan_inf <- sum(is.nan(data[[y_col]])) + sum(is.infinite(data[[y_col]]))
+  if (new_nan_inf > old_nan_inf) {
+    rlang::warn(glue::glue("NaN and Inf introduced in `plot_prep`, likely due to division by zero. {new_nan_inf - old_nan_inf} values were lost."))
+  }
+
   # This names the data the same thing as it was interactively, but fails in the function. Just call it data for consistency
   # dataname <- as.character(substitute(data))
-  return(tibble::lst(data, y_col, colors, gaugefilter, scenariofilter, base_lev, comp_fun, ylab_append))
+  return(tibble::lst(data, y_col, ylab_append))
 }
 
 

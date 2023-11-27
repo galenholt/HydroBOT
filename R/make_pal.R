@@ -15,6 +15,9 @@ make_pal <- function(levels, palette,
                      refvals = NULL, refcols = NULL,
                      includeRef = FALSE, returnUnref = FALSE) {
 
+  # only use unique levels. I can't think of a reason to give the same value different colors if it appears more than once
+  levels <- unique(levels)
+
   # need some name references to know what function to use
   cnames <- paletteer::palettes_c_names |>
     dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) |>
