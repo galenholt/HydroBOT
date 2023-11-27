@@ -27,7 +27,7 @@ make_pal(
 \item{returnUnref}{logical, default FALSE. Should we return the base palette with the refvals matched to \code{palette} in addition to the version where they match \code{refcols} (TRUE). Only works if \code{includeRef = TRUE}. If \code{TRUE}, returns a list with the base palette and the palette matching \code{refcols}}
 }
 \value{
-typically a named character vector of colours, unless \code{includeRef = TRUE} and \code{returnUnref = TRUE}. In that case, a list of two named colour vectors.
+typically a named character vector of colors, unless \code{includeRef = TRUE} and \code{returnUnref = TRUE}. In that case, a list of two named color vectors.
 }
 \description{
 Function to ensure colors match across plots

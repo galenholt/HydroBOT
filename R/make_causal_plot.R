@@ -1,7 +1,7 @@
 #' Builds a causal network plot
 #'
 #' Takes node and edges dfs, along with arguments to specify attributes
-#' (particularly colour), and how to return the output. Internally, this finds
+#' (particularly color), and how to return the output. Internally, this finds
 #' the network relevant to a given set of nodes (by default all of them), using
 #' `find_related_nodes`, attributes according to the attribute arguments using
 #' `causal_colors_general` and `node_plot_atts` and then uses `DiagrammeR` to
@@ -16,22 +16,22 @@
 #' @param drop_unused_nodes logical, default `TRUE`, drops nodes with no
 #'   connections. `FALSE` could be useful to keep unconnected nodes if we want
 #'   to see if there are any that are not causally related to the others.
-#' @param edge_pal a named list of colour palettes or colour values for the
-#'   edges.  Currently only supports paletteer palettes, vectors of colours, or
-#'   single colours. See \code{\link{causal_colors_general}}
+#' @param edge_pal a named list of color palettes or color values for the
+#'   edges.  Currently only supports paletteer palettes, vectors of colors, or
+#'   single colors. See \code{\link{causal_colors_general}}
 #' @param edge_colorgroups NULL (the default) or a column name (character)
-#'   specifying a grouping column for different colour palettes for the edges.
+#'   specifying a grouping column for different color palettes for the edges.
 #'   See \code{\link{causal_colors_general}}
 #' @param edge_colorset a column name (character) giving the column to define
-#'   edge colour. See \code{\link{causal_colors_general}}
-#' @param node_pal a named list of colour palettes or colour values for the
-#'   nodes. Currently only supports paletteer palettes, vectors of colours, or
-#'   single colours. See \code{\link{causal_colors_general}}
+#'   edge color. See \code{\link{causal_colors_general}}
+#' @param node_pal a named list of color palettes or color values for the
+#'   nodes. Currently only supports paletteer palettes, vectors of colors, or
+#'   single colors. See \code{\link{causal_colors_general}}
 #' @param node_colorgroups NULL (the default) or a column name (character)
-#'   specifying a grouping column for different colour palettes for the nodes.
+#'   specifying a grouping column for different color palettes for the nodes.
 #'   See \code{\link{causal_colors_general}}
 #' @param node_colorset a column name (character) giving the column to define
-#'   node colour. See \code{\link{causal_colors_general}}
+#'   node color. See \code{\link{causal_colors_general}}
 #' @param setLimits NULL (default) or length-2 numeric vector to force limits of the color scale.
 #' @param wrap_names logical, default `TRUE`, should long node names be wrapped
 #'   to multiple lines

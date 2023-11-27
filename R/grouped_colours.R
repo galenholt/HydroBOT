@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-grouped_colours <- function(df, pal_list,
+grouped_colors <- function(df, pal_list,
                             colorgroups = NULL,
                             colorset = NULL,
                             setLimits = NULL) {

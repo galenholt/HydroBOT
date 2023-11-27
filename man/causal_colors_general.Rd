@@ -2,7 +2,7 @@
 % Please edit documentation in R/causal_colors_general.R
 \name{causal_colors_general}
 \alias{causal_colors_general}
-\title{Set colours of nodes or edges}
+\title{Set colors of nodes or edges}
 \usage{
 causal_colors_general(
   df,
@@ -15,7 +15,7 @@ causal_colors_general(
 \arguments{
 \item{df}{a tibble or dataframe, nodes or edges}
 
-\item{pal_list}{a named list of paletteer palettes or a scalar character specifying colour.
+\item{pal_list}{a named list of paletteer palettes or a scalar character specifying color.
 \itemize{
 \item named list: names should match the values in the \code{colorgroups} column, which determine which palettes apply to which rows. If \code{colorgroups = NULL}, the name doesn't matter, but often clearest to match \code{colorset}
 \item character (scalar or vector): short-circuits the palette finding and creates a color column with the given colors.
@@ -23,7 +23,7 @@ causal_colors_general(
 
 \item{colorgroups}{NULL (the default) or length-1 character vector specifying a grouping column, with different palettes applied to the different groups. If NULL, one palette is applied across all of the rows}
 
-\item{colorset}{a length-1 character vector specifying the column to use to define colour. Type doesn't matter, but behaviour differs. If numeric it will space the colours for each row according to value, if not numeric, colours for each row are spaced evenly along the palette.}
+\item{colorset}{a length-1 character vector specifying the column to use to define color. Type doesn't matter, but behaviour differs. If numeric it will space the colors for each row according to value, if not numeric, colors for each row are spaced evenly along the palette.}
 
 \item{setLimits}{NULL (default) or length-2 numeric vector to force limits of the color scale.}
 }
@@ -31,9 +31,9 @@ causal_colors_general(
 an edge tibble with a \code{color} column or a node tibble with \code{fillcolor} and \code{fontcolor}
 }
 \description{
-Given a set of palettes and a column of data to use to determine colour (and
-possibly a grouping column), this assigns colour to each node. Can also be
-short-circuited by passing a scalar color or column of colour names. Edge
+Given a set of palettes and a column of data to use to determine color (and
+possibly a grouping column), this assigns color to each node. Can also be
+short-circuited by passing a scalar color or column of color names. Edge
 tibbles get a \code{color} column, while nodes get \code{fillcolor}, matching
 \code{DiagrammeR} attribute names. The \code{fontcolor} attribute is also set for nodes
 as black or white depending on the \code{fillcolor}

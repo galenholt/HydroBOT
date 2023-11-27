@@ -449,9 +449,9 @@ plot_outcomes <- function(outdf,
           u$underlay <- u$underlay |> dplyr::filter(scenario %in% prepped$scenariofilter)
         }
 
-        # use `grouped_colors` to set colour groups
+        # use `grouped_colors` to set color groups
         # Do we need to pass separate colorgroups and colorset to the underlay? Likely
-        # undercolor <- grouped_colours(underlay, underlay_pal, underlay_colorgroups, underlay_colorset)
+        # undercolor <- grouped_colors(underlay, underlay_pal, underlay_colorgroups, underlay_colorset)
 
         # catch case with multiple fills- need a single color if the main data has a fill scale
         # I need something here to catch whether underlay_pal is  a palette or a color

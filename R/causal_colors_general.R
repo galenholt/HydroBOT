@@ -1,18 +1,18 @@
-#' Set colours of nodes or edges
+#' Set colors of nodes or edges
 #'
-#' Given a set of palettes and a column of data to use to determine colour (and
-#' possibly a grouping column), this assigns colour to each node. Can also be
-#' short-circuited by passing a scalar color or column of colour names. Edge
+#' Given a set of palettes and a column of data to use to determine color (and
+#' possibly a grouping column), this assigns color to each node. Can also be
+#' short-circuited by passing a scalar color or column of color names. Edge
 #' tibbles get a `color` column, while nodes get `fillcolor`, matching
 #' `DiagrammeR` attribute names. The `fontcolor` attribute is also set for nodes
 #' as black or white depending on the `fillcolor`
 #'
 #' @param df a tibble or dataframe, nodes or edges
-#' @param pal_list a named list of paletteer palettes or a scalar character specifying colour.
+#' @param pal_list a named list of paletteer palettes or a scalar character specifying color.
 #'   * named list: names should match the values in the `colorgroups` column, which determine which palettes apply to which rows. If `colorgroups = NULL`, the name doesn't matter, but often clearest to match `colorset`
 #'   * character (scalar or vector): short-circuits the palette finding and creates a color column with the given colors.
 #' @param colorgroups NULL (the default) or length-1 character vector specifying a grouping column, with different palettes applied to the different groups. If NULL, one palette is applied across all of the rows
-#' @param colorset a length-1 character vector specifying the column to use to define colour. Type doesn't matter, but behaviour differs. If numeric it will space the colours for each row according to value, if not numeric, colours for each row are spaced evenly along the palette.
+#' @param colorset a length-1 character vector specifying the column to use to define color. Type doesn't matter, but behaviour differs. If numeric it will space the colors for each row according to value, if not numeric, colors for each row are spaced evenly along the palette.
 #' @param setLimits NULL (default) or length-2 numeric vector to force limits of the color scale.
 
 #' @return an edge tibble with a `color` column or a node tibble with `fillcolor` and `fontcolor`
@@ -29,8 +29,8 @@ causal_colors_general <- function(df, pal_list,
   df <- make_colorcol(df, colorset)
   # and change the colorset to 'colordef' since we just auto-set
 
-  # Then call the general `grouped_colours`
-  dfcolor <- grouped_colours(df, pal_list, colorgroups, 'colordef', setLimits = setLimits)
+  # Then call the general `grouped_colors`
+  dfcolor <- grouped_colors(df, pal_list, colorgroups, 'colordef', setLimits = setLimits)
 
   # names have to be different for nodes and edges. and nodes need text color
   # This is annoying we need the switch, and I don't like making it depend on column names

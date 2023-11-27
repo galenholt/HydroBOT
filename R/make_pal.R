@@ -7,7 +7,7 @@
 #' @param includeRef logical, defailt FALSE. Should the colors be chosen including (TRUE) or not including (FALSE, the default) the levels in `refvals`. Typically `TRUE` if we sometimes want to accentuate a level, and sometimes not.
 #' @param returnUnref logical, default FALSE. Should we return the base palette with the refvals matched to `palette` in addition to the version where they match `refcols` (TRUE). Only works if `includeRef = TRUE`. If `TRUE`, returns a list with the base palette and the palette matching `refcols`
 #'
-#' @return typically a named character vector of colours, unless `includeRef = TRUE` and `returnUnref = TRUE`. In that case, a list of two named colour vectors.
+#' @return typically a named character vector of colors, unless `includeRef = TRUE` and `returnUnref = TRUE`. In that case, a list of two named color vectors.
 #' @export
 #'
 #' @examples

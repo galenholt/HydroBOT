@@ -6,7 +6,7 @@
 #' numbers are hardcoded, and need to be made relative. It's possible to
 #' add other attributes (see `DiagrammeR` documentation), and we'll likely also
 #' want to set some of these (especially height and width) functionally (like we
-#' do with colour)
+#' do with color)
 #'
 #' @param nodedf a tibble, the dataframe of nodes
 #'

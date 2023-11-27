@@ -12,11 +12,11 @@ nodes <- make_nodes(edges)
 
 test_that("defaults work", {
 
-  edgecols <- grouped_colours(edges,
+  edgecols <- grouped_colors(edges,
                                     pal_list = list(fromtype = "nationalparkcolors::GeneralGrant"),
                                     colorgroups = NULL, colorset = 'fromtype')
 
-  nodecols <- grouped_colours(nodes,
+  nodecols <- grouped_colors(nodes,
                                     pal_list = list(fromtype = "nationalparkcolors::GeneralGrant"),
                                     colorgroups = NULL, colorset = 'NodeType')
   # Looking at it will be the easiest check
@@ -47,11 +47,11 @@ test_that("defaults work", {
 test_that("scalar colors work and font switching", {
 
 
-  edgecols <- grouped_colours(edges,
+  edgecols <- grouped_colors(edges,
                                     pal_list = "forestgreen",
                                     colorgroups = NULL, colorset = 'fromtype')
 
-  nodecols <- grouped_colours(nodes,
+  nodecols <- grouped_colors(nodes,
                                     pal_list = "cornflowerblue",
                                     colorgroups = NULL, colorset = 'NodeType')
 
@@ -77,11 +77,11 @@ test_that("values work for nodes and edges", {
   nodes <- nodes |>
     dplyr::mutate(value = dplyr::row_number())
 
-  edgecols <- grouped_colours(edges,
+  edgecols <- grouped_colors(edges,
                                     pal_list = list(value = 'scico::oslo'),
                                     colorgroups = NULL, colorset = 'value')
 
-  nodecols <- grouped_colours(nodes,
+  nodecols <- grouped_colors(nodes,
                                     pal_list = list(value = 'scico::berlin'),
                                     colorgroups = NULL, colorset = 'value')
 
@@ -110,12 +110,12 @@ test_that("different palette per group", {
                      Target = 'scico::hawaii',
                      target_5_year_2024 = 'scico::lisbon')
 
-  edgecols <- grouped_colours(edges,
+  edgecols <- grouped_colors(edges,
                                     pal_list = pal_list_c,
                                     colorgroups = 'fromtype',
                                     colorset = 'from')
 
-  nodecols <- grouped_colours(nodes,
+  nodecols <- grouped_colors(nodes,
                                     pal_list = pal_list_c,
                                     colorgroups = 'NodeType',
                                     colorset = 'Name')

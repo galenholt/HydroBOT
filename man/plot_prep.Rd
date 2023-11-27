@@ -26,7 +26,7 @@ plot_prep(
 
 \item{colors}{a named \code{colors} object or character vector giving a
 {paletteer} \code{palette} argument. Typically the former using \code{make_pal} to
-keep scenarios with consistent colours throughout, likely with a reference
+keep scenarios with consistent colors throughout, likely with a reference
 level.}
 
 \item{sceneorder}{character or factor giving the order to present scenario
