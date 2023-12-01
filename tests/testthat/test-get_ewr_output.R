@@ -114,3 +114,10 @@ test_that("making assessment tibble works", {
   expect_equal(names(assessed), c('ewr_code', 'ewr_code_timing', 'gauge',
                                   'scenario', 'planning_unit', 'ewr_achieved', 'ewr_achieved_timeframe'))
 })
+
+test_that("making MAX scenario works", {
+  assessed <- get_ewr_output(ewrpath)|>
+    dplyr::filter(scenario == "MAX")
+  expect_equal(nrow(assessed)> 0,TRUE)
+})
+
