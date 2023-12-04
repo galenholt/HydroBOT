@@ -774,7 +774,7 @@
 <text x='694.47' y='307.25' style='font-size: 8.00px; font-family: sans;' textLength='15.57px' lengthAdjust='spacingAndGlyphs'>0.50</text>
 <text x='694.47' y='285.72' style='font-size: 8.00px; font-family: sans;' textLength='15.57px' lengthAdjust='spacingAndGlyphs'>0.75</text>
 <text x='694.47' y='264.20' style='font-size: 8.00px; font-family: sans;' textLength='15.57px' lengthAdjust='spacingAndGlyphs'>1.00</text>
-<text x='672.20' y='255.28' style='font-size: 10.00px; font-family: sans;' textLength='21.68px' lengthAdjust='spacingAndGlyphs'>color</text>
+<text x='672.20' y='255.28' style='font-size: 10.00px; font-family: sans;' textLength='30.56px' lengthAdjust='spacingAndGlyphs'>allArith</text>
 <line x1='672.20' y1='347.56' x2='675.66' y2='347.56' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <line x1='672.20' y1='326.03' x2='675.66' y2='326.03' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <line x1='672.20' y1='304.50' x2='675.66' y2='304.50' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
@@ -785,6 +785,6 @@
 <line x1='686.03' y1='304.50' x2='689.48' y2='304.50' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <line x1='686.03' y1='282.97' x2='689.48' y2='282.97' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <line x1='686.03' y1='261.44' x2='689.48' y2='261.44' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<text x='26.71' y='170.14' style='font-size: 12.00px; font-family: sans;' textLength='86.72px' lengthAdjust='spacingAndGlyphs'>sdl_map_simple</text>
+<text x='26.71' y='170.14' style='font-size: 12.00px; font-family: sans;' textLength='103.41px' lengthAdjust='spacingAndGlyphs'>sdl_map_colorlabel</text>
 </g>
 </svg>

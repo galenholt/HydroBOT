@@ -48,7 +48,7 @@ plot_numeric <- function(prepped, x_col, x_lab, y_lab,
                          se = TRUE,
                          method.args = NULL,
                          linewidth = NULL,# Odd that I have to set this.
-                         alpha = 0.25)
+                         alpha = 0.4)
 
 
   # Deal with logical carryover
@@ -85,7 +85,7 @@ plot_numeric <- function(prepped, x_col, x_lab, y_lab,
 
 }
 
-plot_map <- function(prepped, underlay_list, overlay_list,
+plot_map <- function(prepped, underlay_list, overlay_list, y_lab,
                      facet_wrapper, facet_row, facet_col,
                      sceneorder, transy, setLimits, base_list) {
 
@@ -126,8 +126,11 @@ plot_map <- function(prepped, underlay_list, overlay_list,
   outcome_plot <- ggplot2::ggplot()
 
     # layer up the underlays
-    outcome_plot <- make_underover(underlay_list, outcome_plot, sceneorder,
-                                  maindatatype, maincolorpal = prepped$pal_list,
+    outcome_plot <- make_underover(underover_list = underlay_list,
+                                   outcome_plot = outcome_plot,
+                                   sceneorder = sceneorder, y_lab = y_lab,
+                                   maindata = prepped$data,
+                                   maindatatype = maindatatype, maincolorpal = prepped$pal_list,
                                   transy = transy, setLimits = setLimits,
                                   base_list = base_list, uotype = 'underlay')
 
@@ -144,6 +147,9 @@ plot_map <- function(prepped, underlay_list, overlay_list,
                                     transy = transy,
                                     setLimits = setLimits,
                                     base_list = base_list)
+
+    outcome_plot <- outcome_plot + ggplot2::labs(color = paste0(y_lab, prepped$ylab_append))
+
   }
   if (maindatatype == 'areal') {
     outcome_plot <- outcome_plot +
@@ -155,6 +161,8 @@ plot_map <- function(prepped, underlay_list, overlay_list,
                                     transy = transy,
                                     setLimits = setLimits,
                                     base_list = base_list)
+
+    outcome_plot <- outcome_plot + ggplot2::labs(fill = paste0(y_lab, prepped$ylab_append))
   }
 
 
@@ -174,8 +182,12 @@ plot_map <- function(prepped, underlay_list, overlay_list,
 
 
     # layer up the overlays
-    outcome_plot <- make_underover(overlay_list, outcome_plot, sceneorder,
-                                   maindatatype, maincolorpal = prepped$pal_list,
+    outcome_plot <- make_underover(underover_list = overlay_list,
+                                   outcome_plot = outcome_plot,
+                                   sceneorder = sceneorder, y_lab = y_lab,
+                                   maindata = prepped$data,
+                                   maindatatype = maindatatype,
+                                   maincolorpal = prepped$pal_list,
                                    transy = transy, setLimits = setLimits,
                                    base_list = base_list, uotype = 'overlay')
 
@@ -185,6 +197,7 @@ plot_map <- function(prepped, underlay_list, overlay_list,
 
 
 make_underover <- function(underover_list, outcome_plot, sceneorder,
+                           y_lab, maindata,
                           maindatatype, maincolorpal, transy,
                           setLimits, base_list, uotype = 'internal') {
 
@@ -192,12 +205,14 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
   full_list <- list(underover = NULL, y_col = NULL,
                     pal_list = NA, # NA will show something, NULL just fails
                     colorgroups = NULL,
+                    y_lab = y_lab, # inherit from outer, but can be overwritten
                     base_list = NULL, zero_adjust = 0,
                     onlyzeros = FALSE,
                     transy = transy,
                     transx = NULL,
                     point_group = NULL,
-                    uotype = NULL)
+                    uotype = NULL,
+                    clip = FALSE)
 
   # To make this function generic, it can have the main piece named 'underover', 'underlay', or 'overlay'
   # but we need some errorchecking
@@ -205,7 +220,6 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
   # We don't currently *use* the uotype entry in the underover_list, but this is
   # here to provide first backwards compatibility, but also set us up with the
   # backbone to just do all the layers in one go.
-
   settype <- function(x, typename) {
     if (typename %in% names(x)) {
       names(x)[names(x) == typename] <- 'underover'
@@ -217,6 +231,8 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
     x$uotype <- typename
     return(x)
   }
+
+
 
   if (uotype == 'underlay') {
     underover_list <- purrr::map(underover_list, \(x) settype(x, typename = 'underlay'))
@@ -241,6 +257,11 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
 
     # NULL-fill slots without arguments
     uo <- modifyList(full_list, uo)
+
+    # clip to the main geometry
+    if (uo$clip) {
+      uo$underover <- sf::st_filter(uo$underover, dplyr::distinct(maindata))
+    }
 
     # get the type of this underover
     if (all(sf::st_is(uo$underover, c("POLYGON", "MULTIPOLYGON")))) {
@@ -289,6 +310,10 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
                                         transy = transy,
                                         setLimits = setLimits,
                                         base_list = base_list)
+
+        outcome_plot <- outcome_plot +
+          ggplot2::labs(color = paste0(uo$y_lab, uprep$ylab_append))
+
       }
 
 
@@ -307,6 +332,10 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
                                       transy = transy,
                                       setLimits = setLimits,
                                       base_list = base_list)
+
+      outcome_plot <- outcome_plot +
+        ggplot2::labs(fill = paste0(uo$y_lab, uprep$ylab_append))
+
       }
     }
 

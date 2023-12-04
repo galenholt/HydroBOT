@@ -367,110 +367,110 @@
 <polyline points='24.22,182.81 26.71,182.81 ' style='stroke-width: 0.97; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='24.22,149.06 26.71,149.06 ' style='stroke-width: 0.97; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='24.22,115.31 26.71,115.31 ' style='stroke-width: 0.97; stroke: #333333; stroke-linecap: butt;' />
-<rect x='-84.68' y='379.02' width='131.91' height='39.39' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<image width='86.40' height='17.28' x='-44.15' y='384.00' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAABCAYAAABkOJMpAAABSElEQVQ4jW2RQXYkMQxCP3juf4ScIQdsi1lIdlUys/ArQAjRr/X1nWxCCJV+h2dwDd/jCeEDVy9CUb1P2OHF5xvYFEmxc3bOvN+ukMGd0/7sYo+eeVUvXkXVJsnwTSqkPuMJpMje/+DUvhlJQW04etV4Wj+3ScEuqHpp6Q7VmJoec6/57N7O6VzO7cz9ejqcrIRkuu3JOF3qdYP2Hz0poGedP7P5f7vrRnMT5h3/8ZD2cPDZbV0UApQggqjHBxhGT/sIUr1m3BmXg/Vg/qP56G58uX5m+Ne+Xzck3ayzZwsJjBDCxyP1fQlbPVd71miSWO+ZzFpgufdk1vhksbSePBsfvsTymvtu71qTOV6vJ9fGPnj95DT2MpKx3F1X37M0szXzzpBP38ayh3v4n5t1ulvjW5Orxs9do9UZ3b17WfPbl67Pd9ZZfwEDRmtnC2ovXgAAAABJRU5ErkJggg=='/>
-<text x='-44.01' y='411.76' text-anchor='middle' style='font-size: 8.00px; font-family: sans;' textLength='11.12px' lengthAdjust='spacingAndGlyphs'>0.0</text>
-<text x='-21.86' y='411.76' text-anchor='middle' style='font-size: 8.00px; font-family: sans;' textLength='11.12px' lengthAdjust='spacingAndGlyphs'>0.2</text>
-<text x='0.28' y='411.76' text-anchor='middle' style='font-size: 8.00px; font-family: sans;' textLength='11.12px' lengthAdjust='spacingAndGlyphs'>0.4</text>
-<text x='22.42' y='411.76' text-anchor='middle' style='font-size: 8.00px; font-family: sans;' textLength='11.12px' lengthAdjust='spacingAndGlyphs'>0.6</text>
-<text x='-79.70' y='402.15' style='font-size: 10.00px; font-family: sans;' textLength='30.56px' lengthAdjust='spacingAndGlyphs'>allArith</text>
-<line x1='-44.01' y1='401.28' x2='-44.01' y2='397.82' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='-21.86' y1='401.28' x2='-21.86' y2='397.82' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='0.28' y1='401.28' x2='0.28' y2='397.82' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='22.42' y1='401.28' x2='22.42' y2='397.82' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='-44.01' y1='387.45' x2='-44.01' y2='384.00' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='-21.86' y1='387.45' x2='-21.86' y2='384.00' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='0.28' y1='387.45' x2='0.28' y2='384.00' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='22.42' y1='387.45' x2='22.42' y2='384.00' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<rect x='57.19' y='379.02' width='754.08' height='113.64' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<text x='62.18' y='439.28' style='font-size: 10.00px; font-family: sans;' textLength='62.25px' lengthAdjust='spacingAndGlyphs'>SWSDLName</text>
-<rect x='129.41' y='384.00' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='130.12' y='384.71' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #F0F0F1;' />
-<rect x='129.41' y='401.28' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='130.12' y='401.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #194068;' />
-<rect x='129.41' y='418.56' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='130.12' y='419.27' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #ADB8CB;' />
-<rect x='129.41' y='435.84' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='130.12' y='436.55' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #C6CBD2;' />
-<rect x='129.41' y='453.12' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='130.12' y='453.83' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #6A8DC8;' />
-<rect x='129.41' y='470.40' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='130.12' y='471.11' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #0C1A28;' />
-<rect x='310.04' y='384.00' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='310.75' y='384.71' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #B9C1CD;' />
-<rect x='310.04' y='401.28' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='310.75' y='401.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #3364A1;' />
-<rect x='310.04' y='418.56' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='310.75' y='419.27' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #12304D;' />
-<rect x='310.04' y='435.84' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='310.75' y='436.55' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #97A9C9;' />
-<rect x='310.04' y='453.12' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='310.75' y='453.83' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #0F2840;' />
-<rect x='310.04' y='470.40' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='310.75' y='471.11' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #D4D7DB;' />
-<rect x='410.66' y='384.00' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='411.37' y='384.71' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #14385A;' />
-<rect x='410.66' y='401.28' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='411.37' y='401.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #235285;' />
-<rect x='410.66' y='418.56' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='411.37' y='419.27' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #0A131D;' />
-<rect x='410.66' y='435.84' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='411.37' y='436.55' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #5D84C3;' />
-<rect x='410.66' y='453.12' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='411.37' y='453.83' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #FFFFFF;' />
-<rect x='410.66' y='470.40' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='411.37' y='471.11' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #406EAF;' />
-<rect x='522.85' y='384.00' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='523.56' y='384.71' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #2A5B93;' />
-<rect x='522.85' y='401.28' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='523.56' y='401.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #7694C9;' />
-<rect x='522.85' y='418.56' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='523.56' y='419.27' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #0F2133;' />
-<rect x='522.85' y='435.84' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='523.56' y='436.55' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #A2B0CA;' />
-<rect x='522.85' y='453.12' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='523.56' y='453.83' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #8CA3C9;' />
-<rect x='522.85' y='470.40' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='523.56' y='471.11' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #4F7ABB;' />
-<rect x='644.38' y='384.00' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='645.09' y='384.71' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #060B12;' />
-<rect x='644.38' y='401.28' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='645.09' y='401.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #000000;' />
-<rect x='644.38' y='418.56' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='645.09' y='419.27' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #1C4875;' />
-<rect x='644.38' y='435.84' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='645.09' y='436.55' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #809BCA;' />
-<rect x='644.38' y='453.12' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<rect x='645.09' y='453.83' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #E2E3E5;' />
-<text x='151.67' y='395.39' style='font-size: 8.00px; font-family: sans;' textLength='153.39px' lengthAdjust='spacingAndGlyphs'>Australian Capital Territory (Surface Water)</text>
-<text x='151.67' y='412.67' style='font-size: 8.00px; font-family: sans;' textLength='104.50px' lengthAdjust='spacingAndGlyphs'>Barwon–Darling Watercourse</text>
-<text x='151.67' y='429.95' style='font-size: 8.00px; font-family: sans;' textLength='25.35px' lengthAdjust='spacingAndGlyphs'>Broken</text>
-<text x='151.67' y='447.23' style='font-size: 8.00px; font-family: sans;' textLength='38.70px' lengthAdjust='spacingAndGlyphs'>Campaspe</text>
-<text x='151.67' y='464.51' style='font-size: 8.00px; font-family: sans;' textLength='74.73px' lengthAdjust='spacingAndGlyphs'>Condamine–Balonne</text>
-<text x='151.67' y='481.79' style='font-size: 8.00px; font-family: sans;' textLength='101.41px' lengthAdjust='spacingAndGlyphs'>Eastern Mount Lofty Ranges</text>
-<text x='332.30' y='395.39' style='font-size: 8.00px; font-family: sans;' textLength='32.91px' lengthAdjust='spacingAndGlyphs'>Goulburn</text>
-<text x='332.30' y='412.67' style='font-size: 8.00px; font-family: sans;' textLength='24.90px' lengthAdjust='spacingAndGlyphs'>Gwydir</text>
-<text x='332.30' y='429.95' style='font-size: 8.00px; font-family: sans;' textLength='73.38px' lengthAdjust='spacingAndGlyphs'>Intersecting Streams</text>
-<text x='332.30' y='447.23' style='font-size: 8.00px; font-family: sans;' textLength='21.79px' lengthAdjust='spacingAndGlyphs'>Kiewa</text>
-<text x='332.30' y='464.51' style='font-size: 8.00px; font-family: sans;' textLength='28.03px' lengthAdjust='spacingAndGlyphs'>Lachlan</text>
-<text x='332.30' y='481.79' style='font-size: 8.00px; font-family: sans;' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>Loddon</text>
-<text x='432.92' y='395.39' style='font-size: 8.00px; font-family: sans;' textLength='49.36px' lengthAdjust='spacingAndGlyphs'>Lower Darling</text>
-<text x='432.92' y='412.67' style='font-size: 8.00px; font-family: sans;' textLength='84.95px' lengthAdjust='spacingAndGlyphs'>Macquarie–Castlereagh</text>
-<text x='432.92' y='429.95' style='font-size: 8.00px; font-family: sans;' textLength='59.16px' lengthAdjust='spacingAndGlyphs'>Marne Saunders</text>
-<text x='432.92' y='447.23' style='font-size: 8.00px; font-family: sans;' textLength='26.24px' lengthAdjust='spacingAndGlyphs'>Moonie</text>
-<text x='432.92' y='464.51' style='font-size: 8.00px; font-family: sans;' textLength='51.59px' lengthAdjust='spacingAndGlyphs'>Murrumbidgee</text>
-<text x='432.92' y='481.79' style='font-size: 8.00px; font-family: sans;' textLength='69.80px' lengthAdjust='spacingAndGlyphs'>NSW Border Rivers</text>
-<text x='545.11' y='395.39' style='font-size: 8.00px; font-family: sans;' textLength='23.12px' lengthAdjust='spacingAndGlyphs'>Namoi</text>
-<text x='545.11' y='412.67' style='font-size: 8.00px; font-family: sans;' textLength='25.35px' lengthAdjust='spacingAndGlyphs'>Nebine</text>
-<text x='545.11' y='429.95' style='font-size: 8.00px; font-family: sans;' textLength='90.71px' lengthAdjust='spacingAndGlyphs'>New South Wales Murray</text>
-<text x='545.11' y='447.23' style='font-size: 8.00px; font-family: sans;' textLength='23.13px' lengthAdjust='spacingAndGlyphs'>Ovens</text>
-<text x='545.11' y='464.51' style='font-size: 8.00px; font-family: sans;' textLength='21.35px' lengthAdjust='spacingAndGlyphs'>Paroo</text>
-<text x='545.11' y='481.79' style='font-size: 8.00px; font-family: sans;' textLength='94.29px' lengthAdjust='spacingAndGlyphs'>Queensland Border Rivers</text>
-<text x='666.64' y='395.39' style='font-size: 8.00px; font-family: sans;' textLength='85.83px' lengthAdjust='spacingAndGlyphs'>South Australian Murray</text>
-<text x='666.64' y='412.67' style='font-size: 8.00px; font-family: sans;' textLength='139.65px' lengthAdjust='spacingAndGlyphs'>South Australian Non-Prescribed Areas</text>
-<text x='666.64' y='429.95' style='font-size: 8.00px; font-family: sans;' textLength='58.25px' lengthAdjust='spacingAndGlyphs'>Victorian Murray</text>
-<text x='666.64' y='447.23' style='font-size: 8.00px; font-family: sans;' textLength='30.68px' lengthAdjust='spacingAndGlyphs'>Warrego</text>
-<text x='666.64' y='464.51' style='font-size: 8.00px; font-family: sans;' textLength='120.93px' lengthAdjust='spacingAndGlyphs'>Wimmera–Mallee (Surface Water)</text>
+<rect x='-79.41' y='379.02' width='145.26' height='39.39' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<image width='86.40' height='17.28' x='-25.53' y='384.00' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAABCAYAAABkOJMpAAABSElEQVQ4jW2RQXYkMQxCP3juf4ScIQdsi1lIdlUys/ArQAjRr/X1nWxCCJV+h2dwDd/jCeEDVy9CUb1P2OHF5xvYFEmxc3bOvN+ukMGd0/7sYo+eeVUvXkXVJsnwTSqkPuMJpMje/+DUvhlJQW04etV4Wj+3ScEuqHpp6Q7VmJoec6/57N7O6VzO7cz9ejqcrIRkuu3JOF3qdYP2Hz0poGedP7P5f7vrRnMT5h3/8ZD2cPDZbV0UApQggqjHBxhGT/sIUr1m3BmXg/Vg/qP56G58uX5m+Ne+Xzck3ayzZwsJjBDCxyP1fQlbPVd71miSWO+ZzFpgufdk1vhksbSePBsfvsTymvtu71qTOV6vJ9fGPnj95DT2MpKx3F1X37M0szXzzpBP38ayh3v4n5t1ulvjW5Orxs9do9UZ3b17WfPbl67Pd9ZZfwEDRmtnC2ovXgAAAABJRU5ErkJggg=='/>
+<text x='-25.38' y='411.76' text-anchor='middle' style='font-size: 8.00px; font-family: sans;' textLength='11.12px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text x='-3.24' y='411.76' text-anchor='middle' style='font-size: 8.00px; font-family: sans;' textLength='11.12px' lengthAdjust='spacingAndGlyphs'>0.2</text>
+<text x='18.90' y='411.76' text-anchor='middle' style='font-size: 8.00px; font-family: sans;' textLength='11.12px' lengthAdjust='spacingAndGlyphs'>0.4</text>
+<text x='41.04' y='411.76' text-anchor='middle' style='font-size: 8.00px; font-family: sans;' textLength='11.12px' lengthAdjust='spacingAndGlyphs'>0.6</text>
+<text x='-74.42' y='402.15' style='font-size: 10.00px; font-family: sans;' textLength='43.91px' lengthAdjust='spacingAndGlyphs'>New label</text>
+<line x1='-25.38' y1='401.28' x2='-25.38' y2='397.82' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<line x1='-3.24' y1='401.28' x2='-3.24' y2='397.82' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<line x1='18.90' y1='401.28' x2='18.90' y2='397.82' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<line x1='41.04' y1='401.28' x2='41.04' y2='397.82' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<line x1='-25.38' y1='387.45' x2='-25.38' y2='384.00' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<line x1='-3.24' y1='387.45' x2='-3.24' y2='384.00' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<line x1='18.90' y1='387.45' x2='18.90' y2='384.00' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<line x1='41.04' y1='387.45' x2='41.04' y2='384.00' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<rect x='75.82' y='379.02' width='730.18' height='113.64' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<text x='80.80' y='439.28' style='font-size: 10.00px; font-family: sans;' textLength='38.36px' lengthAdjust='spacingAndGlyphs'>SDL unit</text>
+<rect x='124.14' y='384.00' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='124.84' y='384.71' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #F0F0F1;' />
+<rect x='124.14' y='401.28' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='124.84' y='401.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #194068;' />
+<rect x='124.14' y='418.56' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='124.84' y='419.27' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #ADB8CB;' />
+<rect x='124.14' y='435.84' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='124.84' y='436.55' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #C6CBD2;' />
+<rect x='124.14' y='453.12' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='124.84' y='453.83' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #6A8DC8;' />
+<rect x='124.14' y='470.40' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='124.84' y='471.11' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #0C1A28;' />
+<rect x='304.77' y='384.00' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='305.48' y='384.71' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #B9C1CD;' />
+<rect x='304.77' y='401.28' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='305.48' y='401.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #3364A1;' />
+<rect x='304.77' y='418.56' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='305.48' y='419.27' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #12304D;' />
+<rect x='304.77' y='435.84' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='305.48' y='436.55' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #97A9C9;' />
+<rect x='304.77' y='453.12' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='305.48' y='453.83' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #0F2840;' />
+<rect x='304.77' y='470.40' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='305.48' y='471.11' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #D4D7DB;' />
+<rect x='405.39' y='384.00' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='406.10' y='384.71' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #14385A;' />
+<rect x='405.39' y='401.28' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='406.10' y='401.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #235285;' />
+<rect x='405.39' y='418.56' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='406.10' y='419.27' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #0A131D;' />
+<rect x='405.39' y='435.84' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='406.10' y='436.55' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #5D84C3;' />
+<rect x='405.39' y='453.12' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='406.10' y='453.83' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #FFFFFF;' />
+<rect x='405.39' y='470.40' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='406.10' y='471.11' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #406EAF;' />
+<rect x='517.58' y='384.00' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='518.29' y='384.71' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #2A5B93;' />
+<rect x='517.58' y='401.28' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='518.29' y='401.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #7694C9;' />
+<rect x='517.58' y='418.56' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='518.29' y='419.27' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #0F2133;' />
+<rect x='517.58' y='435.84' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='518.29' y='436.55' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #A2B0CA;' />
+<rect x='517.58' y='453.12' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='518.29' y='453.83' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #8CA3C9;' />
+<rect x='517.58' y='470.40' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='518.29' y='471.11' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #4F7ABB;' />
+<rect x='639.11' y='384.00' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='639.82' y='384.71' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #060B12;' />
+<rect x='639.11' y='401.28' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='639.82' y='401.99' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #000000;' />
+<rect x='639.11' y='418.56' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='639.82' y='419.27' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #1C4875;' />
+<rect x='639.11' y='435.84' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='639.82' y='436.55' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #809BCA;' />
+<rect x='639.11' y='453.12' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
+<rect x='639.82' y='453.83' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #595959; stroke-linecap: butt; stroke-linejoin: miter; fill: #E2E3E5;' />
+<text x='146.40' y='395.39' style='font-size: 8.00px; font-family: sans;' textLength='153.39px' lengthAdjust='spacingAndGlyphs'>Australian Capital Territory (Surface Water)</text>
+<text x='146.40' y='412.67' style='font-size: 8.00px; font-family: sans;' textLength='104.50px' lengthAdjust='spacingAndGlyphs'>Barwon–Darling Watercourse</text>
+<text x='146.40' y='429.95' style='font-size: 8.00px; font-family: sans;' textLength='25.35px' lengthAdjust='spacingAndGlyphs'>Broken</text>
+<text x='146.40' y='447.23' style='font-size: 8.00px; font-family: sans;' textLength='38.70px' lengthAdjust='spacingAndGlyphs'>Campaspe</text>
+<text x='146.40' y='464.51' style='font-size: 8.00px; font-family: sans;' textLength='74.73px' lengthAdjust='spacingAndGlyphs'>Condamine–Balonne</text>
+<text x='146.40' y='481.79' style='font-size: 8.00px; font-family: sans;' textLength='101.41px' lengthAdjust='spacingAndGlyphs'>Eastern Mount Lofty Ranges</text>
+<text x='327.03' y='395.39' style='font-size: 8.00px; font-family: sans;' textLength='32.91px' lengthAdjust='spacingAndGlyphs'>Goulburn</text>
+<text x='327.03' y='412.67' style='font-size: 8.00px; font-family: sans;' textLength='24.90px' lengthAdjust='spacingAndGlyphs'>Gwydir</text>
+<text x='327.03' y='429.95' style='font-size: 8.00px; font-family: sans;' textLength='73.38px' lengthAdjust='spacingAndGlyphs'>Intersecting Streams</text>
+<text x='327.03' y='447.23' style='font-size: 8.00px; font-family: sans;' textLength='21.79px' lengthAdjust='spacingAndGlyphs'>Kiewa</text>
+<text x='327.03' y='464.51' style='font-size: 8.00px; font-family: sans;' textLength='28.03px' lengthAdjust='spacingAndGlyphs'>Lachlan</text>
+<text x='327.03' y='481.79' style='font-size: 8.00px; font-family: sans;' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>Loddon</text>
+<text x='427.65' y='395.39' style='font-size: 8.00px; font-family: sans;' textLength='49.36px' lengthAdjust='spacingAndGlyphs'>Lower Darling</text>
+<text x='427.65' y='412.67' style='font-size: 8.00px; font-family: sans;' textLength='84.95px' lengthAdjust='spacingAndGlyphs'>Macquarie–Castlereagh</text>
+<text x='427.65' y='429.95' style='font-size: 8.00px; font-family: sans;' textLength='59.16px' lengthAdjust='spacingAndGlyphs'>Marne Saunders</text>
+<text x='427.65' y='447.23' style='font-size: 8.00px; font-family: sans;' textLength='26.24px' lengthAdjust='spacingAndGlyphs'>Moonie</text>
+<text x='427.65' y='464.51' style='font-size: 8.00px; font-family: sans;' textLength='51.59px' lengthAdjust='spacingAndGlyphs'>Murrumbidgee</text>
+<text x='427.65' y='481.79' style='font-size: 8.00px; font-family: sans;' textLength='69.80px' lengthAdjust='spacingAndGlyphs'>NSW Border Rivers</text>
+<text x='539.84' y='395.39' style='font-size: 8.00px; font-family: sans;' textLength='23.12px' lengthAdjust='spacingAndGlyphs'>Namoi</text>
+<text x='539.84' y='412.67' style='font-size: 8.00px; font-family: sans;' textLength='25.35px' lengthAdjust='spacingAndGlyphs'>Nebine</text>
+<text x='539.84' y='429.95' style='font-size: 8.00px; font-family: sans;' textLength='90.71px' lengthAdjust='spacingAndGlyphs'>New South Wales Murray</text>
+<text x='539.84' y='447.23' style='font-size: 8.00px; font-family: sans;' textLength='23.13px' lengthAdjust='spacingAndGlyphs'>Ovens</text>
+<text x='539.84' y='464.51' style='font-size: 8.00px; font-family: sans;' textLength='21.35px' lengthAdjust='spacingAndGlyphs'>Paroo</text>
+<text x='539.84' y='481.79' style='font-size: 8.00px; font-family: sans;' textLength='94.29px' lengthAdjust='spacingAndGlyphs'>Queensland Border Rivers</text>
+<text x='661.37' y='395.39' style='font-size: 8.00px; font-family: sans;' textLength='85.83px' lengthAdjust='spacingAndGlyphs'>South Australian Murray</text>
+<text x='661.37' y='412.67' style='font-size: 8.00px; font-family: sans;' textLength='139.65px' lengthAdjust='spacingAndGlyphs'>South Australian Non-Prescribed Areas</text>
+<text x='661.37' y='429.95' style='font-size: 8.00px; font-family: sans;' textLength='58.25px' lengthAdjust='spacingAndGlyphs'>Victorian Murray</text>
+<text x='661.37' y='447.23' style='font-size: 8.00px; font-family: sans;' textLength='30.68px' lengthAdjust='spacingAndGlyphs'>Warrego</text>
+<text x='661.37' y='464.51' style='font-size: 8.00px; font-family: sans;' textLength='120.93px' lengthAdjust='spacingAndGlyphs'>Wimmera–Mallee (Surface Water)</text>
 <text x='26.71' y='91.60' style='font-size: 12.00px; font-family: sans;' textLength='91.42px' lengthAdjust='spacingAndGlyphs'>gauges_map_sdl</text>
 </g>
 </svg>

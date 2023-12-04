@@ -110,8 +110,8 @@ test_that("flipped", {
     plot_outcomes(y_col = 'allArith',
                   x_col = 'env_obj',
                   colorgroups = NULL,
-                  colorset = 'env_obj',
-                  pal_list = list('scico::berlin'),
+                  colorset = 'scenario',
+                  pal_list = scene_pal,
                   facet_row = 'SWSDLName',
                   facet_col = '.',
                   sceneorder = c('down4', 'base', 'up4'))
@@ -314,6 +314,21 @@ test_that("maps", {
 
   vdiffr::expect_doppelganger("sdl_map_simple", sdl_map)
 
+  # Make a minimal map, change the label
+  sdl_map_l <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == 'EF') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                  x_col = 'map',
+                  y_lab = 'New label',
+                  colorgroups = NULL,
+                  colorset = 'allArith',
+                  pal_list = list('scico::berlin'),
+                  facet_col = 'env_obj',
+                  facet_row = 'scenario',
+                  sceneorder = c('down4', 'base', 'up4'))
+
+  vdiffr::expect_doppelganger("sdl_map_colorlabel", sdl_map)
+
 
   # put the basin in the background
   sdl_basin_background <- obj_sdl_to_plot |>
@@ -370,6 +385,7 @@ test_that("maps", {
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
     plot_outcomes(y_col = 'allArith',
                   x_col = 'map',
+                  y_lab = 'New label',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -378,7 +394,8 @@ test_that("maps", {
                   sceneorder = c('down4', 'base', 'up4'),
                   underlay_list = list(underlay = sdl_units,
                                        underlay_ycol = 'SWSDLName',
-                                       underlay_pal = 'scico::oslo')) +
+                                       underlay_pal = 'scico::oslo',
+                                       y_lab = 'SDL unit')) +
     ggplot2::theme(legend.position = 'bottom')
 
   vdiffr::expect_doppelganger("gauges_map_sdl", gauges_map_sdl)

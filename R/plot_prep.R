@@ -33,6 +33,13 @@ plot_data_prep <- function(data, y_col,
                       zero_adjust = 0,
                       onlyzeros = FALSE) {
 
+  # Order the scenario if I've given it an order (and if it exists).
+  if (!is.null(sceneorder) && 'scenario' %in% names(data)) {
+    if (inherits(sceneorder, 'factor')) {sceneorder <- levels(sceneorder)}
+    data <- data |>
+      dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
+  }
+
   # if y_col is NULL, as happens with maps sometimes, or non-numeric, just skip
   # this entirely there's no y data to adjust mathematically
   if (is.null(y_col) || !is.numeric(data[[y_col]])) {
@@ -69,7 +76,8 @@ plot_data_prep <- function(data, y_col,
     # We've already handled the zero-shifts, so don't do it again
     data <- data |>
       baseline_compare(compare_col = 'scenario', base_lev = base_list$base_lev,
-                       values_col = y_col, comp_fun = base_list$comp_fun, group_cols = base_list$group_cols,
+                       values_col = y_col, comp_fun = base_list$comp_fun,
+                       group_cols = base_list$group_cols,
                        zero_adjust = 0, onlyzeros = TRUE)
 
     if (is.character(base_list$comp_fun)) {
@@ -87,13 +95,6 @@ plot_data_prep <- function(data, y_col,
     ylab_append <- paste0('\n', comp_fun_name, ' to ', as.character(base_list$base_lev))
   }
 
-  # Order the scenario if I've given it an order.
-  if (!is.null(sceneorder)) {
-    if (inherits(sceneorder, 'factor')) {sceneorder <- levels(sceneorder)}
-    data <- data |>
-      dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
-  }
-
   # That can introduce some infs and nans, often from division by zero in the relativiser
   new_nan_inf <- sum(is.nan(data[[y_col]])) + sum(is.infinite(data[[y_col]]))
   old_nan_inf <- sum(is.nan(data[[y_col]])) + sum(is.infinite(data[[y_col]]))
@@ -106,7 +107,8 @@ plot_data_prep <- function(data, y_col,
   return(tibble::lst(data, y_col, ylab_append))
 }
 
-plot_style_prep <- function(prepped, colorset, colorgroups, pal_list, transy, transx, point_group) {
+plot_style_prep <- function(prepped, colorset, colorgroups, pal_list,
+                            transy, transx, point_group) {
   # Warn about conflicts with y-axis trans
   if (!is.null(prepped$y_col)) {
     if (!inherits(transy, 'trans') &&
@@ -157,9 +159,14 @@ plot_style_prep <- function(prepped, colorset, colorgroups, pal_list, transy, tr
 
   # Deal with additional point_groups
   if (is.null(point_group)) {
-    prepped$data <- prepped$data |>
-      dplyr::mutate(pointgroup = ifelse(is.null(colorset), NA,
-                                        .data[[colorset]]))
+    if (is.null(colorset)) {
+      prepped$data$pointgroup <- NA
+    } else {
+      prepped$data$pointgroup <- prepped$data[[colorset]]
+    }
+    # prepped$data <- prepped$data |>
+    #   dplyr::mutate(pointgroup = ifelse(is.null(colorset), NA,
+    #                                     .data[[colorset]]))
   } else {
     prepped$data <- prepped$data |>
       dplyr::mutate(pointgroup = interaction(.data[[colorset]], .data[[point_group]]))
