@@ -1,8 +1,27 @@
 
 agg_theme_space <- make_test_agg()
 
+# create a quant description of scenarios
+scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+
+obj_sdl_to_plot <- agg_theme_space$sdl_units |>
+  dplyr::rename(allArith = 4) |> # readability
+  dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+  dplyr::filter(!is.na(env_group)) |>
+  dplyr::arrange(env_group, env_obj) |>
+  # and join the quant descriptions
+  dplyr::left_join(scenarios, by = 'scenario')
+
+
+# palettes
 SDL_pal <- make_pal(unique(agg_theme_space$sdl_units$SWSDLName),
                     palette = "ggsci::nrc_npg")
+
+scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
+                      palette = 'calecopal::superbloom3')
+
+obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$env_group),
+                    palette = 'scico::berlin')
 
 test_that("basin works with single color palette", {
   basin_to_plot <- agg_theme_space$mdb |>
@@ -19,15 +38,23 @@ test_that("basin works with single color palette", {
   vdiffr::expect_doppelganger("stacked bar simple", basin_plot)
 })
 
-test_that("multi-palette and facetting", {
-  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
-    dplyr::rename(allArith = 4) # for readability
+test_that("a fixed color works (contrived)", {
+  basin_to_plot <- agg_theme_space$mdb |>
+    dplyr::rename(allArith = 4, oneLimiting = 5) |> # for readability
+    dplyr::filter(!is.na(Objective))
 
-  # Create a grouping variable
-  obj_sdl_to_plot <- obj_sdl_to_plot |>
-    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-    dplyr::filter(!is.na(env_group)) |>
-    dplyr::arrange(env_group, env_obj)
+  basin_plotred <- plot_outcomes(basin_to_plot,
+                              y_col = 'allArith',
+                              colorset = 'Objective',
+                              pal_list = 'firebrick',
+                              sceneorder = c('down4', 'base', 'up4')) +
+    ggplot2::theme(legend.position = 'none')
+
+  vdiffr::expect_doppelganger("stackedred", basin_plotred)
+})
+
+test_that("multi-palette and facetting", {
+
 
   # Create a palette list
   grouplist = list(EB = 'grDevices::Grays',
@@ -78,18 +105,6 @@ test_that("flipped", {
   # What I want to do is just swap the x and fill arguments and pass in the
   # scenario palette. Can I do that easily?
 
-  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
-    dplyr::rename(allArith = 4) # for readability
-
-  # Create a grouping variable
-  obj_sdl_to_plot <- obj_sdl_to_plot |>
-    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-    dplyr::filter(!is.na(env_group)) |>
-    dplyr::arrange(env_group, env_obj)
-
-  scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
-                        palette = 'calecopal::superbloom3')
-
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_plot <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
@@ -99,28 +114,20 @@ test_that("flipped", {
                   pal_list = list('scico::berlin'),
                   facet_row = 'SWSDLName',
                   facet_col = '.',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'))
 
   vdiffr::expect_doppelganger("scenario stack", sdl_plot)
 
 
-  # outcome groups- If I want to do this, I need pass a named palette, I think
-  # It doesn't actually plot any differently at present, but I'm leaving it here
-  # because if we can figure out how to plot those colors in a not-ugly way,
-  # we'll be there.
-  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$env_group),
-                      palette = 'scico::berlin')
-
+  # outcome groups
   sdl_plot_g <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
                   x_col = 'env_obj',
                   colorgroups = 'env_group',
-                  colorset = 'env_obj',
-                  pal_list = obj_pal,
+                  colorset = 'scenario',
+                  pal_list = scene_pal,
                   facet_row = 'SWSDLName',
                   facet_col = '.',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'))
 
   vdiffr::expect_doppelganger("scenario stack group", sdl_plot_g)
@@ -129,13 +136,12 @@ test_that("flipped", {
   sdl_plot_groupblock <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
                   x_col = 'scenario',
-                  colorgroups = 'env_group',
-                  colorset = 'env_obj',
+                  colorset = 'env_group',
                   pal_list = obj_pal,
                   facet_row = 'SWSDLName',
                   facet_col = '.',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'))
+
   vdiffr::expect_doppelganger("stacked_objgroups", sdl_plot_groupblock)
 
   # change label name
@@ -143,13 +149,11 @@ test_that("flipped", {
   sdl_plot_groupblock_l <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
                   x_col = 'scenario',
-                  colorgroups = 'env_group',
-                  colorset = 'env_obj',
+                  colorset = 'env_group',
                   color_lab = 'Environmental\ngroup',
                   pal_list = obj_pal,
                   facet_row = 'SWSDLName',
                   facet_col = '.',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'))
   vdiffr::expect_doppelganger("legend_name", sdl_plot_groupblock_l)
 
@@ -157,13 +161,11 @@ test_that("flipped", {
   sdl_plot_groupblock_n <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
                   x_col = 'scenario',
-                  colorgroups = 'env_group',
-                  colorset = 'env_obj',
+                  colorset = 'env_group',
                   color_lab = NULL,
                   pal_list = obj_pal,
                   facet_row = 'SWSDLName',
                   facet_col = '.',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'))
 
   vdiffr::expect_doppelganger("no legend title", sdl_plot_groupblock_n)
@@ -176,37 +178,17 @@ test_that("quant x", {
   # What I want to do is just use a quantitative x and have it automatically use
   # a line. Can I do that easily?
 
-  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
-    dplyr::rename(allArith = 4) # for readability
-
   # create a quant description of scenarios
   scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
-
-  # Create a grouping variable
-  obj_sdl_to_plot <- obj_sdl_to_plot |>
-    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-    dplyr::filter(!is.na(env_group)) |>
-    dplyr::arrange(env_group, env_obj) |>
-    # and join the quant descriptions
-    dplyr::left_join(scenarios, by = 'scenario')
-
-  scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
-                        palette = 'calecopal::superbloom3')
-
-  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$env_group),
-                      palette = 'scico::berlin')
 
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_line <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
                   x_col = 'delta',
-                  colorgroups = NULL,
                   colorset = 'env_obj',
                   pal_list = list('scico::berlin'),
                   facet_row = 'SWSDLName',
-                  facet_col = '.',
-                  scene_pal = scene_pal,
-                  sceneorder = c('down4', 'base', 'up4'))
+                  facet_col = '.')
 
   vdiffr::expect_doppelganger("line defaults", sdl_line)
 
@@ -218,16 +200,13 @@ test_that("quant x", {
                   x_lab = 'Change in flow',
                   transx = 'log10',
                   color_lab = 'Environmental\ngroup',
-                  colorgroups = 'env_group',
-                  colorset = 'env_obj',
+                  colorset = 'env_group',
+                  point_group = 'env_obj',
                   pal_list = obj_pal,
                   facet_row = 'SWSDLName',
                   facet_col = '.',
-                  scene_pal = scene_pal,
-                  sceneorder = c('down4', 'base', 'up4'),
-                  base_lev = 'base',
-                  comp_fun = 'difference',
-                  group_cols = c('env_obj', 'polyID'))
+                  base_list = list(base_lev = 'base', comp_fun = 'difference',
+                                   group_cols = c('env_obj', 'polyID')))
 
   vdiffr::expect_doppelganger("line with scaling and labels", sdl_line_options)
 
@@ -240,18 +219,13 @@ test_that("quant x", {
                   x_lab = 'Change in flow',
                   transx = 'log10',
                   color_lab = 'Catchment',
-                  colorgroups = NULL,
                   colorset = 'SWSDLName',
                   point_group = 'env_obj',
                   pal_list = list('RColorBrewer::Dark2'),
                   facet_row = 'env_group',
                   facet_col = '.',
-                  scene_pal = scene_pal,
-                  sceneorder = c('down4', 'base', 'up4'),
-                  base_lev = 'base',
-                  comp_fun = 'difference',
-                  group_cols = c('env_obj', 'polyID'),
-                  smooth = FALSE)
+                  base_list = list(base_lev = 'base', comp_fun = 'difference',
+                                   group_cols = c('env_obj', 'polyID')))
   vdiffr::expect_doppelganger("line by catchment with obj groups", sdl_line_catchment)
 
   # jittering- set the seed each time or the jitters differ
@@ -263,19 +237,16 @@ test_that("quant x", {
                   x_lab = 'Change in flow',
                   transx = 'log10',
                   color_lab = 'Environmental\ngroup',
-                  colorgroups = 'env_group',
-                  colorset = 'env_obj',
+                  colorset = 'env_group',
                   pal_list = obj_pal,
                   facet_row = 'SWSDLName',
                   facet_col = '.',
-                  scene_pal = scene_pal,
-                  sceneorder = c('down4', 'base', 'up4'),
-                  base_lev = 'base',
-                  comp_fun = 'difference',
-                  group_cols = c('polyID'),
-                  smooth = TRUE,
-                  smooth_method = 'lm',
+                  base_list = list(base_lev = 'base',
+                                   comp_fun = 'difference',
+                                   group_cols = c('polyID')),
+                  smooth_arglist = list(method = 'lm'),
                   position = ggplot2::position_jitter(width = 0.01, height = 0))
+
   vdiffr::expect_doppelganger("jitter_function", sdl_smooth_mean_jf)
 
   # jittering- default
@@ -287,24 +258,21 @@ test_that("quant x", {
                   x_lab = 'Change in flow',
                   transx = 'log10',
                   color_lab = 'Environmental\ngroup',
-                  colorgroups = 'env_group',
-                  colorset = 'env_obj',
+                  colorset = 'env_group',
                   pal_list = obj_pal,
                   facet_row = 'SWSDLName',
                   facet_col = '.',
-                  scene_pal = scene_pal,
-                  sceneorder = c('down4', 'base', 'up4'),
-                  base_lev = 'base',
-                  comp_fun = 'difference',
-                  group_cols = c('polyID'),
-                  smooth = TRUE,
-                  smooth_method = 'lm',
+                  base_list = list(base_lev = 'base',
+                                   comp_fun = 'difference',
+                                   group_cols = c('polyID')),
+                  smooth_arglist = list(method = 'lm'),
                   position = 'jitter')
 
   vdiffr::expect_doppelganger("jitter_character", sdl_smooth_mean_jc)
 
   skip("skip loess- warnings can't be silenced. Inspect visually")
   # The loess isn't happy about singularities. I don't want to silence them, but also don't care for this example.
+  # I'm not entirely sure why this works- i think I *should* have to say `smooth_arglist = TRUE`, but it seems to work with just `smooth`
   sdl_line_catchment_smooth <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
                   x_col = 'delta',
@@ -317,11 +285,9 @@ test_that("quant x", {
                   pal_list = list('RColorBrewer::Dark2'),
                   facet_row = 'env_group',
                   facet_col = '.',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
-                  base_lev = 'base',
-                  comp_fun = 'difference',
-                  group_cols = c('env_obj', 'polyID'),
+                  base_list = list(base_lev = 'base', comp_fun = 'difference',
+                                   group_cols = c('env_obj', 'polyID')),
                   smooth = TRUE)
 
   vdiffr::expect_doppelganger("smoothed_lines",
@@ -330,26 +296,6 @@ test_that("quant x", {
 })
 
 test_that("maps", {
-
-  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
-    dplyr::rename(allArith = 4) # for readability
-
-  # create a quant description of scenarios
-  scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
-
-  # Create a grouping variable
-  obj_sdl_to_plot <- obj_sdl_to_plot |>
-    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-    dplyr::filter(!is.na(env_group)) |>
-    dplyr::arrange(env_group, env_obj) |>
-    # and join the quant descriptions
-    dplyr::left_join(scenarios, by = 'scenario')
-
-  scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
-                        palette = 'calecopal::superbloom3')
-
-  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$env_group),
-                      palette = 'scico::berlin')
 
   env_obj_points_to_plot <- agg_theme_space$env_obj |>
     dplyr::rename(allArith = 5)
@@ -364,7 +310,6 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'env_obj',
                   facet_row = 'scenario',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'))
 
   vdiffr::expect_doppelganger("sdl_map_simple", sdl_map)
@@ -380,7 +325,6 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'env_obj',
                   facet_row = 'scenario',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   underlay_list = list(underlay = basin, underlay_pal = 'azure'))
 
@@ -397,7 +341,6 @@ test_that("maps", {
                                  pal_list = list('scico::berlin'),
                                  facet_col = 'env_obj',
                                  facet_row = 'scenario',
-                                 scene_pal = scene_pal,
                                  sceneorder = c('down4', 'base', 'up4'),
                                  underlay_list = list(underlay = cewo_valleys,
                                                       underlay_ycol = 'ValleyName',
@@ -415,7 +358,6 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   underlay_list = list(underlay = 'basin',
                                        underlay_pal = 'azure')) +
@@ -433,7 +375,6 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   underlay_list = list(underlay = sdl_units,
                                        underlay_ycol = 'SWSDLName',
@@ -454,7 +395,6 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   underlay_list = list(underlay = dplyr::filter(obj_sdl_to_plot, env_obj == 'NF1'),
                                        underlay_ycol = 'allArith',
@@ -473,7 +413,6 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   underlay_list = list(list(underlay = 'basin',
                                             underlay_pal = 'cornsilk'),
@@ -494,7 +433,6 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   underlay_list = 'basin',
                   overlay_list = list(overlay = 'bom_basin_gauges', overlay_pal = 'purple')) +
@@ -512,7 +450,6 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   underlay_list = 'basin',
                   overlay_list = list(overlay = 'bom_basin_gauges',
@@ -532,7 +469,6 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   underlay_list = 'basin',
                   overlay_list = list(overlay = dplyr::filter(env_obj_points_to_plot, env_obj == 'NF1'),
@@ -553,7 +489,6 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   underlay_list = 'basin',
                   overlay_list = list(overlay = dplyr::filter(env_obj_points_to_plot, env_obj == 'NF1'),
@@ -563,49 +498,6 @@ test_that("maps", {
     ggplot2::theme(legend.position = 'bottom')
 
   vdiffr::expect_doppelganger("sdl_gauges_quant", sdl_gauges_quant)
-
-
-  # check that scenariofilter works on underlay and overlay
-  # that one would be good with two levels- basin and sdl
-  gauges_scenefilter_u <- env_obj_points_to_plot |> # for readability
-    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
-                  colorgroups = NULL,
-                  colorset = 'allArith',
-                  pal_list = list('scico::berlin'),
-                  facet_col = 'scenario',
-                  facet_row = 'env_obj',
-                  scene_pal = scene_pal,
-                  sceneorder = c('down4', 'base', 'up4'),
-                  scenariofilter = c('down4', 'up4'),
-                  underlay_list = list(list(underlay = dplyr::filter(obj_sdl_to_plot, env_obj == 'NF1'),
-                                            underlay_ycol = 'allArith',
-                                            underlay_pal = 'scico::oslo'))) +
-    ggplot2::theme(legend.position = 'bottom')
-
-  vdiffr::expect_doppelganger("gauges_scenefilter_u", gauges_scenefilter_u)
-
-  gauges_scenefilter_o <- obj_sdl_to_plot |>
-    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
-                  colorgroups = NULL,
-                  colorset = 'allArith',
-                  pal_list = list('scico::berlin'),
-                  facet_col = 'scenario',
-                  facet_row = 'env_obj',
-                  scene_pal = scene_pal,
-                  sceneorder = c('down4', 'base', 'up4'),
-                  underlay_list = 'basin',
-                  scenariofilter = c('down4', 'up4'),
-                  overlay_list = list(overlay = dplyr::filter(env_obj_points_to_plot, env_obj == 'NF1'),
-                                      overlay_pal = 'scico::oslo',
-                                      overlay_ycol = 'allArith',
-                                      clip = TRUE)) +
-    ggplot2::theme(legend.position = 'bottom')
-
-  vdiffr::expect_doppelganger("gauges_scenefilter_o", gauges_scenefilter_o)
 
 
   # Does it work for the basin?
@@ -621,7 +513,6 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'Objective',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   overlay_list = 'bom_basin_gauges')+
     ggplot2::theme(legend.position = 'bottom')
@@ -641,9 +532,8 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'Objective',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
-                  overlay_list = list(list(overlay = 'sdl_units', overlay_pal = 'black'),
+                  overlay_list = list(list(overlay = 'sdl_units', overlay_pal = NA),
                                       list(overlay = dplyr::filter(env_obj_points_to_plot, env_obj == 'NF1'),
                                            overlay_pal = 'scico::oslo',
                                            overlay_ycol = 'allArith')))+
@@ -662,7 +552,6 @@ test_that("maps", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   underlay_list = list(underlay = 'basin', underlay_pal = "azure"),
                   overlay_list = list(overlay = dplyr::filter(env_obj_points_to_plot, env_obj == 'NF1'),
@@ -685,11 +574,9 @@ test_that("maps", {
                   pal_list = list('ggthemes::Orange-Blue-White Diverging'),
                   facet_col = 'env_obj',
                   facet_row = 'scenario',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
-                  base_lev = 'base',
-                  comp_fun = 'difference',
-                  group_cols = c('env_obj', 'polyID'), # Do I need to group_by polyID for the maps? Yes. should probably automate that.
+                  base_list = list(base_lev = 'base', comp_fun = 'difference',
+                                   group_cols = c('env_obj', 'polyID')), # Do I need to group_by polyID for the maps? Yes. should probably automate that.
                   underlay_list = list(underlay = basin, underlay_pal = 'azure'))
 
   vdiffr::expect_doppelganger("sdl_basin_background_difference", sdl_basin_background_difference)
@@ -704,13 +591,11 @@ test_that("maps", {
                   pal_list = list('ggthemes::Orange-Blue-White Diverging'),
                   facet_col = 'env_obj',
                   facet_row = 'scenario',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
-                  base_lev = 'base',
-                  comp_fun = 'relative',
+                  base_list = list(base_lev = 'base', comp_fun = 'relative',
+                                   group_cols = c('env_obj', 'polyID')),
                   zero_adjust = 'auto',
-                  transy = 'log10',
-                  group_cols = c('env_obj', 'polyID'), # Do I need to group_by polyID for the maps? Yes. should probably automate that.
+                  transy = 'log10', # Do I need to group_by polyID for the maps? Yes. should probably automate that.
                   underlay_list = list(underlay = basin, underlay_pal = 'azure'))
 
   skip("strange bug introduces NaN and Inf, but only when printed to vdiffr. Inspect manually")
@@ -755,26 +640,6 @@ test_that("setLimits works", {
   vdiffr::expect_doppelganger("stacked bar 10", basin_plot10)
 
   # Line plots
-  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
-    dplyr::rename(allArith = 4) # for readability
-
-  # create a quant description of scenarios
-  scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
-
-  # Create a grouping variable
-  obj_sdl_to_plot <- obj_sdl_to_plot |>
-    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-    dplyr::filter(!is.na(env_group)) |>
-    dplyr::arrange(env_group, env_obj) |>
-    # and join the quant descriptions
-    dplyr::left_join(scenarios, by = 'scenario')
-
-  scene_pal <- make_pal(levels = unique(obj_sdl_to_plot$scenario),
-                        palette = 'calecopal::superbloom3')
-
-  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$env_group),
-                      palette = 'scico::berlin')
-
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_line_75 <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
@@ -782,9 +647,9 @@ test_that("setLimits works", {
                   colorgroups = NULL,
                   colorset = 'env_obj',
                   pal_list = list('scico::berlin'),
+                  point_group = 'env_obj',
                   facet_row = 'SWSDLName',
                   facet_col = '.',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   setLimits = c(0, 0.75))
 
@@ -801,7 +666,6 @@ test_that("setLimits works", {
                   pal_list = list('scico::berlin'),
                   facet_col = 'env_obj',
                   facet_row = 'scenario',
-                  scene_pal = scene_pal,
                   sceneorder = c('down4', 'base', 'up4'),
                   setLimits = c(0, 2))
 
@@ -816,9 +680,8 @@ test_that("ewr works as in `plot_outcomes_bar`", {
     dplyr::slice(1) |>
     dplyr::ungroup() |>
     dplyr::filter(ewr_code %in% c('BF1', 'LF1', "OB5") &
-                    gauge %in% c("412002", "412005", "412038"))
-
-  scene_pal <- make_pal(levels = unique(ewr_to_bar_data$scenario), palette = 'calecopal::superbloom3')
+                    gauge %in% c("412002", "412005", "412038")) |>
+    dplyr::mutate(ewr_achieved = as.numeric(ewr_achieved)) # logicals fail
 
 
   ewr_plot <- plot_outcomes(ewr_to_bar_data,
@@ -838,7 +701,6 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
     dplyr::rename(allArith = 4, oneLimiting = 5) |> # for readability
     dplyr::filter(!is.na(Objective))
 
-  scene_pal <- make_pal(levels = unique(basin_to_plot$scenario), palette = 'calecopal::superbloom3')
   basin_plot <- plot_outcomes(basin_to_plot,
                               y_col = 'allArith',
                               x_col = 'scenario',
@@ -863,16 +725,6 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
 
 test_that("facet addition works", {
 
-  # It turns out this is actually about leaving out rows or cols
-  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
-    dplyr::rename(allArith = 4) # for readability
-
-  # Create a grouping variable
-  obj_sdl_to_plot <- obj_sdl_to_plot |>
-    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-    dplyr::filter(!is.na(env_group)) |>
-    dplyr::arrange(env_group, env_obj)
-
   sdl_colors_row <- obj_sdl_to_plot |>
     # dplyr::summarise(allArith = mean(allArith, na.rm = TRUE),
     #                  .by = c(SWSDLName, scenario, geometry)) |>
@@ -880,8 +732,8 @@ test_that("facet addition works", {
                   y_lab = 'Proportion\nEWR achieved',
                   x_col = 'SWSDLName',
                   facet_row = 'env_group + SWSDLName',
-                  colorset = 'SWSDLName',
-                  pal_list = SDL_pal,
+                  colorset = 'scenario',
+                  pal_list = scene_pal,
                   position = 'dodge',
                   setLimits = c(0,1))
 
@@ -892,8 +744,8 @@ test_that("facet addition works", {
                   y_lab = 'Proportion\nEWR achieved',
                   x_col = 'SWSDLName',
                   facet_col = 'env_group + SWSDLName',
-                  colorset = 'SWSDLName',
-                  pal_list = SDL_pal,
+                  colorset = 'scenario',
+                  pal_list = scene_pal,
                   position = 'dodge',
                   setLimits = c(0,1))
 
@@ -909,15 +761,6 @@ test_that("scenarios aren't special", {
 
   # This is a strange example, because scenario can easily be special here. But
   # roll with it to solve the more general issue.
-
-  obj_sdl_to_plot <- agg_theme_space$sdl_units |>
-    dplyr::rename(allArith = 4) # for readability
-
-  # Create a grouping variable
-  obj_sdl_to_plot <- obj_sdl_to_plot |>
-    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-    dplyr::filter(!is.na(env_group)) |>
-    dplyr::arrange(env_group, env_obj)
 
   sdl_colors <- obj_sdl_to_plot |>
     dplyr::summarise(allArith = mean(allArith, na.rm = TRUE),

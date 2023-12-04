@@ -34,7 +34,6 @@
 #'   be length of `colorgroups`
 #' @param sceneorder character or factor giving the order to present scenario
 #'   levels
-#' @param scene_pal named palette for scenarios, only used if `scene_x = FALSE`
 #' @param scales facet scales, as in [ggplot2::facet_wrap()]. Default `scales =
 #'   'fixed'` holds them the same, most common change will be to `scales =
 #'   'free_y'` if gauges have very different flows.
@@ -49,9 +48,18 @@
 #'   to change from stacked to dodged bars or jitter points. Can be character,
 #'   e.g. 'jitter' or a function, e.g. `ggplot2::position_jitter(width = 0.1,
 #'   height = 0)`
-#' @param smooth, logical, default `FALSE`. If plotting lines (`x_col` is
-#'   numeric), do we want straight lines (the default, [ggplot2::geom_line()])
-#'   or fits ([ggplot2::geom_smooth()])?
+#' @param base_list NULL (default) or limited list of arguments to [baseline_compare()];
+#'  * base_lev
+#'  * comp_fun
+#' * group_cols
+#'  [plot_prep()] handles `zero_adjust`, and other arguments are inferred or not supported
+#' @param smooth_arglist NULL (default) or limited list of arguments to [ggplot2::geom_smooth()]. If NULL and x is quantitative, defaults to straight lines.
+#' Arguments
+#' * method
+#' * method.args
+#' * se
+#' * linewidth
+#' If others are desired, we can develop something more general.
 #' @param smooth_method `method` argument to [ggplot2::geom_smooth()]. Ignored
 #'   if not smoothing
 #' @param smooth_args `method.args` argument to [ggplot2::stat_smooth()]. Ignored if not smoothing.
@@ -68,7 +76,6 @@
 #'   underlay is fill (polygons) and the main data is points.
 #' @param overlay_list as `underlay_list`, but names `"overlay_*"`
 #' @param setLimits sets user-supplied color/fill limits for maps or y limits for other plots. Also sets `underlay` and `overlay` limits for consistency.
-#' @param ... passed to [plot_prep()]
 #'
 #' @return a ggplot stacked bar plot with standard formatting and coloring,
 #'   stacking either scenarios or colorset
@@ -84,6 +91,7 @@ plot_outcomes <- function(outdf,
                           pal_list = "scico::berlin",
                           colorgroups = NULL,
                           color_lab = ifelse(is.null(colorgroups), colorset, colorgroups),
+                          plot_type = '2d',
                                   facet_row = NULL,
                                   facet_col = NULL,
                                   facet_wrapper = NULL,
@@ -93,18 +101,14 @@ plot_outcomes <- function(outdf,
                                   scales = 'fixed',
                                   transy = 'identity',
                                   transx = 'identity',
-                                  base_lev = NULL,
-                                  comp_fun = NULL,
-                                  zero_adjust = 0,
+                          zero_adjust = 0,
+
                                   position = 'stack',
-                                  smooth = FALSE,
-                                  smooth_method = NULL,
-                                  smooth_se = TRUE,
-                                  smooth_args = NULL,
+                          base_list = NULL,
+                                  smooth_arglist = NULL,
                                   underlay_list = NULL,
                                   overlay_list = NULL,
-                                  setLimits = NULL,
-                                  ...) {
+                                  setLimits = NULL) {
 
 
   ## Cleaning inputs
@@ -119,115 +123,116 @@ plot_outcomes <- function(outdf,
 
   # Bare names get lost as we go down into further functions, so use characters
   # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
-  if (is.function(comp_fun) || (is.list(comp_fun) & is.function(comp_fun[[1]]))) {
-    comp_fun <- as.character(substitute(comp_fun))
-    if(comp_fun[1] == "c") {comp_fun <- comp_fun[2:length(comp_fun)]}
+  # Really want to shove this in plot_prep. Maybe I can now that it's in a list?
+  if (!is.null(base_list)) {
+    if (is.function(base_list$comp_fun) || (is.list(base_list$comp_fun) & is.function(base_list$comp_fun[[1]]))) {
+      base_list$comp_fun <- as.character(substitute(base_list$comp_fun))
+      if(base_list$comp_fun[1] == "c") {base_list$comp_fun <- base_list$comp_fun[2:length(base_list$comp_fun)]}
+    }
+  }
+
+  # infer plot_type to cover some previous behavior
+  if (x_col == 'map') {
+    plot_type <- 'map'
   }
 
 
   # Prep the data
-  prepped <- plot_prep(data = outdf, y_col = y_col,
+  prepped <- plot_data_prep(data = outdf, y_col = y_col,
                        sceneorder = sceneorder,
-                       base_lev = base_lev,
-                       comp_fun = comp_fun,
-                       zero_adjust = zero_adjust, ...)
+                       base_list = base_list,
+                       zero_adjust = zero_adjust)
 
-  # Warn about conflicts with y-axis trans
-  if (!inherits(transy, 'trans') && transy %in% c('log', 'log10') & any(prepped$data[[prepped$y_col]] == 0)) {
-    rlang::warn(glue::glue("`transy` takes logs, but data has
-                           {sum(prepped$data[[prepped$y_col]] == 0)} zeros and
-                           {sum(prepped$data[[prepped$y_col]] < 0)} less than 0,
-                           which will get lost"))
-  }
+  prepped <- plot_style_prep(prepped = prepped,
+                             colorset, colorgroups, pal_list,
+                             transy, transx, point_group)
 
-
-  # Handle different color options
-  color_type <- find_color_type(pal_list)
-
-  # if the data is qualitative but the palette is continuous, we need to make a named palette
-  if (color_type == 'paletteer_c' & !is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,colorset])))) {
-    pal_list <- make_pal(prepped$data[[colorset]], pal_list[[1]])
-    color_type <- 'colorobj'
-  }
-
-  # if the data is quantitative but the palette is discrete, we need to do something, but maybe just fail.
-  if (color_type == 'paletteer_c' & !is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,colorset])))) {
-    rlang::abort(glue::glue("Using discrete palette {pal_list[[1]]} for continous data {colorset}"))
-  }
-
-  # This is annoying, but having a column with the same name lets us avoid a lot of duplicated code
-  if (color_type == 'grouped') {
-    prepped$data <- grouped_colors(prepped$data, pal_list, colorgroups, colorset)
-  } else {
-    prepped$data$color <- prepped$data[[colorset]]
-  }
+  # # Warn about conflicts with y-axis trans
+  # if (!inherits(transy, 'trans') && transy %in% c('log', 'log10') & any(prepped$data[[prepped$y_col]] == 0)) {
+  #   rlang::warn(glue::glue("`transy` takes logs, but data has
+  #                          {sum(prepped$data[[prepped$y_col]] == 0)} zeros and
+  #                          {sum(prepped$data[[prepped$y_col]] < 0)} less than 0,
+  #                          which will get lost"))
+  # }
+  #
+  #
+  # # Handle different color options
+  # color_type <- find_color_type(pal_list)
+  #
+  # # if the data is qualitative but the palette is continuous, we need to make a named palette
+  # if (color_type == 'paletteer_c' & !is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,colorset])))) {
+  #   pal_list <- make_pal(prepped$data[[colorset]], pal_list[[1]])
+  #   color_type <- 'colorobj'
+  # }
+  #
+  # # if the data is quantitative but the palette is discrete, we need to do something, but maybe just fail.
+  # if (color_type == 'paletteer_c' & !is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,colorset])))) {
+  #   rlang::abort(glue::glue("Using discrete palette {pal_list[[1]]} for continous data {colorset}"))
+  # }
+  #
+  # # This is annoying, but having a column with the same name lets us avoid a lot of duplicated code
+  # if (color_type == 'grouped') {
+  #   prepped$data <- grouped_colors(prepped$data, pal_list, colorgroups, colorset)
+  #   prepped$data <- prepped$data |>
+  #     dplyr::mutate(color = forcats::fct_inorder(color)) # Works, but explictly making it line up with colordef might be better?
+  # } else {
+  #   prepped$data$color <- prepped$data[[colorset]]
+  # }
 
   # Find limits for the color scale- needs to be a function, so write it here so it inherits variables.
   # allows centering diverging palettes with baseline comparisons
-  # by defining this in here, it inherits comp_fun and other values
+  # by defining this in here, it inherits base_list$comp_fun and other values
   # x is typically prepped$data[[prepped$y_col]] (because `prepped$y_col` is
   # the new y_col name if baselined). Should I just use that? Or can I call it from inside the `scale`
   # x here is a length-2 default set of limits.
-  findlimits <- function(x) {
-    # use hard-set user-supplied limits
-    if (!is.null(setLimits)) {
-      return(setLimits)
-    }
-    # use default limits
-    if (is.null(comp_fun) || (!comp_fun %in% c('difference', 'relative')) &
-        is.null(setLimits)) {return(x)}
-    # Set limits to make midpoint 0 if difference
-    if (comp_fun == 'difference') {
-      limits <- max(abs(x), na.rm = TRUE) * c(-1, 1)
-    }
-    # setting midpoint at 1 for multiplicative is trickier
-    if (comp_fun == 'relative') {
-      logvals <- log(x)
-      loglims <- max(abs(logvals), na.rm = TRUE) * c(-1, 1)
-      limits <- exp(loglims)
-    }
+  # findlimits <- function(x, lims, base_list) {
+  #   # use hard-set user-supplied limits
+  #   if (!is.null(lims)) {
+  #     return(lims)
+  #   }
+  #   # use default limits
+  #   if (is.null(base_list) || (!base_list$comp_fun %in% c('difference', 'relative')) &
+  #       is.null(lims)) {return(x)}
+  #   # Set limits to make midpoint 0 if difference
+  #   if (!is.null(base_list) && base_list$comp_fun == 'difference') {
+  #     limits <- max(abs(x), na.rm = TRUE) * c(-1, 1)
+  #   }
+  #   # setting midpoint at 1 for multiplicative is trickier
+  #   if (!is.null(base_list) && base_list$comp_fun == 'relative') {
+  #     logvals <- log(x)
+  #     loglims <- max(abs(logvals), na.rm = TRUE) * c(-1, 1)
+  #     limits <- exp(loglims)
+  #   }
+  #
+  #   return(limits)
+  #
+  # }
 
-    return(limits)
-
-  }
-
-  # finds labels that match scale_color_identity
-  labfind <- function(breaks, data = prepped$data) {
-    if (inherits(data, 'sf')) {data <- sf::st_drop_geometry(data)}
-    matched_vals <- unique(data[,c('colordef', 'color')])
-    # make sure everything lines up
-    m_ind <- match(breaks, matched_vals$color)
-    return(dplyr::pull(matched_vals[, 'colordef'])[m_ind])
-  }
-
-  # Deal with additional point_groups- temped to put in grouped_colors, but
-  # there are too many short-circuits
-  if (is.null(point_group)) {
-    outdf <- outdf |>
-      dplyr::mutate(pointgroup = .data[[colorset]])
-  } else {
-    outdf <- outdf |>
-      dplyr::mutate(pointgroup = interaction(.data[[colorset]], .data[[point_group]]))
-  }
+  # # Deal with additional point_groups- temped to put in grouped_colors, but
+  # # there are too many short-circuits, and plot_prep would be good, but it's not a data transform.
+  # if (is.null(point_group)) {
+  #   prepped$data <- prepped$data |>
+  #     dplyr::mutate(pointgroup = .data[[colorset]])
+  # } else {
+  #   prepped$data <- prepped$data |>
+  #     dplyr::mutate(pointgroup = interaction(.data[[colorset]], .data[[point_group]]))
+  # }
 
 
 
   ## different plot types
 
-  # Maps get a different treatment than 2-d
-    # What am I going to do with heatmaps and networks? I might end up wanting a plot_type argument to just be explicit
-  if (x_col != 'map') {
+  # Easier to define the 2d (standard) plots as NOT the other sorts
+  if (!(plot_type %in% c('map', 'heatmap', 'network'))) {
     # Numeric x
     if (is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
       outcome_plot <- plot_numeric(prepped, x_col, x_lab, y_lab,
-                                   color_type, pal_list,
-                                   smooth, position,
-                                   transy, transx)
+                                   position, transy, transx,
+                                   smooth_arglist)
     }
     # Qualitative x
     if (!is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
       outcome_plot <- plot_bar(prepped, x_col, x_lab, y_lab,
-                               color_type, pal_list,
                                position, transy)
     }
 
@@ -249,7 +254,8 @@ plot_outcomes <- function(outdf,
     if (!is.null(facet_row) & !is.null(facet_col)) {
 
       outcome_plot <- outcome_plot +
-        # ahhh. reformulate is (RHS, LHS) - so, backwards to what we want.
+        # reformulate is (RHS, LHS) - so, backwards to how we think about
+        # row-column indexing.
         ggplot2::facet_grid(stats::reformulate(facet_col,facet_row),
                             # Good in theory, but often too long and blocks the plot, so not using
                             # labeller = ggplot2::label_wrap_gen(),
@@ -266,396 +272,415 @@ plot_outcomes <- function(outdf,
 
   }
 
-  # # scenario on x, bar
-  # if (x_col == 'scenario') {
+  if (plot_type == 'map') {
+    if (length(pal_list) > 1) {rlang::warn(glue::glue("using first palette for {y_col}.
+                                                      Splitting up palettes in maps needs more thought"))}
+
+    outcome_plot <- plot_map(prepped, underlay_list, overlay_list,
+                             facet_wrapper, facet_row, facet_col,
+                             sceneorder, transy, setLimits, base_list)
+
+    # labels
+    outcome_plot <- outcome_plot +
+      ggplot2::labs(y = NULL,
+                    x = NULL) +
+      theme_werp_toolkit()
+  }
+
+  # # # scenario on x, bar
+  # # if (x_col == 'scenario') {
+  # #
+  # #   # end-run a situation where we color and x by scenario- need to clean this up
+  # #   if (all(names(pal_list) %in% prepped$data$scenario)) {
+  # #     prepped$data <- dplyr::arrange(prepped$data, scenario)
+  # #   }
+  # #
+  # #   outcome_plot <- prepped$data |>
+  # #     dplyr::filter(scenario %in% prepped$scenariofilter) |>
+  # #     ggplot2::ggplot(ggplot2::aes(x = scenario, y = .data[[prepped$y_col]],
+  # #                                  fill = forcats::fct_inorder(color))) +
+  # #     ggplot2::geom_col(position = position) +
+  # #     ggplot2::labs(y = paste0(y_lab, prepped$ylab_append), x = x_lab,
+  # #                   color = colorset) +
+  # #     ggplot2::scale_y_continuous(trans = transy) +
+  # #     ggplot2::scale_fill_identity(guide = 'legend',
+  # #                                  labels = labfind,
+  # #                                  name = color_lab) +
+  # #     theme_werp_toolkit()
+  # #
+  # #   if (!is.null(setLimits)) {
+  # #     outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
+  # #   }
+  # # }
+  # #
+  # # # Something else on x, scenario as fill. bar
+  # # # close to allowing a grouping aesthetic, but it's ugly with color, so not
+  # # # doing it now.
+  # # if (!(x_col %in% c('scenario', 'map')) &&
+  # #     !is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
+  # #   outcome_plot <- prepped$data |>
+  # #     dplyr::filter(scenario %in% prepped$scenariofilter) |>
+  # #     ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]], y = .data[[prepped$y_col]],
+  # #                                  # color = color,
+  # #                                  fill = scenario)) +
+  # #     ggplot2::geom_col(position = position) +
+  # #     ggplot2::labs(y = paste0(y_lab, prepped$ylab_append)) +
+  # #     ggplot2::scale_y_continuous(trans = transy) +
+  # #     ggplot2::scale_fill_manual(values = prepped$colors) +
+  # #     ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 45)) +
+  # #     # ggplot2::scale_color_identity() +
+  # #     theme_werp_toolkit()
+  # #
+  # #   if (!is.null(setLimits)) {
+  # #     outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
+  # #   }
+  # # }
+  # #
+  # # # Some quantitative x, typically a quant representation of scenario
+  # # if (x_col != 'map') {
+  # #   if (is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
+  # #
+  # #     # I was trying to get this to work to color the *points* one way and the
+  # #     # lines another. It's kind of a mess because ggplot doesn't like that
+  # #     # I can potentially use 'fill' if I use shapes that take that argument
+  # #
+  # #     # The more I think about this, I *could* force the use of filled points, but
+  # #     # that's not really the point. The point is the scenarios give us the values
+  # #     # on x, so let's just leave them alone, and color by whatever we're coloring
+  # #     # by. We can revisit that decision later if we want.
+  # #
+  # #     if (!inherits(position, 'gg')) {
+  # #       if (is.null(position) || position == 'stack') {
+  # #         position = 'identity'
+  # #       }
+  # #     }
+  # #
+  # #
+  # #     outcome_plot <- prepped$data |>
+  # #       dplyr::filter(scenario %in% prepped$scenariofilter) |>
+  # #       ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]],
+  # #                                    y = .data[[prepped$y_col]],
+  # #                                    group = .data$pointgroup)) +
+  # #       ggplot2::geom_point(mapping = ggplot2::aes(color = .data$color),
+  # #                           position = position) +
+  # #       ggplot2::labs(y = paste0(y_lab, prepped$ylab_append),
+  # #                     x = x_lab) +
+  # #       ggplot2::scale_y_continuous(trans = transy) +
+  # #       ggplot2::scale_x_continuous(trans = transx) +
+  # #       ggplot2::scale_fill_manual(values = prepped$colors) +
+  # #       ggplot2::scale_color_identity(guide = 'legend',
+  # #                                     labels = labfind,
+  # #                                     name = color_lab) +
+  # #       theme_werp_toolkit()
+  # #
+  # #     if (!is.null(setLimits)) {
+  # #       outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
+  # #     }
+  # #
+  # #     if (smooth) {
+  # #       outcome_plot <- outcome_plot +
+  # #         ggplot2::geom_smooth(mapping = ggplot2::aes(color = .data$color, fill = .data$color),
+  # #                              method = smooth_method,
+  # #                              method.args = smooth_args,
+  # #                              linewidth = 0.1,
+  # #                              se = smooth_se) +
+  # #         ggplot2::scale_fill_identity(guide = 'legend',
+  # #                                       labels = labfind,
+  # #                                       name = color_lab)
+  # #     }
+  # #     if (!smooth) {
+  # #       outcome_plot <- outcome_plot +
+  # #         ggplot2::geom_line(mapping = ggplot2::aes(color = .data$color))
+  # #     }
+  # #
+  # #   }
+  # # }
   #
-  #   # end-run a situation where we color and x by scenario- need to clean this up
-  #   if (all(names(pal_list) %in% prepped$data$scenario)) {
-  #     prepped$data <- dplyr::arrange(prepped$data, scenario)
-  #   }
   #
-  #   outcome_plot <- prepped$data |>
-  #     dplyr::filter(scenario %in% prepped$scenariofilter) |>
-  #     ggplot2::ggplot(ggplot2::aes(x = scenario, y = .data[[prepped$y_col]],
-  #                                  fill = forcats::fct_inorder(color))) +
-  #     ggplot2::geom_col(position = position) +
-  #     ggplot2::labs(y = paste0(y_lab, prepped$ylab_append), x = x_lab,
-  #                   color = colorset) +
-  #     ggplot2::scale_y_continuous(trans = transy) +
-  #     ggplot2::scale_fill_identity(guide = 'legend',
-  #                                  labels = labfind,
-  #                                  name = color_lab) +
-  #     theme_werp_toolkit()
+  # # This is getting contrived to do all these in one function. I *really* need
+  # # to fully pull out the dataprep from the plotting in this function.
+  # # I *think* I'm going to have to call the same col y_col and colorset to get the transforms to work as if it's y as well as the colors.
+  # # This might just be too contrived.
+  # # I probably really need a catcher here that identifies if there are multiple values being plotted and fail.
+  # # Can we split mulitple palettes? probably, and it might make sense if we
+  # # crossed with facetting. Doing it is a bit unclear, and I'll need to think
+  # # more. Do we have a way to generate the color mapping for continuuous? I
+  # # think yes. Do we have a way to also do that for `trans` functions? What
+  # # about preserving the values for display on the legend? That's all doable,
+  # # but gets tricky
+  # # What else do I want here? potentially additional geoms- gauge points and basin.
+  # if (x_col == 'map') {
   #
-  #   if (!is.null(setLimits)) {
-  #     outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
-  #   }
-  # }
+  #   # if (length(pal_list) > 1) {rlang::warn(glue::glue("using first palette for {y_col}, splitting up palettes needs more thought"))}
   #
-  # # Something else on x, scenario as fill. bar
-  # # close to allowing a grouping aesthetic, but it's ugly with color, so not
-  # # doing it now.
-  # if (!(x_col %in% c('scenario', 'map')) &&
-  #     !is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
-  #   outcome_plot <- prepped$data |>
-  #     dplyr::filter(scenario %in% prepped$scenariofilter) |>
-  #     ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]], y = .data[[prepped$y_col]],
-  #                                  # color = color,
-  #                                  fill = scenario)) +
-  #     ggplot2::geom_col(position = position) +
-  #     ggplot2::labs(y = paste0(y_lab, prepped$ylab_append)) +
-  #     ggplot2::scale_y_continuous(trans = transy) +
-  #     ggplot2::scale_fill_manual(values = prepped$colors) +
-  #     ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 45)) +
-  #     # ggplot2::scale_color_identity() +
-  #     theme_werp_toolkit()
+  #   # overplot_test <- prepped$data |>
+  #   #   dplyr::group_by(geometry)
+  #   #
+  #   # if (!is.null(facet_wrapper)) {
+  #   #   overplot_test <- overplot_test |>
+  #   #     dplyr::group_by(.data[[facet_wrapper]], .add = TRUE)
+  #   # }
+  #   # if (!is.null(facet_row) && facet_row != '.') {
+  #   #   overplot_test <- overplot_test |>
+  #   #     dplyr::group_by(.data[[facet_row]], .add = TRUE)
+  #   # }
+  #   # if (!is.null(facet_col) && facet_col != '.') {
+  #   #   overplot_test <- overplot_test |>
+  #   #     dplyr::group_by(.data[[facet_col]], .add = TRUE)
+  #   # }
+  #   #
+  #   # overplot_test <- overplot_test |>
+  #   #   dplyr::summarise(nrows = dplyr::n()) |>
+  #   #   dplyr::ungroup()
+  #   #
+  #   # if (!all(overplot_test$nrows == 1)) {
+  #   #   rlang::abort(glue::glue("Trying to plot multiple values
+  #   #                (up to {max(overplot_test$nrows)}) in single polygons.
+  #   #                Something is duplicated-
+  #   #                do you need more facetting or filtering?"))
+  #   # }
   #
-  #   if (!is.null(setLimits)) {
-  #     outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
-  #   }
-  # }
+  #   ## START BUILDING THE PLOT
+  #   outcome_plot <- ggplot2::ggplot()
   #
-  # # Some quantitative x, typically a quant representation of scenario
-  # if (x_col != 'map') {
-  #   if (is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
+  #   # underlay
+  #   if (!is.null(underlay_list)) {
+  #     # Handle multiple levels and a flat list or a list of lists-
+  #     # Allow a short-circuit passing character, e.g. 'basin'
+  #     if (is.character(underlay_list)) {underlay_list <- list(underlay = get(underlay_list), underlay_pal = NA)}
+  #     # if flat put it as the first list in a length-one list for generality
+  #     if ('underlay' %in% names(underlay_list)) {underlay_list <- list(underlay_list)}
   #
-  #     # I was trying to get this to work to color the *points* one way and the
-  #     # lines another. It's kind of a mess because ggplot doesn't like that
-  #     # I can potentially use 'fill' if I use shapes that take that argument
+  #     for (u in underlay_list) {
+  #       # Allow passing names
+  #       if (is.character(u$underlay)) {u$underlay <- get(u$underlay)}
   #
-  #     # The more I think about this, I *could* force the use of filled points, but
-  #     # that's not really the point. The point is the scenarios give us the values
-  #     # on x, so let's just leave them alone, and color by whatever we're coloring
-  #     # by. We can revisit that decision later if we want.
+  #       # deal with ordering scenarios if the underlay has them- otherwise the facets lose the ordering.
+  #       # We really should be `plot_prep` ing the underlays and overlays, or
+  #       # at least some subset of `plot_prep`
+  #       if ('scenario' %in% names(u$underlay)) {
+  #         # Order the scenario if I've given it an order.
+  #         if (!is.null(sceneorder)) {
+  #           if (inherits(sceneorder, 'factor')) {sceneorder <- levels(sceneorder)}
+  #           u$underlay <- u$underlay |>
+  #             dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
+  #         }
   #
-  #     if (!inherits(position, 'gg')) {
-  #       if (is.null(position) || position == 'stack') {
-  #         position = 'identity'
+  #         # filter the underlay scenarios too
+  #         u$underlay <- u$underlay |> dplyr::filter(scenario %in% prepped$scenariofilter)
   #       }
+  #
+  #       # use `grouped_colors` to set color groups
+  #       # Do we need to pass separate colorgroups and colorset to the underlay? Likely
+  #       # undercolor <- grouped_colors(underlay, underlay_pal, underlay_colorgroups, underlay_colorset)
+  #
+  #       # catch case with multiple fills- need a single color if the main data has a fill scale
+  #       # I need something here to catch whether underlay_pal is  a palette or a color
+  #       # If the main data is a polygon, or if we are only passed a single color value, just use a single color value
+  #
+  #       if (all(sf::st_is(prepped$data, c("POLYGON", "MULTIPOLYGON"))) &
+  #           grepl("::", u$underlay_pal)) {
+  #         rlang::warn("Trying to have fill scale for underlay and main data. Removing for underlay")
+  #         u$underlay_pal = NA
+  #       }
+  #
+  #       if (u$underlay_pal %in% grDevices::colors() |
+  #           is.na(u$underlay_pal) |
+  #           grepl("#", u$underlay_pal)) {
+  #
+  #         outcome_plot <- outcome_plot +
+  #           ggplot2::geom_sf(data = u$underlay, fill = u$underlay_pal)
+  #       }
+  #
+  #       # If the main data is points, we can use fill for the underlay, but only if underlay_pal is a palette name
+  #       if (all(sf::st_is(prepped$data, c("POINT", "LINESTRING"))) &
+  #           grepl("::", u$underlay_pal)) {
+  #
+  #
+  #         if (is.numeric(dplyr::pull(sf::st_drop_geometry(u$underlay[, u$underlay_ycol])))) {
+  #           # I don't `plot_prep` or `baseline_compare` the under- or overlays,
+  #           # so don't use `trans` or `limit` in the scale call. If we want to
+  #           # change that, we can, but would need to institute running
+  #           # plot_prep, I think
+  #           outcome_plot <- outcome_plot +
+  #             ggplot2::geom_sf(data = u$underlay,
+  #                              ggplot2::aes(fill = .data[[u$underlay_ycol]])) +
+  #             paletteer::scale_fill_paletteer_c(palette = u$underlay_pal,
+  #                                               trans = transy, limit = findlimits)
+  #           if (u$underlay_ycol == y_col) {
+  #             outcome_plot <- outcome_plot +
+  #               ggplot2::labs(fill = paste0(y_lab, prepped$ylab_append))
+  #           }
+  #
+  #         } else {
+  #           undercols <- make_pal(unique(dplyr::pull(sf::st_drop_geometry(u$underlay[,u$underlay_ycol]))), palette = u$underlay_pal)
+  #           outcome_plot <- outcome_plot +
+  #             ggplot2::geom_sf(data = u$underlay,
+  #                              ggplot2::aes(fill = .data[[u$underlay_ycol]])) +
+  #             ggplot2::scale_fill_manual(values = undercols)
+  #         }
+  #
+  #
+  #       }
+  #
   #     }
+  #   }
   #
   #
-  #     outcome_plot <- prepped$data |>
-  #       dplyr::filter(scenario %in% prepped$scenariofilter) |>
-  #       ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]],
-  #                                    y = .data[[prepped$y_col]],
-  #                                    group = .data$pointgroup)) +
-  #       ggplot2::geom_point(mapping = ggplot2::aes(color = .data$color),
-  #                           position = position) +
-  #       ggplot2::labs(y = paste0(y_lab, prepped$ylab_append),
-  #                     x = x_lab) +
-  #       ggplot2::scale_y_continuous(trans = transy) +
-  #       ggplot2::scale_x_continuous(trans = transx) +
-  #       ggplot2::scale_fill_manual(values = prepped$colors) +
-  #       ggplot2::scale_color_identity(guide = 'legend',
-  #                                     labels = labfind,
-  #                                     name = color_lab) +
+  #   # I could use the same method as above with scale_fill_manual, e.g.
+  #   # outcome_plot <- outcome_plot +
+  #   #   ggplot2::geom_sf(data = prepped$data |>
+  #   #                      dplyr::filter(scenario %in% prepped$scenariofilter),
+  #   #                    ggplot2::aes(fill = color)) +
+  #   #   ggplot2::scale_fill_identity(guide = 'legend',
+  #   #                                labels = labfind,
+  #   #                                name = color_lab) +
+  #   #   # ahhh. reformulate is (RHS, LHS) - so, backwards to what we want.
+  #   #   ggplot2::facet_grid(reformulate(facet_col,facet_row))
+  #   # outcome_plot
+  #
+  #   # but that would require more manipulation of the legend- it produces a
+  #   # legend with value examples, and in a weird order. So we'd need to clean up
+  #   # the names, do some sorting, etc. The issue is this is the only place I'm
+  #   # using color/fill as a numeric, and so the `plot_prep`-->
+  #   # `scale_fill_manual` method works, but is hackier. I might have to make
+  #   # `plot_prep` more general at some point in the future if we do want a
+  #   # cleaner, more consistent approach.
+  #   if (all(sf::st_is(prepped$data, c("POINT", "LINESTRING", "MULTIPOINT")))) {
+  #     outcome_plot <- outcome_plot +
+  #       ggplot2::geom_sf(data = prepped$data |>
+  #                          dplyr::filter(scenario %in% prepped$scenariofilter),
+  #                        ggplot2::aes(color = .data[[prepped$y_col]])) +
+  #       paletteer::scale_color_paletteer_c(palette = pal_list[[1]],
+  #                                          trans = transy, limit = \(x) findlimits(x,
+  #                                                                                  lims = setLimits,
+  #                                                                                  base_list = base_list)) +
+  #       ggplot2::labs(color = paste0(y_lab, prepped$ylab_append)) +
+  #       theme_werp_toolkit()
+  #   }
+  #   if (all(sf::st_is(prepped$data, c("POLYGON", "MULTIPOLYGON")))) {
+  #     outcome_plot <- outcome_plot +
+  #       ggplot2::geom_sf(data = prepped$data |>
+  #                          dplyr::filter(scenario %in% prepped$scenariofilter),
+  #                        ggplot2::aes(fill = .data[[prepped$y_col]])) +
+  #       paletteer::scale_fill_paletteer_c(palette = pal_list[[1]],
+  #                                         trans = transy, limit = \(x) findlimits(x,
+  #                                                                                 lims = setLimits,
+  #                                                                                 base_list = base_list)) +
+  #       ggplot2::labs(fill = paste0(y_lab, prepped$ylab_append)) +
   #       theme_werp_toolkit()
   #
-  #     if (!is.null(setLimits)) {
-  #       outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = setLimits)
-  #     }
+  #     # outcome_plot + ggplot2::facet_grid(reformulate(facet_col,facet_row))
+  #     # outcome_plot <- op
+  #   }
   #
-  #     if (smooth) {
-  #       outcome_plot <- outcome_plot +
-  #         ggplot2::geom_smooth(mapping = ggplot2::aes(color = .data$color, fill = .data$color),
-  #                              method = smooth_method,
-  #                              method.args = smooth_args,
-  #                              linewidth = 0.1,
-  #                              se = smooth_se) +
-  #         ggplot2::scale_fill_identity(guide = 'legend',
-  #                                       labels = labfind,
-  #                                       name = color_lab)
-  #     }
-  #     if (!smooth) {
-  #       outcome_plot <- outcome_plot +
-  #         ggplot2::geom_line(mapping = ggplot2::aes(color = .data$color))
-  #     }
+  #   # The facetting is really causing issues for maps below. Try to do the map facets here
+  #   if (!is.null(facet_wrapper)) {
+  #     outcome_plot <- outcome_plot +
+  #       ggplot2::facet_wrap(facet_wrapper)
+  #   }
   #
+  #   if (!is.null(facet_row) & !is.null(facet_col)) {
+  #     outcome_plot <- outcome_plot +
+  #       # ahhh. reformulate is (RHS, LHS) - so, backwards to what we want.
+  #       ggplot2::facet_grid(stats::reformulate(facet_col,facet_row))
+  #   }
+  #
+  #
+  #   # overlay
+  #   if (!is.null(overlay_list)) {
+  #     # Handle multiple levels and a flat list or a list of lists-
+  #     # Allow a short-circuit passing character, e.g. 'bom_basin_gauges'
+  #     # Setting the color to black because this is color and so will be a polygon outline or points
+  #     if (is.character(overlay_list)) {overlay_list <- list(overlay = get(overlay_list), overlay_pal = 'black')}
+  #     # if flat put it as the first list in a length-one list for generality
+  #     if ('overlay' %in% names(overlay_list)) {overlay_list <- list(overlay_list)}
+  #
+  #     for (o in overlay_list) {
+  #       # Allow passing names
+  #       if (is.character(o$overlay)) {o$overlay <- get(o$overlay)}
+  #
+  #       # deal with ordering scenarios if the overlay has them- otherwise the facets lose the ordering.
+  #       # We really should be `plot_prep` ing the underlays and overlays, or
+  #       # at least some subset of `plot_prep`
+  #       if ('scenario' %in% names(o$overlay)) {
+  #         # Order the scenario if I've given it an order.
+  #         if (!is.null(sceneorder)) {
+  #           if (inherits(sceneorder, 'factor')) {sceneorder <- levels(sceneorder)}
+  #           o$overlay <- o$overlay |>
+  #             dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
+  #         }
+  #
+  #         # filter scenarios in overlay
+  #         o$overlay <- o$overlay |> dplyr::filter(scenario %in% prepped$scenariofilter)
+  #       }
+  #
+  #
+  #
+  #       # clip to main data automatically
+  #       if ('clip' %in% names(o) && o$clip) {
+  #         o$overlay <- sf::st_filter(o$overlay, dplyr::distinct(overplot_test))
+  #       }
+  #
+  #       # catch case with multiple colors- need a single color if the main data has a color scale
+  #       # I need something here to catch whether overlay_pal is  a palette or a color
+  #
+  #       if (all(sf::st_is(prepped$data, "POINT")) &
+  #           grepl("::", o$overlay_pal)) {
+  #         if (all(sf::st_is(o$overlay, "POINT"))) {
+  #           o$overlay_pal = 'black'
+  #         } else {
+  #           o$overlay_pal = NA
+  #         }
+  #         rlang::warn(glue::glue("Trying to have color scale for overlay and main data.
+  #                     Removing for overlay and setting to {o$overlay_pal}"))
+  #
+  #       }
+  #
+  #       if (o$overlay_pal %in% grDevices::colors() |
+  #           is.na(o$overlay_pal) |
+  #           grepl("#", o$overlay_pal)) {
+  #
+  #         outcome_plot <- outcome_plot +
+  #           ggplot2::geom_sf(data = o$overlay, color = o$overlay_pal, fill = NA)
+  #       }
+  #
+  #       # If the main data is polygons, we can use color for the overlay, but
+  #       # only if overlay_pal is a palette name
+  #       if (all(sf::st_is(prepped$data, c("POLYGON", "MULTIPOLYGON"))) &
+  #           grepl("::", o$overlay_pal)) {
+  #
+  #
+  #         if (is.numeric(dplyr::pull(sf::st_drop_geometry(o$overlay[, o$overlay_ycol])))) {
+  #           # I don't `plot_prep` or `baseline_compare` the under- or overlays,
+  #           # so don't use `trans` or `limit` in the scale call. If we want to
+  #           # change that, we can, but would need to institute running
+  #           # plot_prep, I think
+  #           outcome_plot <- outcome_plot +
+  #             ggplot2::geom_sf(data = o$overlay,
+  #                              ggplot2::aes(color = .data[[o$overlay_ycol]]), fill = NA) +
+  #             paletteer::scale_color_paletteer_c(palette = o$overlay_pal)
+  #
+  #           if (o$overlay_ycol == y_col) {
+  #             outcome_plot <- outcome_plot +
+  #               ggplot2::labs(color = paste0(y_lab, prepped$ylab_append))
+  #           }
+  #
+  #         } else {
+  #           overcols <- make_pal(unique(dplyr::pull(sf::st_drop_geometry(o$overlay[,o$overlay_ycol]))),
+  #                                palette = o$overlay_pal)
+  #           outcome_plot <- outcome_plot +
+  #             ggplot2::geom_sf(data = o$overlay,
+  #                              ggplot2::aes(color = .data[[o$overlay_ycol]]), fill = NA) +
+  #             ggplot2::scale_color_manual(values = overcols)
+  #         }
+  #
+  #
+  #       }
+  #
+  #     }
   #   }
   # }
-
-
-  # This is getting contrived to do all these in one function. I *really* need
-  # to fully pull out the dataprep from the plotting in this function.
-  # I *think* I'm going to have to call the same col y_col and colorset to get the transforms to work as if it's y as well as the colors.
-  # This might just be too contrived.
-  # I probably really need a catcher here that identifies if there are multiple values being plotted and fail.
-  # Can we split mulitple palettes? probably, and it might make sense if we
-  # crossed with facetting. Doing it is a bit unclear, and I'll need to think
-  # more. Do we have a way to generate the color mapping for continuuous? I
-  # think yes. Do we have a way to also do that for `trans` functions? What
-  # about preserving the values for display on the legend? That's all doable,
-  # but gets tricky
-  # What else do I want here? potentially additional geoms- gauge points and basin.
-  if (x_col == 'map') {
-
-    if (length(pal_list) > 1) {rlang::warn(glue::glue("using first palette for {y_col}, splitting up palettes needs more thought"))}
-
-    overplot_test <- prepped$data |>
-      dplyr::group_by(geometry)
-
-    if (!is.null(facet_wrapper)) {
-      overplot_test <- overplot_test |>
-        dplyr::group_by(.data[[facet_wrapper]], .add = TRUE)
-    }
-    if (!is.null(facet_row) && facet_row != '.') {
-      overplot_test <- overplot_test |>
-        dplyr::group_by(.data[[facet_row]], .add = TRUE)
-    }
-    if (!is.null(facet_col) && facet_col != '.') {
-      overplot_test <- overplot_test |>
-        dplyr::group_by(.data[[facet_col]], .add = TRUE)
-    }
-
-    overplot_test <- overplot_test |>
-      dplyr::summarise(nrows = dplyr::n()) |>
-      dplyr::ungroup()
-
-    if (!all(overplot_test$nrows == 1)) {
-      rlang::abort(glue::glue("Trying to plot multiple values
-                   (up to {max(overplot_test$nrows)}) in single polygons.
-                   Something is duplicated-
-                   do you need more facetting or filtering?"))
-    }
-
-    ## START BUILDING THE PLOT
-    outcome_plot <- ggplot2::ggplot()
-
-    # underlay
-    if (!is.null(underlay_list)) {
-      # Handle multiple levels and a flat list or a list of lists-
-      # Allow a short-circuit passing character, e.g. 'basin'
-      if (is.character(underlay_list)) {underlay_list <- list(underlay = get(underlay_list), underlay_pal = NA)}
-      # if flat put it as the first list in a length-one list for generality
-      if ('underlay' %in% names(underlay_list)) {underlay_list <- list(underlay_list)}
-
-      for (u in underlay_list) {
-        # Allow passing names
-        if (is.character(u$underlay)) {u$underlay <- get(u$underlay)}
-
-        # deal with ordering scenarios if the underlay has them- otherwise the facets lose the ordering.
-        # We really should be `plot_prep` ing the underlays and overlays, or
-        # at least some subset of `plot_prep`
-        if ('scenario' %in% names(u$underlay)) {
-          # Order the scenario if I've given it an order.
-          if (!is.null(sceneorder)) {
-            if (inherits(sceneorder, 'factor')) {sceneorder <- levels(sceneorder)}
-            u$underlay <- u$underlay |>
-              dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
-          }
-
-          # filter the underlay scenarios too
-          u$underlay <- u$underlay |> dplyr::filter(scenario %in% prepped$scenariofilter)
-        }
-
-        # use `grouped_colors` to set color groups
-        # Do we need to pass separate colorgroups and colorset to the underlay? Likely
-        # undercolor <- grouped_colors(underlay, underlay_pal, underlay_colorgroups, underlay_colorset)
-
-        # catch case with multiple fills- need a single color if the main data has a fill scale
-        # I need something here to catch whether underlay_pal is  a palette or a color
-        # If the main data is a polygon, or if we are only passed a single color value, just use a single color value
-
-        if (all(sf::st_is(prepped$data, c("POLYGON", "MULTIPOLYGON"))) &
-            grepl("::", u$underlay_pal)) {
-          rlang::warn("Trying to have fill scale for underlay and main data. Removing for underlay")
-          u$underlay_pal = NA
-        }
-
-        if (u$underlay_pal %in% grDevices::colors() |
-            is.na(u$underlay_pal) |
-            grepl("#", u$underlay_pal)) {
-
-          outcome_plot <- outcome_plot +
-            ggplot2::geom_sf(data = u$underlay, fill = u$underlay_pal)
-        }
-
-        # If the main data is points, we can use fill for the underlay, but only if underlay_pal is a palette name
-        if (all(sf::st_is(prepped$data, c("POINT", "LINESTRING"))) &
-            grepl("::", u$underlay_pal)) {
-
-
-          if (is.numeric(dplyr::pull(sf::st_drop_geometry(u$underlay[, u$underlay_ycol])))) {
-            # I don't `plot_prep` or `baseline_compare` the under- or overlays,
-            # so don't use `trans` or `limit` in the scale call. If we want to
-            # change that, we can, but would need to institute running
-            # plot_prep, I think
-            outcome_plot <- outcome_plot +
-              ggplot2::geom_sf(data = u$underlay,
-                               ggplot2::aes(fill = .data[[u$underlay_ycol]])) +
-              paletteer::scale_fill_paletteer_c(palette = u$underlay_pal,
-                                                trans = transy, limit = findlimits)
-            if (u$underlay_ycol == y_col) {
-              outcome_plot <- outcome_plot +
-                ggplot2::labs(fill = paste0(y_lab, prepped$ylab_append))
-            }
-
-          } else {
-            undercols <- make_pal(unique(dplyr::pull(sf::st_drop_geometry(u$underlay[,u$underlay_ycol]))), palette = u$underlay_pal)
-            outcome_plot <- outcome_plot +
-              ggplot2::geom_sf(data = u$underlay,
-                               ggplot2::aes(fill = .data[[u$underlay_ycol]])) +
-              ggplot2::scale_fill_manual(values = undercols)
-          }
-
-
-        }
-
-      }
-    }
-
-
-    # I could use the same method as above with scale_fill_manual, e.g.
-    # outcome_plot <- outcome_plot +
-    #   ggplot2::geom_sf(data = prepped$data |>
-    #                      dplyr::filter(scenario %in% prepped$scenariofilter),
-    #                    ggplot2::aes(fill = color)) +
-    #   ggplot2::scale_fill_identity(guide = 'legend',
-    #                                labels = labfind,
-    #                                name = color_lab) +
-    #   # ahhh. reformulate is (RHS, LHS) - so, backwards to what we want.
-    #   ggplot2::facet_grid(reformulate(facet_col,facet_row))
-    # outcome_plot
-
-    # but that would require more manipulation of the legend- it produces a
-    # legend with value examples, and in a weird order. So we'd need to clean up
-    # the names, do some sorting, etc. The issue is this is the only place I'm
-    # using color/fill as a numeric, and so the `plot_prep`-->
-    # `scale_fill_manual` method works, but is hackier. I might have to make
-    # `plot_prep` more general at some point in the future if we do want a
-    # cleaner, more consistent approach.
-    if (all(sf::st_is(prepped$data, c("POINT", "LINESTRING", "MULTIPOINT")))) {
-      outcome_plot <- outcome_plot +
-        ggplot2::geom_sf(data = prepped$data |>
-                           dplyr::filter(scenario %in% prepped$scenariofilter),
-                         ggplot2::aes(color = .data[[prepped$y_col]])) +
-        paletteer::scale_color_paletteer_c(palette = pal_list[[1]],
-                                           trans = transy, limit = findlimits) +
-        ggplot2::labs(color = paste0(y_lab, prepped$ylab_append)) +
-        theme_werp_toolkit()
-    }
-    if (all(sf::st_is(prepped$data, c("POLYGON", "MULTIPOLYGON")))) {
-      outcome_plot <- outcome_plot +
-        ggplot2::geom_sf(data = prepped$data |>
-                           dplyr::filter(scenario %in% prepped$scenariofilter),
-                         ggplot2::aes(fill = .data[[prepped$y_col]])) +
-        paletteer::scale_fill_paletteer_c(palette = pal_list[[1]],
-                                          trans = transy, limit = findlimits) +
-        ggplot2::labs(fill = paste0(y_lab, prepped$ylab_append)) +
-        theme_werp_toolkit()
-
-      # outcome_plot + ggplot2::facet_grid(reformulate(facet_col,facet_row))
-      # outcome_plot <- op
-    }
-
-    # The facetting is really causing issues for maps below. Try to do the map facets here
-    if (!is.null(facet_wrapper)) {
-      outcome_plot <- outcome_plot +
-        ggplot2::facet_wrap(facet_wrapper)
-    }
-
-    if (!is.null(facet_row) & !is.null(facet_col)) {
-      outcome_plot <- outcome_plot +
-        # ahhh. reformulate is (RHS, LHS) - so, backwards to what we want.
-        ggplot2::facet_grid(stats::reformulate(facet_col,facet_row))
-    }
-
-
-    # overlay
-    if (!is.null(overlay_list)) {
-      # Handle multiple levels and a flat list or a list of lists-
-      # Allow a short-circuit passing character, e.g. 'bom_basin_gauges'
-      # Setting the color to black because this is color and so will be a polygon outline or points
-      if (is.character(overlay_list)) {overlay_list <- list(overlay = get(overlay_list), overlay_pal = 'black')}
-      # if flat put it as the first list in a length-one list for generality
-      if ('overlay' %in% names(overlay_list)) {overlay_list <- list(overlay_list)}
-
-      for (o in overlay_list) {
-        # Allow passing names
-        if (is.character(o$overlay)) {o$overlay <- get(o$overlay)}
-
-        # deal with ordering scenarios if the overlay has them- otherwise the facets lose the ordering.
-        # We really should be `plot_prep` ing the underlays and overlays, or
-        # at least some subset of `plot_prep`
-        if ('scenario' %in% names(o$overlay)) {
-          # Order the scenario if I've given it an order.
-          if (!is.null(sceneorder)) {
-            if (inherits(sceneorder, 'factor')) {sceneorder <- levels(sceneorder)}
-            o$overlay <- o$overlay |>
-              dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
-          }
-
-          # filter scenarios in overlay
-          o$overlay <- o$overlay |> dplyr::filter(scenario %in% prepped$scenariofilter)
-        }
-
-
-
-        # clip to main data automatically
-        if ('clip' %in% names(o) && o$clip) {
-          o$overlay <- sf::st_filter(o$overlay, dplyr::distinct(overplot_test))
-        }
-
-        # catch case with multiple colors- need a single color if the main data has a color scale
-        # I need something here to catch whether overlay_pal is  a palette or a color
-
-        if (all(sf::st_is(prepped$data, "POINT")) &
-            grepl("::", o$overlay_pal)) {
-          if (all(sf::st_is(o$overlay, "POINT"))) {
-            o$overlay_pal = 'black'
-          } else {
-            o$overlay_pal = NA
-          }
-          rlang::warn(glue::glue("Trying to have color scale for overlay and main data.
-                      Removing for overlay and setting to {o$overlay_pal}"))
-
-        }
-
-        if (o$overlay_pal %in% grDevices::colors() |
-            is.na(o$overlay_pal) |
-            grepl("#", o$overlay_pal)) {
-
-          outcome_plot <- outcome_plot +
-            ggplot2::geom_sf(data = o$overlay, color = o$overlay_pal, fill = NA)
-        }
-
-        # If the main data is polygons, we can use color for the overlay, but
-        # only if overlay_pal is a palette name
-        if (all(sf::st_is(prepped$data, c("POLYGON", "MULTIPOLYGON"))) &
-            grepl("::", o$overlay_pal)) {
-
-
-          if (is.numeric(dplyr::pull(sf::st_drop_geometry(o$overlay[, o$overlay_ycol])))) {
-            # I don't `plot_prep` or `baseline_compare` the under- or overlays,
-            # so don't use `trans` or `limit` in the scale call. If we want to
-            # change that, we can, but would need to institute running
-            # plot_prep, I think
-            outcome_plot <- outcome_plot +
-              ggplot2::geom_sf(data = o$overlay,
-                               ggplot2::aes(color = .data[[o$overlay_ycol]]), fill = NA) +
-              paletteer::scale_color_paletteer_c(palette = o$overlay_pal)
-
-            if (o$overlay_ycol == y_col) {
-              outcome_plot <- outcome_plot +
-                ggplot2::labs(color = paste0(y_lab, prepped$ylab_append))
-            }
-
-          } else {
-            overcols <- make_pal(unique(dplyr::pull(sf::st_drop_geometry(o$overlay[,o$overlay_ycol]))),
-                                 palette = o$overlay_pal)
-            outcome_plot <- outcome_plot +
-              ggplot2::geom_sf(data = o$overlay,
-                               ggplot2::aes(color = .data[[o$overlay_ycol]]), fill = NA) +
-              ggplot2::scale_color_manual(values = overcols)
-          }
-
-
-        }
-
-      }
-    }
-  }
 
   ## facetting- happens in common for all plot types *except maps*- the scales
   ## argument messes up maps. I really should just separate out the maps.

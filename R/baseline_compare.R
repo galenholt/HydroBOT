@@ -7,7 +7,7 @@
 #' @param base_lev value for baseline. Can be a level in `compare_col`, or a scalar, or a vector of `length(unique(val_df$compare_col))`. A dataframe would be useful but not yet implemented.
 #' @param values_col column containing the values. Can be character or tidyselect or bare names, though the last are fragile.
 #' @param comp_fun function to use for comparison comparing the first two arguments (`difference` and `relative` included here as wrappers for `-` and `/`). Can be character, or list-format, (both safe) or bare name (brittle)
-#' @param ... additional arguments to [create_base()]
+#' @param ... additional arguments to `comp_fun`
 #' @param failmissing logical, default TRUE. Use `tidyselect::any_of` or `tidyselect::all_of` when `values_col` or `compare_col` are character. see [selectcreator()]
 #' @param names_to character, as in [tidyr::pivot_longer()], used for auto-pivotting
 #' @param values_to character, as in [tidyr::pivot_longer()], used for auto-pivotting
