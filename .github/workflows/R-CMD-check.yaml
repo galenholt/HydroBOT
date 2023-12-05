@@ -34,6 +34,18 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+      
+      - name: Install Dependencies on Ubuntu
+        if: matrix.config.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgeos-dev libgdal-dev
+
+      - name: Install Dependencies on macOS
+        if: matrix.config.os == 'macos-latest'
+        run: |
+          brew update
+          brew install geos gdal
 
       - name: Set-up Pandoc
         uses: r-lib/actions/setup-pandoc@v2
