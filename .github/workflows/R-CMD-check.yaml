@@ -35,11 +35,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
       
-      - name: Install Dependencies on Ubuntu
+      - name: Install System Libraries on Ubuntu
         if: matrix.config.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgeos-dev libgdal-dev
+          sudo apt-get -y install libssl-dev libgdal-dev gdal-bin libgeos-dev libproj-dev libsqlite3-dev libudunits2-dev libicu-dev make libglpk-dev libgmp3-dev libxml2-dev pandoc zlib1g-dev
 
       - name: Install Dependencies on macOS
         if: matrix.config.os == 'macos-latest'
@@ -90,3 +90,11 @@ jobs:
         uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
+
+      - name: Print Directory Structure
+        run: ls -R
+        continue-on-error: true
+
+      - name: Run Tests Verbosely
+        run: Rscript tests/testthat.R --verbose
+        continue-on-error: true
