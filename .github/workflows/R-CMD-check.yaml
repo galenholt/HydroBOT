@@ -39,7 +39,7 @@ jobs:
         if: matrix.config.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get -y install libssl1.1 libgdal20 gdal-bin libgeos-3.8.0 libproj15 libsqlite3-0 libudunits2-0 libicu66 make libglpk40 libgmp10 libxml2 pandoc zlib1g librsvg2-2
+          sudo apt-get -y install librsvg2-2 gdal-bin geos-bin pandoc
 
       - name: Install Dependencies on macOS
         if: matrix.config.os == 'macos-latest'
