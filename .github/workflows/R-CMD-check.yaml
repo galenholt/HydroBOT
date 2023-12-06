@@ -36,10 +36,10 @@ jobs:
         uses: actions/checkout@v3
       
       - name: Install System Libraries on Ubuntu
-        if: matrix.config.os == 'ubuntu--latest'
+        if: matrix.config.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get -y install libssl-dev libgdal-dev gdal-bin libgeos-dev libproj-dev libsqlite3-dev libudunits2-dev libicu-dev make libglpk-dev libgmp3-dev libxml2-dev pandoc zlib1g-dev librsvg2-dev
+          sudo apt-get -y install libssl1.1 libgdal20 gdal-bin libgeos-3.8.0 libproj15 libsqlite3-0 libudunits2-0 libicu66 make libglpk40 libgmp10 libxml2 pandoc zlib1g librsvg2-2
 
       - name: Install Dependencies on macOS
         if: matrix.config.os == 'macos-latest'
