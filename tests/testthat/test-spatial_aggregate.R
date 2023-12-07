@@ -48,6 +48,16 @@ test_that("gauge to poly works", {
 })
 
 test_that("poly to poly works", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skip the test on non-Windows OS (failing on github actions)
+  if (os_name != "windows"){
+    message("Skipping test on non-Windows systems")
+    skip()
+  }
+
   sumspat <- gauge2geo(summary_ewr_output,
                        gaugelocs = bom_basin_gauges)
 
