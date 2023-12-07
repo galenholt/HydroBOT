@@ -5,9 +5,9 @@ test_that("gauge to poly works", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skip the test on non-Windows OS (failing on github actions)
-  if (os_name != "windows"){
-    message("Skipping test on non-Windows systems")
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
     skip()
   }
 
@@ -62,9 +62,9 @@ test_that("poly to poly works", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skip the test on non-Windows OS (failing on github actions)
-  if (os_name != "windows"){
-    message("Skipping test on non-Windows systems")
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
     skip()
   }
 

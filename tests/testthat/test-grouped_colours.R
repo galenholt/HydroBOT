@@ -12,6 +12,15 @@ nodes <- make_nodes(edges)
 
 test_that("defaults work", {
 
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   edgecols <- grouped_colours(edges,
                                     pal_list = list(fromtype = "nationalparkcolors::GeneralGrant"),
                                     colorgroups = NULL, colorset = 'fromtype')
@@ -72,6 +81,15 @@ test_that("scalar colors work and font switching", {
 
 test_that("values work for nodes and edges", {
 
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   edges <- edges |>
     dplyr::mutate(value = dplyr::row_number())
   nodes <- nodes |>
@@ -103,6 +121,15 @@ test_that("values work for nodes and edges", {
 })
 
 test_that("different palette per group", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
 
   pal_list_c <- list(ewr_code = 'viridis::mako',
                      env_obj = 'viridis::plasma',

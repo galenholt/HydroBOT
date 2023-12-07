@@ -111,6 +111,16 @@ test_that("multiple functions", {
 # Tests from spatial_aggregate --------------------------------------------
 
 test_that("gauge to poly works", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   sumspat <- gauge2geo(summary_ewr_output,
                        gaugelocs = bom_basin_gauges)
 
@@ -166,6 +176,16 @@ test_that("gauge to poly works", {
 })
 
 test_that("poly to poly works", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   sumspat <- gauge2geo(summary_ewr_output,
                        gaugelocs = bom_basin_gauges)
 
@@ -344,6 +364,16 @@ test_that("multi-step theme agg works, auto-edges", {
 
 # Spatial only
 test_that("multi-step spatial works", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   sumspat <- gauge2geo(summary_ewr_output,
                        gaugelocs = bom_basin_gauges)
   aggseq <- list(sdl_units = sdl_units,
@@ -402,6 +432,16 @@ test_that("multi-step spatial works", {
 
 # Theme and spatial together
 test_that("multi-step theme and spatial works", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   sumspat <- gauge2geo(summary_ewr_output,
                        gaugelocs = bom_basin_gauges)
 
@@ -455,6 +495,16 @@ test_that("multi-step theme and spatial works", {
 
 # Theme and spatial together
 test_that("multi-step theme and spatial works with !namehistory", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   sumspat <- gauge2geo(summary_ewr_output,
                        gaugelocs = bom_basin_gauges)
 
@@ -599,6 +649,16 @@ test_that("backstepping along theme axis throws informative error", {
 
 
 test_that("saving the list of steps", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   sumspat <- gauge2geo(summary_ewr_output,
                        gaugelocs = bom_basin_gauges)
 

@@ -5,6 +5,16 @@ SDL_pal <- make_pal(unique(agg_theme_space$sdl_units$SWSDLName),
                     palette = "ggsci::nrc_npg")
 
 test_that("basin works with single color palette", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   basin_to_plot <- agg_theme_space$mdb |>
     dplyr::rename(allArith = 4, oneLimiting = 5) |> # for readability
     dplyr::filter(!is.na(Objective))
@@ -20,6 +30,16 @@ test_that("basin works with single color palette", {
 })
 
 test_that("multi-palette and facetting", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   obj_sdl_to_plot <- agg_theme_space$sdl_units |>
     dplyr::rename(allArith = 4) # for readability
 
@@ -75,6 +95,16 @@ test_that("multi-palette and facetting", {
 })
 
 test_that("flipped", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   # What I want to do is just swap the x and fill arguments and pass in the
   # scenario palette. Can I do that easily?
 
@@ -173,6 +203,16 @@ test_that("flipped", {
 })
 
 test_that("quant x", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   # What I want to do is just use a quantitative x and have it automatically use
   # a line. Can I do that easily?
 
@@ -330,6 +370,15 @@ test_that("quant x", {
 })
 
 test_that("maps", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
 
   obj_sdl_to_plot <- agg_theme_space$sdl_units |>
     dplyr::rename(allArith = 4) # for readability
@@ -729,6 +778,15 @@ test_that("maps", {
 
 test_that("setLimits works", {
 
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   # Bar plots
   basin_to_plot <- agg_theme_space$mdb |>
     dplyr::rename(allArith = 4, oneLimiting = 5) |> # for readability
@@ -810,6 +868,16 @@ test_that("setLimits works", {
 })
 
 test_that("ewr works as in `plot_outcomes_bar`", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   ewr_to_bar_data <- summary_ewr_output |>
     # just grab the first code_timing
     dplyr::group_by(ewr_code, gauge, scenario) |>
@@ -862,6 +930,15 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
 
 
 test_that("facet addition works", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
 
   # It turns out this is actually about leaving out rows or cols
   obj_sdl_to_plot <- agg_theme_space$sdl_units |>

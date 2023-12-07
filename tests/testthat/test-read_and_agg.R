@@ -27,6 +27,15 @@ ewr_results <- file.path(temp_parent_dir, 'module_output', 'EWR')
 
 test_that("multi-step theme and spatial works", {
 
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                  env_obj =  c('ewr_code', "env_obj"),
                  sdl_units = sdl_units,

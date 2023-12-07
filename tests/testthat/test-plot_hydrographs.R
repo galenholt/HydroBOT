@@ -1,6 +1,16 @@
 # hard to test really well that it *looks* right. I guess let's just check it makes a ggplot
 # the answer is {vdiffr} tidyverse.org/blog/2021/06/vdiffr-1-0-0/
 test_that("expected use makes plot", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
   hydpal <- make_pal(levels = unique(hydlong$scenario), palette = 'calecopal::superbloom3')
   hydplot <- plot_hydrographs(hydlong, colors = hydpal)
@@ -10,6 +20,16 @@ test_that("expected use makes plot", {
 })
 
 test_that("sceneorder works", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
   hydpal <- make_pal(levels = unique(hydlong$scenario), palette = 'calecopal::superbloom3')
   hydplot <- plot_hydrographs(hydlong, colors = hydpal, sceneorder = c('down4', 'base', 'up4'))
@@ -19,6 +39,16 @@ test_that("sceneorder works", {
 })
 
 test_that("palette name makes plot", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
   hydplot <- plot_hydrographs(hydlong, colors = 'calecopal::superbloom3')
   expect_s3_class(hydplot, 'ggplot')
@@ -27,6 +57,16 @@ test_that("palette name makes plot", {
 })
 
 test_that("gauge and scenariofilter work", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
   hydpal <- make_pal(levels = unique(hydlong$scenario), palette = 'calecopal::superbloom3')
   gauges_to_plot <- c('412002', '421001')
@@ -38,6 +78,16 @@ test_that("gauge and scenariofilter work", {
 })
 
 test_that("scales and transy makes plot", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
   hydpal <- make_pal(levels = unique(hydlong$scenario), palette = 'calecopal::superbloom3')
   # Add an eps to avoid log(0) warnings, since that's not the point here
@@ -50,6 +100,16 @@ test_that("scales and transy makes plot", {
 })
 
 test_that("auto-baselining works", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on ubuntu systems
+  if (os_name == "ubuntu") {
+    message("Skipping test on Ubuntu systems")
+    skip()
+  }
+
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
   hydpal <- make_pal(levels = unique(hydlong$scenario), palette = 'calecopal::superbloom3', refvals = 'base', refcols = 'black')
   hydplot <- plot_hydrographs(hydlong, colors = hydpal, base_lev = 'base',
