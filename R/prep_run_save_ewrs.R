@@ -45,11 +45,13 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'   provide a datestamp. Should be deprecated in favour of metadata files.
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
 #' @param rparallel logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using `furrr`. To use, install `furrr` and set a [future::plan()] (likely `multisession` or `multicore`)
+#' @param retries Number of retries if there are errors. 0 is no retries, but still runs once. Default 2.
 #' @param climate deprecated, included to let old calls pass
 #' @param MINT deprecated, included to let old calls pass
 #' @param MAXT deprecated, included to let old calls pass
 #' @param DUR deprecated, included to let old calls pass
 #' @param DRAW deprecated, included to let old calls pass
+
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
@@ -59,8 +61,9 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                                model_format = 'IQQM - NSW 10,000 years',
                                outputType = 'none', returnType = 'none',
                                extrameta = NULL,
-                               datesuffix = FALSE,
                                rparallel = FALSE,
+                               retries = 2,
+                               datesuffix = FALSE,
                                climate = NULL,
                                MINT = NULL, MAXT = NULL,
                                DUR = NULL, DRAW = NULL) {
@@ -162,13 +165,8 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                                        datesuffix = datesuffix)
   }
 
-  if (rparallel) {
-    ewr_out <- furrr::future_imap(hydro_paths, ewrfun,
-                                 .options = furrr::furrr_options(seed = TRUE))
 
-  } else {
-    ewr_out <- purrr::imap(hydro_paths, ewrfun)
-  }
+    ewr_out <- safe_imap(hydro_paths, ewrfun, retries = retries, parallel = rparallel)
 
   # Clean up the list structure
   ewr_out <- purrr::list_transpose(ewr_out) |>
