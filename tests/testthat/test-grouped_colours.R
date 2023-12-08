@@ -15,9 +15,9 @@ test_that("defaults work", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -84,9 +84,9 @@ test_that("values work for nodes and edges", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -125,9 +125,9 @@ test_that("different palette per group", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 

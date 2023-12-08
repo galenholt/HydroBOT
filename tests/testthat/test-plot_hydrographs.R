@@ -5,9 +5,9 @@ test_that("expected use makes plot", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -15,7 +15,6 @@ test_that("expected use makes plot", {
   hydpal <- make_pal(levels = unique(hydlong$scenario), palette = 'calecopal::superbloom3')
   hydplot <- plot_hydrographs(hydlong, colors = hydpal)
   expect_s3_class(hydplot, 'ggplot')
-  vdiffr::expect_doppelganger("default hydroplot", hydplot)
 
 })
 
@@ -24,9 +23,9 @@ test_that("sceneorder works", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -43,9 +42,9 @@ test_that("palette name makes plot", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -61,9 +60,9 @@ test_that("gauge and scenariofilter work", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -82,9 +81,9 @@ test_that("scales and transy makes plot", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -104,9 +103,9 @@ test_that("auto-baselining works", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 

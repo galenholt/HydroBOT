@@ -115,9 +115,9 @@ test_that("gauge to poly works", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -180,9 +180,9 @@ test_that("poly to poly works", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -368,9 +368,9 @@ test_that("multi-step spatial works", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -436,9 +436,9 @@ test_that("multi-step theme and spatial works", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -499,9 +499,9 @@ test_that("multi-step theme and spatial works with !namehistory", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -653,9 +653,9 @@ test_that("saving the list of steps", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 

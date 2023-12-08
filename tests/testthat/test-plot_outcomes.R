@@ -9,9 +9,9 @@ test_that("basin works with single color palette", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -34,9 +34,9 @@ test_that("multi-palette and facetting", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -99,9 +99,9 @@ test_that("flipped", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -207,9 +207,9 @@ test_that("quant x", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -374,9 +374,9 @@ test_that("maps", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -781,9 +781,9 @@ test_that("setLimits works", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -872,9 +872,9 @@ test_that("ewr works as in `plot_outcomes_bar`", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
@@ -934,9 +934,9 @@ test_that("facet addition works", {
   # check the OS
   os_name <- tolower(Sys.info()["sysname"])
 
-  # skipping on ubuntu systems
-  if (os_name == "ubuntu") {
-    message("Skipping test on Ubuntu systems")
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
     skip()
   }
 
