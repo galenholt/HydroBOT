@@ -44,8 +44,8 @@ jobs:
       - name: Install Dependencies on macOS
         if: matrix.config.os == 'macos-latest'
         run: |
+          brew update
           brew install geos gdal proj
-          export PROJ_LIB=/usr/local/share/proj
 
       - name: Set-up Pandoc
         uses: r-lib/actions/setup-pandoc@v2
