@@ -46,6 +46,14 @@ jobs:
         run: |
           brew update
           brew install geos gdal proj
+          brew upgrade mongodb-community@5.0
+
+          
+      - name: Debugging
+        if: matrix.config.os == 'macos-latest'
+        run: |
+          echo "PATH=$PATH"
+          echo "PROJ_LIB=$PROJ_LIB"
 
       - name: Set-up Pandoc
         uses: r-lib/actions/setup-pandoc@v2
