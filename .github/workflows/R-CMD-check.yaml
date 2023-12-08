@@ -44,7 +44,7 @@ jobs:
       - name: Install Dependencies on macOS
         if: matrix.config.os == 'macos-latest'
         run: |
-          brew install geos gdal
+          brew install geos gdal proj
 
       - name: Set-up Pandoc
         uses: r-lib/actions/setup-pandoc@v2
@@ -89,15 +89,3 @@ jobs:
         uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-
-      - name: Print Directory Structure
-        run: ls -R
-        continue-on-error: true
-
-      - name: Run testthat tests Verbosely
-        run: Rscript tests/testthat.R --verbose
-        continue-on-error: true
-      
-      - name: Run vdiffr tests Verbosely
-        run: Rscript tests/vdiffr.R --verbose
-        continue-on-error: true
