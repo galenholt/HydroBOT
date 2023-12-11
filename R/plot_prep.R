@@ -7,13 +7,10 @@
 #' keeps those changes sandboxed
 #'
 #' @param data dataframe to prep
+#' @param y_col character, column name for what's plotted on the y-axis.
 #' @param sceneorder character or factor giving the order to present scenario
 #'   levels
-#' @param y_col character, column name for what's plotted on the y-axis.
-#' @param base_lev value to use as the base for comparison. Default NULL, no
-#'   comparison. See [baseline_compare()] and [create_base()] for options.
-#' @param comp_fun function to use in comparison. Default NULL, no comparison.
-#'   See [baseline_compare()] and [create_base()] for options.
+#' @param base_list NULL (default) or list of arguments for [baseline_compare()]
 #' @param zero_adjust numeric (default 0) or `"auto"`, adjustment to data to
 #'   avoid zeros by adding `zero_adjust` to `abs(data)`, e.g shifting all data
 #'   away from zero, either positively or negatively. Zeros themselves are
@@ -46,15 +43,6 @@ plot_data_prep <- function(data, y_col,
     ylab_append = ''
     return(tibble::lst(data, y_col, ylab_append))
   }
-
-  # Data adjustments
-  # ensure y is numeric
-  # Have to [[]] because [] yields an sf-tibble, not just the col.
-  # This was here for a reason, but it seems dangerous- better to put data type on the user.
-  # if (!is.numeric(data[[y_col]])) {
-  #   data <- data |>
-  #     dplyr::mutate("{y_col}" := as.numeric(.data[[y_col]]))
-  # }
 
   # Adjust to keep off zero if requested, but warn if not relative
   # Not sure this is necessary.
@@ -107,6 +95,20 @@ plot_data_prep <- function(data, y_col,
   return(tibble::lst(data, y_col, ylab_append))
 }
 
+#' Title
+#'
+#' @param prepped
+#' @param colorset
+#' @param colorgroups
+#' @param pal_list
+#' @param transy
+#' @param transx
+#' @param point_group
+#'
+#' @return
+#' @export
+#'
+#' @examples
 plot_style_prep <- function(prepped, colorset, colorgroups, pal_list,
                             transy, transx, point_group) {
   # Warn about conflicts with y-axis trans
