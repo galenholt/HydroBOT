@@ -862,5 +862,25 @@ test_that('speed test', {
 
 })
 
+# test multiple returns- use the next one once EWR is debugged.
+test_that('safety works', {
+  # create dir so building makes sense
+  make_temp_hydro()
 
+  # Create a file that should fail
+  dir.create(file.path(temp_hydro_dir, 'FAILURE'))
+  write.csv(datasets::iris, file.path(temp_hydro_dir, 'FAILURE', 'iris.csv'))
+
+  ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
+                                output_parent_dir = temp_parent_dir,
+                                outputType = list('none'),
+                                datesuffix = FALSE,
+                                returnType = list('summary', 'all'))
+  expect_equal(length(ewr_out), 2)
+  expect_true(all(c('summary','all_events') %in% names(ewr_out)))
+  expect_equal(unique(ewr_out$summary$scenario),
+               c('base_base', 'down4_down4', 'up4_up4'))
+
+
+})
 

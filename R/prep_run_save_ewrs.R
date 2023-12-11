@@ -166,6 +166,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   }
 
 
+  # Run the EWR tool over all hydro_paths
     ewr_out <- safe_imap(hydro_paths, ewrfun, retries = retries, parallel = rparallel)
 
   # Clean up the list structure
