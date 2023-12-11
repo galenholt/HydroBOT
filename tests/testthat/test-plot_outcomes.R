@@ -29,7 +29,7 @@ test_that("basin works with single color palette", {
     dplyr::filter(!is.na(Objective))
 
   basin_plot <- plot_outcomes(basin_to_plot,
-                              y_col = 'allArith',
+                              outcome_col = 'allArith',
                               colorset = 'Objective',
                               pal_list = list("scico::oslo"),
                               sceneorder = c('down4', 'base', 'up4')) +
@@ -44,7 +44,7 @@ test_that("a fixed color works (contrived)", {
     dplyr::filter(!is.na(Objective))
 
   basin_plotred <- plot_outcomes(basin_to_plot,
-                              y_col = 'allArith',
+                              outcome_col = 'allArith',
                               colorset = 'Objective',
                               pal_list = 'firebrick',
                               sceneorder = c('down4', 'base', 'up4')) +
@@ -66,7 +66,7 @@ test_that("multi-palette and facetting", {
 
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_plot <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   colorgroups = 'env_group',
                   colorset = 'env_obj',
                   pal_list = grouplist,
@@ -78,7 +78,7 @@ test_that("multi-palette and facetting", {
   # This is really just a test that passing '.' to a facet_row or facet_col
   # behaves as expected
   sdl_plot_facrow <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   colorgroups = 'env_group',
                   colorset = 'env_obj',
                   pal_list = grouplist,
@@ -89,7 +89,7 @@ test_that("multi-palette and facetting", {
   vdiffr::expect_doppelganger("bar_basin_group_sdlrow", sdl_plot_facrow)
 
   sdl_plot_factgroup <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   colorgroups = 'env_group',
                   colorset = 'env_obj',
                   pal_list = grouplist,
@@ -107,7 +107,7 @@ test_that("flipped", {
 
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_plot <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   x_col = 'env_obj',
                   colorgroups = NULL,
                   colorset = 'scenario',
@@ -121,7 +121,7 @@ test_that("flipped", {
 
   # outcome groups
   sdl_plot_g <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   x_col = 'env_obj',
                   colorgroups = 'env_group',
                   colorset = 'scenario',
@@ -134,7 +134,7 @@ test_that("flipped", {
 
   # interesting plot, good for testing labels
   sdl_plot_groupblock <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   x_col = 'scenario',
                   colorset = 'env_group',
                   pal_list = obj_pal,
@@ -147,7 +147,7 @@ test_that("flipped", {
   # change label name
   # interesting plot, good for testing labels
   sdl_plot_groupblock_l <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   x_col = 'scenario',
                   colorset = 'env_group',
                   color_lab = 'Environmental\ngroup',
@@ -159,7 +159,7 @@ test_that("flipped", {
 
   # Drop labels
   sdl_plot_groupblock_n <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   x_col = 'scenario',
                   colorset = 'env_group',
                   color_lab = NULL,
@@ -183,7 +183,7 @@ test_that("quant x", {
 
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_line <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   x_col = 'delta',
                   colorset = 'env_obj',
                   pal_list = list('scico::berlin'),
@@ -194,9 +194,9 @@ test_that("quant x", {
 
   # change a bunch of options
   sdl_line_options <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   x_col = 'delta',
-                  y_lab = 'Proportion met',
+                  outcome_lab = 'Proportion met',
                   x_lab = 'Change in flow',
                   transx = 'log10',
                   color_lab = 'Environmental\ngroup',
@@ -213,9 +213,9 @@ test_that("quant x", {
   # check that it works with other things as colors
   # and that the point_group argument works.
   sdl_line_catchment <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   x_col = 'delta',
-                  y_lab = 'Proportion met',
+                  outcome_lab = 'Proportion met',
                   x_lab = 'Change in flow',
                   transx = 'log10',
                   color_lab = 'Catchment',
@@ -231,9 +231,9 @@ test_that("quant x", {
   # jittering- set the seed each time or the jitters differ
   set.seed(18)
   sdl_smooth_mean_jf <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   x_col = 'delta',
-                  y_lab = 'Proportion met',
+                  outcome_lab = 'Proportion met',
                   x_lab = 'Change in flow',
                   transx = 'log10',
                   color_lab = 'Environmental\ngroup',
@@ -252,9 +252,9 @@ test_that("quant x", {
   # jittering- default
   set.seed(18)
   sdl_smooth_mean_jc <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   x_col = 'delta',
-                  y_lab = 'Proportion met',
+                  outcome_lab = 'Proportion met',
                   x_lab = 'Change in flow',
                   transx = 'log10',
                   color_lab = 'Environmental\ngroup',
@@ -274,9 +274,9 @@ test_that("quant x", {
   # The loess isn't happy about singularities. I don't want to silence them, but also don't care for this example.
   # I'm not entirely sure why this works- i think I *should* have to say `smooth_arglist = TRUE`, but it seems to work with just `smooth`
   sdl_line_catchment_smooth <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   x_col = 'delta',
-                  y_lab = 'Proportion met',
+                  outcome_lab = 'Proportion met',
                   x_lab = 'Change in flow',
                   color_lab = 'Catchment',
                   colorgroups = NULL,
@@ -303,8 +303,8 @@ test_that("maps", {
   # Make a minimal map
   sdl_map <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'EF') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -317,9 +317,9 @@ test_that("maps", {
   # Make a minimal map, change the label
   sdl_map_l <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'EF') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
-                  y_lab = 'New label',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
+                  outcome_lab = 'New label',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -333,8 +333,8 @@ test_that("maps", {
   # put the basin in the background
   sdl_basin_background <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -349,8 +349,8 @@ test_that("maps", {
   # Using cewo valleys because then it makes sense to have a fill sometimes.
   expect_warning(sdl_valley_background_warn <- obj_sdl_to_plot |>
                    dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
-                   plot_outcomes(y_col = 'allArith',
-                                 x_col = 'map',
+                   plot_outcomes(outcome_col = 'allArith',
+                                 plot_type = 'map',
                                  colorgroups = NULL,
                                  colorset = 'allArith',
                                  pal_list = list('scico::berlin'),
@@ -366,8 +366,8 @@ test_that("maps", {
   # gauges as main focus
   gauges_map <- env_obj_points_to_plot |> # for readability
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -383,9 +383,9 @@ test_that("maps", {
   # gauges with filled underlay values
   gauges_map_sdl <- env_obj_points_to_plot |> # for readability
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
-                  y_lab = 'New label',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
+                  outcome_lab = 'New label',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -395,7 +395,7 @@ test_that("maps", {
                   underlay_list = list(underlay = sdl_units,
                                        underlay_ycol = 'SWSDLName',
                                        underlay_pal = 'scico::oslo',
-                                       y_lab = 'SDL unit')) +
+                                       outcome_lab = 'SDL unit')) +
     ggplot2::theme(legend.position = 'bottom')
 
   vdiffr::expect_doppelganger("gauges_map_sdl", gauges_map_sdl)
@@ -405,8 +405,8 @@ test_that("maps", {
   # Should be able to do that automatically
   gauges_map_sdl_agg <- env_obj_points_to_plot |> # for readability
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -423,8 +423,8 @@ test_that("maps", {
   # that one would be good with two levels- basin and sdl
   gauges_map_2_level <- env_obj_points_to_plot |> # for readability
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -443,8 +443,8 @@ test_that("maps", {
   # include gauges- looks better without facetting
   sdl_gauges_all <- obj_sdl_to_plot |>
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -460,8 +460,8 @@ test_that("maps", {
   # clipped to the main data
   sdl_gauges_clip <- obj_sdl_to_plot |>
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -479,8 +479,8 @@ test_that("maps", {
   # with a meaningful palette- simple qualitative to start
   sdl_gauges_qual <- obj_sdl_to_plot |>
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -499,8 +499,8 @@ test_that("maps", {
   # with a meaningful palette- simple quantitative and an underlay
   sdl_gauges_quant <- obj_sdl_to_plot |>
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -523,8 +523,8 @@ test_that("maps", {
     dplyr::filter(Objective %in% c("Maintain water-dependent species richness",
                                    "Increase opportunities for colonial waterbird breeding*",
                                    "Support instream & floodplain productivity")) |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -542,8 +542,8 @@ test_that("maps", {
     dplyr::filter(Objective %in% c("Maintain water-dependent species richness",
                                    "Increase opportunities for colonial waterbird breeding*",
                                    "Support instream & floodplain productivity")) |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -562,8 +562,8 @@ test_that("maps", {
   # How under- and overlays. nearly identical to above, but make sure palettes work with under
   sdl_gauges_quant_basinpal <- obj_sdl_to_plot |>
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -584,8 +584,8 @@ test_that("maps", {
 
   sdl_basin_background_difference <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('ggthemes::Orange-Blue-White Diverging'),
@@ -601,8 +601,8 @@ test_that("maps", {
   # Relative to baseline
   sdl_basin_background_rel <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('ggthemes::Orange-Blue-White Diverging'),
@@ -612,7 +612,7 @@ test_that("maps", {
                   base_list = list(base_lev = 'base', comp_fun = 'relative',
                                    group_cols = c('env_obj', 'polyID')),
                   zero_adjust = 'auto',
-                  transy = 'log10', # Do I need to group_by polyID for the maps? Yes. should probably automate that.
+                  transoutcome = 'log10', # Do I need to group_by polyID for the maps? Yes. should probably automate that.
                   underlay_list = list(underlay = basin, underlay_pal = 'azure'))
 
   skip("strange bug introduces NaN and Inf, but only when printed to vdiffr. Inspect manually")
@@ -637,7 +637,7 @@ test_that("setLimits works", {
     dplyr::filter(!is.na(Objective))
 
   basin_plot20 <- plot_outcomes(basin_to_plot,
-                                y_col = 'allArith',
+                                outcome_col = 'allArith',
                                 colorset = 'Objective',
                                 pal_list = list("scico::oslo"),
                                 sceneorder = c('down4', 'base', 'up4'),
@@ -647,7 +647,7 @@ test_that("setLimits works", {
   vdiffr::expect_doppelganger("stacked bar 20", basin_plot20)
 
   basin_plot10 <- plot_outcomes(basin_to_plot,
-                                y_col = 'allArith',
+                                outcome_col = 'allArith',
                                 colorset = 'Objective',
                                 pal_list = list("scico::oslo"),
                                 sceneorder = c('down4', 'base', 'up4'),
@@ -659,7 +659,7 @@ test_that("setLimits works", {
   # Line plots
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_line_75 <- obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'allArith',
+    plot_outcomes(outcome_col = 'allArith',
                   x_col = 'delta',
                   colorgroups = NULL,
                   colorset = 'env_obj',
@@ -676,8 +676,8 @@ test_that("setLimits works", {
   # Make a minimal map
   sdl_mapL <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'EF') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'allArith',
-                  x_col = 'map',
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'map',
                   colorgroups = NULL,
                   colorset = 'allArith',
                   pal_list = list('scico::berlin'),
@@ -702,7 +702,7 @@ test_that("ewr works as in `plot_outcomes_bar`", {
 
 
   ewr_plot <- plot_outcomes(ewr_to_bar_data,
-                            y_col = 'ewr_achieved',
+                            outcome_col = 'ewr_achieved',
                             x_col = 'scenario',
                             facet_row = 'gauge',
                             facet_col = 'ewr_code',
@@ -719,7 +719,7 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
     dplyr::filter(!is.na(Objective))
 
   basin_plot <- plot_outcomes(basin_to_plot,
-                              y_col = 'allArith',
+                              outcome_col = 'allArith',
                               x_col = 'scenario',
                               colorset = 'scenario',
                               pal_list = scene_pal,
@@ -729,8 +729,8 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
   vdiffr::expect_doppelganger("bar_basin", basin_plot)
 
   basin_plot_L <- plot_outcomes(basin_to_plot,
-                                y_col = 'allArith',
-                                y_lab = "Aggregated outcome",
+                                outcome_col = 'allArith',
+                                outcome_lab = "Aggregated outcome",
                                 facet_wrapper = 'Objective',
                                 colorset = 'scenario',
                                 pal_list = scene_pal,
@@ -745,8 +745,8 @@ test_that("facet addition works", {
   sdl_colors_row <- obj_sdl_to_plot |>
     # dplyr::summarise(allArith = mean(allArith, na.rm = TRUE),
     #                  .by = c(SWSDLName, scenario, geometry)) |>
-    plot_outcomes(y_col = 'allArith',
-                  y_lab = 'Proportion\nEWR achieved',
+    plot_outcomes(outcome_col = 'allArith',
+                  outcome_lab = 'Proportion\nEWR achieved',
                   x_col = 'SWSDLName',
                   facet_row = 'env_group + SWSDLName',
                   colorset = 'scenario',
@@ -757,8 +757,8 @@ test_that("facet addition works", {
   sdl_colors_col <- obj_sdl_to_plot |>
     # dplyr::summarise(allArith = mean(allArith, na.rm = TRUE),
     #                  .by = c(SWSDLName, scenario, geometry)) |>
-    plot_outcomes(y_col = 'allArith',
-                  y_lab = 'Proportion\nEWR achieved',
+    plot_outcomes(outcome_col = 'allArith',
+                  outcome_lab = 'Proportion\nEWR achieved',
                   x_col = 'SWSDLName',
                   facet_col = 'env_group + SWSDLName',
                   colorset = 'scenario',
@@ -776,7 +776,7 @@ test_that("hydrographs", {
 
   # This one sums the flwos
  hydplot_bar <- plot_outcomes(hydro_to_plot,
-                              y_col = 'flow',
+                              outcome_col = 'flow',
                               colorset = 'scenario',
                               pal_list = scene_pal,
                               facet_wrapper = 'gauge',
@@ -786,7 +786,7 @@ test_that("hydrographs", {
   vdiffr::expect_doppelganger("hydplot_bar", hydplot_bar)
 
   hydplot <- plot_outcomes(hydro_to_plot,
-                               y_col = 'flow',
+                               outcome_col = 'flow',
                            x_col = 'Date',
                                colorset = 'scenario',
                                pal_list = scene_pal,
@@ -797,20 +797,20 @@ test_that("hydrographs", {
   vdiffr::expect_doppelganger("hydroplot", hydplot)
 
   hydplot_st <- plot_outcomes(hydro_to_plot |> dplyr::mutate(flow = flow + 1),
-                           y_col = 'flow',
+                           outcome_col = 'flow',
                            x_col = 'Date',
                            colorset = 'scenario',
                            pal_list = scene_pal,
                            facet_wrapper = 'gauge',
                            scales = 'free_y',
-                           transy = 'log10',
+                           transoutcome = 'log10',
                            sceneorder = c('down4', 'base', 'up4')) +
     ggplot2::theme(legend.position = 'none')
 
   vdiffr::expect_doppelganger("hydroplot_st", hydplot_st)
 
   hydplot_baseD <- plot_outcomes(hydro_to_plot,
-                           y_col = 'flow',
+                           outcome_col = 'flow',
                            x_col = 'Date',
                            colorset = 'scenario',
                            pal_list = scene_pal,
@@ -824,14 +824,14 @@ test_that("hydrographs", {
   vdiffr::expect_doppelganger("hydroplot_baseD", hydplot_baseD)
 
   hydplot_baseR <- plot_outcomes(hydro_to_plot,
-                                  y_col = 'flow',
+                                  outcome_col = 'flow',
                                   x_col = 'Date',
                                   colorset = 'scenario',
                                   pal_list = scene_pal,
                                   facet_wrapper = 'gauge',
                                   sceneorder = c('down4', 'base', 'up4'),
                                  zero_adjust = 'auto',
-                                 transy = 'log10',
+                                 transoutcome = 'log10',
                                   base_list = list(base_lev = 'base',
                                                    comp_fun = 'relative',
                                                    group_cols = c('Date', 'gauge'))) +
@@ -850,8 +850,8 @@ test_that("scenarios aren't special", {
   sdl_colors <- obj_sdl_to_plot |>
     dplyr::summarise(allArith = mean(allArith, na.rm = TRUE),
                      .by = c(SWSDLName, scenario, geometry)) |>
-    plot_outcomes(y_col = 'allArith',
-                  y_lab = 'Proportion\nEWR achieved',
+    plot_outcomes(outcome_col = 'allArith',
+                  outcome_lab = 'Proportion\nEWR achieved',
                   x_col = 'SWSDLName',
                   facet_row = 'scenario',
                   colorset = 'SWSDLName',

@@ -12,13 +12,13 @@
 #' @export
 #'
 plot_hydrographs <- function(hydrolong,
-                             y_col = 'flow',
+                             outcome_col = 'flow',
                              gaugefilter = NULL,
                              scenariofilter = NULL,
                              colors = "RColorBrewer::Dark2",
                              sceneorder = NULL,
                              scales = 'fixed',
-                             transy = 'identity',
+                             transoutcome = 'identity',
                              base_lev = NULL,
                              comp_fun = NULL,
                              ...) {
@@ -34,7 +34,7 @@ plot_hydrographs <- function(hydrolong,
     if(comp_fun[1] == "c") {comp_fun <- comp_fun[2:length(comp_fun)]}
   }
 
-  prepped <- plot_prep(data = hydrolong, y_col = y_col, colors = colors,
+  prepped <- plot_prep(data = hydrolong, outcome_col = outcome_col, colors = colors,
                        sceneorder = sceneorder,
                        gaugefilter = gaugefilter,
                        scenariofilter = scenariofilter,
@@ -45,11 +45,11 @@ plot_hydrographs <- function(hydrolong,
 
   hydro_plot <- prepped$data |>
     dplyr::filter(gauge %in% prepped$gaugefilter & scenario %in% prepped$scenariofilter) |>
-    ggplot2::ggplot(ggplot2::aes(x = Date, y = .data[[prepped$y_col]], color = scenario)) +
+    ggplot2::ggplot(ggplot2::aes(x = Date, y = .data[[prepped$outcome_col]], color = scenario)) +
     ggplot2::geom_line() +
     ggplot2::facet_wrap(~gauge, scales = scales) +
     ggplot2::labs(y = paste0("Flow (ML/day)", prepped$ylab_append), color = 'Scenario') +
-    ggplot2::scale_y_continuous(trans = transy) +
+    ggplot2::scale_y_continuous(trans = transoutcome) +
     ggplot2::scale_color_manual(values = prepped$colors) +
     theme_werp_toolkit()
 

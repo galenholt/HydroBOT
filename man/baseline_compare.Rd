@@ -32,7 +32,7 @@ baseline_compare(
 
 \item{comp_fun}{function to use for comparison comparing the first two arguments (\code{difference} and \code{relative} included here as wrappers for \code{-} and \code{/}). Can be character, or list-format, (both safe) or bare name (brittle)}
 
-\item{...}{additional arguments to \code{\link[=create_base]{create_base()}}}
+\item{...}{additional arguments to \code{comp_fun}}
 
 \item{failmissing}{logical, default TRUE. Use \code{tidyselect::any_of} or \code{tidyselect::all_of} when \code{values_col} or \code{compare_col} are character. see \code{\link[=selectcreator]{selectcreator()}}}
 

@@ -7,7 +7,7 @@
 #' keeps those changes sandboxed
 #'
 #' @param data dataframe to prep
-#' @param y_col character, column name for what's plotted on the y-axis.
+#' @param outcome_col character, column name for what's plotted on the y-axis.
 #' @param sceneorder character or factor giving the order to present scenario
 #'   levels
 #' @param base_list NULL (default) or list of arguments for [baseline_compare()]
@@ -19,12 +19,12 @@
 #'   `0.1*min(abs(data[data != 0]))`.
 #' @param onlyzeros logical, default `FALSE`. Should all values be adjusted away from zero (`TRUE`) or only adjust zero values (`FALSE`)?
 #'
-#' @return a list with prepped versions of `data`, `y_col`, `ylab_append` to
+#' @return a list with prepped versions of `data`, `outcome_col`, `ylab_append` to
 #'   be used in plot calls
 #' @export
 #'
 #' @examples
-plot_data_prep <- function(data, y_col,
+plot_data_prep <- function(data, outcome_col,
                       sceneorder = NULL,
                       base_list = NULL,
                       zero_adjust = 0,
@@ -37,11 +37,11 @@ plot_data_prep <- function(data, y_col,
       dplyr::mutate(scenario = forcats::fct_relevel(scenario, sceneorder))
   }
 
-  # if y_col is NULL, as happens with maps sometimes, or non-numeric, just skip
+  # if outcome_col is NULL, as happens with maps sometimes, or non-numeric, just skip
   # this entirely there's no y data to adjust mathematically
-  if (is.null(y_col) || !is.numeric(data[[y_col]])) {
+  if (is.null(outcome_col) || !is.numeric(data[[outcome_col]])) {
     ylab_append = ''
-    return(tibble::lst(data, y_col, ylab_append))
+    return(tibble::lst(data, outcome_col, ylab_append))
   }
 
   # Adjust to keep off zero if requested, but warn if not relative
@@ -53,10 +53,10 @@ plot_data_prep <- function(data, y_col,
   }
 
   if (grepl('auto', zero_adjust)) {
-    zero_adjust <- min(abs(data[[y_col]])[data[[y_col]] != 0], na.rm = TRUE)*0.1
+    zero_adjust <- min(abs(data[[outcome_col]])[data[[outcome_col]] != 0], na.rm = TRUE)*0.1
   }
   # move data away from zero
-  data <- adjust_zeros(data, y_col, zero_adjust, onlyzeros)
+  data <- adjust_zeros(data, outcome_col, zero_adjust, onlyzeros)
 
   # Baseline data
   ylab_append <- ''
@@ -64,7 +64,7 @@ plot_data_prep <- function(data, y_col,
     # We've already handled the zero-shifts, so don't do it again
     data <- data |>
       baseline_compare(compare_col = 'scenario', base_lev = base_list$base_lev,
-                       values_col = y_col, comp_fun = base_list$comp_fun,
+                       values_col = outcome_col, comp_fun = base_list$comp_fun,
                        group_cols = base_list$group_cols,
                        zero_adjust = 0, onlyzeros = TRUE)
 
@@ -77,22 +77,22 @@ plot_data_prep <- function(data, y_col,
                        likely because of bare names lost in the call stack.
                        Please use character or list-defined functions. ")
     }
-    base_col_name <- paste0(comp_fun_name, '_', y_col)
-    names(data)[names(data) == paste0('comp_fun_', y_col)] <- base_col_name
-    y_col <- base_col_name
+    base_col_name <- paste0(comp_fun_name, '_', outcome_col)
+    names(data)[names(data) == paste0('comp_fun_', outcome_col)] <- base_col_name
+    outcome_col <- base_col_name
     ylab_append <- paste0('\n', comp_fun_name, ' to ', as.character(base_list$base_lev))
   }
 
   # That can introduce some infs and nans, often from division by zero in the relativiser
-  new_nan_inf <- sum(is.nan(data[[y_col]])) + sum(is.infinite(data[[y_col]]))
-  old_nan_inf <- sum(is.nan(data[[y_col]])) + sum(is.infinite(data[[y_col]]))
+  new_nan_inf <- sum(is.nan(data[[outcome_col]])) + sum(is.infinite(data[[outcome_col]]))
+  old_nan_inf <- sum(is.nan(data[[outcome_col]])) + sum(is.infinite(data[[outcome_col]]))
   if (new_nan_inf > old_nan_inf) {
     rlang::warn(glue::glue("NaN and Inf introduced in `plot_prep`, likely due to division by zero. {new_nan_inf - old_nan_inf} values were lost."))
   }
 
   # This names the data the same thing as it was interactively, but fails in the function. Just call it data for consistency
   # dataname <- as.character(substitute(data))
-  return(tibble::lst(data, y_col, ylab_append))
+  return(tibble::lst(data, outcome_col, ylab_append))
 }
 
 #' Title
@@ -101,7 +101,7 @@ plot_data_prep <- function(data, y_col,
 #' @param colorset
 #' @param colorgroups
 #' @param pal_list
-#' @param transy
+#' @param transoutcome
 #' @param transx
 #' @param point_group
 #'
@@ -110,15 +110,15 @@ plot_data_prep <- function(data, y_col,
 #'
 #' @examples
 plot_style_prep <- function(prepped, colorset, colorgroups, pal_list,
-                            transy, transx, point_group) {
+                            transoutcome, transx, point_group) {
   # Warn about conflicts with y-axis trans
-  if (!is.null(prepped$y_col)) {
-    if (!inherits(transy, 'trans') &&
-        transy %in% c('log', 'log10') &
-        any(prepped$data[[prepped$y_col]] == 0)) {
-      rlang::warn(glue::glue("`transy` takes logs, but data has
-                           {sum(prepped$data[[prepped$y_col]] == 0)} zeros and
-                           {sum(prepped$data[[prepped$y_col]] < 0)} less than 0,
+  if (!is.null(prepped$outcome_col)) {
+    if (!inherits(transoutcome, 'trans') &&
+        transoutcome %in% c('log', 'log10') &
+        any(prepped$data[[prepped$outcome_col]] == 0)) {
+      rlang::warn(glue::glue("`transoutcome` takes logs, but data has
+                           {sum(prepped$data[[prepped$outcome_col]] == 0)} zeros and
+                           {sum(prepped$data[[prepped$outcome_col]] < 0)} less than 0,
                            which will get lost"))
     }
   }

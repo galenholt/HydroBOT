@@ -6,13 +6,13 @@
 \usage{
 plot_hydrographs(
   hydrolong,
-  y_col = "flow",
+  outcome_col = "flow",
   gaugefilter = NULL,
   scenariofilter = NULL,
   colors = "RColorBrewer::Dark2",
   sceneorder = NULL,
   scales = "fixed",
-  transy = "identity",
+  transoutcome = "identity",
   base_lev = NULL,
   comp_fun = NULL,
   ...
@@ -21,12 +21,14 @@ plot_hydrographs(
 \arguments{
 \item{hydrolong}{hydrograph data in long format}
 
-\item{y_col}{character, name of column for the y-axis}
+\item{outcome_col}{character, name of outcome column. This is the data of
+interest being plotted. All data operations in \code{\link[=plot_data_prep]{plot_data_prep()}} happen to
+this column, and \code{\link[=plot_style_prep]{plot_style_prep()}} bases styling on it. For 2d plots, it is
+the y-axis, and for maps, heatmaps, and network plots, it is color/fill. It
+is entirely possible to also use it as color/fill for 2d plots in addition
+to the y-axis.}
 
 \item{gaugefilter}{set of gauges to filter}
-
-\item{scenariofilter}{set of scenarios to plot, default \code{NULL} plots all of
-them}
 
 \item{colors}{name of palette. Will change in future to match plot_outcomes color defining}
 
@@ -35,15 +37,9 @@ levels}
 
 \item{scales}{facet scales, as in \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if gauges have very different flows.}
 
-\item{transy}{transformation for y axis as in \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}}.
-Default \code{transy = 'identity'} just uses the data. Most common change likely
-\verb{transy = 'log10}}
-
-\item{base_lev}{value to use as the base for comparison. Default NULL, no
-comparison. See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}
-
-\item{comp_fun}{function to use in comparison. Default NULL, no comparison.
-See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}
+\item{transoutcome}{transformation for y axis as in
+\code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}}. Default \code{transoutcome = 'identity'} just uses
+the data. Most common change likely \verb{transoutcome = 'log10}}
 
 \item{...}{passed to \code{\link[=plot_prep]{plot_prep()}}}
 }

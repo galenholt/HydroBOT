@@ -6,48 +6,67 @@
 \usage{
 plot_outcomes(
   outdf,
-  y_col,
+  outcome_col,
+  outcome_lab = outcome_col,
+  y_col = outcome_col,
   y_lab = y_col,
   x_col = "scenario",
   x_lab = x_col,
+  colorset = "scenario",
+  pal_list = "scico::berlin",
+  colorgroups = NULL,
+  color_lab = ifelse(is.null(colorgroups), colorset, colorgroups),
+  plot_type = "2d",
   facet_row = NULL,
   facet_col = NULL,
   facet_wrapper = NULL,
-  scenariofilter = NULL,
-  colorgroups = NULL,
-  colorset = "scenario",
-  color_lab = ifelse(is.null(colorgroups), colorset, colorgroups),
   point_group = NULL,
-  pal_list = "scico::berlin",
   sceneorder = NULL,
-  scene_pal = "scico::bamako",
   scales = "fixed",
-  transy = "identity",
+  transoutcome = "identity",
   transx = "identity",
-  base_lev = NULL,
-  comp_fun = NULL,
   zero_adjust = 0,
   position = "stack",
-  smooth = FALSE,
-  smooth_method = NULL,
-  smooth_se = TRUE,
-  smooth_args = NULL,
+  base_list = NULL,
+  smooth_arglist = NULL,
   underlay_list = NULL,
   overlay_list = NULL,
-  setLimits = NULL,
-  ...
+  setLimits = NULL
 )
 }
 \arguments{
 \item{outdf}{dataframe of outcomes, needs a \code{scenario} column}
 
-\item{y_col}{character, name of column for the y-axis}
+\item{outcome_col}{character, name of outcome column. This is the data of
+interest being plotted. All data operations in \code{\link[=plot_data_prep]{plot_data_prep()}} happen to
+this column, and \code{\link[=plot_style_prep]{plot_style_prep()}} bases styling on it. For 2d plots, it is
+the y-axis, and for maps, heatmaps, and network plots, it is color/fill. It
+is entirely possible to also use it as color/fill for 2d plots in addition
+to the y-axis.}
 
-\item{y_lab}{character, default \code{y_col}, allows changing y-label}
+\item{outcome_lab}{character, default \code{outcome_col}, allows changing label of the outcome_col (y-axis or color/fill)}
+
+\item{y_col}{character, default \code{outcome_col}. Allows separately specifying
+y-axis from outcome (e.g. maps, heatmaps, networks)}
+
+\item{y_lab}{character, default y_col, allows changing y-lable}
 
 \item{x_col}{character, name of column for the x-axis. Default \code{'scenario'}}
 
 \item{x_lab}{character, default \code{x_col}, allows changing x-label}
+
+\item{colorset}{character, column name defining the colors to use (if
+\code{scene_x = TRUE}) or the x-levels (if \code{scene_x = FALSE})- needs to be
+renamed to reflect that it isn't just colors}
+
+\item{pal_list}{list of palettes for defining colors for \code{colorset}. Should
+be length of \code{colorgroups}}
+
+\item{colorgroups}{character, column name for grouping \code{colorset},
+particularly into different palettes}
+
+\item{color_lab}{character, default either \code{colorgroups} or \code{colorset} (if
+\code{is.null(colorgroups)}). Allows changing the color legend label}
 
 \item{facet_row}{NULL (default) or character for facet row. Can be \code{'.'} to
 have one row and column-facets}
@@ -58,70 +77,48 @@ to have one column and row-facets}
 \item{facet_wrapper}{NULL (default) or character for column to use for
 \code{facet_wrap}}
 
-\item{scenariofilter}{set of scenarios to plot, default \code{NULL} plots all of
-them}
-
-\item{colorgroups}{character, column name for grouping \code{colorset},
-particularly into different palettes}
-
-\item{colorset}{character, column name defining the colors to use (if
-\code{scene_x = TRUE}) or the x-levels (if \code{scene_x = FALSE})- needs to be
-renamed to reflect that it isn't just colors}
-
-\item{color_lab}{character, default either \code{colorgroups} or \code{colorset} (if
-\code{is.null(colorgroups)}). Allows changing the color legend label}
-
 \item{point_group}{character, column to add additional point groupings to,
 e.g. if plotting color by an environmental group, but need separate
 lines/points for each environmental objective.}
 
-\item{pal_list}{list of palettes for defining colors for \code{colorset}. Should
-be length of \code{colorgroups}}
-
 \item{sceneorder}{character or factor giving the order to present scenario
 levels}
 
-\item{scene_pal}{named palette for scenarios, only used if \code{scene_x = FALSE}}
-
 \item{scales}{facet scales, as in \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if gauges have very different flows.}
 
-\item{transy}{transformation for y axis as in \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}}.
-Default \code{transy = 'identity'} just uses the data. Most common change likely
-\verb{transy = 'log10}}
+\item{transoutcome}{transformation for y axis as in
+\code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}}. Default \code{transoutcome = 'identity'} just uses
+the data. Most common change likely \verb{transoutcome = 'log10}}
 
 \item{transx}{transformation for x axis as in
 \code{\link[ggplot2:scale_continuous]{ggplot2::scale_x_continuous()}}. Default \code{transx = 'identity'} just uses
 the data. Most common change likely \verb{transx = 'log10}}
-
-\item{base_lev}{value to use as the base for comparison. Default NULL, no
-comparison. See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}
-
-\item{comp_fun}{function to use in comparison. Default NULL, no comparison.
-See \code{\link[=baseline_compare]{baseline_compare()}} and \code{\link[=create_base]{create_base()}} for options.}
-
-\item{zero_adjust}{numeric (default 0) or \code{"auto"}, adjustment to data to
-avoid zeros by adding \code{zero_adjust} to \code{abs(data)}, e.g shifting all data
-away from zero, either positively or negatively. Zeros themselves are
-shifted up or down randomly. Used for avoiding x/0, NaN, and Inf when
-relativiszing and taking logs, primarily. Auto shifts by
-\code{0.1*min(abs(data[data != 0]))}.}
 
 \item{position}{character or \code{position} function, \code{position} arguments from
 \code{\link[ggplot2:geom_bar]{ggplot2::geom_col()}} and \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} (depending on plot type),
 to change from stacked to dodged bars or jitter points. Can be character,
 e.g. 'jitter' or a function, e.g. \code{ggplot2::position_jitter(width = 0.1, height = 0)}}
 
-\item{smooth, }{logical, default \code{FALSE}. If plotting lines (\code{x_col} is
-numeric), do we want straight lines (the default, \code{\link[ggplot2:geom_path]{ggplot2::geom_line()}})
-or fits (\code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}})?}
+\item{base_list}{NULL (default) or limited list of arguments to
+\code{\link[=baseline_compare]{baseline_compare()}};
+\itemize{
+\item base_lev
+\item comp_fun
+\item group_cols
+\code{\link[=plot_prep]{plot_prep()}} handles \code{zero_adjust}, and other arguments are inferred or
+not supported
+}}
 
-\item{smooth_method}{\code{method} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. Ignored
-if not smoothing}
-
-\item{smooth_se}{\code{se} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. Ignored if not
-smoothing}
-
-\item{smooth_args}{\code{method.args} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::stat_smooth()}}. Ignored if not smoothing.}
+\item{smooth_arglist}{NULL (default) or limited list of arguments to
+\code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. If NULL and x is quantitative, defaults to
+straight lines. Arguments
+\itemize{
+\item method
+\item method.args
+\item se
+\item linewidth
+If others are desired, we can develop something more general.
+}}
 
 \item{underlay_list}{default NULL, named list (or list of named lists for
 multiple underlay levels) of arguments to plot a map underlying the main
@@ -135,13 +132,20 @@ underlay is fill (polygons) and the main data is points.}
 
 \item{overlay_list}{as \code{underlay_list}, but names \code{"overlay_*"}}
 
-\item{setLimits}{sets user-supplied color/fill limits for maps or y limits for other plots. Also sets \code{underlay} and \code{overlay} limits for consistency.}
+\item{setLimits}{sets user-supplied color/fill limits for maps, heatmaps, and networks, or y limits
+for other plots. Also sets \code{underlay} and \code{overlay} limits for consistency.}
 
-\item{...}{passed to \code{\link[=plot_prep]{plot_prep()}}}
+\item{smooth_method}{\code{method} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. Ignored
+if not smoothing}
+
+\item{smooth_args}{\code{method.args} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::stat_smooth()}}.
+Ignored if not smoothing.}
+
+\item{smooth_se}{\code{se} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. Ignored if not
+smoothing}
 }
 \value{
-a ggplot stacked bar plot with standard formatting and coloring,
-stacking either scenarios or colorset
+a ggplot stacked bar plot with standard formatting and data cleaning
 }
 \description{
 Has several ways to color, including grouped palettes. Lets us choose whether

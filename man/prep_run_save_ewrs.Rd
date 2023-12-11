@@ -12,8 +12,9 @@ prep_run_save_ewrs(
   outputType = "none",
   returnType = "none",
   extrameta = NULL,
-  datesuffix = FALSE,
   rparallel = FALSE,
+  retries = 2,
+  datesuffix = FALSE,
   climate = NULL,
   MINT = NULL,
   MAXT = NULL,
@@ -64,10 +65,12 @@ to the active R session. Same options as \code{outputType}}
 
 \item{extrameta}{list, extra information to include in saved metadata documentation for the run. Default NULL.}
 
+\item{rparallel}{logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using \code{furrr}. To use, install \code{furrr} and set a \code{\link[future:plan]{future::plan()}} (likely \code{multisession} or \code{multicore})}
+
+\item{retries}{Number of retries if there are errors. 0 is no retries, but still runs once. Default 2.}
+
 \item{datesuffix}{logical. whether to add a suffix to saved filenames to
 provide a datestamp. Should be deprecated in favour of metadata files.}
-
-\item{rparallel}{logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using \code{furrr}. To use, install \code{furrr} and set a \code{\link[future:plan]{future::plan()}} (likely \code{multisession} or \code{multicore})}
 
 \item{climate}{deprecated, included to let old calls pass}
 

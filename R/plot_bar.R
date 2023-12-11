@@ -1,12 +1,12 @@
-plot_bar <- function(prepped, x_col, x_lab, y_lab,
-                     position, transy) {
+plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
+                     position, transoutcome) {
 
     outcome_plot <- prepped$data |>
       ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]],
-                                   y = .data[[prepped$y_col]],
+                                   y = .data[[prepped$outcome_col]],
                                    fill = .data$color)) +
       ggplot2::geom_col(position = position) +
-      ggplot2::scale_y_continuous(trans = transy) +
+      ggplot2::scale_y_continuous(trans = transoutcome) +
       ggplot2::scale_x_discrete(guide = ggplot2::guide_axis())
 
 
@@ -18,8 +18,8 @@ plot_bar <- function(prepped, x_col, x_lab, y_lab,
 }
 
 
-plot_numeric <- function(prepped, x_col, x_lab, y_lab,
-                         position, transy, transx,
+plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
+                         position, transoutcome, transx,
                          smooth_arglist, xdate = FALSE) {
 
   if (!inherits(position, 'gg')) {
@@ -31,11 +31,11 @@ plot_numeric <- function(prepped, x_col, x_lab, y_lab,
 
   outcome_plot <- prepped$data |>
     ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]],
-                                 y = .data[[prepped$y_col]],
+                                 y = .data[[prepped$outcome_col]],
                                  color = .data$color,
 
                                  group = .data$pointgroup)) +
-    ggplot2::scale_y_continuous(trans = transy)
+    ggplot2::scale_y_continuous(trans = transoutcome)
 
   if (!xdate) {
     outcome_plot <- outcome_plot +
@@ -90,9 +90,9 @@ plot_numeric <- function(prepped, x_col, x_lab, y_lab,
 
 }
 
-plot_map <- function(prepped, underlay_list, overlay_list, y_lab,
+plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
                      facet_wrapper, facet_row, facet_col,
-                     sceneorder, transy, setLimits, base_list) {
+                     sceneorder, transoutcome, setLimits, base_list) {
 
   # this is just a check- it either completes silently or aborts with a message
   test_overplotting(data = prepped$data, facet_wrapper, facet_row, facet_col)
@@ -133,10 +133,10 @@ plot_map <- function(prepped, underlay_list, overlay_list, y_lab,
     # layer up the underlays
     outcome_plot <- make_underover(underover_list = underlay_list,
                                    outcome_plot = outcome_plot,
-                                   sceneorder = sceneorder, y_lab = y_lab,
+                                   sceneorder = sceneorder, outcome_lab = outcome_lab,
                                    maindata = prepped$data,
                                    maindatatype = maindatatype, maincolorpal = prepped$pal_list,
-                                  transy = transy, setLimits = setLimits,
+                                  transoutcome = transoutcome, setLimits = setLimits,
                                   base_list = base_list, uotype = 'underlay')
 
   # Make the 'main' level. This is sort of silly in some ways, since we could
@@ -149,11 +149,11 @@ plot_map <- function(prepped, underlay_list, overlay_list, y_lab,
     outcome_plot <- handle_palettes(outcome_plot, aes_type = 'color',
                                     pal_list = prepped$pal_list,
                                     color_type = prepped$color_type,
-                                    transy = transy,
+                                    transoutcome = transoutcome,
                                     setLimits = setLimits,
                                     base_list = base_list)
 
-    outcome_plot <- outcome_plot + ggplot2::labs(color = paste0(y_lab, prepped$ylab_append))
+    outcome_plot <- outcome_plot + ggplot2::labs(color = paste0(outcome_lab, prepped$ylab_append))
 
   }
   if (maindatatype == 'areal') {
@@ -163,11 +163,11 @@ plot_map <- function(prepped, underlay_list, overlay_list, y_lab,
     outcome_plot <- handle_palettes(outcome_plot, aes_type = 'fill',
                                     pal_list = prepped$pal_list,
                                     color_type = prepped$color_type,
-                                    transy = transy,
+                                    transoutcome = transoutcome,
                                     setLimits = setLimits,
                                     base_list = base_list)
 
-    outcome_plot <- outcome_plot + ggplot2::labs(fill = paste0(y_lab, prepped$ylab_append))
+    outcome_plot <- outcome_plot + ggplot2::labs(fill = paste0(outcome_lab, prepped$ylab_append))
   }
 
 
@@ -189,11 +189,11 @@ plot_map <- function(prepped, underlay_list, overlay_list, y_lab,
     # layer up the overlays
     outcome_plot <- make_underover(underover_list = overlay_list,
                                    outcome_plot = outcome_plot,
-                                   sceneorder = sceneorder, y_lab = y_lab,
+                                   sceneorder = sceneorder, outcome_lab = outcome_lab,
                                    maindata = prepped$data,
                                    maindatatype = maindatatype,
                                    maincolorpal = prepped$pal_list,
-                                   transy = transy, setLimits = setLimits,
+                                   transoutcome = transoutcome, setLimits = setLimits,
                                    base_list = base_list, uotype = 'overlay')
 
     return(outcome_plot)
@@ -202,18 +202,18 @@ plot_map <- function(prepped, underlay_list, overlay_list, y_lab,
 
 
 make_underover <- function(underover_list, outcome_plot, sceneorder,
-                           y_lab, maindata,
-                          maindatatype, maincolorpal, transy,
+                           outcome_lab, maindata,
+                          maindatatype, maincolorpal, transoutcome,
                           setLimits, base_list, uotype = 'internal') {
 
   # A full list to allow partial specification with null-filling
-  full_list <- list(underover = NULL, y_col = NULL,
+  full_list <- list(underover = NULL, outcome_col = NULL,
                     pal_list = NA, # NA will show something, NULL just fails
                     colorgroups = NULL,
-                    y_lab = y_lab, # inherit from outer, but can be overwritten
+                    outcome_lab = outcome_lab, # inherit from outer, but can be overwritten
                     base_list = NULL, zero_adjust = 0,
                     onlyzeros = FALSE,
-                    transy = transy,
+                    transoutcome = transoutcome,
                     transx = NULL,
                     point_group = NULL,
                     uotype = NULL,
@@ -231,7 +231,7 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
     }
 
     names(x)[names(x) %in% c('underlay_pal', 'overlay_pal')] <- 'pal_list'
-    names(x)[names(x) %in% c('underlay_ycol', 'overlay_ycol')] <- 'y_col'
+    names(x)[names(x) %in% c('underlay_ycol', 'overlay_ycol')] <- 'outcome_col'
 
     x$uotype <- typename
     return(x)
@@ -285,17 +285,17 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
     }
 
     # data and plot prep
-    uprep <- plot_data_prep(data = uo$underover, y_col = uo$y_col,
+    uprep <- plot_data_prep(data = uo$underover, outcome_col = uo$outcome_col,
                             sceneorder = sceneorder,
                             base_list = uo$base_list,
                             zero_adjust = uo$zero_adjust,
                             onlyzeros = uo$onlyzeros)
 
     uprep <- plot_style_prep(prepped = uprep,
-                               colorset = uo$y_col,
+                               colorset = uo$outcome_col,
                              colorgroups = uo$colorgroups,
                              pal_list = uo$pal_list,
-                               transy = uo$transy,
+                               transoutcome = uo$transoutcome,
                              transx = uo$transx,
                              point_group = uo$point_group)
 
@@ -312,12 +312,12 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
         outcome_plot <- handle_palettes(outcome_plot, aes_type = 'color',
                                         pal_list = uprep$pal_list,
                                         color_type = uprep$color_type,
-                                        transy = transy,
+                                        transoutcome = transoutcome,
                                         setLimits = setLimits,
                                         base_list = base_list)
 
         outcome_plot <- outcome_plot +
-          ggplot2::labs(color = paste0(uo$y_lab, uprep$ylab_append))
+          ggplot2::labs(color = paste0(uo$outcome_lab, uprep$ylab_append))
 
       }
 
@@ -334,12 +334,12 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
       outcome_plot <- handle_palettes(outcome_plot, aes_type = 'fill',
                                       pal_list = uprep$pal_list,
                                       color_type = uprep$color_type,
-                                      transy = transy,
+                                      transoutcome = transoutcome,
                                       setLimits = setLimits,
                                       base_list = base_list)
 
       outcome_plot <- outcome_plot +
-        ggplot2::labs(fill = paste0(uo$y_lab, uprep$ylab_append))
+        ggplot2::labs(fill = paste0(uo$outcome_lab, uprep$ylab_append))
 
       }
     }
@@ -352,4 +352,67 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
 
   }
 
+plot_heatmap <- function(prepped,
+                         x_col, x_lab,
+                         y_col, y_lab,
+                         outcome_lab,
+                         transoutcome, transx, transy,
+                         smooth_arglist, xdate = FALSE) {
 
+  outcome_plot <- prepped$data |>
+    ggplot2::ggplot(ggplot2::aes(x = .data[[x_col]],
+                                 y = .data[[y_col]],
+                                 fill = .data[[prepped$outcome_col]])) +
+    ggplot2::scale_y_continuous(trans = transy)
+
+  if (!xdate) {
+    outcome_plot <- outcome_plot +
+      ggplot2::scale_x_continuous(trans = transx)
+  }
+
+
+  # THESE CONDITIONALS ARE A MESS. MAYBE JUST is.logical, is.list, is.null...
+
+  # There must be a slick way to do this, but the rlang::exec and do.call
+  # methods don't let use keep using the defaults for other args, as far as I
+  # can tell.
+  default_smooth <- list(method = NULL,
+                         se = TRUE,
+                         method.args = NULL,
+                         linewidth = NULL,# Odd that I have to set this.
+                         alpha = 0.4)
+
+
+  # Deal with logical carryover
+  if (is.logical(smooth_arglist)) {
+    if (smooth_arglist) {
+      smooth_arglist <- default_smooth
+    } else if (!smooth_arglist) {
+      smooth_arglist <- NULL
+    }
+  }
+
+  if (is.null(smooth_arglist)) {
+    outcome_plot <- outcome_plot +
+      ggplot2::geom_line()
+  } else if (!is.null(smooth_arglist)) {
+    smooth_arglist <- utils::modifyList(default_smooth, smooth_arglist)
+
+    outcome_plot <- outcome_plot +
+      ggplot2::geom_smooth(mapping = ggplot2::aes(fill = .data$color),
+                           method = smooth_arglist$method,
+                           method.args = smooth_arglist$method.args,
+                           se = smooth_arglist$se,
+                           linewidth = smooth_arglist$linewidth,
+                           alpha = smooth_arglist$alpha)
+
+  }
+
+
+  # do I need to do this for fill as well when I have smooth?
+  outcome_plot <- handle_palettes(outcome_plot, aes_type = 'color',
+                                  prepped$pal_list, prepped$color_type)
+  outcome_plot <- handle_palettes(outcome_plot, aes_type = 'fill',
+                                  prepped$pal_list, prepped$color_type)
+
+}

@@ -49,7 +49,7 @@ find_color_type <- function(pal_list) {
 }
 
 handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
-                            transy = 'identity', setLimits = NULL,
+                            transoutcome = 'identity', setLimits = NULL,
                             base_list = NULL) {
 
   if (color_type == 'colorobj') {
@@ -68,7 +68,7 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
     if (aes_type == 'fill') {
       ggobj <- ggobj +
         paletteer::scale_fill_paletteer_c(palette = pal_list[[1]],
-                                          trans = transy,
+                                          trans = transoutcome,
                                           limit = \(x) findlimits(x,
                                                                   lims = setLimits,
                                                                   base_list = base_list))
@@ -76,7 +76,7 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
     if (aes_type == 'color') {
       ggobj <- ggobj +
         paletteer::scale_color_paletteer_c(palette = pal_list[[1]],
-                                           trans = transy,
+                                           trans = transoutcome,
                                            limit = \(x) findlimits(x,
                                                                    lims = setLimits,
                                                                    base_list = base_list))
@@ -173,8 +173,8 @@ test_overplotting <- function(data, facet_wrapper, facet_row, facet_col) {
 # Find limits for the color scale- needs to be a function, so write it here so it inherits variables.
 # allows centering diverging palettes with baseline comparisons
 # by defining this in here, it inherits base_list$comp_fun and other values
-# x is typically prepped$data[[prepped$y_col]] (because `prepped$y_col` is
-# the new y_col name if baselined). Should I just use that? Or can I call it from inside the `scale`
+# x is typically prepped$data[[prepped$outcome_col]] (because `prepped$outcome_col` is
+# the new outcome_col name if baselined). Should I just use that? Or can I call it from inside the `scale`
 # x here is a length-2 default set of limits.
 findlimits <- function(x, lims, base_list) {
   # use hard-set user-supplied limits
