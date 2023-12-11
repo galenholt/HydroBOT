@@ -156,16 +156,24 @@ plot_outcomes <- function(outdf,
 
   # Easier to define the 2d (standard) plots as NOT the other sorts
   if (!(plot_type %in% c('map', 'heatmap', 'network'))) {
+
+    # we want to use numeric x for numeric x or dates
+    xc <- dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col]))
+    xnumeric <- is.numeric(xc)
+    xdate <- inherits(xc, 'POSIXt') |
+      inherits(xc, 'Date')
+
     # Numeric x
-    if (is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
+    if (xnumeric | xdate) {
       outcome_plot <- plot_numeric(prepped = prepped, x_col = x_col,
                                    x_lab = x_lab, y_lab = y_lab,
                                    position = position,
                                    transy = transy, transx = transx,
-                                   smooth_arglist = smooth_arglist)
+                                   smooth_arglist = smooth_arglist,
+                                   xdate = xdate)
     }
     # Qualitative x
-    if (!is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,x_col])))) {
+    if (!xnumeric & !xdate) {
       outcome_plot <- plot_bar(prepped = prepped, x_col = x_col,
                                x_lab = x_lab, y_lab = y_lab,
                                position = position, transy = transy)

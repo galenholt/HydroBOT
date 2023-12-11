@@ -20,7 +20,7 @@ plot_bar <- function(prepped, x_col, x_lab, y_lab,
 
 plot_numeric <- function(prepped, x_col, x_lab, y_lab,
                          position, transy, transx,
-                         smooth_arglist) {
+                         smooth_arglist, xdate = FALSE) {
 
   if (!inherits(position, 'gg')) {
     if (is.null(position) || position == 'stack') {
@@ -35,9 +35,14 @@ plot_numeric <- function(prepped, x_col, x_lab, y_lab,
                                  color = .data$color,
 
                                  group = .data$pointgroup)) +
-    ggplot2::geom_point(position = position) +
-    ggplot2::scale_y_continuous(trans = transy) +
-    ggplot2::scale_x_continuous(trans = transx)
+    ggplot2::scale_y_continuous(trans = transy)
+
+  if (!xdate) {
+    outcome_plot <- outcome_plot +
+      ggplot2::geom_point(position = position) +
+      ggplot2::scale_x_continuous(trans = transx)
+  }
+
 
   # THESE CONDITIONALS ARE A MESS. MAYBE JUST is.logical, is.list, is.null...
 

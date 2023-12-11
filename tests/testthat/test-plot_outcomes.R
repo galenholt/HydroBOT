@@ -771,6 +771,74 @@ test_that("facet addition works", {
 
 })
 
+test_that("hydrographs", {
+  hydro_to_plot <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'))
+
+  # This one sums the flwos
+ hydplot_bar <- plot_outcomes(hydro_to_plot,
+                              y_col = 'flow',
+                              colorset = 'scenario',
+                              pal_list = scene_pal,
+                              facet_wrapper = 'gauge',
+                              sceneorder = c('down4', 'base', 'up4')) +
+    ggplot2::theme(legend.position = 'none')
+
+  vdiffr::expect_doppelganger("hydplot_bar", hydplot_bar)
+
+  hydplot <- plot_outcomes(hydro_to_plot,
+                               y_col = 'flow',
+                           x_col = 'Date',
+                               colorset = 'scenario',
+                               pal_list = scene_pal,
+                           facet_wrapper = 'gauge',
+                               sceneorder = c('down4', 'base', 'up4')) +
+    ggplot2::theme(legend.position = 'none')
+
+  vdiffr::expect_doppelganger("hydroplot", hydplot)
+
+  hydplot_st <- plot_outcomes(hydro_to_plot |> dplyr::mutate(flow = flow + 1),
+                           y_col = 'flow',
+                           x_col = 'Date',
+                           colorset = 'scenario',
+                           pal_list = scene_pal,
+                           facet_wrapper = 'gauge',
+                           scales = 'free_y',
+                           transy = 'log10',
+                           sceneorder = c('down4', 'base', 'up4')) +
+    ggplot2::theme(legend.position = 'none')
+
+  vdiffr::expect_doppelganger("hydroplot_st", hydplot_st)
+
+  hydplot_baseD <- plot_outcomes(hydro_to_plot,
+                           y_col = 'flow',
+                           x_col = 'Date',
+                           colorset = 'scenario',
+                           pal_list = scene_pal,
+                           facet_wrapper = 'gauge',
+                           sceneorder = c('down4', 'base', 'up4'),
+                           base_list = list(base_lev = 'base',
+                                            comp_fun = 'difference',
+                                            group_cols = c('Date', 'gauge'))) +
+    ggplot2::theme(legend.position = 'none')
+
+  vdiffr::expect_doppelganger("hydroplot_baseD", hydplot_baseD)
+
+  hydplot_baseR <- plot_outcomes(hydro_to_plot,
+                                  y_col = 'flow',
+                                  x_col = 'Date',
+                                  colorset = 'scenario',
+                                  pal_list = scene_pal,
+                                  facet_wrapper = 'gauge',
+                                  sceneorder = c('down4', 'base', 'up4'),
+                                 zero_adjust = 'auto',
+                                 transy = 'log10',
+                                  base_list = list(base_lev = 'base',
+                                                   comp_fun = 'relative',
+                                                   group_cols = c('Date', 'gauge'))) +
+    ggplot2::theme(legend.position = 'none')
+
+  vdiffr::expect_doppelganger("hydroplot_baseR", hydplot_baseR)
+})
 
 # work in progress --------------------------------------------------------
 
