@@ -11,7 +11,6 @@
 #' @return ggplot object
 #' @export
 #'
-#' @examples
 plot_hydrographs <- function(hydrolong,
                              y_col = 'flow',
                              gaugefilter = NULL,
@@ -24,7 +23,10 @@ plot_hydrographs <- function(hydrolong,
                              comp_fun = NULL,
                              ...) {
 
-  rlang::warn("`plot_hydrographs` is deprecated. Please use `plot_outcomes` instead as a general-purpose plotting function, or `plot_numeric` with `xdate = TRUE`.")
+  # This is not supported anymore
+  rlang::abort("`plot_hydrographs` is deprecated and will soon be removed.
+               Please use `plot_outcomes` instead as a general-purpose plotting function,
+               or `plot_numeric` with `xdate = TRUE`.")
   # Bare names get lost as we go down into further functions, so use characters
   # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
   if (is.function(comp_fun) || (is.list(comp_fun) & is.function(comp_fun[[1]]))) {
