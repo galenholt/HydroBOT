@@ -859,3 +859,206 @@ test_that("scenarios aren't special", {
                   position = 'dodge',
                   setLimits = c(0,1))
 })
+
+
+
+test_that("heatmaps", {
+
+  # create a quant description of scenarios
+  # scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+
+  # Mock data to have two dimensions. This is silly, but doesn't matter.
+  ostp05 <- obj_sdl_to_plot |>
+    dplyr::mutate(scenario = stringr::str_c(scenario, 'minus1'),
+                  allArith = allArith - 1,
+                  adelta = -1)
+  ostp2 <- obj_sdl_to_plot |>
+    dplyr::mutate(scenario = stringr::str_c(scenario, 'plus1'),
+                  allArith = allArith + 1,
+                  adelta = 1)
+
+  ostp <- obj_sdl_to_plot |>
+    dplyr::mutate(adelta = 0,
+                  scenario = stringr::str_c(scenario, 'zero')) |>
+    dplyr::bind_rows(ostp05, ostp2)
+
+
+
+
+  # need to facet by space sdl unit and create a group col to take multiple palettes
+  # first, make sure things are unique- later, will need to check they are as in maps. At least for heatmaps. Contours should? be OK?
+  sdl_heat <- ostp |>
+    sf::st_drop_geometry() |>
+    dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'heatmap',
+                  x_col = 'delta',
+                  y_col = 'adelta',
+                  colorset = 'allArith',
+                  pal_list = list('scico::turku'),
+                  facet_row = 'SWSDLName',
+                  facet_col = 'env_group')
+
+  vdiffr::expect_doppelganger("sdl_heat", sdl_heat)
+
+  sdl_heat_tx <- ostp |>
+    sf::st_drop_geometry() |>
+    dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'heatmap',
+                  x_col = 'delta',
+                  y_col = 'adelta',
+                  transx = 'log10',
+                  colorset = 'allArith',
+                  pal_list = list('scico::turku'),
+                  facet_row = 'SWSDLName',
+                  facet_col = 'env_group')
+
+  vdiffr::expect_doppelganger("sdl_heat_tx", sdl_heat_tx)
+
+  # same, contour defaults
+  sdl_contour <- ostp |>
+    sf::st_drop_geometry() |>
+    dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'heatmap',
+                  x_col = 'delta',
+                  y_col = 'adelta',
+                  colorset = 'allArith',
+                  pal_list = list('scico::turku'),
+                  facet_row = 'SWSDLName',
+                  facet_col = 'env_group',
+                  contour_arglist = list())
+
+  vdiffr::expect_doppelganger("sdl_contour", sdl_contour)
+
+  # baseline, specify breaks
+  sdl_contour_base_breaks <- ostp |>
+    sf::st_drop_geometry() |>
+    dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'heatmap',
+                  x_col = 'delta',
+                  y_col = 'adelta',
+                  colorset = 'allArith',
+                  pal_list = list('scico::turku'),
+                  facet_row = 'SWSDLName',
+                  facet_col = 'env_group',
+                  contour_arglist = list(breaks = c(-3000, -2000, -1000, 0, 1000, 2000)),
+                  zero_adjust = 'auto',
+                  base_list = list(base_lev = 'basezero', comp_fun = 'relative',
+                                   group_cols = c('env_group', 'SWSDLName')))
+
+  vdiffr::expect_doppelganger("sdl_contour_base_breaks", sdl_contour_base_breaks)
+
+  # specify bins, use transx, transoutcome. Using a difference from lowest to avoid negative numbers so the trnas works
+  # and check the auto-drop of geometry
+  sdl_contour_base_bin <- ostp |>
+    # sf::st_drop_geometry() |>
+    dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    plot_outcomes(outcome_col = 'allArith',
+                  plot_type = 'heatmap',
+                  x_col = 'delta',
+                  y_col = 'adelta',
+                  colorset = 'allArith',
+                  pal_list = list('scico::turku'),
+                  facet_row = 'SWSDLName',
+                  facet_col = 'env_group',
+                  contour_arglist = list(bins = 5),
+                  zero_adjust = 'auto',
+                  transx = 'log10',
+                  transoutcome = 'sqrt',
+                  base_list = list(base_lev = 'down4minus1', comp_fun = 'difference',
+                                   group_cols = c('env_group', 'SWSDLName')))
+
+    vdiffr::expect_doppelganger("sdl_contour_base_bin", sdl_contour_base_bin)
+
+
+  # catch an overplot by not facetting in one dimension
+    expect_error(sdl_heat_overplot <- ostp |>
+      sf::st_drop_geometry() |>
+      # don't do the grouping correctly
+      dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+      plot_outcomes(outcome_col = 'allArith',
+                    plot_type = 'heatmap',
+                    x_col = 'delta',
+                    y_col = 'adelta',
+                    colorset = 'allArith',
+                    pal_list = list('scico::turku'),
+                    facet_row = 'SWSDLName',
+                    facet_col = '.'))
+
+
+    # check sceneorder is transferring where needed. This is contrived and looks terrible, but that's not the point.
+    sdl_heat_so <- ostp |>
+      sf::st_drop_geometry() |>
+      dplyr::filter(SWSDLName == 'Lachlan') |>
+      dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, delta, adelta)) |>
+      plot_outcomes(outcome_col = 'allArith',
+                    plot_type = 'heatmap',
+                    x_col = 'delta',
+                    y_col = 'adelta',
+                    transx = 'log10',
+                    colorset = 'allArith',
+                    pal_list = list('scico::turku'),
+                    sceneorder = c('down4minus1', 'down4zero', 'down4plus1',
+                                   'baseminus1', 'basezero', 'baseplus1',
+                                   'up4minus1', 'up4zero', 'up4plus1'),
+                    facet_row = 'scenario',
+                    facet_col = 'env_group')
+
+    vdiffr::expect_doppelganger("sdl_heat_so", sdl_heat_so)
+
+    # interpolated raster
+    sdl_heat_interp <- ostp |>
+      sf::st_drop_geometry() |>
+      dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+      plot_outcomes(outcome_col = 'allArith',
+                    plot_type = 'heatmap',
+                    x_col = 'delta',
+                    y_col = 'adelta',
+                    colorset = 'allArith',
+                    pal_list = list('scico::turku'),
+                    transx = 'log10',
+                    facet_row = 'SWSDLName',
+                    facet_col = 'env_group',
+                    contour_arglist = list(interpolate = TRUE))
+
+    vdiffr::expect_doppelganger("sdl_heat_interp", sdl_heat_interp)
+
+    # Qualitative x-y (e.g. named scenario types)
+    sdl_heat_char <- ostp |>
+      sf::st_drop_geometry() |>
+      dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+      dplyr::mutate(delta = as.character(delta),
+                    adelta = as.character(adelta)) |>
+      plot_outcomes(outcome_col = 'allArith',
+                    plot_type = 'heatmap',
+                    x_col = 'delta',
+                    y_col = 'adelta',
+                    colorset = 'allArith',
+                    pal_list = list('scico::turku'),
+                    facet_row = 'SWSDLName',
+                    facet_col = 'env_group')
+
+    vdiffr::expect_doppelganger("sdl_heat_char", sdl_heat_char)
+
+    sdl_heat_fact <- ostp |>
+      sf::st_drop_geometry() |>
+      dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+      dplyr::mutate(delta = as.factor(delta),
+                    adelta = as.factor(adelta)) |>
+      plot_outcomes(outcome_col = 'allArith',
+                    plot_type = 'heatmap',
+                    x_col = 'delta',
+                    y_col = 'adelta',
+                    colorset = 'allArith',
+                    pal_list = list('scico::turku'),
+                    facet_row = 'SWSDLName',
+                    facet_col = 'env_group')
+
+    vdiffr::expect_doppelganger("sdl_heat_fact", sdl_heat_fact)
+  ## Still to test/develop
+  # grouped colors? Unclear how that'd work... Different ramps for the different groups? Needed? Would look cool, but I think like maps, do that later
+
+})

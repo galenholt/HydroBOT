@@ -17,10 +17,12 @@
 #'   shifted up or down randomly. Used for avoiding x/0, NaN, and Inf when
 #'   relativiszing and taking logs, primarily. Auto shifts by
 #'   `0.1*min(abs(data[data != 0]))`.
-#' @param onlyzeros logical, default `FALSE`. Should all values be adjusted away from zero (`TRUE`) or only adjust zero values (`FALSE`)?
+#'   *note* the adjustment happens *before* baselining (so the baselining works), but if the baseline reintroduces zeros, they will not be re-adjusted out. This is done under the expectation that zeros returned by baselining are desired, e.g. difference of a baseline with itself.
+#' @param onlyzeros logical, default `FALSE`. Should all values be adjusted away
+#'   from zero (`TRUE`) or only adjust zero values (`FALSE`)?
 #'
-#' @return a list with prepped versions of `data`, `outcome_col`, `ylab_append` to
-#'   be used in plot calls
+#' @return a list with prepped versions of `data`, `outcome_col`, `ylab_append`
+#'   to be used in plot calls
 #' @export
 #'
 #' @examples
@@ -111,7 +113,7 @@ plot_data_prep <- function(data, outcome_col,
 #' @examples
 plot_style_prep <- function(prepped, colorset, colorgroups, pal_list,
                             transoutcome, transx, point_group) {
-  # Warn about conflicts with y-axis trans
+  # Warn about conflicts with outcome trans
   if (!is.null(prepped$outcome_col)) {
     if (!inherits(transoutcome, 'trans') &&
         transoutcome %in% c('log', 'log10') &

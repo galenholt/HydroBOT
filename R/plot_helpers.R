@@ -50,10 +50,16 @@ find_color_type <- function(pal_list) {
 
 handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
                             transoutcome = 'identity', setLimits = NULL,
-                            base_list = NULL) {
+                            base_list = NULL,
+                            nbins = 10) {
+
+  # If nbins is NULL and this is a contour, we cannot infer (currently), so just return
+  if (is.null(nbins) & aes_type == 'contour') {
+    return(ggobj)
+  }
 
   if (color_type == 'colorobj') {
-    if (aes_type == 'fill') {
+    if (aes_type == 'fill' | aes_type == 'contour') {
       ggobj <- ggobj +
         ggplot2::scale_fill_manual(values = pal_list)
     }
@@ -81,6 +87,12 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
                                                                    lims = setLimits,
                                                                    base_list = base_list))
     }
+    if (aes_type == 'contour') {
+      # contours are actually bins, despite usually being drawn from a continuous palette.
+      binpal <- paletteer::paletteer_c(palette = pal_list[[1]], n = nbins)
+      ggobj <- ggobj +
+        ggplot2::scale_fill_manual(values = binpal)
+    }
 
   }
 
@@ -92,6 +104,12 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
     if (aes_type == 'color') {
       ggobj <- ggobj +
         paletteer::scale_color_paletteer_d(palette = pal_list[[1]])
+    }
+    if (aes_type == 'contour') {
+      # contours are actually bins, despite usually being drawn from palettes.
+      binpal <- paletteer::paletteer_d(palette = pal_list[[1]], n = nbins)
+      ggobj <- ggobj +
+        ggplot2::scale_fill_manual(values = binpal)
     }
 
   }
@@ -136,27 +154,50 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
   return(ggobj)
 }
 
-test_overplotting <- function(data, facet_wrapper, facet_row, facet_col) {
+test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col = NULL, y_col = NULL) {
 
-  # group by geometry if an sf- allows use for heatmaps
-  if (inherits(data, 'sf')) {
-    data <- data |>
-      dplyr::group_by(geometry)
-  }
+  # Get the geometry column if there is one (will be NULL otherwise)
+  geom_col_name <- attr(data, "sf_column")
+
+  # This way is WAY cleaner than below, but there must be a reason I was using
+  # the convoluted .data stuff?
+  groupcols <- c(geom_col_name, facet_wrapper, facet_row, facet_col, x_col, y_col)
+
+  # NULLs above get dropped, but facet_col and facet_row can be '.' to indicate
+  # nothing on that dimension. Drop that.
+  groupcols <- groupcols[groupcols != '.']
+
+  data <- data |>
+    dplyr::group_by(dplyr::across(tidyselect::all_of(groupcols)))
 
 
-  if (!is.null(facet_wrapper)) {
-    data <- data |>
-      dplyr::group_by(.data[[facet_wrapper]], .add = TRUE)
-  }
-  if (!is.null(facet_row) && facet_row != '.') {
-    data <- data |>
-      dplyr::group_by(.data[[facet_row]], .add = TRUE)
-  }
-  if (!is.null(facet_col) && facet_col != '.') {
-    data <- data |>
-      dplyr::group_by(.data[[facet_col]], .add = TRUE)
-  }
+  # This works, but seems unecessary? Keep until tests pass clean.
+  # # group by geometry if an sf- allows use for heatmaps
+  # if (inherits(data, 'sf')) {
+  #   data <- data |>
+  #     dplyr::group_by(geometry)
+  # }
+  #
+  # # heatmaps need to group by the x-y pairs instead of geometry
+  # if (!inherits(data, 'sf')) {
+  #   data <- data |>
+  #     dplyr::group_by(.data[[x_col]]) |>
+  #     dplyr::group_by(.data[[y_col]], .add = TRUE)
+  # }
+  #
+  #
+  # if (!is.null(facet_wrapper)) {
+  #   data <- data |>
+  #     dplyr::group_by(.data[[facet_wrapper]], .add = TRUE)
+  # }
+  # if (!is.null(facet_row) && facet_row != '.') {
+  #   data <- data |>
+  #     dplyr::group_by(.data[[facet_row]], .add = TRUE)
+  # }
+  # if (!is.null(facet_col) && facet_col != '.') {
+  #   data <- data |>
+  #     dplyr::group_by(.data[[facet_col]], .add = TRUE)
+  # }
 
   data <- data |>
     dplyr::summarise(nrows = dplyr::n()) |>

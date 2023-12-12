@@ -88,6 +88,7 @@
 #'   palettes for underlay fill and main data fill, for example, but can if the
 #'   underlay is fill (polygons) and the main data is points.
 #' @param overlay_list as `underlay_list`, but names `"overlay_*"`
+#' @param contour_arglist default `NULL`, else a list of arguments to [ggplot2::geom_contour_filled()] (or `interpolate = TRUE` to use [ggplot2::geom_raster()] with `interpolate = TRUE`. If want to use contours and all defaults, set to `list()`.
 #' @param setLimits sets user-supplied color/fill limits for maps, heatmaps, and networks, or y limits
 #'   for other plots. Also sets `underlay` and `overlay` limits for consistency.
 #'
@@ -114,7 +115,7 @@ plot_outcomes <- function(outdf,
                           sceneorder = NULL,
                           scales = "fixed",
                           transoutcome = "identity",
-                          transy = 'identity',
+                          transy = "identity",
                           transx = "identity",
                           zero_adjust = 0,
                           position = "stack",
@@ -122,6 +123,7 @@ plot_outcomes <- function(outdf,
                           smooth_arglist = NULL,
                           underlay_list = NULL,
                           overlay_list = NULL,
+                          contour_arglist = NULL,
                           setLimits = NULL) {
   ## Cleaning inputs
 
@@ -154,13 +156,13 @@ plot_outcomes <- function(outdf,
     plot_type <- "map"
   }
 
-  if (!(plot_type %in% c("map", "heatmap", "network"))) {
+  if (!(plot_type %in% c("map", "heatmap", "network", "contour"))) {
     if (y_col != outcome_col) {
       rlang::warn("y-axis in a 2-d plot should be the outcome. If you have a case where that isn't true, please raise an issue")
     }
   }
 
-  if ((plot_type %in% c("map", "heatmap", "network"))) {
+  if ((plot_type %in% c("map", "heatmap", "network", "contour"))) {
     if (colorset != outcome_col) {
       rlang::warn("color/fill in a 3-d plot or network should be the outcome. If you have a case where that isn't true, please raise an issue")
     }
@@ -186,29 +188,43 @@ plot_outcomes <- function(outdf,
     transoutcome, transx, point_group
   )
 
+  # We often need to know what x is
+  xc <- dplyr::pull(sf::st_drop_geometry(prepped$data[, x_col]))
+  xtype <- dplyr::case_when(
+    is.numeric(xc) ~ "numeric",
+    inherits(xc, "POSIXt") |
+      inherits(xc, "Date") ~ "date",
+    is.factor(xc) | is.character(xc) ~ "qual"
+  )
+
+  # We need to know what y is for heatmaps
+  yc <- dplyr::pull(sf::st_drop_geometry(prepped$data[, x_col]))
+  ytype <- dplyr::case_when(
+    is.numeric(yc) ~ "numeric",
+    inherits(yc, "POSIXt") |
+      inherits(yc, "Date") ~ "date",
+    is.factor(yc) | is.character(xc) ~ "qual"
+  )
+
   ## different plot types
 
   # Easier to define the 2d (standard) plots as NOT the other sorts
-  if (!(plot_type %in% c("map", "heatmap", "network"))) {
+  if (!(plot_type %in% c("map", "heatmap", "network", "contour"))) {
     # we want to use numeric x for numeric x or dates
-    xc <- dplyr::pull(sf::st_drop_geometry(prepped$data[, x_col]))
-    xnumeric <- is.numeric(xc)
-    xdate <- inherits(xc, "POSIXt") |
-      inherits(xc, "Date")
 
     # Numeric x
-    if (xnumeric | xdate) {
+    if (xtype %in% c("numeric", "date")) {
       outcome_plot <- plot_numeric(
         prepped = prepped, x_col = x_col,
         x_lab = x_lab, outcome_lab = outcome_lab,
         position = position,
         transoutcome = transoutcome, transx = transx,
         smooth_arglist = smooth_arglist,
-        xdate = xdate
+        xtype = xtype
       )
     }
     # Qualitative x
-    if (!xnumeric & !xdate) {
+    if (xtype == "qual") {
       outcome_plot <- plot_bar(
         prepped = prepped, x_col = x_col,
         x_lab = x_lab, outcome_lab = outcome_lab,
@@ -257,7 +273,7 @@ plot_outcomes <- function(outdf,
   if (plot_type == "map") {
     if (length(pal_list) > 1) {
       rlang::warn(glue::glue("using first palette for {outcome_col}.
-                                                      Splitting up palettes in maps needs more thought"))
+                             Splitting up palettes in maps needs more thought"))
     }
 
     # need a lot of arguments here because we might need to fully build several
@@ -279,6 +295,70 @@ plot_outcomes <- function(outdf,
         x = NULL
       ) +
       theme_werp_toolkit()
+  }
+
+  if (plot_type %in% c("heatmap", "contour")) {
+    if (length(pal_list) > 1) {
+      rlang::warn(glue::glue("using first palette for {outcome_col}.
+                             Splitting up palettes in heatmaps needs more thought"))
+    }
+
+    # # unlike maps, these plots do not automatically break things up by
+    # geometry, and so to avoid accidentally depending on that
+    prepped$data <- sf::st_drop_geometry(prepped$data)
+
+    # Check whether we're accidentally overplotting. This either completes
+    # silently or aborts with a message
+    # Q: are matchign x-y with different z OK if contouring?
+    test_overplotting(
+      data = prepped$data,
+      facet_wrapper = facet_wrapper,
+      facet_row = facet_row,
+      facet_col = facet_col,
+      x_col = x_col,
+      y_col = y_col
+    )
+
+    outcome_plot <- plot_heatmap(
+      prepped = prepped,
+      x_col = x_col, x_lab = x_lab,
+      y_col = y_col, y_lab = y_lab,
+      outcome_lab = outcome_lab,
+      transoutcome = transoutcome, transx = transx, transy = transy,
+      contour_arglist = contour_arglist,
+      xtype = xtype, ytype = ytype,
+      setLimits = setLimits, base_list = base_list
+    )
+
+    # labels
+    outcome_plot <- outcome_plot +
+      ggplot2::labs(
+        y = y_lab,
+        x = x_lab,
+        fill = paste0(outcome_lab, prepped$ylab_append)
+      ) +
+      theme_werp_toolkit()
+
+    # Facetting would sure be better all at once if it worked for maps.
+    if (!is.null(facet_row) & !is.null(facet_col)) {
+      outcome_plot <- outcome_plot +
+        # reformulate is (RHS, LHS) - so, backwards to how we think about
+        # row-column indexing.
+        ggplot2::facet_grid(stats::reformulate(facet_col, facet_row),
+          # Good in theory, but often too long and blocks the plot, so not using
+          # labeller = ggplot2::label_wrap_gen(),
+          scales = scales
+        )
+    }
+
+    if (!is.null(facet_wrapper)) {
+      outcome_plot <- outcome_plot +
+        ggplot2::facet_wrap(facet_wrapper,
+          # Good in theory, but often too long and blocks the plot, so not using
+          # labeller = ggplot2::label_wrap_gen(),
+          scales = scales
+        )
+    }
   }
 
   return(outcome_plot)
