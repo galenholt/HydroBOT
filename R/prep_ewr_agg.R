@@ -27,13 +27,7 @@
 #' @examples
 prep_ewr_agg <- function(ewrpath, type = 'achievement', geopath, whichcrs = 4283, ...) {
   # Dots pass gaugefilter and scenariofilter
-
-  # If there's a path to the data instead of a dataframe, go get the ewrs
-  if (is.character(ewrpath)) {
     dat <- get_ewr_output(ewrpath, type, ...)
-  } else {
-    dat <- ewrpath
-  }
 
   # deal with a single dataframe vs list of dfs
   if (is.data.frame(dat)) {

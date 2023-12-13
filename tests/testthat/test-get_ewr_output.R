@@ -114,3 +114,9 @@ test_that("making assessment tibble works", {
   expect_equal(names(assessed), c('ewr_code', 'ewr_code_timing', 'gauge',
                                   'scenario', 'planning_unit', 'ewr_achieved', 'ewr_achieved_timeframe'))
 })
+
+test_that("passing in a list from memory works", {
+  ewr_out <- make_test_ewr_output()
+
+  ewrprepped <- get_ewr_output(ewr_out, type = 'achievement')
+})

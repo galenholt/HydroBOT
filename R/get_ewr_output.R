@@ -71,36 +71,49 @@ get_ewr_output <- function(dir, type = 'achievement', year_roll = 'best',
 get_any_ewr_output <- function(dir, type,
                            gaugefilter = NULL, scenariofilter = NULL) {
 
-  # assumes files are csvs.
-  gaugefiles <- list.files(dir, pattern = '.csv',
-                           full.names = TRUE, recursive = TRUE)
+  if (is.character(dir)) {
+    # assumes files are csvs.
+    gaugefiles <- list.files(dir, pattern = '.csv',
+                             full.names = TRUE, recursive = TRUE)
 
-  # only get the relevant type of ewr output
-  if (type != 'everything') {
-    relevantfiles <- gaugefiles[stringr::str_which(gaugefiles, pattern = type)]
+    # only get the relevant type of ewr output
+    if (type != 'everything') {
+      relevantfiles <- gaugefiles[stringr::str_which(gaugefiles, pattern = type)]
+    }
+    if (type == 'everything') {
+      relevantfiles <- gaugefiles
+    }
+
+
+    # cut to requested gauges or scenarios
+    if (!is.null(gaugefilter)) {
+      relevantfiles <- relevantfiles[stringr::str_which(relevantfiles,
+                                                        pattern = stringr::str_flatten(gaugefilter, collapse = '|'))]
+    }
+
+    if (!is.null(scenariofilter)) {
+      relevantfiles <- relevantfiles[stringr::str_which(relevantfiles,
+                                                        pattern = stringr::str_flatten(scenariofilter, collapse = '|'))]
+    }
+
+    # read into one df
+    ewrdata <- foreach::foreach(i = relevantfiles,
+                                .combine = dplyr::bind_rows) %do% {
+
+                                  temp <- readr::read_csv(i, col_types = readr::cols())
+                                }
+
+  } else if (is.list(dir)) {
+      ewrdata <- dir[[type]]
+
+      if (!is.null(gaugefilter)) {
+        ewrdata <- ewrdata |> dplyr::filter(gauge %in% gaugefilter)
+      }
+
+      if (!is.null(scenariofilter)) {
+        ewrdata <- ewrdata |> dplyr::filter(scenario %in% scenariofilter)
+      }
   }
-  if (type == 'everything') {
-    relevantfiles <- gaugefiles
-  }
-
-
-  # cut to requested gauges or scenarios
-  if (!is.null(gaugefilter)) {
-    relevantfiles <- relevantfiles[stringr::str_which(relevantfiles,
-                                                      pattern = stringr::str_flatten(gaugefilter, collapse = '|'))]
-  }
-
-  if (!is.null(scenariofilter)) {
-    relevantfiles <- relevantfiles[stringr::str_which(relevantfiles,
-                                                      pattern = stringr::str_flatten(scenariofilter, collapse = '|'))]
-  }
-
-  # read into one df
-  ewrdata <- foreach::foreach(i = relevantfiles,
-                              .combine = dplyr::bind_rows) %do% {
-
-                                temp <- readr::read_csv(i, col_types = readr::cols())
-                              }
 
   # There are sometimes wholly-blank columns that are read as NA, but should be
   # numeric. We can't pre-set them with readr because they may be in different

@@ -1,8 +1,7 @@
 # build the aggregated data so we don't have to include it in the package
 
 make_test_agg <- function() {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+  sumspat <- make_test_ewr_prepped()
 
   aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                  env_obj =  c('ewr_code', "env_obj"),
@@ -33,6 +32,7 @@ make_test_agg <- function() {
                                      causal_edges = causal_ewr,
                                      saveintermediate = TRUE)
 
+  return(agg_theme_space)
 }
 
 
