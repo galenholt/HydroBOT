@@ -222,7 +222,8 @@ assess_ewr_achievement <- function(annualdf, summarydf,  year_roll = ifelse(nrow
   Target_frequencies <- summarydf |>
     dplyr::select(planning_unit, gauge, ewr_code, ewr_code_timing, target_frequency) |>
     dplyr::group_by(planning_unit, gauge, ewr_code, ewr_code_timing, target_frequency) |>
-    dplyr::distinct()
+    dplyr::distinct() |>
+    dplyr::ungroup()
 
   #Join target frequencies to annualdf
   annualdf <- dplyr::left_join(annualdf, Target_frequencies,
@@ -241,14 +242,16 @@ assess_ewr_achievement <- function(annualdf, summarydf,  year_roll = ifelse(nrow
       dplyr::mutate(eventyears_per_n_years = purrr::reduce(purrr::map(1:(year_roll-1), ~ lag(event_years, ., order_by = year)), `+`) + event_years) |>
       dplyr::mutate(frequency_per_n_years = (eventyears_per_n_years/year_roll)*100) |>
       dplyr::mutate(frequency_check_n_years = ifelse(grepl("CF",ewr_code), frequency_per_n_years <= target_frequency,
-                                                     frequency_per_n_years >= target_frequency))
+                                                     frequency_per_n_years >= target_frequency)) |>
+      dplyr::ungroup()
 
     # ACHIEVEMENT test
     EWR_results <- annualdf |>
       dplyr::group_by(ewr_code, ewr_code_timing, gauge, scenario, planning_unit) |>
       dplyr::filter(!is.na(frequency_check_n_years))|>
       dplyr::summarise(ewr_achieved = sum(frequency_check_n_years) == dplyr::n())|> #do all pass?
-      dplyr::mutate(ewr_achieved_timeframe = year_roll)
+      dplyr::mutate(ewr_achieved_timeframe = year_roll) |>
+      dplyr::ungroup()
 
   } else if (year_roll <= 1) {
     #Pre-defined time frames
@@ -271,7 +274,8 @@ assess_ewr_achievement <- function(annualdf, summarydf,  year_roll = ifelse(nrow
       dplyr::mutate(eventyears_per_all_years = sum(event_years)) |>
       dplyr::mutate(frequency_per_all_years = (sum(event_years)/dplyr::n())*100) |>
       dplyr::mutate(frequency_check_all_years = ifelse(grepl("CF",ewr_code), frequency_per_all_years <= target_frequency,
-                                                       frequency_per_all_years >= target_frequency))
+                                                       frequency_per_all_years >= target_frequency)) |>
+      dplyr::ungroup()
 
     nYdata <- length(unique(annualdf$year))
 
@@ -281,7 +285,8 @@ assess_ewr_achievement <- function(annualdf, summarydf,  year_roll = ifelse(nrow
     EWR_results <- annualdf |>
       dplyr::group_by(ewr_code, ewr_code_timing, gauge, scenario, planning_unit) |>
       dplyr::summarise(ewr_achieved = sum(frequency_check_all_years) == dplyr::n())|> #do all pass?
-      dplyr::mutate(ewr_achieved_timeframe = nYdata)
+      dplyr::mutate(ewr_achieved_timeframe = nYdata) |>
+      dplyr::ungroup()
 
   } else if (nYdata >= 10 & nYdata < 20) {
     #less than 20 years data (uses 10 year rolling time frame window)
@@ -289,7 +294,8 @@ assess_ewr_achievement <- function(annualdf, summarydf,  year_roll = ifelse(nrow
       dplyr::group_by(ewr_code, ewr_code_timing, gauge, scenario, planning_unit) |>
       dplyr::filter(!is.na(frequency_check_10_years))|>
       dplyr::summarise(ewr_achieved = sum(frequency_check_10_years) == dplyr::n())|> #do all pass?
-      dplyr::mutate(ewr_achieved_timeframe = 10)
+      dplyr::mutate(ewr_achieved_timeframe = 10) |>
+      dplyr::ungroup()
 
   } else if (nYdata >= 20) {
     #20 or more years data (uses 10 and 20 year rolling time frame windows depending on EWR)
@@ -299,7 +305,8 @@ assess_ewr_achievement <- function(annualdf, summarydf,  year_roll = ifelse(nrow
                     ewr_achieved_timeframe = ifelse(target_frequency < 10 | target_frequency > 90 , 20, 10)) |>
       dplyr::filter(!is.na(frequency_check_10and20_years))|>
       dplyr::summarise(ewr_achieved = sum(frequency_check_10and20_years) == dplyr::n(), #do all pass?
-                       ewr_achieved_timeframe = unique(ewr_achieved_timeframe))
+                       ewr_achieved_timeframe = unique(ewr_achieved_timeframe)) |>
+      dplyr::ungroup()
 
   }
 
