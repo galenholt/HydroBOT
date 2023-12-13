@@ -77,8 +77,12 @@ theme_aggregate <- function(dat,
     groupers <- c(groupers, 'polyID')
   }
 
-  # may not need this, but too many conditionals
-  g2p <- extract_gauge_pu(causal_edges)
+  # Need to get the gauge x planning unit mappngs. EWR tool returns the names, not the IDs
+  g2p <- get_ewr_table()|>
+    dplyr::select(Gauge, PlanningUnitName) |>
+    dplyr::distinct() |>
+    tibble::tibble() |>
+    dplyr::rename_with(tolower)
 
   # clean up the edges to only relevant
   # auto-generate the edges if a full list has been passed in
@@ -98,9 +102,11 @@ theme_aggregate <- function(dat,
   }
 
 
-  # the theme-level outcomes are defined at gauges. we want to map back to that
-  # until we've done spatial aggregation into something larger. this conditional
-  # is really ugly though
+  # the theme-level outcomes are defined at gauges and planning units (often
+  # many-to-many, e.g. gauges might contribute to EWRs in multiple PUs, and PUs
+  # might include several gauges). we want to map back to that until we've done
+  # spatial aggregation into something larger. this conditional is really ugly
+  # though
 
   if (spatialflag && polyflag) {
     pairdat <- dat |>

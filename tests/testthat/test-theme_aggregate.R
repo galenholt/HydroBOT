@@ -1,6 +1,8 @@
+ewr_to_agg <- make_test_ewr_prepped()
+
 test_that("ewr-obj works, nongeom", {
   # no need to load the demo/test data since it's in /data
-  agged <- theme_aggregate(summary_ewr_output,
+  agged <- theme_aggregate(ewr_to_agg |> sf::st_drop_geometry(),
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
@@ -12,7 +14,7 @@ test_that("ewr-obj works, nongeom", {
 })
 
 test_that("auto-generating causal_edges works", {
-  agged <- theme_aggregate(summary_ewr_output,
+  agged <- theme_aggregate(ewr_to_agg |> sf::st_drop_geometry(),
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
@@ -24,9 +26,7 @@ test_that("auto-generating causal_edges works", {
 })
 
 test_that("spatial input data works", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
-  agged <- theme_aggregate(sumspat,
+  agged <- theme_aggregate(ewr_to_agg,
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
@@ -40,7 +40,7 @@ test_that("spatial input data works", {
   expect_s3_class(agged, 'sf')
 
   # Not usually how geonames will be used, but it does work as a test
-  agged <- theme_aggregate(sumspat,
+  agged <- theme_aggregate(ewr_to_agg,
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
@@ -57,56 +57,66 @@ test_that("spatial input data works", {
 })
 
 test_that("bare functions", {
-  agged <- theme_aggregate(summary_ewr_output,
+  agged <- theme_aggregate(ewr_to_agg,
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
                            funlist = mean,
                            causal_edges = causal_ewr)
-  expect_equal(names(agged), c('scenario', 'gauge', 'ewr_code', 'ewr_code_mean_ewr_achieved'))
+  expect_equal(names(agged), c('scenario', 'gauge', 'polyID',
+                               'ewr_code', 'ewr_code_mean_ewr_achieved',
+                               'geometry'))
   expect_s3_class(agged, 'data.frame')
 })
 
 test_that("list functions", {
-  agged <- theme_aggregate(summary_ewr_output,
+  agged <- theme_aggregate(ewr_to_agg,
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
                            funlist = list(mean = ~mean(., na.rm = TRUE)),
                            causal_edges = causal_ewr)
-  expect_equal(names(agged), c('scenario', 'gauge', 'ewr_code', 'ewr_code_mean_ewr_achieved'))
+  expect_equal(names(agged), c('scenario', 'gauge', 'polyID',
+                               'ewr_code', 'ewr_code_mean_ewr_achieved',
+                               'geometry'))
   expect_s3_class(agged, 'data.frame')
 })
 
 test_that("multiple functions", {
   # Character
-  agged_c <- theme_aggregate(summary_ewr_output,
+  agged_c <- theme_aggregate(ewr_to_agg,
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
                            funlist = c('mean', 'sd'),
                            causal_edges = causal_ewr)
-  expect_equal(names(agged_c), c('scenario', 'gauge', 'ewr_code',
-                                 'ewr_code_mean_ewr_achieved', 'ewr_code_sd_ewr_achieved'))
+  expect_equal(names(agged_c), c('scenario', 'gauge', 'polyID',
+                               'ewr_code',
+                               'ewr_code_mean_ewr_achieved',
+                               'ewr_code_sd_ewr_achieved',
+                               'geometry'))
   expect_s3_class(agged_c, 'data.frame')
 
   # bare
-  agged_b <- theme_aggregate(summary_ewr_output,
+  agged_b <- theme_aggregate(ewr_to_agg,
                              from_theme = 'ewr_code_timing',
                              to_theme = 'ewr_code',
                              groupers = c('scenario', 'gauge'),
                              aggCols = 'ewr_achieved',
                              funlist = c(mean, sd),
                              causal_edges = causal_ewr)
-  expect_equal(names(agged_b), c('scenario', 'gauge', 'ewr_code',
-                                 'ewr_code_mean_ewr_achieved', 'ewr_code_sd_ewr_achieved'))
+  expect_equal(names(agged_b), c('scenario', 'gauge', 'polyID',
+                                 'ewr_code',
+                                 'ewr_code_mean_ewr_achieved',
+                                 'ewr_code_sd_ewr_achieved',
+                                 'geometry'))
   expect_s3_class(agged_b, 'data.frame')
 
   # List
-  agged_l <- theme_aggregate(summary_ewr_output,
+  agged_l <- theme_aggregate(ewr_to_agg,
                              from_theme = 'ewr_code_timing',
                              to_theme = 'ewr_code',
                              groupers = c('scenario', 'gauge'),
@@ -114,9 +124,28 @@ test_that("multiple functions", {
                              funlist = list(mean = ~mean(., na.rm = TRUE),
                                             sd = ~sd(., na.rm = TRUE)),
                              causal_edges = causal_ewr)
-  expect_equal(names(agged_l), c('scenario', 'gauge', 'ewr_code',
-                                 'ewr_code_mean_ewr_achieved', 'ewr_code_sd_ewr_achieved'))
+  expect_equal(names(agged_l), c('scenario', 'gauge', 'polyID',
+                                 'ewr_code',
+                                 'ewr_code_mean_ewr_achieved',
+                                 'ewr_code_sd_ewr_achieved',
+                                 'geometry'))
   expect_s3_class(agged_l, 'data.frame')
+})
+
+test_that("ewr-obj works with PU and sf", {
+
+  agged <- theme_aggregate(ewr_to_agg,
+                           from_theme = 'ewr_code_timing',
+                           to_theme = 'ewr_code',
+                           groupers = c('PlanningUnitID', 'scenario', 'gauge'),
+                           aggCols = 'ewr_achieved',
+                           funlist = 'mean',
+                           causal_edges = causal_ewr)
+  expect_equal(names(agged), c('PlanningUnitID', 'scenario', 'gauge', 'polyID',
+                               'ewr_code', 'ewr_code_mean_ewr_achieved',
+                               'geometry'))
+  expect_s3_class(agged, 'data.frame')
+  expect_s3_class(agged, 'sf')
 })
 
 # different arguments (bar, char, tidyselect) ----------------------------- I
@@ -124,7 +153,7 @@ test_that("multiple functions", {
 # actually test across everything
 
 # test_that("tidyselect groupers and aggcols works", {
-#   agged <- theme_aggregate(summary_ewr_output,
+#   agged <- theme_aggregate(ewr_to_agg,
 #                            from_theme = 'ewr_code_timing',
 #                            to_theme = 'ewr_code',
 #                            groupers = tidyselect::any_of(c('scenario', 'gauge')),
