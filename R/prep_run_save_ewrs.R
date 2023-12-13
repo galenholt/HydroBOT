@@ -4,9 +4,11 @@
 ## new versions without `install`ing the package. The `future` uses seem most
 ## sensitive to this- I think maybe test shims don't work right?
 controller_functions <- reticulate::import_from_path("controller_functions",
-                                                     path = system.file("python",
-                                                                        package = 'werptoolkitr'),
-                                                     delay_load = TRUE)
+  path = system.file("python",
+    package = "werptoolkitr"
+  ),
+  delay_load = TRUE
+)
 
 #' Set up, run, and (possibly) save EWR outputs
 #'
@@ -58,8 +60,8 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'
 #' @examples
 prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
-                               model_format = 'IQQM - NSW 10,000 years',
-                               outputType = 'none', returnType = 'none',
+                               model_format = "IQQM - NSW 10,000 years",
+                               outputType = "none", returnType = "none",
                                extrameta = NULL,
                                rparallel = FALSE,
                                retries = 2,
@@ -67,7 +69,6 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                                climate = NULL,
                                MINT = NULL, MAXT = NULL,
                                DUR = NULL, DRAW = NULL) {
-
   # Version checking is slow. Should we just immediately drop support?
   # users won't actually get here anyway since the arguments are changing
   # pypkgs <- reticulate::py_list_packages()
@@ -83,8 +84,8 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   # THEN check the version. It won't catch where they were set as defaults, and
   # the user expects the old version to work, but it's something.
   if (any(!purrr::map_lgl(list(climate, MINT, MAXT, DUR, DRAW), is.null))) {
-    if ('py-ewr' %in% pypkgs$package) {
-      ewrversion <- pypkgs$version[which(pypkgs$package == 'py-ewr')] |>
+    if ("py-ewr" %in% pypkgs$package) {
+      ewrversion <- pypkgs$version[which(pypkgs$package == "py-ewr")] |>
         stringr::str_extract("[0-9]*\\.[0-9]*") |>
         as.numeric()
 
@@ -92,15 +93,18 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
         rlang::inform("New py-ewr (>= 2.1) does not use `climate` or the allowance params (MINT, MAXT, DUR, DRAW). They will be ignored for now and support dropped in the future.")
       } else {
         rlang::abort("py-ewr updates have caused breaking changes that are no longer supported in this function. Please update py-ewr to > 2.1. If you need to use the old version, call `prep_run_save_ewrs_old`, but this will not be maintained.")
-
       }
     }
   }
 
 
   # allow sloppy outputTypes and returnTypes
-  if (!is.list(outputType)) {outputType <- as.list(outputType)}
-  if (!is.list(returnType)) {returnType <- as.list(returnType)}
+  if (!is.list(outputType)) {
+    outputType <- as.list(outputType)
+  }
+  if (!is.list(returnType)) {
+    returnType <- as.list(returnType)
+  }
 
   # ensure the spellings and calls are consistent
   outputType <- make_ewr_consistent(outputType)
@@ -110,8 +114,12 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   # that's no longer true, it makes the now-required loops easier to use one in
   # R
   if (is.null(scenarios)) {
-    if (model_format == 'IQQM - NSW 10,000 years') {filetype <- 'csv'}
-    if (grepl('netcdf', model_format)) {filetype <- 'nc'}
+    if (model_format == "IQQM - NSW 10,000 years") {
+      filetype <- "csv"
+    }
+    if (grepl("netcdf", model_format)) {
+      filetype <- "nc"
+    }
     hydro_paths <- find_scenario_paths(hydro_dir, type = filetype)
   } else {
     hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
@@ -126,28 +134,34 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
 
   # output_path doesn't get used for outputType == 'none', but we don't really
   # want to build directories in that case, so skip it.
-  if (length(outputType) == 1 && outputType == 'none') {
-    output_path <- '' # This shouldn't do anything
+  if (length(outputType) == 1 && outputType == "none") {
+    output_path <- "" # This shouldn't do anything
   } else {
-    output_path <- make_output_dir(output_parent_dir, scenarios = names(hydro_paths),
-                                   module_name = 'EWR', ewr_outtypes = unlist(outputType))
+    output_path <- make_output_dir(output_parent_dir,
+      scenarios = names(hydro_paths),
+      module_name = "EWR", ewr_outtypes = unlist(outputType)
+    )
     # set up flags for the metadata in case the ewr fails partway
-    init_params <- list(meta_message = "Started run, has not finished. New metadata file will write when it does. If this metadata entry persists, the run failed.",
-                        ewr_status = FALSE,
-                        time = format(Sys.time(), digits = 0, usetz = TRUE))
+    init_params <- list(
+      meta_message = "Started run, has not finished. New metadata file will write when it does. If this metadata entry persists, the run failed.",
+      ewr_status = FALSE,
+      time = format(Sys.time(), digits = 0, usetz = TRUE)
+    )
     yaml::write_yaml(init_params,
-                     file = file.path(output_path, 'ewr_metadata.yml'))
-    if (rlang::is_installed('jsonlite')) {
+      file = file.path(output_path, "ewr_metadata.yml")
+    )
+    if (rlang::is_installed("jsonlite")) {
       jsonlite::write_json(init_params,
-                           path = file.path(output_path, 'ewr_metadata.json'))
+        path = file.path(output_path, "ewr_metadata.json")
+      )
     } else {
-      rlang::inform('json metadata not saved. If desired, install `jsonlite`',
-                    .frequency = 'regularly', .frequency_id = 'jsoncheck')
+      rlang::inform("json metadata not saved. If desired, install `jsonlite`",
+        .frequency = "regularly", .frequency_id = "jsoncheck"
+      )
     }
-
   }
 
-  if (rparallel && !rlang::is_installed('furrr')) {
+  if (rparallel && !rlang::is_installed("furrr")) {
     rlang::warn("parallel processing over hydro_paths requires furrr. Please install it. Setting `parallel = FALSE` and proceeding")
     rparallel <- FALSE
   }
@@ -157,51 +171,111 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   ewrfun <- function(x, y) {
     # x <- file.path(hydro_dir, x)
     controller_functions$run_save_ewrs(x,
-                                       output_path,
-                                       model_format,
-                                       outputType = outputType,
-                                       returnType = returnType,
-                                       scenario_name = y,
-                                       datesuffix = datesuffix)
+      output_path,
+      model_format,
+      outputType = outputType,
+      returnType = returnType,
+      scenario_name = y,
+      datesuffix = datesuffix
+    )
   }
 
 
   # Run the EWR tool over all hydro_paths
-    ewr_out <- safe_imap(hydro_paths, ewrfun, retries = retries, parallel = rparallel)
+  ewr_out <- safe_imap(hydro_paths, ewrfun, retries = retries, parallel = rparallel)
 
-  # Clean up the list structure
+  # rearrange to be a list of the different types of output, instead of the different scenarios
   ewr_out <- purrr::list_transpose(ewr_out) |>
     purrr::map(dplyr::bind_rows)
 
+  # list cleanup in R is needed to get it to look like it does when read in from
+  # csv. Some of these steps can take a while, so don't do them if not
+  # returning.
+  if (returnType[[1]] != "none") {
 
+    # some ewr outputs have list-columns, and sometimes within those columns are
+    # python datetime objects. Why isn't reticulate translating them? One option
+    # is to turn them into characters in python. The other is to do it with
+    # `reticulate::py_to_r()`. I like the idea of keeping dates dates, but if
+    # the translation is slow (it may well be), we can move to the python
+    # translation (and anything read from csv will be like that anyway). The
+    # annoying thing is they're py objects inside an R list-column, and so we
+    # need to drill in a ways. The plan here is to purrr over ewr_out, and
+    # tidyr::unnest list-columns. But first we need to make those lists
+    # R-objects if they're py
 
+    # To do that, we need to find those list-cols, and then purrr down them.
+    ispydatelist <- function(x) {
+      is.list(x) & is.environment(x[[1]])
+    }
+
+    # do this to the lists (which are embeddedin dataframes)
+    fixpydatelist <- function(pl) {
+      pl |>
+        purrr::map(reticulate::py_to_r) |>
+        purrr::list_simplify()
+    }
+
+    # do this to the dataframes (which are embedded in the list of ewr outputs)
+    fixpydate <- function(df, dfn) {
+      listrows <- nrow(df)
+      # catch a 0-row edge case
+      if (listrows == 0) {
+        return(df |> tibble::tibble())
+      }
+      df <- df |>
+        dplyr::mutate(across(where(ispydatelist), fixpydatelist)) |> # The python dates
+        tidyr::unnest(cols = where(is.list)) |> # other list-cols
+        tibble::tibble() # for consistency
+
+      # check that the unlisting hasn't changed the data- could happen if the list-cols have multiple numbers per cell
+      unlistrows <- nrow(df)
+      if (unlistrows != listrows) {
+        rlang::inform(glue::glue("Unlisting list-columns in EWR output {dfn} has caused rows to change from {listrows} to {unlistrows}. Check that this is expected behaviour."))
+      }
+
+      return(df)
+    }
+
+    # do this over the list of ewr outputs
+    # use imap so the `inform` can have the name of the sheet.
+    ewr_out <- ewr_out |>
+      purrr::imap(fixpydate)
+  }
 
   # auto-build metadata- this builds the data needed to run from params
   # And do it *after* the ewrs get processed so it only happens if the run works
-  if (output_path != '') {
-    if (!rlang::is_installed('git2r')) {
-      rlang::inform('git sha not available. Install `git2r`',
-                    .frequency = 'regularly', .frequency_id = 'git2rcheck')
+  if (output_path != "") {
+    if (!rlang::is_installed("git2r")) {
+      rlang::inform("git sha not available. Install `git2r`",
+        .frequency = "regularly", .frequency_id = "git2rcheck"
+      )
       gitcom <- NULL
     }
-    if (rlang::is_installed('git2r')) {
+    if (rlang::is_installed("git2r")) {
       gitcom <- try(git2r::sha(git2r::commits()[[1]]), silent = TRUE)
-      if (inherits(gitcom, 'try-error')) {gitcom <- NULL}
+      if (inherits(gitcom, "try-error")) {
+        gitcom <- NULL
+      }
     }
 
 
-    ewr_params <- list(output_parent_dir = output_parent_dir,
-                       hydro_dir = hydro_dir,
-                       ewr_results = output_path,
-                       model_format = model_format,
-                       outputType = outputType,
-                       returnType = returnType,
-                       ewr_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
-                       ewr_status = TRUE,
-                       ewr_git_commit = gitcom)
+    ewr_params <- list(
+      output_parent_dir = output_parent_dir,
+      hydro_dir = hydro_dir,
+      ewr_results = output_path,
+      model_format = model_format,
+      outputType = outputType,
+      returnType = returnType,
+      ewr_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
+      ewr_status = TRUE,
+      ewr_git_commit = gitcom
+    )
 
     # add any passed metadata info
-    if (is.list(extrameta)) {ewr_params <- utils::modifyList(ewr_params, extrameta)}
+    if (is.list(extrameta)) {
+      ewr_params <- utils::modifyList(ewr_params, extrameta)
+    }
 
     # append any scenario metadata, so it all stays together
     ymlscenepath <- list.files(hydro_dir, pattern = "*.yml")
@@ -213,9 +287,10 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
     }
 
     yaml::write_yaml(c(ymlscenes, ewr_params),
-                     file = file.path(output_path, 'ewr_metadata.yml'))
+      file = file.path(output_path, "ewr_metadata.yml")
+    )
 
-    if (rlang::is_installed('jsonlite')) {
+    if (rlang::is_installed("jsonlite")) {
       jsonscenepath <- list.files(hydro_dir, pattern = "*.json")
       if (length(jsonscenepath) != 0) {
         jsonscenes <- file.path(hydro_dir, jsonscenepath) |>
@@ -224,12 +299,13 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
         jsonscenes <- NULL
       }
       jsonlite::write_json(c(jsonscenes, ewr_params),
-                           path = file.path(output_path, 'ewr_metadata.json'))
+        path = file.path(output_path, "ewr_metadata.json")
+      )
     } else {
-      rlang::inform('json metadata not saved. If desired, install `jsonlite`',
-                    .frequency = 'regularly', .frequency_id = 'jsoncheck')
+      rlang::inform("json metadata not saved. If desired, install `jsonlite`",
+        .frequency = "regularly", .frequency_id = "jsoncheck"
+      )
     }
-
   }
 
 
@@ -238,14 +314,14 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
 
 make_ewr_consistent <- function(typearg) {
   typearg <- unlist(typearg)
-  typearg <- dplyr::case_when(typearg == 'all' ~ 'all_events',
-                              typearg == 'annual' ~ 'yearly',
-                              typearg == 'successful' ~ 'all_successful_events',
-                              typearg == 'all_interevents' ~ 'all_interEvents',
-                              typearg == 'all_successful_interevents' ~ 'all_successful_interEvents',
-                              .default = typearg)
+  typearg <- dplyr::case_when(typearg == "all" ~ "all_events",
+    typearg == "annual" ~ "yearly",
+    typearg == "successful" ~ "all_successful_events",
+    typearg == "all_interevents" ~ "all_interEvents",
+    typearg == "all_successful_interevents" ~ "all_successful_interEvents",
+    .default = typearg
+  )
   typearg <- as.list(typearg)
-
 }
 
 
@@ -299,27 +375,32 @@ make_ewr_consistent <- function(typearg) {
 #'
 #' @examples
 prep_run_save_ewrs_old <- function(hydro_dir, output_parent_dir, scenarios = NULL,
-                               model_format = 'IQQM - NSW 10,000 years',
-                               climate = 'Standard - 1911 to 2018 climate categorisation',
-                               outputType = 'none', returnType = 'none',
-                               MINT = (100 - 0)/100, MAXT = (100 + 0 )/100,
-                               DUR = (100 - 0 )/100, DRAW = (100 -0 )/100,
-                               scenario_filename_split = '_DIRECTORYAPPEND_',
-                               extrameta = NULL,
-                               datesuffix = FALSE,
-                               rparallel = FALSE) {
-
+                                   model_format = "IQQM - NSW 10,000 years",
+                                   climate = "Standard - 1911 to 2018 climate categorisation",
+                                   outputType = "none", returnType = "none",
+                                   MINT = (100 - 0) / 100, MAXT = (100 + 0) / 100,
+                                   DUR = (100 - 0) / 100, DRAW = (100 - 0) / 100,
+                                   scenario_filename_split = "_DIRECTORYAPPEND_",
+                                   extrameta = NULL,
+                                   datesuffix = FALSE,
+                                   rparallel = FALSE) {
   # allow sloppy outputTypes and returnTypes
-  if (!is.list(outputType)) {outputType <- as.list(outputType)}
-  if (!is.list(returnType)) {returnType <- as.list(returnType)}
+  if (!is.list(outputType)) {
+    outputType <- as.list(outputType)
+  }
+  if (!is.list(returnType)) {
+    returnType <- as.list(returnType)
+  }
 
   # ensure the spellings and calls are consistent
   outputType <- make_ewr_consistent(outputType)
   returnType <- make_ewr_consistent(returnType)
 
   # dicts in py come from named lists in R
-  allowance <- list(minThreshold = MINT, maxThreshold = MAXT,
-                    duration = DUR, drawdown = DRAW)
+  allowance <- list(
+    minThreshold = MINT, maxThreshold = MAXT,
+    duration = DUR, drawdown = DRAW
+  )
 
   # get the paths to all the hydrographs. python needs a list, not a vector
   hydro_paths <- as.list(find_scenario_paths(hydro_dir))
@@ -336,51 +417,59 @@ prep_run_save_ewrs_old <- function(hydro_dir, output_parent_dir, scenarios = NUL
 
   # output_path doesn't get used for outputType == 'none', but we don't really
   # want to build directories in that case, so skip it.
-  if (length(outputType) == 1 && outputType == 'none') {
-    output_path <- '' # This shouldn't do anything
+  if (length(outputType) == 1 && outputType == "none") {
+    output_path <- "" # This shouldn't do anything
   } else {
-    output_path <- make_output_dir(output_parent_dir, scenarios = scenarios,
-                                   module_name = 'EWR', ewr_outtypes = unlist(outputType))
+    output_path <- make_output_dir(output_parent_dir,
+      scenarios = scenarios,
+      module_name = "EWR", ewr_outtypes = unlist(outputType)
+    )
     # set up flags for the metadata in case the ewr fails partway
-    init_params <- list(meta_message = "Started run, has not finished. New metadata file will write when it does. If this metadata entry persists, the run failed.",
-                        ewr_status = FALSE,
-                        time = format(Sys.time(), digits = 0, usetz = TRUE))
+    init_params <- list(
+      meta_message = "Started run, has not finished. New metadata file will write when it does. If this metadata entry persists, the run failed.",
+      ewr_status = FALSE,
+      time = format(Sys.time(), digits = 0, usetz = TRUE)
+    )
     yaml::write_yaml(init_params,
-                     file = file.path(output_path, 'ewr_metadata.yml'))
-    if (rlang::is_installed('jsonlite')) {
+      file = file.path(output_path, "ewr_metadata.yml")
+    )
+    if (rlang::is_installed("jsonlite")) {
       jsonlite::write_json(init_params,
-                           path = file.path(output_path, 'ewr_metadata.json'))
+        path = file.path(output_path, "ewr_metadata.json")
+      )
     } else {
-      rlang::inform('json metadata not saved. If desired, install `jsonlite`',
-                    .frequency = 'regularly', .frequency_id = 'jsoncheck')
+      rlang::inform("json metadata not saved. If desired, install `jsonlite`",
+        .frequency = "regularly", .frequency_id = "jsoncheck"
+      )
     }
-
   }
 
-  if (rparallel && !rlang::is_installed('furrr')) {
+  if (rparallel && !rlang::is_installed("furrr")) {
     rlang::warn("parallel processing over hydro_paths requires furrr. Please install it. Setting `parallel = FALSE` and proceeding")
     rparallel <- FALSE
   }
 
   if (rparallel) {
     ewr_out <- furrr::future_map(hydro_paths, \(x) controller_functions$run_save_ewrs_old(list(x), output_path,
-                                                                                      model_format, allowance, climate,
-                                                                                      outputType = outputType,
-                                                                                      returnType = returnType,
-                                                                                      scenario_filename_split = scenario_filename_split,
-                                                                                      datesuffix = datesuffix),
-                                 .options = furrr::furrr_options(seed = TRUE))
+      model_format, allowance, climate,
+      outputType = outputType,
+      returnType = returnType,
+      scenario_filename_split = scenario_filename_split,
+      datesuffix = datesuffix
+    ),
+    .options = furrr::furrr_options(seed = TRUE)
+    )
 
     ewr_out <- purrr::list_transpose(ewr_out) |>
       purrr::map(dplyr::bind_rows)
-
   } else {
     ewr_out <- controller_functions$run_save_ewrs_old(hydro_paths, output_path,
-                                                  model_format, allowance, climate,
-                                                  outputType = outputType,
-                                                  returnType = returnType,
-                                                  scenario_filename_split = scenario_filename_split,
-                                                  datesuffix = datesuffix)
+      model_format, allowance, climate,
+      outputType = outputType,
+      returnType = returnType,
+      scenario_filename_split = scenario_filename_split,
+      datesuffix = datesuffix
+    )
   }
 
 
@@ -388,31 +477,38 @@ prep_run_save_ewrs_old <- function(hydro_dir, output_parent_dir, scenarios = NUL
 
   # auto-build metadata- this builds the data needed to run from params
   # And do it *after* the ewrs get processed so it only happens if the run works
-  if (output_path != '') {
-    if (!rlang::is_installed('git2r')) {
-      rlang::inform('git sha not available. Install `git2r`',
-                    .frequency = 'regularly', .frequency_id = 'git2rcheck')
+  if (output_path != "") {
+    if (!rlang::is_installed("git2r")) {
+      rlang::inform("git sha not available. Install `git2r`",
+        .frequency = "regularly", .frequency_id = "git2rcheck"
+      )
       gitcom <- NULL
     }
-    if (rlang::is_installed('git2r')) {
+    if (rlang::is_installed("git2r")) {
       gitcom <- try(git2r::sha(git2r::commits()[[1]]), silent = TRUE)
-      if (inherits(gitcom, 'try-error')) {gitcom <- NULL}
+      if (inherits(gitcom, "try-error")) {
+        gitcom <- NULL
+      }
     }
 
 
-    ewr_params <- list(output_parent_dir = output_parent_dir,
-                       hydro_dir = hydro_dir,
-                       ewr_results = output_path,
-                       model_format = model_format,
-                       climate = climate,
-                       outputType = outputType,
-                       returnType = returnType,
-                       ewr_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
-                       ewr_status = TRUE,
-                       ewr_git_commit = gitcom)
+    ewr_params <- list(
+      output_parent_dir = output_parent_dir,
+      hydro_dir = hydro_dir,
+      ewr_results = output_path,
+      model_format = model_format,
+      climate = climate,
+      outputType = outputType,
+      returnType = returnType,
+      ewr_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
+      ewr_status = TRUE,
+      ewr_git_commit = gitcom
+    )
 
     # add any passed metadata info
-    if (is.list(extrameta)) {ewr_params <- utils::modifyList(ewr_params, extrameta)}
+    if (is.list(extrameta)) {
+      ewr_params <- utils::modifyList(ewr_params, extrameta)
+    }
 
     # append any scenario metadata, so it all stays together
     ymlscenepath <- list.files(hydro_dir, pattern = "*.yml")
@@ -424,9 +520,10 @@ prep_run_save_ewrs_old <- function(hydro_dir, output_parent_dir, scenarios = NUL
     }
 
     yaml::write_yaml(c(ymlscenes, ewr_params),
-                     file = file.path(output_path, 'ewr_metadata.yml'))
+      file = file.path(output_path, "ewr_metadata.yml")
+    )
 
-    if (rlang::is_installed('jsonlite')) {
+    if (rlang::is_installed("jsonlite")) {
       jsonscenepath <- list.files(hydro_dir, pattern = "*.json")
       if (length(jsonscenepath) != 0) {
         jsonscenes <- file.path(hydro_dir, jsonscenepath) |>
@@ -435,12 +532,13 @@ prep_run_save_ewrs_old <- function(hydro_dir, output_parent_dir, scenarios = NUL
         jsonscenes <- NULL
       }
       jsonlite::write_json(c(jsonscenes, ewr_params),
-                           path = file.path(output_path, 'ewr_metadata.json'))
+        path = file.path(output_path, "ewr_metadata.json")
+      )
     } else {
-      rlang::inform('json metadata not saved. If desired, install `jsonlite`',
-                    .frequency = 'regularly', .frequency_id = 'jsoncheck')
+      rlang::inform("json metadata not saved. If desired, install `jsonlite`",
+        .frequency = "regularly", .frequency_id = "jsoncheck"
+      )
     }
-
   }
 
 
