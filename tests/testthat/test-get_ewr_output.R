@@ -133,7 +133,7 @@ test_that("ewr_code separation works", {
 
   ues <- unique(ewrsep$ewr_code)
 
-  expect_snapshot_value(ues)
+  expect_snapshot_value(as.list(ues))
 
   # causal straight from data-raw. This isn't ideal and might have to be skipped because it wont be available to data-raw
     causalewrs <- readr::read_csv('data-raw/causal_networks/ewr_obj_codes_nsw/obj_codes_dec22.csv', show_col_types = FALSE)  |>
@@ -145,5 +145,5 @@ test_that("ewr_code separation works", {
     ucs <- unique(causalsep$ewr_code)
 
     ucs[!ucs %in% ues]
-    expect_snapshot_value(ucs)
+    expect_snapshot_value(as.list(ucs))
 })
