@@ -74,3 +74,17 @@ map_ewr_gauges <- function() {
     ggplot2::geom_sf(data = ewrgauges, ggplot2::aes(color = owner, geometry = geometry))
   return(gaugemap)
 }
+
+#' Get the mapping of gauges to IQQM nodes for netcdf
+#'
+#'
+#' @return dataframe of the ewr table
+#' @export
+#'
+#' @examples
+get_iqqm_gauges <- function() {
+  pdi <- reticulate::import("py_ewr.data_inputs")
+  iqqm_gauges <- pdi$get_iqqm_codes()
+  iqqm_gauges <- tibble::tibble(iqqm_node = names(iqqm_gauges), gauge = unlist(iqqm_gauges))
+  return(iqqm_gauges)
+}
