@@ -28,12 +28,12 @@ test_that("summary works", {
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
   namestring <- c('scenario', 'gauge', 'planning_unit',
-                  'ewr_code', 'ewr_code_timing', 'multigauge', 'event_years',
+                  'ewr_code', 'multigauge', 'event_years',
                   'frequency', 'target_frequency', 'achievement_count',
                   'achievement_per_year', 'event_count', 'event_count_all',
                   'events_per_year', 'events_per_year_all',
                   'average_event_length', 'threshold_days',
-                  'max_inter_event_years', 'no_data_days', 'total_days')
+                  'max_inter_event_years', 'no_data_days', 'total_days', 'ewr_code_timing')
   expect_equal(names(sumdat), namestring)
   # a couple critical checks of the bits we use
   expect_true(is.character(sumdat$scenario))
@@ -49,8 +49,8 @@ test_that("yearly works", {
                   'total_event_days', 'total_event_days_achieved',
                   'max_event_days', 'max_rolling_events', 'max_rolling_achievement',
                   'missing_days', 'total_possible_days', 'ewr_code',
-                  'ewr_code_timing', 'scenario', 'gauge', 'planning_unit', 'multigauge',
-                  'rolling_max_inter_event', 'rolling_max_inter_event_achieved')
+                  'scenario', 'gauge', 'planning_unit', 'multigauge',
+                  'rolling_max_inter_event', 'rolling_max_inter_event_achieved', 'ewr_code_timing')
   expect_equal(names(ewrdat), namestring)
   # a couple critical checks of the bits we use
   expect_true(is.character(ewrdat$scenario))
@@ -61,9 +61,9 @@ test_that("all_events works", {
   ewrdat <- get_any_ewr_output(ewrpath, type = 'all_events')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
-  namestring <- c('scenario', 'gauge', 'planning_unit', 'ewr_code', 'ewr_code_timing',
+  namestring <- c('scenario', 'gauge', 'planning_unit', 'ewr_code',
                   'water_year', 'start_date', 'end_date', 'event_duration',
-                  'event_length', 'multigauge')
+                  'event_length', 'multigauge', 'ewr_code_timing')
   expect_equal(names(ewrdat), namestring)
   # a couple critical checks of the bits we use
   expect_true(is.character(ewrdat$scenario))
@@ -74,9 +74,9 @@ test_that("all_successful_events works", {
   ewrdat <- get_any_ewr_output(ewrpath, type = 'all_successful_events')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
-  namestring <- c('scenario', 'gauge', 'planning_unit', 'ewr_code', 'ewr_code_timing',
+  namestring <- c('scenario', 'gauge', 'planning_unit', 'ewr_code',
                   'water_year', 'start_date', 'end_date', 'event_duration',
-                  'event_length', 'multigauge')
+                  'event_length', 'multigauge', 'ewr_code_timing')
   expect_equal(names(ewrdat), namestring)
   # a couple critical checks of the bits we use
   expect_true(is.character(ewrdat$scenario))
@@ -87,8 +87,8 @@ test_that("all_successful_interEvents works", {
   ewrdat <- get_any_ewr_output(ewrpath, type = 'all_successful_interEvents')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
-  namestring <- c('scenario', 'gauge', 'planning_unit', 'ewr_code', 'ewr_code_timing',
-                  'start_date', 'end_date', 'inter_event_length')
+  namestring <- c('scenario', 'gauge', 'planning_unit', 'ewr_code',
+                  'start_date', 'end_date', 'inter_event_length', 'ewr_code_timing')
   expect_equal(names(ewrdat), namestring)
   # a couple critical checks of the bits we use
   expect_true(is.character(ewrdat$scenario))
@@ -118,5 +118,32 @@ test_that("making assessment tibble works", {
 test_that("passing in a list from memory works", {
   ewr_out <- make_test_ewr_output()
 
-  ewrprepped <- get_ewr_output(ewr_out, type = 'achievement')
+   ewrprepped <- get_ewr_output(ewr_out, type = 'achievement')
+})
+
+test_that("ewr_code separation works", {
+  # The whole EWR table (simplified down)
+  et <- get_ewr_table() |>
+    tibble::tibble() |>
+    dplyr::mutate(ewr_code = Code) |>
+    dplyr::select(ewr_code) |>
+    dplyr::distinct()
+
+  ewrsep <- separate_ewr_codes(et)
+
+  ues <- unique(ewrsep$ewr_code)
+
+  expect_snapshot_value(ues)
+
+  # causal straight from data-raw. This isn't ideal and might have to be skipped because it wont be available to data-raw
+    causalewrs <- readr::read_csv('data-raw/causal_networks/ewr_obj_codes_nsw/obj_codes_dec22.csv', show_col_types = FALSE)  |>
+      dplyr::rename(ewr_code = EWR) |>
+      dplyr::select(ewr_code) |>
+      dplyr::distinct()
+
+    causalsep <- separate_ewr_codes(causalewrs)
+    ucs <- unique(causalsep$ewr_code)
+
+    ucs[!ucs %in% ues]
+    expect_snapshot_value(ucs)
 })

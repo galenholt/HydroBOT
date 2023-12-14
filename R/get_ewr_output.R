@@ -150,12 +150,54 @@ cleanewrs <- function(ewrdf) {
   names(ewrdf) <- nameclean(names(ewrdf))
 
   ewrdf <- ewrdf |>
-    tidyr::separate(ewr_code, into = c("ewr_code", "ewr_code_timing"), sep = "_", remove = FALSE)
-    # tidyr::separate(ewr_code, into = c("ewr_code", "ewr_code_timing"), sep = "_(?!W)", extra = "merge") #FIX LATER!
+    separate_ewr_codes()
+
   return(ewrdf)
 }
 
 
+#' Parser for EWR codes into the main code and the extra bits (called 'timing' for some reason)
+#'
+#'I want something that can be used against the whole ewr
+# table and causal networks to keep them matched and standardize the parsing.
+#'
+#' @param df a dataframe with an ewr_code column with raw ewr names (e.g. EWR outputs, causal mappings)
+#'
+#' @return a dataframe with a clean ewr_code column and an ewr_code_timing column with the extra stuff
+#' @export
+#'
+#' @examples
+separate_ewr_codes <- function(df) {
+
+  # We need a consistent way to parse ewr codes from EWR tool and causal
+  # networks. This isnt' perfect, but it's much better than before
+    basestring <- df$ewr_code |>
+      # ewr returns the / as _
+      stringr::str_replace("/", "_") |>
+      # change the _ to - so we can split on _
+      stringr::str_replace("OB_W", "OB-W")
+
+    # Get a clean main EWR code (as best I can)
+    ewrpart <- basestring |>
+      # get the bit before the first _
+      stringr::str_extract("^[^_]+") |>
+      # some have the a,b,c, attached instead of separated
+      stringr::str_remove("[a-z]$")
+
+    # Get the leftovers. Typically _P, _S, _a, etc, but sometimes weirder
+    extrapart <- basestring |>
+      # remove the main ewr string from the full string
+      stringr::str_remove(ewrpart) |>
+      # remove leading _
+      stringr::str_remove("^_")
+
+    # put back on the df
+    df$ewr_code <- ewrpart
+    df$ewr_code_timing <- extrapart
+
+    return(df)
+
+}
 
 #' Clean the incoming summary EWRs
 #'

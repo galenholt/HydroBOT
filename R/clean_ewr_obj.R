@@ -32,27 +32,28 @@ clean_ewr_obj <- function(ewrobjpath,
     dplyr::mutate(env_obj = stringr::str_remove_all(Objectives, ' ')) |>
     dplyr::mutate(env_obj = stringr::str_split(env_obj, ',|\\.')) |>
     dplyr::select(-Objectives) |>
-    tidyr::unnest_longer(env_obj) |>
-    tidyr::separate_wider_delim(ewr_code, delim = "_",
-                                names = c("ewr_code", "ewr_code_timing"),
-                                too_few = 'align_start', too_many = 'merge')
+    tidyr::unnest_longer(env_obj)
+
+  ewr2obj <- ewr2obj |>
+    separate_ewr_codes()
 
   if (gaugescale) {
     # Expand out to gauge scale- give the relevant LTWP area and ewr_code to each gauge and PlanningUnit
     # This may not be needed here, but it retains maximal information, including some that got lost in the switch to NSW ewr-obj mapping
     ewrs_in_pyewr <- get_ewr_table() |>
       dplyr::select(PlanningUnitID, LTWPShortName, gauge = Gauge, ewr_code = Code) |>
-      tidyr::separate_wider_delim(ewr_code, delim = "_",
-                                  names = c("ewr_code", "ewr_code_timing"),
-                                  too_few = 'align_start', too_many = 'merge')
+      separate_ewr_codes()
 
     ewr2obj <- dplyr::left_join(ewrs_in_pyewr, ewr2obj, by = c('LTWPShortName', 'ewr_code', 'ewr_code_timing'))
 
   }
 
-  # don't save NAs
+  # don't save NAs and make it a tibble
   ewr2obj <- ewr2obj |>
-    dplyr::filter(!is.na(ewr_code) & !is.na(env_obj))
+    dplyr::filter(!is.na(ewr_code) & !is.na(env_obj)) |>
+    tibble::tibble()
+
+  attr(ewr2obj, "pandas.index") <- NULL
 
   # save
   if (saveout == 'r') {
