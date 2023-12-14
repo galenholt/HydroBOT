@@ -47,7 +47,9 @@ Suggests:
     furrr,
     future,
     DiagrammeRsvg,
-    rsvg
+    rsvg,
+    metR,
+    PCICt
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)

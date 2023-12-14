@@ -15,3 +15,19 @@ test_that("wide hydrograph csv works", {
   expect_equal(nrow(hydwide), 5475)
 
 })
+
+
+test_that("long hydrograph netcdf works", {
+  hydlong <- read_hydro(hydropath = system.file("extdata/ncdfexample/nchydros", package = 'werptoolkitr'), format = 'nc', gaugemap = 'iqqm')
+  expect_equal(names(hydlong), c('scenario', 'Date', 'gauge', 'flow', 'node'))
+  expect_equal(class(hydlong), c('tbl_df', 'tbl', 'data.frame'))
+  expect_equal(nrow(hydlong), 24000)
+
+  # read everything in
+  hydlong <- read_hydro(hydropath = system.file("extdata/ncdfexample/nchydros", package = 'werptoolkitr'), format = 'nc', gaugemap = 'none')
+  expect_equal(names(hydlong), c('scenario', 'Date', 'flow', 'node'))
+  expect_equal(class(hydlong), c('tbl_df', 'tbl', 'data.frame'))
+  expect_equal(nrow(hydlong), 33000)
+
+
+})
