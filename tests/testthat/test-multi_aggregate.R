@@ -2,14 +2,15 @@
 ### First, test that it works as a wrapper of theme_aggregate and
 ### multi_aggregate- it should pass all their tests with minor format edits:
 # edits- change function name, turn aggregation and functions into lists
+ewr_to_agg <- make_test_ewr_prepped()
 
-
+non_spatial_ewrout <- ewr_to_agg |> sf::st_drop_geometry()
 
 # Tests from theme_aggregate ----------------------------------------------
 
 test_that("ewr-obj works, nongeom", {
   # no need to load the demo/test data since it's in /data
-  agged <- multi_aggregate(summary_ewr_output,
+  agged <- multi_aggregate(non_spatial_ewrout,
                            aggsequence = list(c('ewr_code_timing', 'ewr_code')),
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
@@ -20,7 +21,7 @@ test_that("ewr-obj works, nongeom", {
 })
 
 test_that("auto-generating causal_edges works", {
-  agged <- multi_aggregate(summary_ewr_output,
+  agged <- multi_aggregate(non_spatial_ewrout,
                            aggsequence = list(c('ewr_code_timing', 'ewr_code')),
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
@@ -31,9 +32,9 @@ test_that("auto-generating causal_edges works", {
 })
 
 test_that("spatial input data works", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
-  agged <- multi_aggregate(sumspat,
+
+
+  agged <- multi_aggregate(ewr_to_agg,
                            aggsequence = list(c('ewr_code_timing', 'ewr_code')),
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
@@ -49,7 +50,7 @@ test_that("spatial input data works", {
 })
 
 test_that("bare functions", {
-  agged <- multi_aggregate(summary_ewr_output,
+  agged <- multi_aggregate(non_spatial_ewrout,
                            aggsequence = list(c('ewr_code_timing', 'ewr_code')),
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
@@ -60,7 +61,7 @@ test_that("bare functions", {
 })
 
 test_that("list functions", {
-  agged <- multi_aggregate(summary_ewr_output,
+  agged <- multi_aggregate(non_spatial_ewrout,
                            aggsequence = list(c('ewr_code_timing', 'ewr_code')),
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
@@ -72,7 +73,7 @@ test_that("list functions", {
 
 test_that("multiple functions", {
   # Character
-  agged_c <- multi_aggregate(summary_ewr_output,
+  agged_c <- multi_aggregate(non_spatial_ewrout,
                              aggsequence = list(c('ewr_code_timing', 'ewr_code')),
                              groupers = c('scenario', 'gauge'),
                              aggCols = 'ewr_achieved',
@@ -83,7 +84,7 @@ test_that("multiple functions", {
   expect_s3_class(agged_c, 'data.frame')
 
   # bare
-  agged_b <- multi_aggregate(summary_ewr_output,
+  agged_b <- multi_aggregate(non_spatial_ewrout,
                              aggsequence = list(c('ewr_code_timing', 'ewr_code')),
                              groupers = c('scenario', 'gauge'),
                              aggCols = 'ewr_achieved',
@@ -94,7 +95,7 @@ test_that("multiple functions", {
   expect_s3_class(agged_b, 'data.frame')
 
   # List
-  agged_l <- multi_aggregate(summary_ewr_output,
+  agged_l <- multi_aggregate(non_spatial_ewrout,
                              aggsequence = list(c('ewr_code_timing', 'ewr_code')),
                              groupers = c('scenario', 'gauge'),
                              aggCols = 'ewr_achieved',
@@ -111,17 +112,17 @@ test_that("multiple functions", {
 # Tests from spatial_aggregate --------------------------------------------
 
 test_that("gauge to poly works", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
 
   # should error if not list, to keep from iterating over sdl_units itself
-  expect_error(multi_aggregate(sumspat,
+  expect_error(multi_aggregate(ewr_to_agg,
                              aggsequence = sdl_units,
                              groupers = 'scenario',
                              aggCols = 'ewr_achieved',
                              funsequence = list('mean')))
 
-  spatagg <- multi_aggregate(sumspat,
+  spatagg <- multi_aggregate(ewr_to_agg,
                              aggsequence = list(sdl_units = sdl_units),
                              groupers = 'scenario',
                              aggCols = 'ewr_achieved',
@@ -134,7 +135,7 @@ test_that("gauge to poly works", {
   expect_equal(nrow(spatagg), 6)
 
   # Keeping the whole set of polys
-  spataggkeep <- multi_aggregate(sumspat,
+  spataggkeep <- multi_aggregate(ewr_to_agg,
                                  aggsequence = list(sdl_units = sdl_units),
                                  groupers = 'scenario',
                                  aggCols = 'ewr_achieved',
@@ -144,20 +145,20 @@ test_that("gauge to poly works", {
   # namestring <- c('scenario', 'polyID', 'sdl_units_mean_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spataggkeep), namestring)
   expect_s3_class(spataggkeep, 'sf')
-  expect_equal(nrow(spataggkeep), nrow(sdl_units)*length(unique(sumspat$scenario)))
+  expect_equal(nrow(spataggkeep), nrow(sdl_units)*length(unique(ewr_to_agg$scenario)))
 
   # Plots are useful for checking spatial outcomes
   g2sdl_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data =spatagg,
                      ggplot2::aes(fill = sdl_units_mean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::geom_sf(data = ewr_to_agg) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = 'bottom')
 
   g2sdl_all_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data =spataggkeep,
                      ggplot2::aes(fill = sdl_units_mean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::geom_sf(data = ewr_to_agg) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = 'bottom')
 
@@ -166,10 +167,10 @@ test_that("gauge to poly works", {
 })
 
 test_that("poly to poly works", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
 
-  g2pagg <- multi_aggregate(sumspat,
+
+
+  g2pagg <- multi_aggregate(ewr_to_agg,
                             aggsequence = list(sdl_units = sdl_units),
                             groupers = 'scenario',
                             aggCols = 'ewr_achieved',
@@ -192,7 +193,7 @@ test_that("poly to poly works", {
   g2sdl2cewo_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data =p2pagg,
                      ggplot2::aes(fill = cewo_valleys_mean_sdl_units_mean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::geom_sf(data = ewr_to_agg) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = 'bottom')
 
@@ -205,10 +206,10 @@ test_that("poly to poly works", {
 
 
 test_that("bare functions", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
 
-  spatagg <- multi_aggregate(sumspat,
+
+
+  spatagg <- multi_aggregate(ewr_to_agg,
                              aggsequence = list(sdl_units = sdl_units),
                              groupers = 'scenario',
                              aggCols = 'ewr_achieved',
@@ -221,10 +222,10 @@ test_that("bare functions", {
 })
 
 test_that("list functions", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
 
-  spatagg <- multi_aggregate(sumspat,
+
+
+  spatagg <- multi_aggregate(ewr_to_agg,
                              aggsequence = list(sdl_units = sdl_units),
                              groupers = 'scenario',
                              aggCols = 'ewr_achieved',
@@ -237,11 +238,11 @@ test_that("list functions", {
 })
 
 test_that("multiple functions", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
 
   # character
-  spatagg_c <- multi_aggregate(sumspat,
+  spatagg_c <- multi_aggregate(ewr_to_agg,
                                aggsequence = list(sdl_units = sdl_units),
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
@@ -254,7 +255,7 @@ test_that("multiple functions", {
   expect_equal(nrow(spatagg_c), 6)
 
   # bare- naming fails
-  spatagg_b <- multi_aggregate(sumspat,
+  spatagg_b <- multi_aggregate(ewr_to_agg,
                                aggsequence = list(sdl_units = sdl_units),
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
@@ -267,7 +268,7 @@ test_that("multiple functions", {
   expect_equal(nrow(spatagg_b), 6)
 
   # list
-  spatagg_l <- multi_aggregate(sumspat,
+  spatagg_l <- multi_aggregate(ewr_to_agg,
                                aggsequence = list(sdl_units = sdl_units),
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
@@ -299,7 +300,7 @@ test_that("multi-step theme agg works, nongeom", {
                  c('ArithmeticMean'),
                  c('ArithmeticMean'))
 
-  agged <- multi_aggregate(summary_ewr_output,
+  agged <- multi_aggregate(non_spatial_ewrout,
                            aggsequence = aggseq,
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
@@ -327,7 +328,7 @@ test_that("multi-step theme agg works, auto-edges", {
                  c('ArithmeticMean'),
                  c('ArithmeticMean'))
 
-  agged <- multi_aggregate(summary_ewr_output,
+  agged <- multi_aggregate(non_spatial_ewrout,
                            aggsequence = aggseq,
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
@@ -344,8 +345,8 @@ test_that("multi-step theme agg works, auto-edges", {
 
 # Spatial only
 test_that("multi-step spatial works", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
   aggseq <- list(sdl_units = sdl_units,
                  cewo_valleys = cewo_valleys,
                  basin = basin)
@@ -353,7 +354,7 @@ test_that("multi-step spatial works", {
                  'ArithmeticMean',
                  'ArithmeticMean')
 
-    spatagg <- multi_aggregate(sumspat,
+    spatagg <- multi_aggregate(ewr_to_agg,
                                             aggsequence = aggseq,
                                             groupers = 'scenario',
                                             aggCols = 'ewr_achieved',
@@ -369,7 +370,7 @@ test_that("multi-step spatial works", {
   expect_equal(nrow(spatagg), 3)
 
   # Keeping the whole set of polys doesn't really matter here
-  spataggkeep <- multi_aggregate(sumspat,
+  spataggkeep <- multi_aggregate(ewr_to_agg,
                                                 aggsequence = aggseq,
                                                 groupers = 'scenario',
                                                 aggCols = 'ewr_achieved',
@@ -379,20 +380,20 @@ test_that("multi-step spatial works", {
   # namestring <- c('scenario', 'polyID', 'sdl_units_mean_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spataggkeep), namestring)
   expect_s3_class(spataggkeep, 'sf')
-  expect_equal(nrow(spataggkeep), nrow(basin)*length(unique(sumspat$scenario)))
+  expect_equal(nrow(spataggkeep), nrow(basin)*length(unique(ewr_to_agg$scenario)))
 
   # Plots are useful for checking spatial outcomes
   g2sdl_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data =spatagg,
                      ggplot2::aes(fill = basin_ArithmeticMean_cewo_valleys_ArithmeticMean_sdl_units_ArithmeticMean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::geom_sf(data = ewr_to_agg) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = 'bottom')
 
   g2sdl_all_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data =spataggkeep,
                      ggplot2::aes(fill = basin_ArithmeticMean_cewo_valleys_ArithmeticMean_sdl_units_ArithmeticMean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::geom_sf(data = ewr_to_agg) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = 'bottom')
 
@@ -402,8 +403,8 @@ test_that("multi-step spatial works", {
 
 # Theme and spatial together
 test_that("multi-step theme and spatial works", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
 
   aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                  env_obj =  c('ewr_code', "env_obj"),
@@ -423,7 +424,7 @@ test_that("multi-step theme and spatial works", {
                  'ArithmeticMean',
                  'ArithmeticMean')
 
-  spatagg <- multi_aggregate(sumspat,
+  spatagg <- multi_aggregate(ewr_to_agg,
                                             aggsequence = aggseq,
                                             groupers = 'scenario',
                                             aggCols = 'ewr_achieved',
@@ -446,7 +447,7 @@ test_that("multi-step theme and spatial works", {
   g2sdl_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data = target_5,
                      ggplot2::aes(fill = target_5_year_2024_ArithmeticMean_mdb_ArithmeticMean_Objective_ArithmeticMean_catchment_ArithmeticMean_Specific_goal_ArithmeticMean_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::geom_sf(data = ewr_to_agg) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = 'bottom')
 
@@ -455,8 +456,8 @@ test_that("multi-step theme and spatial works", {
 
 # Theme and spatial together
 test_that("multi-step theme and spatial works with !namehistory", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
 
   aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                  env_obj =  c('ewr_code', "env_obj"),
@@ -477,7 +478,7 @@ test_that("multi-step theme and spatial works with !namehistory", {
                  'ArithmeticMean')
 
 
-  spatagg <- multi_aggregate(sumspat,
+  spatagg <- multi_aggregate(ewr_to_agg,
                                             aggsequence = aggseq,
                                             groupers = 'scenario',
                                             aggCols = 'ewr_achieved',
@@ -504,7 +505,7 @@ test_that("multi-step theme and spatial works with !namehistory", {
   g2sdl_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data = target_5,
                      ggplot2::aes(fill = ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::geom_sf(data = ewr_to_agg) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = 'bottom')
 
@@ -512,8 +513,8 @@ test_that("multi-step theme and spatial works with !namehistory", {
 })
 
 test_that("passing name of sf objects works", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
 
   aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                  env_obj =  c('ewr_code', "env_obj"),
@@ -534,7 +535,7 @@ test_that("passing name of sf objects works", {
                  'ArithmeticMean')
 
 
-  spatagg <- multi_aggregate(sumspat,
+  spatagg <- multi_aggregate(ewr_to_agg,
                              aggsequence = aggseq,
                              groupers = 'scenario',
                              aggCols = 'ewr_achieved',
@@ -562,8 +563,8 @@ test_that("passing name of sf objects works", {
 test_that("backstepping along theme axis throws informative error", {
   # How does the code behave if we try to back back up a previous  causal level,
   # e.g. not move in a nested way through the network?
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
 
   aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                  env_obj =  c('ewr_code', "env_obj"),
@@ -586,7 +587,7 @@ test_that("backstepping along theme axis throws informative error", {
                  'ArithmeticMean')
 
 
-  expect_error(spatagg <- multi_aggregate(sumspat,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
                              aggsequence = aggseq,
                              groupers = 'scenario',
                              aggCols = 'ewr_achieved',
@@ -599,8 +600,8 @@ test_that("backstepping along theme axis throws informative error", {
 
 
 test_that("saving the list of steps", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
 
   aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                  env_obj =  c('ewr_code', "env_obj"),
@@ -620,7 +621,7 @@ test_that("saving the list of steps", {
                  'ArithmeticMean',
                  'ArithmeticMean')
 
-  spatagg <- multi_aggregate(sumspat,
+  spatagg <- multi_aggregate(ewr_to_agg,
                                                            aggsequence = aggseq,
                                                            groupers = 'scenario',
                                                            aggCols = 'ewr_achieved',
@@ -641,7 +642,7 @@ test_that("saving the list of steps", {
   g2sdl_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data = target_5,
                      ggplot2::aes(fill = target_5_year_2024_ArithmeticMean_mdb_ArithmeticMean_Objective_ArithmeticMean_catchment_ArithmeticMean_Specific_goal_ArithmeticMean_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::geom_sf(data = ewr_to_agg) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = 'bottom')
 
@@ -652,8 +653,8 @@ test_that("saving the list of steps", {
 # Types of functions ------------------------------------------------------
 
 test_that("single functions at each step, called in different ways", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
 
   # Use a smaller set of aggs
   aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
@@ -665,7 +666,7 @@ test_that("single functions at each step, called in different ways", {
                    'ArithmeticMean')
 
   # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
-  spatagg_c <- multi_aggregate(sumspat,
+  spatagg_c <- multi_aggregate(ewr_to_agg,
                                aggsequence = aggseq,
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
@@ -676,7 +677,7 @@ test_that("single functions at each step, called in different ways", {
   expect_equal(names(spatagg_c), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_c, 'list')
   expect_s3_class(spatagg_c[[length(spatagg_c)]], 'sf')
-  expect_equal(nrow(spatagg_c$sdl_units), 195)
+  expect_equal(nrow(spatagg_c$sdl_units), 159)
   expect_equal(sum(is.na(spatagg_c$sdl_units)), 6)
 
   # bare
@@ -685,7 +686,7 @@ test_that("single functions at each step, called in different ways", {
                    ArithmeticMean)
 
   # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
-  expect_error(spatagg_b <- multi_aggregate(sumspat,
+  expect_error(spatagg_b <- multi_aggregate(ewr_to_agg,
                                             aggsequence = aggseq,
                                             groupers = 'scenario',
                                             aggCols = 'ewr_achieved',
@@ -693,7 +694,7 @@ test_that("single functions at each step, called in different ways", {
                                             causal_edges = causal_ewr,
                                             saveintermediate = TRUE))
 
-  spatagg_b <- multi_aggregate(sumspat,
+  spatagg_b <- multi_aggregate(ewr_to_agg,
                                aggsequence = aggseq,
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
@@ -706,7 +707,7 @@ test_that("single functions at each step, called in different ways", {
   expect_equal(names(spatagg_b), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_b, 'list')
   expect_s3_class(spatagg_b[[length(spatagg_b)]], 'sf')
-  expect_equal(nrow(spatagg_b$sdl_units), 195)
+  expect_equal(nrow(spatagg_b$sdl_units), 159)
   expect_equal(sum(is.na(spatagg_b$sdl_units)), 6)
 
   # list
@@ -714,7 +715,7 @@ test_that("single functions at each step, called in different ways", {
                    list(~ArithmeticMean(.)),
                    list(~ArithmeticMean(.)))
 
-  spatagg_l <- multi_aggregate(sumspat,
+  spatagg_l <- multi_aggregate(ewr_to_agg,
                                aggsequence = aggseq,
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
@@ -725,14 +726,14 @@ test_that("single functions at each step, called in different ways", {
   expect_equal(names(spatagg_l), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_l, 'list')
   expect_s3_class(spatagg_l[[length(spatagg_l)]], 'sf')
-  expect_equal(nrow(spatagg_l$sdl_units), 195)
+  expect_equal(nrow(spatagg_l$sdl_units), 159)
   expect_equal(sum(is.na(spatagg_l$sdl_units)), 6)
 
 })
 
 test_that("multiple functions at each step", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
 
   # Use a smaller set of aggs
   aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
@@ -743,7 +744,7 @@ test_that("multiple functions at each step", {
                    c('ArithmeticMean', 'GeometricMean'),
                    c('ArithmeticMean', 'CompensatingFactor'))
 
-  spatagg_c <- multi_aggregate(sumspat,
+  spatagg_c <- multi_aggregate(ewr_to_agg,
                                aggsequence = aggseq,
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
@@ -754,7 +755,7 @@ test_that("multiple functions at each step", {
   expect_equal(names(spatagg_c), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_c, 'list')
   expect_s3_class(spatagg_c[[length(spatagg_c)]], 'sf')
-  expect_equal(nrow(spatagg_c$sdl_units), 195)
+  expect_equal(nrow(spatagg_c$sdl_units), 159)
   expect_equal(ncol(spatagg_c$sdl_units), 15)
   expect_equal(sum(is.na(spatagg_c$sdl_units)), 6)
 
@@ -763,7 +764,7 @@ test_that("multiple functions at each step", {
   #                  c(ArithmeticMean, GeometricMean),
   #                  c(ArithmeticMean, CompensatingFactor))
 
-  spatagg_b <- multi_aggregate(sumspat,
+  spatagg_b <- multi_aggregate(ewr_to_agg,
                                aggsequence = aggseq,
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
@@ -776,7 +777,7 @@ test_that("multiple functions at each step", {
   expect_equal(names(spatagg_b), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_b, 'list')
   expect_s3_class(spatagg_b[[length(spatagg_b)]], 'sf')
-  expect_equal(nrow(spatagg_b$sdl_units), 195)
+  expect_equal(nrow(spatagg_b$sdl_units), 159)
   expect_equal(ncol(spatagg_c$sdl_units), 15)
   expect_equal(sum(is.na(spatagg_b$sdl_units)), 6)
 
@@ -785,7 +786,7 @@ test_that("multiple functions at each step", {
                    list(ArithmeticMean = ~ArithmeticMean(.), GeometricMean = ~GeometricMean(.)),
                    list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
-  spatagg_l <- multi_aggregate(sumspat,
+  spatagg_l <- multi_aggregate(ewr_to_agg,
                                aggsequence = aggseq,
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
@@ -796,14 +797,14 @@ test_that("multiple functions at each step", {
   expect_equal(names(spatagg_l), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg_l, 'list')
   expect_s3_class(spatagg_l[[length(spatagg_l)]], 'sf')
-  expect_equal(nrow(spatagg_l$sdl_units), 195)
+  expect_equal(nrow(spatagg_l$sdl_units), 159)
   expect_equal(ncol(spatagg_c$sdl_units), 15)
   expect_equal(sum(is.na(spatagg_l$sdl_units)), 6)
 })
 
 test_that("mixed functions between steps", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
 
   # Use a smaller set of aggs
   aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
@@ -815,7 +816,7 @@ test_that("mixed functions between steps", {
                  c(ArithmeticMean, GeometricMean),
                  list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
-  expect_error(spatagg <- multi_aggregate(sumspat,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
                                           aggsequence = aggseq,
                                           groupers = 'scenario',
                                           aggCols = 'ewr_achieved',
@@ -824,7 +825,7 @@ test_that("mixed functions between steps", {
                                           saveintermediate = TRUE))
 
   # Directly declaring list
-  spatagg <- multi_aggregate(sumspat,
+  spatagg <- multi_aggregate(ewr_to_agg,
                              aggsequence = aggseq,
                              groupers = 'scenario',
                              aggCols = 'ewr_achieved',
@@ -837,7 +838,7 @@ test_that("mixed functions between steps", {
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg, 'list')
   expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  expect_equal(nrow(spatagg$sdl_units), 195)
+  expect_equal(nrow(spatagg$sdl_units), 159)
   expect_equal(ncol(spatagg$sdl_units), 15)
   expect_equal(sum(is.na(spatagg$sdl_units)), 6)
 
@@ -846,7 +847,7 @@ test_that("mixed functions between steps", {
                     ArithmeticMean,
                     list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
-  expect_error(spatagg <- multi_aggregate(sumspat,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
                                           aggsequence = aggseq,
                                           groupers = 'scenario',
                                           aggCols = 'ewr_achieved',
@@ -860,7 +861,7 @@ test_that("mixed functions between steps", {
                    ArithmeticMean,
                    list(ArithmeticMean = ~ArithmeticMean(.)))
 
-  expect_error(spatagg <- multi_aggregate(sumspat,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
                                           aggsequence = aggseq,
                                           groupers = 'scenario',
                                           aggCols = 'ewr_achieved',
@@ -873,7 +874,7 @@ test_that("mixed functions between steps", {
                     c('ArithmeticMean', 'GeometricMean'),
                     list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
-  spatagg <- multi_aggregate(sumspat,
+  spatagg <- multi_aggregate(ewr_to_agg,
                              aggsequence = aggseq,
                              groupers = 'scenario',
                              aggCols = 'ewr_achieved',
@@ -884,7 +885,7 @@ test_that("mixed functions between steps", {
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg, 'list')
   expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  expect_equal(nrow(spatagg$sdl_units), 195)
+  expect_equal(nrow(spatagg$sdl_units), 159)
   expect_equal(ncol(spatagg$sdl_units), 15)
   expect_equal(sum(is.na(spatagg$sdl_units)), 6)
 
@@ -897,7 +898,7 @@ test_that("mixed functions between steps", {
                      list('ArithmeticMean', GeometricMean = ~GeometricMean(.)),
                      list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
-  expect_error(spatagg <- multi_aggregate(sumspat,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
                                           aggsequence = aggseq,
                                           groupers = 'scenario',
                                           aggCols = 'ewr_achieved',
@@ -909,15 +910,15 @@ test_that("mixed functions between steps", {
   # expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   # expect_type(spatagg, 'list')
   # expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  # expect_equal(nrow(spatagg$sdl_units), 195)
+  # expect_equal(nrow(spatagg$sdl_units), 159)
   # expect_equal(ncol(spatagg$sdl_units), 15)
   # expect_equal(sum(is.na(spatagg$sdl_units)), 6)
 })
 
 
 test_that("mixed functions between steps", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
 
   # Use a smaller set of aggs
   aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
@@ -929,7 +930,7 @@ test_that("mixed functions between steps", {
                  c(ArithmeticMean, GeometricMean),
                  list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
-  expect_error(spatagg <- multi_aggregate(sumspat,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
                                           aggsequence = aggseq,
                                           groupers = 'scenario',
                                           aggCols = 'ewr_achieved',
@@ -938,7 +939,7 @@ test_that("mixed functions between steps", {
                                           saveintermediate = TRUE))
 
   # Directly declaring list
-  spatagg <- multi_aggregate(sumspat,
+  spatagg <- multi_aggregate(ewr_to_agg,
                              aggsequence = aggseq,
                              groupers = 'scenario',
                              aggCols = 'ewr_achieved',
@@ -951,7 +952,7 @@ test_that("mixed functions between steps", {
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg, 'list')
   expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  expect_equal(nrow(spatagg$sdl_units), 195)
+  expect_equal(nrow(spatagg$sdl_units), 159)
   expect_equal(ncol(spatagg$sdl_units), 15)
   expect_equal(sum(is.na(spatagg$sdl_units)), 6)
 
@@ -960,7 +961,7 @@ test_that("mixed functions between steps", {
                     ArithmeticMean,
                     list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
-  expect_error(spatagg <- multi_aggregate(sumspat,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
                                           aggsequence = aggseq,
                                           groupers = 'scenario',
                                           aggCols = 'ewr_achieved',
@@ -974,7 +975,7 @@ test_that("mixed functions between steps", {
                    ArithmeticMean,
                    list(ArithmeticMean = ~ArithmeticMean(.)))
 
-  expect_error(spatagg <- multi_aggregate(sumspat,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
                                           aggsequence = aggseq,
                                           groupers = 'scenario',
                                           aggCols = 'ewr_achieved',
@@ -987,7 +988,7 @@ test_that("mixed functions between steps", {
                     c('ArithmeticMean', 'GeometricMean'),
                     list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
-  spatagg <- multi_aggregate(sumspat,
+  spatagg <- multi_aggregate(ewr_to_agg,
                              aggsequence = aggseq,
                              groupers = 'scenario',
                              aggCols = 'ewr_achieved',
@@ -998,7 +999,7 @@ test_that("mixed functions between steps", {
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg, 'list')
   expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  expect_equal(nrow(spatagg$sdl_units), 195)
+  expect_equal(nrow(spatagg$sdl_units), 159)
   expect_equal(ncol(spatagg$sdl_units), 15)
   expect_equal(sum(is.na(spatagg$sdl_units)), 6)
 
@@ -1011,7 +1012,7 @@ test_that("mixed functions between steps", {
                      list('ArithmeticMean', GeometricMean = ~GeometricMean(.)),
                      list(ArithmeticMean = ~ArithmeticMean(.), CompensatingFactor = ~CompensatingFactor(.)))
 
-  expect_error(spatagg <- multi_aggregate(sumspat,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
                                           aggsequence = aggseq,
                                           groupers = 'scenario',
                                           aggCols = 'ewr_achieved',
@@ -1023,14 +1024,14 @@ test_that("mixed functions between steps", {
   # expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   # expect_type(spatagg, 'list')
   # expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  # expect_equal(nrow(spatagg$sdl_units), 195)
+  # expect_equal(nrow(spatagg$sdl_units), 159)
   # expect_equal(ncol(spatagg$sdl_units), 15)
   # expect_equal(sum(is.na(spatagg$sdl_units)), 6)
 })
 
 test_that("mixed functions including quosures, singles, multiples, and characters", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+
+
 
   # The goal here is mostly to provide tests of the situation where we get
   # character vectors from a params file, and to give me things to look at in
@@ -1053,7 +1054,7 @@ test_that("mixed functions including quosures, singles, multiples, and character
                  "rlang::quo(list(wm = ~weighted.mean(., w = area, na.rm = TRUE)))",
                  c('ArithmeticMean', 'LimitingFactor'))
 
-  spatagg <- multi_aggregate(sumspat,
+  spatagg <- multi_aggregate(ewr_to_agg,
                                           aggsequence = aggseq,
                                           groupers = 'scenario',
                                           aggCols = 'ewr_achieved',
@@ -1064,7 +1065,7 @@ test_that("mixed functions including quosures, singles, multiples, and character
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_type(spatagg, 'list')
   expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  expect_equal(nrow(spatagg$sdl_units), 195)
+  expect_equal(nrow(spatagg$sdl_units), 159)
   expect_equal(ncol(spatagg$sdl_units), 8)
   expect_equal(sum(is.na(spatagg$sdl_units)), 6)
   expect_equal(nrow(spatagg$target_5_year_2024), 228)
@@ -1072,6 +1073,68 @@ test_that("mixed functions including quosures, singles, multiples, and character
   expect_equal(sum(is.na(spatagg$target_5_year_2024)), 3)
 
 
+})
+
+test_that("groupers that are only sometimes present", {
+
+
+
+  # Theme only
+  aggseqt <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                 env_obj =  c('ewr_code', "env_obj"),
+                 Specific_goal = c('env_obj', "Specific_goal"),
+                 Objective = c('Specific_goal', 'Objective'),
+                 target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+
+  funseqt <- list('ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean')
+
+  spataggt <- multi_aggregate(ewr_to_agg,
+                             aggsequence = aggseqt,
+                             groupers = 'scenario',
+                             aggCols = 'ewr_achieved',
+                             funsequence = funseqt,
+                             causal_edges = causal_ewr,
+                             saveintermediate = TRUE,
+                             namehistory = FALSE)
+
+  # theme and space
+  aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                 env_obj =  c('ewr_code', "env_obj"),
+                 sdl_units = sdl_units,
+                 Specific_goal = c('env_obj', "Specific_goal"),
+                 catchment = cewo_valleys,
+                 Objective = c('Specific_goal', 'Objective'),
+                 mdb = basin,
+                 target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+
+  funseq <- list('ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean',
+                 'ArithmeticMean')
+
+  spatagg <- multi_aggregate(ewr_to_agg,
+                             aggsequence = aggseq,
+                             groupers = 'scenario',
+                             aggCols = 'ewr_achieved',
+                             funsequence = funseq,
+                             causal_edges = causal_ewr)
+
+  # stringr::str_flatten(names(spatagg), "', '")
+  namestring <- c('scenario', 'polyID', 'target_5_year_2024',
+                  'target_5_year_2024_ArithmeticMean_mdb_ArithmeticMean_Objective_ArithmeticMean_catchment_ArithmeticMean_Specific_goal_ArithmeticMean_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_ewr_achieved',
+                  'OBJECTID', 'DDIV_NAME', 'AREA_HA', 'SHAPE_AREA', 'SHAPE_LEN',
+                  'geometry')
+  expect_equal(names(spatagg), namestring)
+  expect_s3_class(spatagg, 'sf')
+  expect_equal(nrow(spatagg), 228)
 })
 
 # tidyselect for other groupers and aggcols

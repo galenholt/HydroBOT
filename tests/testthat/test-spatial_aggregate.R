@@ -17,16 +17,13 @@ test_that("gauge to poly works", {
   expect_equal(nrow(spatagg), 6)
 
   # Keeping the whole set of polys
-  sumspat <- summary_ewr_output |>
-    gauge2geo(bom_basin_gauges) |>
-    dplyr::select(tidyselect::any_of(names(ewr_to_agg)))
-
   spataggkeep <- spatial_aggregate(ewr_to_agg,
                                    to_geo = sdl_units,
                                    groupers = 'scenario',
                                    aggCols = 'ewr_achieved',
                                    funlist = 'mean',
                                    keepAllPolys = TRUE)
+
   # stringr::str_flatten(names(spatagg), "', '")
   # namestring <- c('scenario', 'polyID', 'spatial_mean_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spataggkeep), namestring)
