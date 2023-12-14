@@ -40,7 +40,8 @@ clean_ewr_obj <- function(ewrobjpath,
   if (gaugescale) {
     # Expand out to gauge scale- give the relevant LTWP area and ewr_code to each gauge and PlanningUnit
     # This may not be needed here, but it retains maximal information, including some that got lost in the switch to NSW ewr-obj mapping
-    ewrs_in_pyewr <- gauge_ltwp_ewr() |>
+    ewrs_in_pyewr <- get_ewr_table() |>
+      dplyr::select(PlanningUnitID, LTWPShortName, gauge = Gauge, ewr_code = Code) |>
       tidyr::separate_wider_delim(ewr_code, delim = "_",
                                   names = c("ewr_code", "ewr_code_timing"),
                                   too_few = 'align_start', too_many = 'merge')
