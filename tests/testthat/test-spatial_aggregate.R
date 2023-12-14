@@ -1,10 +1,11 @@
 rlang::local_options(lifecycle_verbosity = "error")
 
-test_that("gauge to poly works", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
+ewr_to_agg <- make_test_ewr_prepped()
 
-  spatagg <- spatial_aggregate(sumspat,
+
+test_that("gauge to poly works", {
+
+  spatagg <- spatial_aggregate(ewr_to_agg,
                                to_geo = sdl_units,
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
@@ -16,7 +17,11 @@ test_that("gauge to poly works", {
   expect_equal(nrow(spatagg), 6)
 
   # Keeping the whole set of polys
-  spataggkeep <- spatial_aggregate(sumspat,
+  sumspat <- summary_ewr_output |>
+    gauge2geo(bom_basin_gauges) |>
+    dplyr::select(tidyselect::any_of(names(ewr_to_agg)))
+
+  spataggkeep <- spatial_aggregate(ewr_to_agg,
                                    to_geo = sdl_units,
                                    groupers = 'scenario',
                                    aggCols = 'ewr_achieved',
@@ -26,20 +31,20 @@ test_that("gauge to poly works", {
   # namestring <- c('scenario', 'polyID', 'spatial_mean_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spataggkeep), namestring)
   expect_s3_class(spataggkeep, 'sf')
-  expect_equal(nrow(spataggkeep), nrow(sdl_units)*length(unique(sumspat$scenario)))
+  expect_equal(nrow(spataggkeep), nrow(sdl_units)*length(unique(ewr_to_agg$scenario)))
 
   # Plots are useful for checking spatial outcomes
   g2sdl_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data =spatagg,
                      ggplot2::aes(fill = spatial_mean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::geom_sf(data = ewr_to_agg) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = 'bottom')
 
   g2sdl_all_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data =spataggkeep,
                      ggplot2::aes(fill = spatial_mean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::geom_sf(data = ewr_to_agg) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = 'bottom')
 
@@ -48,10 +53,8 @@ test_that("gauge to poly works", {
 })
 
 test_that("poly to poly works", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
 
-  g2pagg <- spatial_aggregate(sumspat,
+  g2pagg <- spatial_aggregate(ewr_to_agg,
                               to_geo = sdl_units,
                               groupers = 'scenario',
                               aggCols = 'ewr_achieved',
@@ -74,7 +77,7 @@ test_that("poly to poly works", {
   g2sdl2cewo_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(data =p2pagg,
                      ggplot2::aes(fill = spatial_mean_spatial_mean_ewr_achieved)) +
-    ggplot2::geom_sf(data = sumspat) +
+    ggplot2::geom_sf(data = ewr_to_agg) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = 'bottom')
 
@@ -87,10 +90,8 @@ test_that("poly to poly works", {
 
 
 test_that("bare functions", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
 
-  spatagg <- spatial_aggregate(sumspat,
+  spatagg <- spatial_aggregate(ewr_to_agg,
                                to_geo = sdl_units,
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
@@ -103,10 +104,8 @@ test_that("bare functions", {
 })
 
 test_that("list functions", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
 
-  spatagg <- spatial_aggregate(sumspat,
+  spatagg <- spatial_aggregate(ewr_to_agg,
                                to_geo = sdl_units,
                                groupers = 'scenario',
                                aggCols = 'ewr_achieved',
@@ -119,11 +118,9 @@ test_that("list functions", {
 })
 
 test_that("multiple functions", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
 
   # character
-  spatagg_c <- spatial_aggregate(sumspat,
+  spatagg_c <- spatial_aggregate(ewr_to_agg,
                                  to_geo = sdl_units,
                                  groupers = 'scenario',
                                  aggCols = 'ewr_achieved',
@@ -136,7 +133,7 @@ test_that("multiple functions", {
   expect_equal(nrow(spatagg_c), 6)
 
   # multiple bare names works if done in the call
-  spatagg_b <- spatial_aggregate(sumspat,
+  spatagg_b <- spatial_aggregate(ewr_to_agg,
                                  to_geo = sdl_units,
                                  groupers = 'scenario',
                                  aggCols = 'ewr_achieved',
@@ -150,7 +147,7 @@ test_that("multiple functions", {
 
   # multiple bare names does not work if declared externally
   bare2 <- c(mean, sd)
-  expect_error(spatagg_b2 <- spatial_aggregate(sumspat,
+  expect_error(spatagg_b2 <- spatial_aggregate(ewr_to_agg,
                                                to_geo = sdl_units,
                                                groupers = 'scenario',
                                                aggCols = 'ewr_achieved',
@@ -159,7 +156,7 @@ test_that("multiple functions", {
   # list- typically specified outside the call
   fnlist <- list(mean = ~mean(., na.rm = TRUE),
                  sd = ~sd(., na.rm = TRUE))
-  spatagg_l <- spatial_aggregate(sumspat,
+  spatagg_l <- spatial_aggregate(ewr_to_agg,
                                  to_geo = sdl_units,
                                  groupers = 'scenario',
                                  aggCols = 'ewr_achieved',
@@ -176,7 +173,7 @@ test_that("multiple functions", {
   # character. Need to do some more sorting out to get it to work.
   # fnlistx <- list(mean = \(x) mean(x, na.rm = TRUE),
   #                sd = \(x) sd(x, na.rm = TRUE))
-  # spatagg_lx <- spatial_aggregate(sumspat,
+  # spatagg_lx <- spatial_aggregate(ewr_to_agg,
   #                                to_geo = sdl_units,
   #                                groupers = 'scenario',
   #                                aggCols = 'ewr_achieved',
@@ -188,7 +185,7 @@ test_that("multiple functions", {
 
 
   # vector arguments (e.g. weighting)
-  wtgauge <- sumspat |>
+  wtgauge <- ewr_to_agg |>
     dplyr::group_by(scenario, gauge) |>
     dplyr::mutate(wt = dplyr::n()) |>
     dplyr::ungroup()
@@ -205,22 +202,12 @@ test_that("multiple functions", {
   namestringw <- c('scenario', 'polyID', 'spatial_mean_ewr_achieved',
                    'spatial_wm_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg_lw), namestringw)
-  expect_s3_class(spatagg_l, 'sf')
-  expect_equal(nrow(spatagg_l), 6)
+  expect_s3_class(spatagg_lw, 'sf')
+  expect_equal(nrow(spatagg_lw), 6)
 
-  # DPLYR 1.1 WILL BREAK THIS- need to sort that out sometime
-  fnlistw <- rlang::quo(list(mean = ~mean(., na.rm = TRUE),
-                             wm = ~weighted.mean(., wt, na.rm = TRUE)))
 
-  sumdat <- prep_ewr_agg(summary_ewr_output, type = 'achievement',
-                         geopath = bom_basin_gauges)
-
-  wtgauge2 <- sumdat |>
-    dplyr::group_by(scenario, gauge) |>
-    dplyr::mutate(wt = dplyr::n()) |>
-    dplyr::ungroup()
-
-  spataggsumdat_lw <- spatial_aggregate(dat = wtgauge2,
+  # Same, but keeping polys?
+  spataggsumdat_lw <- spatial_aggregate(dat = wtgauge,
                                         to_geo = sdl_units,
                                         groupers = c('scenario', 'env_obj'),
                                         aggCols = 'ewr_achieved',
@@ -237,84 +224,77 @@ test_that("multiple functions", {
 
 # character vectors for groups and aggCols
 test_that("bare functions", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
 
-  spatagg <- spatial_aggregate(sumspat,
+  # have to choose the only other numeric to agg
+  spatagg <- spatial_aggregate(ewr_to_agg,
                                to_geo = sdl_units,
                                groupers = c('scenario', 'ewr_code'),
-                               aggCols = c('ewr_achieved', 'event_count'),
+                               aggCols = c('ewr_achieved', 'ewr_achieved_timeframe'),
                                funlist = mean)
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c('scenario', 'ewr_code', 'polyID', 'spatial_mean_ewr_achieved',
-                  'spatial_mean_event_count', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
+                  'spatial_mean_ewr_achieved_timeframe', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 78)
+  expect_equal(nrow(spatagg), 72)
 })
 
 test_that("bare names", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
 
-  spatagg <- spatial_aggregate(sumspat,
+  spatagg <- spatial_aggregate(ewr_to_agg,
                                to_geo = sdl_units,
                                groupers = c(scenario, ewr_code),
-                               aggCols = c(ewr_achieved, event_count),
+                               aggCols = c(ewr_achieved, ewr_achieved_timeframe),
                                funlist = mean)
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c('scenario', 'ewr_code', 'polyID', 'spatial_mean_ewr_achieved',
-                  'spatial_mean_event_count', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
+                  'spatial_mean_ewr_achieved_timeframe', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 78)
+  expect_equal(nrow(spatagg), 72)
 })
 
 test_that("tidyselect and mixed", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
 
-  # this gets extra fancy with the -contains, since sumspat has a
+  # this gets extra fancy with the -contains, since ewr_to_agg has a
   # 'scenario_path' column, making it a good edge case test
-  spatagg <- spatial_aggregate(sumspat,
+  spatagg <- spatial_aggregate(ewr_to_agg,
                                to_geo = sdl_units,
                                groupers = c(starts_with('sce'), ewr_code, -contains('path')),
-                               aggCols = c(ends_with("achieved"), all_of('event_count')),
+                               aggCols = c(ends_with("achieved"), all_of('ewr_achieved_timeframe')),
                                funlist = mean)
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c('scenario', 'ewr_code', 'polyID', 'spatial_mean_ewr_achieved',
-                  'spatial_mean_event_count', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
+                  'spatial_mean_ewr_achieved_timeframe', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 78)
+  expect_equal(nrow(spatagg), 72)
 })
 
 # character vectors for groups and aggCols
 test_that("failmissing", {
-  sumspat <- gauge2geo(summary_ewr_output,
-                       gaugelocs = bom_basin_gauges)
 
   # without failmissing, should error if we request extras
-  expect_error(spatagg <- spatial_aggregate(sumspat,
+  expect_error(spatagg <- spatial_aggregate(ewr_to_agg,
                                             to_geo = sdl_units,
                                             groupers = c('scenario', 'ewr_code', 'fake_grp'),
-                                            aggCols = c('ewr_achieved', 'event_count', 'fake_vals'),
+                                            aggCols = c('ewr_achieved', 'ewr_achieved_timeframe', 'fake_vals'),
                                             funlist = mean))
 
   # Should work and ignore the extras with failmissing = FALSE
-  spatagg <- spatial_aggregate(sumspat,
+  spatagg <- spatial_aggregate(ewr_to_agg,
                                to_geo = sdl_units,
                                groupers = c('scenario', 'ewr_code', 'fake_grp'),
-                               aggCols = c('ewr_achieved', 'event_count', 'fake_vals'),
+                               aggCols = c('ewr_achieved', 'ewr_achieved_timeframe', 'fake_vals'),
                                funlist = mean,
                                failmissing = FALSE)
 
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c('scenario', 'ewr_code', 'polyID', 'spatial_mean_ewr_achieved',
-                  'spatial_mean_event_count', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
+                  'spatial_mean_ewr_achieved_timeframe', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 78)
+  expect_equal(nrow(spatagg), 72)
 })
 
 # todo --------------------------------------------------------------------
