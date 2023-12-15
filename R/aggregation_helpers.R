@@ -148,3 +148,55 @@ parse_char_funs <- function(x) {
   }
 
 }
+
+#' Test whether an object is an sf
+#'
+#' @param x anything, but typically a dataframe
+#'
+#' @return Logical
+#' @export
+#'
+#' @examples
+#' is_sf(basin)
+#' is_sf(iris)
+is_sf <- function(x) {
+  inherits(x, 'sf')
+}
+
+#' Test whether an object is a spatial point sf
+#'
+#' The data has to be both an sf and then only contain points
+#'
+#' @param x dataframe or other object
+#'
+#' @return logical, TRUE if is sf and all data are POINTs
+#' @export
+#'
+#' @examples
+is_point <- function(x) {
+  if (is_sf(x)) {
+    if (all(sf::st_is(x, "POINT"))) {
+      return(TRUE)
+    }
+  }
+  return(FALSE)
+}
+
+#' Test whether an object is an sf other than a point
+#'
+#' This is not just !is_point(), because it still needs to be an sf.
+#'
+#' @param x dataframe or other object
+#'
+#' @return logical, TRUE if sf and not all data are POINTs
+#' @export
+#'
+#' @examples
+is_notpoint <- function(x) {
+  if (is_sf(x)) {
+    if (!all(sf::st_is(x, "POINT"))) {
+      return(TRUE)
+    }
+  }
+  return(FALSE)
+}

@@ -9,8 +9,9 @@
 #'
 #' @param dat sf or tibble or dataframe of values to aggregate, with necessary
 #'   grouping information for non-theme axis (e.g. scenario, location). *Not*
-#'   necessarily the same as `data` in [general_aggregate()]- this function makes
-#'   necessary adjustments to the data before calling [general_aggregate()]
+#'   necessarily the same as `data` in [general_aggregate()]- this function
+#'   makes necessary adjustments to the data before calling
+#'   [general_aggregate()]
 #' @param from_theme character, column name of the theme level the data is
 #'   currently in
 #' @param to_theme character, column name of the theme level to aggregate *to*
@@ -25,6 +26,12 @@
 #'   aggregation. Cannot change with the main `groupers`. Developed to persist
 #'   information about polygons through subsequent theme aggregations, but could
 #'   be more general
+#' @param auto_ewr_PU logical, default FALSE. If TRUE, automatically infers
+#'   whether this is an EWR dataset and has not yet been spatially aggregated.
+#'   If so, applies grouping by 'planning_unit_name'. The preferred solution is
+#'   to include it in `groupers` here (for on-off), or in [multi_aggregate()] to
+#'   use `group_until`. If none of those solutions happen, though, it aborts to
+#'   prevent incorrect pooling over planning units.
 #' @param ... passed to [general_aggregate()]
 #'
 #' @return a dataframe in the same format as read-in (sf or tibble), aggregated
@@ -42,6 +49,7 @@ theme_aggregate <- function(dat,
                             causal_edges,
                             geonames = NULL,
                             failmissing = TRUE,
+                            auto_ewr_PU = FALSE,
                             ...) {
   # Bare names get lost as we go down into further functions, so use characters
   # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
@@ -57,14 +65,10 @@ theme_aggregate <- function(dat,
 
   # this is now getting even closer to spatial with the drop/add of geometry.
   # can they be the same function? probably.
-  spatialflag <- FALSE
-  polyflag <- FALSE
-  if ("sf" %in% class(dat)) {
-    spatialflag <- TRUE
-    if (!all(sf::st_is(dat, "POINT"))) {
-      polyflag <- TRUE
-    }
+  spatialflag <- is_sf(dat)
+  polyflag <- is_notpoint(dat)
 
+  if (spatialflag) {
     if (!("polyID" %in% names(dat))) {
       dat <- dat |>
         add_polyID(failduplicate = FALSE)
@@ -116,8 +120,18 @@ theme_aggregate <- function(dat,
     # Infer EWR from presence in causal_ewr
     ewrnames <- purrr::map(causal_ewr, names) |> unlist()
     isewr <- to_theme %in% ewrnames
-    if (isewr) {
-      groupers <- c(groupers, 'planning_unit_name')
+    if (isewr & !'planning_unit_name' %in% groupers) {
+      if (!auto_ewr_PU) {
+        rlang::abort("EWR outputs should be grouped by `planning_unit_name` until aggregated to larger spatial areas.
+                  Preferred method of addressing this is with `group_until` in `multi_aggregate()`.")
+      } else {
+        rlang::inform("EWR outputs should be grouped by `planning_unit_name` until aggregated to larger spatial areas.
+                  Preferred method of addressing this is with `group_until` in `multi_aggregate()`,
+                      but it is being done automatically in `theme_aggregate()`")
+        groupers <- c(groupers, 'planning_unit_name')
+      }
+
+
     }
   }
 

@@ -17,6 +17,15 @@
 #'   be all grouping columns *except* theme and spatial groupings. These are
 #'   both automatically added to `groupers` according to `aggsequence` before
 #'   passing to [general_aggregate()].
+#' @param group_until named list of groupers and the step to which they should
+#'   be retained. Default NA (retain all groupers for all steps). But most
+#'   commonly for EWR tool `group_until = list('planning_unit_name = is_notpoint)`
+#'   to group by planning unit until larger spatial grouping has
+#'   happened. Step can be an index, name, or a function that evaluates to TRUE
+#'   or FALSE when run on the aggregation sequence. Named list does not need to
+#'   contain all groupers, but if so, those that persist throughout should be
+#'   given NA. Vectors the length of groupers usually work, but are less-well
+#'   supported.
 #' @param aggsequence a named list of aggregation steps in the order to apply
 #'   them. Entries for theme aggregation should be character vectors- e.g. `name
 #'   = c('from_theme', 'to_theme')`. Entries for spatial aggregation should be
@@ -60,18 +69,19 @@
 #' @examples
 multi_aggregate <- function(dat,
                             causal_edges,
-                            groupers = 'scenario',
+                            groupers = "scenario",
+                            group_until = rep(NA, length(groupers)),
                             aggCols,
                             aggsequence,
                             funsequence,
                             saveintermediate = FALSE,
                             namehistory = TRUE,
                             keepAllPolys = FALSE,
-                            failmissing = TRUE) {
-
+                            failmissing = TRUE,
+                            auto_ewr_PU = FALSE) {
   # Check for common sources of errors
-  if (!inherits(aggsequence, 'list') || !inherits(funsequence, 'list')) {
-    rlang::abort('aggsequence and funsequence should both be lists, even if there is only one item. Otherwise iterating over their length causes unexpected behaviour.')
+  if (!inherits(aggsequence, "list") || !inherits(funsequence, "list")) {
+    rlang::abort("aggsequence and funsequence should both be lists, even if there is only one item. Otherwise iterating over their length causes unexpected behaviour.")
   }
 
   # start with the input data
@@ -93,7 +103,6 @@ multi_aggregate <- function(dat,
   # the causal network. Will want to implement that at some point, probably.
   causalsteps <- aggsequence[purrr::map_lgl(aggsequence, is.character)]
   if (any(duplicated(purrr::map_chr(causalsteps, \(x) x[1])))) {
-
     thedups <- causalsteps[duplicated(purrr::map_chr(causalsteps, \(x) x[1]))] |>
       purrr::map_chr(\(x) x[1])
     dupfind <- function(x) {
@@ -116,24 +125,30 @@ multi_aggregate <- function(dat,
   # Bare names get lost as we go down into further functions, so use characters
   # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
   # and now we have to loop over the funsequence and the names are even harder to extract
-  namefunsequence <- vector(mode = 'list', length = length(funsequence))
+  namefunsequence <- vector(mode = "list", length = length(funsequence))
   for (i in 1:length(funsequence)) {
     funlist <- funsequence[[i]]
     if (!rlang::is_quosure(funlist) &&
-        (is.function(funlist) ||
-         (is.list(funlist) &
+      (is.function(funlist) ||
+        (is.list(funlist) &
           is.function(funlist[[1]])))) {
-      if (length(substitute(funsequence)) == 1) {rlang::abort("Cannot infer names of funsequence, likely because it's a named object. Use something other than a pre-built list of bare function names.")}
-      funlist <- as.character(substitute(funsequence)[[i+1]]) # The +1 is because the first item is 'list'.
-      if(funlist[1] == "c") {funlist <- funlist[2:length(funlist)]}
+      if (length(substitute(funsequence)) == 1) {
+        rlang::abort("Cannot infer names of funsequence, likely because it's a named object. Use something other than a pre-built list of bare function names.")
+      }
+      funlist <- as.character(substitute(funsequence)[[i + 1]]) # The +1 is because the first item is 'list'.
+      if (funlist[1] == "c") {
+        funlist <- funlist[2:length(funlist)]
+      }
       namefunsequence[[i]] <- funlist
     }
     rm(funlist)
   }
 
-  notnull <- which(purrr::map_lgl(namefunsequence, ~!is.null(.)))
+  notnull <- which(purrr::map_lgl(namefunsequence, ~ !is.null(.)))
 
-  if (length(notnull) > 0) {funsequence[notnull] <- namefunsequence[notnull]}
+  if (length(notnull) > 0) {
+    funsequence[notnull] <- namefunsequence[notnull]
+  }
 
 
 
@@ -152,55 +167,116 @@ multi_aggregate <- function(dat,
   # Don't use a foreach even though it's tempting, since the loop is dependent-
   # the outcome of the first agg needs to be the input of the second
 
-  for (i in 1:length(aggsequence)) {
+  # get indexing for group_until drops
+  if (!is.list(group_until)) {
+    # Try to fix, but not too hard
+    if (is.character(groupers) & length(group_until) == length(groupers)) {
+      group_until <- as.list(group_until) |> setNames(groupers)
+    } else {
+      rlang::abort("group_until needs to be a named list, at least for now.
+                 There is likely a way to allow a vector of length `groupers`,
+                 but it will run afoul of non-character groupers (e.g. tidyselect)")
+    }
+  }
 
+  # Try a bit harder with the names; they fall off for unnamed vectors with functions
+  if (is.null(names(group_until)) & length(group_until) == length(groupers) & is.character(groupers)) {
+    names(group_until) <- groupers
+  }
+
+  parse_aggnum <- function(x) {
+    # if na, make grouper persist (if we test a closure it `warn`s)
+    if (!rlang::is_function(x) && is.na(x)) {
+      gind <- length(aggsequence) + 1
+    } else {
+      # the is.na in an outer level, because we can have NA characters and numeric and etc
+      # if character, find the aggsequence name
+      if (is.character(x)) {
+        if (!x %in% names(aggsequence)) {
+          rlang::warn("not able to infer `group_until`, aggsequence names do not match.
+                    Retaining grouping until the end")
+          gind <- length(aggsequence) + 1
+        } else {
+          gind <- which(names(aggsequence) == x)
+        }
+      }
+      if (rlang::is_function(x)) {
+        # assumes to evaluate to logical
+        gind <- min(which(aggsequence |> purrr::map_lgl(x)))
+      }
+
+      if (is.numeric(x)) {
+        gind <- x
+      }
+    }
+
+    return(gind)
+  }
+
+  group_indices <- purrr::map(group_until, parse_aggnum)
+
+  for (i in 1:length(aggsequence)) {
     # theme aggregations will be defined as from-to pairs of character vectors,
     # spatial aggs are the polygons being agged into. That allows autodetect
 
     # turn the groupers and aggcols into character vectors however they came in
     # need to do this in the loop because dat changes and so available cols will too
     thisgroup <- selectcreator(rlang::enquo(groupers), dat, failmissing)
-    thisagg <- selectcreator(rlang::expr(tidyselect::ends_with(!!aggCols)),
-                             dat, failmissing)
+    thisagg <- selectcreator(
+      rlang::expr(tidyselect::ends_with(!!aggCols)),
+      dat, failmissing
+    )
+
+    # Deal with the group_until
+    dropgroups <- names(group_indices)[group_indices <= i]
+    # If we drop groups, we have to allow them to not be found in selectcreator
+    # Why not just change groupers? Because it might be tidyselect
+    if (length(dropgroups) > 0) {
+      failmissing <- FALSE
+    }
+    thisgroup <- thisgroup[!thisgroup %in% dropgroups]
 
 
     if (is.character(aggsequence[[i]])) {
-
       # If the aggsequence isn't named, name it. This is less obviously doable
       # for sf. deal with that later. There three different ways unnamed lists
       # can end up here, and so need to deal with them all
       if (is.null(names(aggsequence[i])) ||
-          is.na(names(aggsequence[i])) ||
-          names(aggsequence[i]) == "") {
+        is.na(names(aggsequence[i])) ||
+        names(aggsequence[i]) == "") {
         names(aggsequence)[[i]] <- aggsequence[[i]][2]
       }
 
       # Will need to be able to go get a previous `dat` here if we want to do
       # nonnested aggsequences.
-      dat <- theme_aggregate(dat = dat,
-                            from_theme = aggsequence[[i]][1],
-                             to_theme = aggsequence[[i]][2],
-                            groupers = c(thisgroup, 'gauge'),
-                            aggCols = thisagg, # Does not need the tidyselect::ends_with here because it happens in theme_aggregate
-                             funlist = funsequence[[i]],
-                             causal_edges = causal_edges,
-                            geonames = spatial_to_info,
-                            failmissing = FALSE) # Don't fail if no gauge col
+      dat <- theme_aggregate(
+        dat = dat,
+        from_theme = aggsequence[[i]][1],
+        to_theme = aggsequence[[i]][2],
+        groupers = c(thisgroup, "gauge"),
+        aggCols = thisagg, # Does not need the tidyselect::ends_with here because it happens in theme_aggregate
+        funlist = funsequence[[i]],
+        causal_edges = causal_edges,
+        geonames = spatial_to_info,
+        failmissing = FALSE,
+        auto_ewr_PU = auto_ewr_PU
+      ) # Don't fail if no gauge col
 
       # Track theme so we don't drop it during spatial
       recenttheme <- aggsequence[[i]][2]
+    } else if ("sf" %in% class(aggsequence[[i]])) {
+      dat <- spatial_aggregate(
+        dat = dat,
+        to_geo = aggsequence[[i]],
+        groupers = c(thisgroup, recenttheme),
+        aggCols = thisagg,
+        funlist = funsequence[[i]],
+        prefix = paste0(names(aggsequence)[i], "_"),
+        failmissing = failmissing,
+        keepAllPolys = keepAllPolys
+      )
 
-    } else if ('sf' %in% class(aggsequence[[i]])) {
-      dat <- spatial_aggregate(dat = dat,
-                               to_geo = aggsequence[[i]],
-                               groupers = c(thisgroup, recenttheme),
-                               aggCols = thisagg,
-                               funlist = funsequence[[i]],
-                               prefix = paste0(names(aggsequence)[i], '_'),
-                               failmissing = failmissing,
-                               keepAllPolys = keepAllPolys)
-
-      spatial_to_info <- names(aggsequence[[i]])[names(aggsequence[[i]]) != 'geometry']
+      spatial_to_info <- names(aggsequence[[i]])[names(aggsequence[[i]]) != "geometry"]
     }
 
 
@@ -211,18 +287,19 @@ multi_aggregate <- function(dat,
       # The assignment for namehistory fails
       if (!namehistory) {
         datlist[[names(aggsequence)[i]]] <- agg_names_to_cols(dat,
-                                                              aggsequence = names(aggsequence[1:i]),
-                                                              funsequence = funsequence[1:i],
-                                                              aggCols = aggCols)
+          aggsequence = names(aggsequence[1:i]),
+          funsequence = funsequence[1:i],
+          aggCols = aggCols
+        )
       } else {
         # aggsequence[[i]][2]
         thisname <- names(aggsequence)[i]
-        if (is.null(names(aggsequence)[i])) {thisname <- length(datlist) + 1}
+        if (is.null(names(aggsequence)[i])) {
+          thisname <- length(datlist) + 1
+        }
         datlist[[thisname]] <- dat
       }
-
     }
-
   }
 
   # Determine what to return
@@ -232,12 +309,12 @@ multi_aggregate <- function(dat,
     # history in columns if namehistory is FALSE
     if (!namehistory) {
       dat <- agg_names_to_cols(dat,
-                               aggsequence = names(aggsequence),
-                               funsequence = funsequence,
-                               aggCols = aggCols)
+        aggsequence = names(aggsequence),
+        funsequence = funsequence,
+        aggCols = aggCols
+      )
     }
 
     return(dat)
   }
-
 }

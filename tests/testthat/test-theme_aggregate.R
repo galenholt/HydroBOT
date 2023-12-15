@@ -8,7 +8,8 @@ test_that("ewr-obj works, nongeom", {
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
                            funlist = 'mean',
-                           causal_edges = make_edges(causal_ewr, list(c('ewr_code_timing', 'ewr_code'))))
+                           causal_edges = make_edges(causal_ewr, list(c('ewr_code_timing', 'ewr_code'))),
+                           auto_ewr_PU = TRUE)
   expect_equal(names(agged), c('scenario', 'gauge', 'planning_unit_name', 'ewr_code', 'ewr_code_mean_ewr_achieved'))
   expect_s3_class(agged, 'data.frame')
 })
@@ -20,7 +21,8 @@ test_that("auto-generating causal_edges works", {
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
                            funlist = 'mean',
-                           causal_edges = causal_ewr)
+                           causal_edges = causal_ewr,
+                           auto_ewr_PU = TRUE)
   expect_equal(names(agged), c('scenario', 'gauge', 'planning_unit_name', 'ewr_code', 'ewr_code_mean_ewr_achieved'))
   expect_s3_class(agged, 'data.frame')
 })
@@ -32,7 +34,8 @@ test_that("spatial input data works", {
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
                            funlist = 'mean',
-                           causal_edges = causal_ewr)
+                           causal_edges = causal_ewr,
+                           auto_ewr_PU = TRUE)
   expect_equal(names(agged), c('scenario', 'gauge', 'polyID', 'planning_unit_name',
                                'ewr_code', 'ewr_code_mean_ewr_achieved',
                                'geometry'))
@@ -47,7 +50,8 @@ test_that("spatial input data works", {
                            aggCols = 'ewr_achieved',
                            funlist = 'mean',
                            causal_edges = causal_ewr,
-                           geonames = 'site')
+                           geonames = 'site',
+                           auto_ewr_PU = TRUE)
   expect_equal(names(agged), c('scenario', 'gauge', 'polyID', 'planning_unit_name',
                                'ewr_code', 'ewr_code_mean_ewr_achieved',
                                'site',
@@ -63,7 +67,8 @@ test_that("bare functions", {
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
                            funlist = mean,
-                           causal_edges = causal_ewr)
+                           causal_edges = causal_ewr,
+                           auto_ewr_PU = TRUE)
   expect_equal(names(agged), c('scenario', 'gauge', 'polyID', 'planning_unit_name',
                                'ewr_code', 'ewr_code_mean_ewr_achieved',
                                'geometry'))
@@ -77,7 +82,8 @@ test_that("list functions", {
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
                            funlist = list(mean = ~mean(., na.rm = TRUE)),
-                           causal_edges = causal_ewr)
+                           causal_edges = causal_ewr,
+                           auto_ewr_PU = TRUE)
   expect_equal(names(agged), c('scenario', 'gauge', 'polyID', 'planning_unit_name',
                                'ewr_code', 'ewr_code_mean_ewr_achieved',
                                'geometry'))
@@ -92,7 +98,8 @@ test_that("multiple functions", {
                            groupers = c('scenario', 'gauge'),
                            aggCols = 'ewr_achieved',
                            funlist = c('mean', 'sd'),
-                           causal_edges = causal_ewr)
+                           causal_edges = causal_ewr,
+                           auto_ewr_PU = TRUE)
   expect_equal(names(agged_c), c('scenario', 'gauge', 'polyID', 'planning_unit_name',
                                'ewr_code',
                                'ewr_code_mean_ewr_achieved',
@@ -107,7 +114,8 @@ test_that("multiple functions", {
                              groupers = c('scenario', 'gauge'),
                              aggCols = 'ewr_achieved',
                              funlist = c(mean, sd),
-                             causal_edges = causal_ewr)
+                             causal_edges = causal_ewr,
+                             auto_ewr_PU = TRUE)
   expect_equal(names(agged_b), c('scenario', 'gauge', 'polyID', 'planning_unit_name',
                                  'ewr_code',
                                  'ewr_code_mean_ewr_achieved',
@@ -123,7 +131,8 @@ test_that("multiple functions", {
                              aggCols = 'ewr_achieved',
                              funlist = list(mean = ~mean(., na.rm = TRUE),
                                             sd = ~sd(., na.rm = TRUE)),
-                             causal_edges = causal_ewr)
+                             causal_edges = causal_ewr,
+                             auto_ewr_PU = TRUE)
   expect_equal(names(agged_l), c('scenario', 'gauge', 'polyID', 'planning_unit_name',
                                  'ewr_code',
                                  'ewr_code_mean_ewr_achieved',

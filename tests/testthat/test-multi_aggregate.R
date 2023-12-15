@@ -14,7 +14,8 @@ test_that("ewr-obj works, nongeom", {
     groupers = c("scenario", "gauge"),
     aggCols = "ewr_achieved",
     funsequence = list("mean"),
-    causal_edges = make_edges(causal_ewr, list(c("ewr_code_timing", "ewr_code")))
+    causal_edges = make_edges(causal_ewr, list(c("ewr_code_timing", "ewr_code"))),
+    auto_ewr_PU = TRUE
   )
   expect_equal(names(agged), c("scenario", "gauge", "planning_unit_name", "ewr_code", "ewr_code_mean_ewr_achieved"))
   expect_s3_class(agged, "data.frame")
@@ -26,7 +27,8 @@ test_that("auto-generating causal_edges works", {
     groupers = c("scenario", "gauge"),
     aggCols = "ewr_achieved",
     funsequence = list("mean"),
-    causal_edges = causal_ewr
+    causal_edges = causal_ewr,
+    auto_ewr_PU = TRUE
   )
   expect_equal(names(agged), c("scenario", "gauge", "planning_unit_name", "ewr_code", "ewr_code_mean_ewr_achieved"))
   expect_s3_class(agged, "data.frame")
@@ -38,7 +40,8 @@ test_that("spatial input data works", {
     groupers = c("scenario", "gauge"),
     aggCols = "ewr_achieved",
     funsequence = list("mean"),
-    causal_edges = causal_ewr
+    causal_edges = causal_ewr,
+    auto_ewr_PU = TRUE
   )
   expect_equal(names(agged), c(
     "scenario", "gauge", "polyID", "planning_unit_name",
@@ -57,7 +60,8 @@ test_that("bare functions", {
     groupers = c("scenario", "gauge"),
     aggCols = "ewr_achieved",
     funsequence = list(mean),
-    causal_edges = causal_ewr
+    causal_edges = causal_ewr,
+    auto_ewr_PU = TRUE
   )
   expect_equal(names(agged), c("scenario", "gauge", "planning_unit_name", "ewr_code", "ewr_code_mean_ewr_achieved"))
   expect_s3_class(agged, "data.frame")
@@ -69,7 +73,8 @@ test_that("list functions", {
     groupers = c("scenario", "gauge"),
     aggCols = "ewr_achieved",
     funsequence = list(list(mean = ~ mean(., na.rm = TRUE))),
-    causal_edges = causal_ewr
+    causal_edges = causal_ewr,
+    auto_ewr_PU = TRUE
   )
   expect_equal(names(agged), c("scenario", "gauge", "planning_unit_name", "ewr_code", "ewr_code_mean_ewr_achieved"))
   expect_s3_class(agged, "data.frame")
@@ -82,7 +87,8 @@ test_that("multiple functions", {
     groupers = c("scenario", "gauge"),
     aggCols = "ewr_achieved",
     funsequence = list(c("mean", "sd")),
-    causal_edges = causal_ewr
+    causal_edges = causal_ewr,
+    auto_ewr_PU = TRUE
   )
   expect_equal(names(agged_c), c(
     "scenario", "gauge", "planning_unit_name", "ewr_code",
@@ -96,7 +102,8 @@ test_that("multiple functions", {
     groupers = c("scenario", "gauge"),
     aggCols = "ewr_achieved",
     funsequence = list(c(mean, sd)),
-    causal_edges = causal_ewr
+    causal_edges = causal_ewr,
+    auto_ewr_PU = TRUE
   )
   expect_equal(names(agged_b), c(
     "scenario", "gauge", "planning_unit_name", "ewr_code",
@@ -113,7 +120,8 @@ test_that("multiple functions", {
       mean = ~ mean(., na.rm = TRUE),
       sd = ~ sd(., na.rm = TRUE)
     )),
-    causal_edges = causal_ewr
+    causal_edges = causal_ewr,
+    auto_ewr_PU = TRUE
   )
   expect_equal(names(agged_l), c(
     "scenario", "gauge", "planning_unit_name", "ewr_code",
@@ -332,7 +340,8 @@ test_that("multi-step theme agg works, nongeom", {
     groupers = c("scenario", "gauge"),
     aggCols = "ewr_achieved",
     funsequence = funseq,
-    causal_edges = make_edges(causal_ewr, aggseq)
+    causal_edges = make_edges(causal_ewr, aggseq),
+    auto_ewr_PU = TRUE
   )
 
   # stringr::str_flatten(names(agged), "', '")
@@ -369,7 +378,8 @@ test_that("multi-step theme agg works, auto-edges", {
     groupers = c("scenario", "gauge"),
     aggCols = "ewr_achieved",
     funsequence = funseq,
-    causal_edges = causal_ewr
+    causal_edges = causal_ewr,
+    auto_ewr_PU = TRUE
   )
 
   # stringr::str_flatten(names(agged), "', '")
@@ -401,7 +411,8 @@ test_that("multi-step spatial works", {
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
-    funsequence = funseq
+    funsequence = funseq,
+    auto_ewr_PU = TRUE
   )
 
   # stringr::str_flatten(names(spatagg), "', '")
@@ -421,7 +432,8 @@ test_that("multi-step spatial works", {
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = funseq,
-    keepAllPolys = TRUE
+    keepAllPolys = TRUE,
+    auto_ewr_PU = TRUE
   )
   # stringr::str_flatten(names(spatagg), "', '")
   # namestring <- c('scenario', 'polyID', 'sdl_units_mean_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
@@ -481,7 +493,8 @@ test_that("multi-step theme and spatial works", {
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = funseq,
-    causal_edges = causal_ewr
+    causal_edges = causal_ewr,
+    auto_ewr_PU = TRUE
   )
 
   # stringr::str_flatten(names(spatagg), "', '")
@@ -542,7 +555,8 @@ test_that("multi-step theme and spatial works with !namehistory", {
     aggCols = "ewr_achieved",
     funsequence = funseq,
     causal_edges = causal_ewr,
-    namehistory = FALSE
+    namehistory = FALSE,
+    auto_ewr_PU = TRUE
   )
 
   # stringr::str_flatten(names(spatagg), "', '")
@@ -605,7 +619,8 @@ test_that("passing name of sf objects works", {
     aggCols = "ewr_achieved",
     funsequence = funseq,
     causal_edges = causal_ewr,
-    namehistory = FALSE
+    namehistory = FALSE,
+    auto_ewr_PU = TRUE
   )
 
   # stringr::str_flatten(names(spatagg), "', '")
@@ -665,7 +680,8 @@ test_that("backstepping along theme axis throws informative error", {
       aggCols = "ewr_achieved",
       funsequence = funseq,
       causal_edges = causal_ewr,
-      namehistory = FALSE
+      namehistory = FALSE,
+      auto_ewr_PU = TRUE
     ),
     regexp = "Aggregating multiple times"
   )
@@ -703,7 +719,8 @@ test_that("saving the list of steps and appropriate persistence of PU grouping",
     aggCols = "ewr_achieved",
     funsequence = funseq,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   )
 
   # should have planning units up until we aggregate to sdl
@@ -762,7 +779,8 @@ test_that("single functions at each step, called in different ways", {
     aggCols = "ewr_achieved",
     funsequence = funseq_c,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   )
 
   expect_equal(names(spatagg_c), c("ewr_code_timing", names(aggseq)))
@@ -785,7 +803,8 @@ test_that("single functions at each step, called in different ways", {
     aggCols = "ewr_achieved",
     funsequence = funseq_b,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   ))
 
   spatagg_b <- multi_aggregate(ewr_to_agg,
@@ -798,7 +817,8 @@ test_that("single functions at each step, called in different ways", {
       ArithmeticMean
     ),
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   )
 
   expect_equal(names(spatagg_b), c("ewr_code_timing", names(aggseq)))
@@ -820,7 +840,8 @@ test_that("single functions at each step, called in different ways", {
     aggCols = "ewr_achieved",
     funsequence = funseq_l,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   )
 
   expect_equal(names(spatagg_l), c("ewr_code_timing", names(aggseq)))
@@ -850,7 +871,8 @@ test_that("multiple functions at each step", {
     aggCols = "ewr_achieved",
     funsequence = funseq_c,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   )
 
   expect_equal(names(spatagg_c), c("ewr_code_timing", names(aggseq)))
@@ -875,7 +897,8 @@ test_that("multiple functions at each step", {
       c(ArithmeticMean, CompensatingFactor)
     ),
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   )
 
   expect_equal(names(spatagg_b), c("ewr_code_timing", names(aggseq)))
@@ -898,7 +921,8 @@ test_that("multiple functions at each step", {
     aggCols = "ewr_achieved",
     funsequence = funseq_l,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   )
 
   expect_equal(names(spatagg_l), c("ewr_code_timing", names(aggseq)))
@@ -930,7 +954,8 @@ test_that("mixed functions between steps", {
     aggCols = "ewr_achieved",
     funsequence = funseq,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   ))
 
   # Directly declaring list
@@ -944,7 +969,8 @@ test_that("mixed functions between steps", {
       list(ArithmeticMean = ~ ArithmeticMean(.), CompensatingFactor = ~ CompensatingFactor(.))
     ),
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   )
 
   expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
@@ -967,7 +993,8 @@ test_that("mixed functions between steps", {
     aggCols = "ewr_achieved",
     funsequence = funseq_1b,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   ))
 
   # Mixed single functions
@@ -984,7 +1011,8 @@ test_that("mixed functions between steps", {
     aggCols = "ewr_achieved",
     funsequence = funseq_1,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   ))
 
   # Mixed character and list
@@ -1000,7 +1028,8 @@ test_that("mixed functions between steps", {
     aggCols = "ewr_achieved",
     funsequence = funseq_cl,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   )
 
   expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
@@ -1027,7 +1056,8 @@ test_that("mixed functions between steps", {
     aggCols = "ewr_achieved",
     funsequence = funseq_clc,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   ))
 
   # for dplyr 1.0 these work
@@ -1061,7 +1091,8 @@ test_that("mixed functions between steps", {
     aggCols = "ewr_achieved",
     funsequence = funseq,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   ))
 
   # Directly declaring list
@@ -1075,7 +1106,8 @@ test_that("mixed functions between steps", {
       list(ArithmeticMean = ~ ArithmeticMean(.), CompensatingFactor = ~ CompensatingFactor(.))
     ),
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   )
 
   expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
@@ -1098,7 +1130,8 @@ test_that("mixed functions between steps", {
     aggCols = "ewr_achieved",
     funsequence = funseq_1b,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   ))
 
   # Mixed single functions
@@ -1115,7 +1148,8 @@ test_that("mixed functions between steps", {
     aggCols = "ewr_achieved",
     funsequence = funseq_1,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   ))
 
   # Mixed character and list
@@ -1131,7 +1165,8 @@ test_that("mixed functions between steps", {
     aggCols = "ewr_achieved",
     funsequence = funseq_cl,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   )
 
   expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
@@ -1158,7 +1193,8 @@ test_that("mixed functions between steps", {
     aggCols = "ewr_achieved",
     funsequence = funseq_clc,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   ))
 
   # for dplyr 1.0 these work
@@ -1202,7 +1238,8 @@ test_that("mixed functions including quosures, singles, multiples, and character
     aggCols = "ewr_achieved",
     funsequence = funseq,
     causal_edges = causal_ewr,
-    saveintermediate = TRUE
+    saveintermediate = TRUE,
+    auto_ewr_PU = TRUE
   )
 
   expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
@@ -1216,4 +1253,175 @@ test_that("mixed functions including quosures, singles, multiples, and character
   expect_equal(sum(is.na(spatagg$target_5_year_2024)), 3)
 })
 
-# tidyselect for other groupers and aggcols
+test_that("group_until works", {
+  # basic usage
+  aggseq <- list(
+    ewr_code = c("ewr_code_timing", "ewr_code"),
+    env_obj = c("ewr_code", "env_obj"),
+    sdl_units = sdl_units,
+    Specific_goal = c("env_obj", "Specific_goal"),
+    catchment = cewo_valleys,
+    Objective = c("Specific_goal", "Objective"),
+    mdb = basin,
+    target_5_year_2024 = c("Objective", "target_5_year_2024")
+  )
+
+  funseq <- list(
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean"
+  )
+
+  # first, expect it to fail without auto_ewr_PU or group_until
+
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
+    aggsequence = aggseq,
+    groupers = c("scenario"),
+    aggCols = "ewr_achieved",
+    funsequence = funseq,
+    causal_edges = causal_ewr,
+    saveintermediate = TRUE
+  ))
+
+  # By name, vctor
+  spatagg <- multi_aggregate(ewr_to_agg,
+    aggsequence = aggseq,
+    groupers = c("scenario", "planning_unit_name"),
+    group_until = c(NA, "sdl_units"),
+    aggCols = "ewr_achieved",
+    funsequence = funseq,
+    causal_edges = causal_ewr,
+    saveintermediate = TRUE
+  )
+
+  # should have planning units up until we aggregate to sdl
+  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+    "planning_unit_name" %in% names(spatagg$ewr_code) &
+    "planning_unit_name" %in% names(spatagg$env_obj))
+
+  expect_true(!"planning_unit_name" %in% names(spatagg$sdl_units) &
+    !"planning_unit_name" %in% names(spatagg$Specific_goal) &
+    !"planning_unit_name" %in% names(spatagg$catchment))
+
+  # By name, a list, as it should be
+  spatagg <- multi_aggregate(ewr_to_agg,
+    aggsequence = aggseq,
+    groupers = c("scenario", "planning_unit_name"),
+    group_until = list(scenario = NA, planning_unit_name = "sdl_units"),
+    aggCols = "ewr_achieved",
+    funsequence = funseq,
+    causal_edges = causal_ewr,
+    saveintermediate = TRUE
+  )
+
+
+  # should have planning units up until we aggregate to sdl
+  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+    "planning_unit_name" %in% names(spatagg$ewr_code) &
+    "planning_unit_name" %in% names(spatagg$env_obj))
+
+  expect_true(!"planning_unit_name" %in% names(spatagg$sdl_units) &
+    !"planning_unit_name" %in% names(spatagg$Specific_goal) &
+    !"planning_unit_name" %in% names(spatagg$catchment))
+  # There are more, but that should cover it
+
+  # By index
+  spatagg <- multi_aggregate(ewr_to_agg,
+    aggsequence = aggseq,
+    groupers = c("scenario", "planning_unit_name"),
+    group_until = c(NA, 3),
+    aggCols = "ewr_achieved",
+    funsequence = funseq,
+    causal_edges = causal_ewr,
+    saveintermediate = TRUE
+  )
+
+  # should have planning units up until we aggregate to sdl
+  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+    "planning_unit_name" %in% names(spatagg$ewr_code) &
+    "planning_unit_name" %in% names(spatagg$env_obj))
+
+  expect_true(!"planning_unit_name" %in% names(spatagg$sdl_units) &
+    !"planning_unit_name" %in% names(spatagg$Specific_goal) &
+    !"planning_unit_name" %in% names(spatagg$catchment))
+  # There are more, but that should cover it
+
+  expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
+  expect_type(spatagg, "list")
+
+  # by type/test
+  spatagg <- multi_aggregate(ewr_to_agg,
+    aggsequence = aggseq,
+    groupers = c("scenario", "planning_unit_name"),
+    group_until = c(NA, is_notpoint),
+    aggCols = "ewr_achieved",
+    funsequence = funseq,
+    causal_edges = causal_ewr,
+    saveintermediate = TRUE
+  )
+
+  # should have planning units up until we aggregate to sdl
+  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+    "planning_unit_name" %in% names(spatagg$ewr_code) &
+    "planning_unit_name" %in% names(spatagg$env_obj))
+
+  expect_true(!"planning_unit_name" %in% names(spatagg$sdl_units) &
+    !"planning_unit_name" %in% names(spatagg$Specific_goal) &
+    !"planning_unit_name" %in% names(spatagg$catchment))
+  # There are more, but that should cover it
+
+  expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
+  expect_type(spatagg, "list")
+
+  # a named list, only one entry
+  spatagg <- multi_aggregate(ewr_to_agg,
+    aggsequence = aggseq,
+    groupers = c("scenario", "planning_unit_name"),
+    group_until = list(planning_unit_name = "sdl_units"),
+    aggCols = "ewr_achieved",
+    funsequence = funseq,
+    causal_edges = causal_ewr,
+    saveintermediate = TRUE
+  )
+
+  # should have planning units up until we aggregate to sdl
+  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+    "planning_unit_name" %in% names(spatagg$ewr_code) &
+    "planning_unit_name" %in% names(spatagg$env_obj))
+
+  expect_true(!"planning_unit_name" %in% names(spatagg$sdl_units) &
+    !"planning_unit_name" %in% names(spatagg$Specific_goal) &
+    !"planning_unit_name" %in% names(spatagg$catchment))
+
+  # make sure the other groupers persisted
+  expect_true("scenario" %in% names(spatagg$target_5_year_2024))
+  # There are more, but that should cover it
+
+  # a named list, only one entry, function
+  spatagg <- multi_aggregate(ewr_to_agg,
+    aggsequence = aggseq,
+    groupers = c("scenario", "planning_unit_name"),
+    group_until = list(planning_unit_name = is_notpoint),
+    aggCols = "ewr_achieved",
+    funsequence = funseq,
+    causal_edges = causal_ewr,
+    saveintermediate = TRUE
+  )
+
+  # should have planning units up until we aggregate to sdl
+  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+    "planning_unit_name" %in% names(spatagg$ewr_code) &
+    "planning_unit_name" %in% names(spatagg$env_obj))
+
+  expect_true(!"planning_unit_name" %in% names(spatagg$sdl_units) &
+    !"planning_unit_name" %in% names(spatagg$Specific_goal) &
+    !"planning_unit_name" %in% names(spatagg$catchment))
+
+  # make sure the other groupers persisted
+  expect_true("scenario" %in% names(spatagg$target_5_year_2024))
+})
