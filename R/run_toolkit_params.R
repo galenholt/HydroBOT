@@ -26,8 +26,7 @@
 run_toolkit_params <- function(yamlpath = NULL,
                                passed_args = NULL,
                                list_args = NULL,
-                               defaults = system.file('yml/default_params.yml', package = 'werptoolkitr')) {
-
+                               defaults = system.file("yml/default_params.yml", package = "werptoolkitr")) {
   # I could have a 'defaults' file and then a params that just changes some.
   # Maybe later. Might make a lot of sense if the only thing being passed in is
   # one value.
@@ -47,15 +46,18 @@ run_toolkit_params <- function(yamlpath = NULL,
   comargs <- yaml::yaml.load(passed_args)
 
   # Replace the arglist vals with passed args from command line
-  if (is.list(comargs)) {arglist <- utils::modifyList(arglist, comargs)}
+  if (is.list(comargs)) {
+    arglist <- utils::modifyList(arglist, comargs)
+  }
 
   # bring in list-args (especially useful for parameterised quarto notebook)
   if (is.list(list_args)) {
     # remove class from quarto list so later functions know how to use it
-    if (inherits(list_args, 'knit_param_list')) {list_args <- unclass(list_args)}
+    if (inherits(list_args, "knit_param_list")) {
+      list_args <- unclass(list_args)
+    }
 
     arglist <- utils::modifyList(arglist, list_args)
-
   }
 
   # R file allows aggregation definition with R types and expressions. This is
@@ -64,10 +66,10 @@ run_toolkit_params <- function(yamlpath = NULL,
   if (!is.null(arglist$aggregation_def)) {
     if (file.exists(arglist$aggregation_def)) {
       source(arglist$aggregation_def, local = TRUE)
-    } else if ( file.exists(file.path('inst', arglist$aggregation_def))) {
-      source(file.path('inst', arglist$aggregation_def), local = TRUE)
+    } else if (file.exists(file.path("inst", arglist$aggregation_def))) {
+      source(file.path("inst", arglist$aggregation_def), local = TRUE)
     } else {
-      rlang::abort(glue::glue('requested parameter R file {arglist$aggregation_def} does not exist.'))
+      rlang::abort(glue::glue("requested parameter R file {arglist$aggregation_def} does not exist."))
     }
 
     # check others
@@ -85,14 +87,13 @@ run_toolkit_params <- function(yamlpath = NULL,
 
     # Some attempts at simple cleanup- funseq sometimes comes in as a vector
     # from the yaml if we only have one function
-    if (!inherits(funseq, 'list')) {
+    if (!inherits(funseq, "list")) {
       if (length(funseq) == length(aggseq)) {
         funseq <- as.list(aggseq)
       } else {
         rlang::abort("Function sequence is not a list and cannot obviously be translated into a list of the same length as the aggregation steps. Try to re-specify. The yaml is often easier to enforce a list using names.")
       }
     }
-
   }
 
   # catch edges
@@ -107,43 +108,50 @@ run_toolkit_params <- function(yamlpath = NULL,
   # Type cleanup
   arglist <- type_cleanup(arglist)
 
-  ewr_out <- prep_run_save_ewrs(hydro_dir = arglist$hydro_dir,
-                                  output_parent_dir = arglist$output_parent_dir,
-                                  outputType = arglist$outputType,
-                                  returnType = arglist$returnType,
-                                extrameta = list(ewr_run_from_params = TRUE,
-                                                 ewr_param_default = defaults,
-                                                 ewr_param_yml = yamlpath,
-                                                 ewr_param_passed = passed_args,
-                                                 ewr_param_list = list_args))
+  ewr_out <- prep_run_save_ewrs(
+    hydro_dir = arglist$hydro_dir,
+    output_parent_dir = arglist$output_parent_dir,
+    outputType = arglist$outputType,
+    returnType = arglist$returnType,
+    extrameta = list(
+      ewr_run_from_params = TRUE,
+      ewr_param_default = defaults,
+      ewr_param_yml = yamlpath,
+      ewr_param_passed = passed_args,
+      ewr_param_list = list_args
+    )
+  )
 
-  aggout <- read_and_agg(datpath = arglist$agg_input_path,
-                         type = arglist$aggType,
-                         geopath = bom_basin_gauges,
-                         causalpath = causal_ewr,
-                         groupers = arglist$agg_groups,
-                         group_until = arglist$agg_group_until,
-                         aggCols = arglist$agg_var,
-                         aggsequence = aggseq,
-                         funsequence = funseq,
-                         saveintermediate = TRUE,
-                         namehistory = arglist$namehistory,
-                         keepAllPolys = arglist$keepAllPolys,
-                         auto_ewr_PU = arglist$auto_ewr_PU,
-                         returnList = arglist$aggReturn,
-                         savepath = arglist$agg_results,
-                         extrameta = list(agg_run_from_params = TRUE,
-                                          agg_param_default = defaults,
-                                          agg_param_yml = yamlpath,
-                                          agg_param_passed = passed_args,
-                                          agg_param_list = list_args))
+  aggout <- read_and_agg(
+    datpath = arglist$agg_input_path,
+    type = arglist$aggType,
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = arglist$agg_groups,
+    group_until = arglist$agg_group_until,
+    aggCols = arglist$agg_var,
+    aggsequence = aggseq,
+    funsequence = funseq,
+    saveintermediate = TRUE,
+    namehistory = arglist$namehistory,
+    keepAllPolys = arglist$keepAllPolys,
+    auto_ewr_PU = arglist$auto_ewr_PU,
+    returnList = arglist$aggReturn,
+    savepath = arglist$agg_results,
+    extrameta = list(
+      agg_run_from_params = TRUE,
+      agg_param_default = defaults,
+      agg_param_yml = yamlpath,
+      agg_param_passed = passed_args,
+      agg_param_list = list_args
+    )
+  )
 
   if (arglist$aggReturn) {
     return(aggout)
   } else {
     return(invisible())
   }
-
 }
 
 #
@@ -153,16 +161,16 @@ run_toolkit_params <- function(yamlpath = NULL,
 #'
 #' @examples
 make_default_args <- function(arglist) {
-  if (arglist$hydro_dir == 'default' || is.null(arglist$hydro_dir)) {
-    arglist$hydro_dir = file.path(arglist$output_parent_dir, 'hydrographs')
+  if (arglist$hydro_dir == "default" || is.null(arglist$hydro_dir)) {
+    arglist$hydro_dir <- file.path(arglist$output_parent_dir, "hydrographs")
   }
 
-  if (arglist$agg_input_path == 'default' || is.null(arglist$agg_input_path)) {
-    arglist$agg_input_path <- file.path(arglist$output_parent_dir, 'module_output', 'EWR')
+  if (arglist$agg_input_path == "default" || is.null(arglist$agg_input_path)) {
+    arglist$agg_input_path <- file.path(arglist$output_parent_dir, "module_output", "EWR")
   }
 
-  if (arglist$agg_results == 'default' || is.null(arglist$agg_results)) {
-    arglist$agg_results <- file.path(arglist$output_parent_dir, 'aggregator_output')
+  if (arglist$agg_results == "default" || is.null(arglist$agg_results)) {
+    arglist$agg_results <- file.path(arglist$output_parent_dir, "aggregator_output")
   }
 
   return(arglist)
@@ -175,10 +183,13 @@ make_default_args <- function(arglist) {
 #'
 #' @examples
 type_cleanup <- function(arglist) {
+  if (!is.list(arglist$returnType)) {
+    arglist$returnType <- as.list(arglist$returnType)
+  }
 
-  if (!is.list(arglist$returnType)) {arglist$returnType <- as.list(arglist$returnType)}
-
-  if (!is.list(arglist$outputType)) {arglist$outputType <- as.list(arglist$outputType)}
+  if (!is.list(arglist$outputType)) {
+    arglist$outputType <- as.list(arglist$outputType)
+  }
 
   return(arglist)
 }
