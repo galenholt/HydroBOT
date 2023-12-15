@@ -79,10 +79,11 @@ theme_aggregate <- function(dat,
 
   # Need to get the gauge x planning unit mappngs. EWR tool returns the names, not the IDs
   g2p <- get_ewr_table()|>
-    dplyr::select(Gauge, PlanningUnitName) |>
+    dplyr::select(gauge = Gauge,
+                  planning_unit_name = PlanningUnitName,
+                  PlanningUnitID) |>
     dplyr::distinct() |>
-    tibble::tibble() |>
-    dplyr::rename_with(tolower)
+    tibble::tibble()
 
   # clean up the edges to only relevant
   # auto-generate the edges if a full list has been passed in

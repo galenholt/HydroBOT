@@ -24,7 +24,7 @@ clean_obj_target <- function(ewrobjs,
 
   # This cuts to only a single row per planning unit/objective pair and drops the ewrs
   objpu <- ewrobjs |>
-    dplyr::select(tidyselect::any_of(c('PlanningUnitID', 'LTWPShortName')), env_obj) |>
+    dplyr::select(tidyselect::any_of(c('PlanningUnitID', 'planning_unit_name', 'LTWPShortName')), env_obj) |>
     dplyr::distinct()
 
   # This csv has the relationships from objectives to a few other things- target groups, species and other things like refugia, 'Objectives'
@@ -90,7 +90,7 @@ clean_obj_target <- function(ewrobjs,
 
   # cleanup column ordering
   obj2target <- obj2target |>
-    dplyr::select(any_of('PlanningUnitID'),
+    dplyr::select(any_of(c('PlanningUnitID', 'planning_unit_name')),
                   LTWPShortName, env_obj, Specific_goal, Objective, Target)
 
   # final cleanup of weird characters and dplyr::rename to standard

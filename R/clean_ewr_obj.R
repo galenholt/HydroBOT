@@ -41,7 +41,7 @@ clean_ewr_obj <- function(ewrobjpath,
     # Expand out to gauge scale- give the relevant LTWP area and ewr_code to each gauge and PlanningUnit
     # This may not be needed here, but it retains maximal information, including some that got lost in the switch to NSW ewr-obj mapping
     ewrs_in_pyewr <- get_ewr_table() |>
-      dplyr::select(PlanningUnitID, LTWPShortName, gauge = Gauge, ewr_code = Code) |>
+      dplyr::select(PlanningUnitID, planning_unit_name = PlanningUnitName, LTWPShortName, gauge = Gauge, ewr_code = Code) |>
       separate_ewr_codes()
 
     ewr2obj <- dplyr::left_join(ewrs_in_pyewr, ewr2obj, by = c('LTWPShortName', 'ewr_code', 'ewr_code_timing'))
