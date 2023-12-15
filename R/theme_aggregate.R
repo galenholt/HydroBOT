@@ -43,12 +43,13 @@ theme_aggregate <- function(dat,
                             geonames = NULL,
                             failmissing = TRUE,
                             ...) {
-
   # Bare names get lost as we go down into further functions, so use characters
   # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
   if (is.function(funlist) || (is.list(funlist) & is.function(funlist[[1]]))) {
     funlist <- as.character(substitute(funlist))
-    if(funlist[1] == "c") {funlist <- funlist[2:length(funlist)]}
+    if (funlist[1] == "c") {
+      funlist <- funlist[2:length(funlist)]
+    }
   }
 
   # including geometry in non-geometric
@@ -58,11 +59,13 @@ theme_aggregate <- function(dat,
   # can they be the same function? probably.
   spatialflag <- FALSE
   polyflag <- FALSE
-  if ('sf' %in% class(dat)) {
+  if ("sf" %in% class(dat)) {
     spatialflag <- TRUE
-    if (!all(sf::st_is(dat, 'POINT'))) {polyflag <- TRUE}
+    if (!all(sf::st_is(dat, "POINT"))) {
+      polyflag <- TRUE
+    }
 
-    if (!('polyID' %in% names(dat))) {
+    if (!("polyID" %in% names(dat))) {
       dat <- dat |>
         add_polyID(failduplicate = FALSE)
     }
@@ -74,48 +77,48 @@ theme_aggregate <- function(dat,
       dplyr::ungroup()
 
     dat <- sf::st_drop_geometry(dat)
-    groupers <- c(groupers, 'polyID')
+    groupers <- c(groupers, "polyID")
   }
-
-  # Need to get the gauge x planning unit mappngs. EWR tool returns the names, not the IDs
-  g2p <- get_ewr_table()|>
-    dplyr::select(gauge = Gauge,
-                  planning_unit_name = PlanningUnitName,
-                  PlanningUnitID) |>
-    dplyr::distinct() |>
-    tibble::tibble()
 
   # clean up the edges to only relevant
   # auto-generate the edges if a full list has been passed in
-  if (!inherits(causal_edges, 'data.frame') & inherits(causal_edges, 'list')) {
+  if (!inherits(causal_edges, "data.frame") & inherits(causal_edges, "list")) {
     causal_edges <- make_edges(causal_edges, list(c(from_theme, to_theme)))
   }
   causal_edges <- causal_edges |>
     dplyr::filter(fromtype == from_theme & totype == to_theme) |>
-    dplyr::select(tidyselect::where(~!all(is.na(.))))
+    dplyr::select(tidyselect::where(~ !all(is.na(.))))
 
   # check and dplyr::rename
   if (length(unique(causal_edges$fromtype)) > 1 | length(unique(causal_edges$totype)) > 1) {
     stop("trying to aggregate into multiple groupings")
   } else {
-    names(causal_edges)[names(causal_edges) == 'to'] <- causal_edges$totype[1]
-    names(causal_edges)[names(causal_edges) == 'from'] <- causal_edges$fromtype[1]
+    names(causal_edges)[names(causal_edges) == "to"] <- causal_edges$totype[1]
+    names(causal_edges)[names(causal_edges) == "from"] <- causal_edges$fromtype[1]
   }
 
+
+  # join to causal_edges
+  pairdat <- dat |>
+    dplyr::left_join(causal_edges, relationship = "many-to-many")
 
   # the theme-level outcomes are defined at gauges and planning units (often
   # many-to-many, e.g. gauges might contribute to EWRs in multiple PUs, and PUs
   # might include several gauges). we want to map back to that until we've done
   # spatial aggregation into something larger. this conditional is really ugly
-  # though
-
-  if (spatialflag && polyflag) {
-    pairdat <- dat |>
-      dplyr::left_join(causal_edges, relationship = "many-to-many")
-  } else {
-    pairdat <- dat |>
-      dplyr::left_join(g2p, relationship = "many-to-many") |>
-      dplyr::left_join(causal_edges, relationship = "many-to-many")
+  # though. This is only true of ewrs. SO check if we're not yet in polys, and
+  # if these are EWRs. If yes, then add planning unit to groupers We don't have
+  # to do something similar for spatial, because this gets taken care of as soon
+  # as we're above hte Planning Unit scale (though I suppose it's possible to
+  # aggregate to something smaller than a PU and larger than a gauge, that's an
+  # edge case to deal with later)
+  if (!polyflag) {
+    # Infer EWR from presence in causal_ewr
+    ewrnames <- purrr::map(causal_ewr, names) |> unlist()
+    isewr <- to_theme %in% ewrnames
+    if (isewr) {
+      groupers <- c(groupers, 'planning_unit_name')
+    }
   }
 
 
@@ -123,20 +126,20 @@ theme_aggregate <- function(dat,
   # because aggCols needs to be evaluated to a character vector, not passed in
   # as an object name. Annoying.
   agged <- general_aggregate(pairdat,
-                           groupers = c(groupers, to_theme), # Group by the groupers plus the level we're grouping into
-                           aggCols = tidyselect::ends_with(!!aggCols),
-                           funlist = funlist,
-                           prefix = paste0(to_theme, '_'),# replace the general 'theme' prefix with the specific theme level being aggregated to
-                           failmissing = failmissing,
-                           ...)
+    groupers = c(groupers, to_theme), # Group by the groupers plus the level we're grouping into
+    aggCols = tidyselect::ends_with(!!aggCols),
+    funlist = funlist,
+    prefix = paste0(to_theme, "_"), # replace the general 'theme' prefix with the specific theme level being aggregated to
+    failmissing = failmissing,
+    ...
+  )
 
   if (spatialflag) {
-    dat <- dplyr::left_join(agged, geodat, by = 'polyID') |>
+    dat <- dplyr::left_join(agged, geodat, by = "polyID") |>
       sf::st_as_sf()
   } else {
     dat <- agged
   }
 
   return(dat)
-
 }

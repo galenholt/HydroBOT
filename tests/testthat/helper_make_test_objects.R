@@ -32,9 +32,9 @@ make_test_ewr_prepped <- function() {
     dplyr::mutate(gaugexpu = paste0(gauge, '_', planningUnit))
 
   prepmaps <- ewr_prepped |>
-    dplyr::select(gauge, planning_unit) |>
+    dplyr::select(gauge, planning_unit_name) |>
     dplyr::distinct() |>
-    dplyr::mutate(gaugexpu = paste0(gauge, '_', planning_unit))
+    dplyr::mutate(gaugexpu = paste0(gauge, '_', planning_unit_name))
 
   expect_true(all(ewrmaps$gaugexpu %in% prepmaps$gaugexpu) &
                 all(prepmaps$gaugexpu %in% ewrmaps$gaugexpu))

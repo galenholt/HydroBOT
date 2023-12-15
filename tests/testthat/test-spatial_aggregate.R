@@ -233,7 +233,7 @@ test_that("bare functions", {
                   'spatial_mean_ewr_achieved_timeframe', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 72)
+  expect_equal(nrow(spatagg), 87)
 })
 
 test_that("bare names", {
@@ -248,7 +248,7 @@ test_that("bare names", {
                   'spatial_mean_ewr_achieved_timeframe', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 72)
+  expect_equal(nrow(spatagg), 87)
 })
 
 test_that("tidyselect and mixed", {
@@ -265,7 +265,7 @@ test_that("tidyselect and mixed", {
                   'spatial_mean_ewr_achieved_timeframe', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 72)
+  expect_equal(nrow(spatagg), 87)
 })
 
 # character vectors for groups and aggCols
@@ -291,7 +291,7 @@ test_that("failmissing", {
                   'spatial_mean_ewr_achieved_timeframe', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 72)
+  expect_equal(nrow(spatagg), 87)
 })
 
 # todo --------------------------------------------------------------------
