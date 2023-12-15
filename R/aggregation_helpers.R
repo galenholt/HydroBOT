@@ -32,43 +32,46 @@ agg_names_to_cols <-
         tidyr::pivot_longer(tidyselect::ends_with(aggCols)) |>
         # This removes the aggregation level name ('ewr_code', 'catchment', etc)
         dplyr::mutate(
-          allfuns = stringr::str_remove_all(name,
-                                            stringr::str_flatten(
-                                              stringr::str_c('(', unlist(aggsequence), ')'),
-                                              collapse = '|'
-                                            )),
-          allfuns = stringr::str_remove(allfuns, '^_')
+          allfuns = stringr::str_remove_all(
+            name,
+            stringr::str_flatten(
+              stringr::str_c("(", unlist(aggsequence), ")"),
+              collapse = "|"
+            )
+          ),
+          allfuns = stringr::str_remove(allfuns, "^_")
         ) |>
         tidyr::separate(
           allfuns,
-          into = paste0('aggfun_', length(funsequence):1),
-          sep = '__'
+          into = paste0("aggfun_", length(funsequence):1),
+          sep = "__"
         ) |>
         tidyr::separate(
           aggfun_1,
-          into = c('aggfun_1', 'original'),
-          sep = '_',
-          extra = 'merge'
+          into = c("aggfun_1", "original"),
+          sep = "_",
+          extra = "merge"
         ) |>
         dplyr::mutate(alllevs = stringr::str_remove_all(
           name,
-          stringr::str_flatten(stringr::str_c('(', unlist(funsequence), ')'),
-                               collapse = '|')
+          stringr::str_flatten(stringr::str_c("(", unlist(funsequence), ")"),
+            collapse = "|"
+          )
         )) |>
         tidyr::separate(
           alllevs,
-          into = paste0('aggLevel_', length(funsequence):1),
-          sep = '__'
+          into = paste0("aggLevel_", length(funsequence):1),
+          sep = "__"
         ) |>
         dplyr::select(-name) |>
         # sf seems to be behind tidyverse, and needs characters here instead of bare
         # names. Both seem to work for normal df/tibbles
-        tidyr::pivot_wider(names_from = 'original', values_from = 'value') |>
+        tidyr::pivot_wider(names_from = "original", values_from = "value") |>
         dplyr::select(
-          !tidyselect::ends_with(stringr::str_c('_', as.character(
+          !tidyselect::ends_with(stringr::str_c("_", as.character(
             1:length(funsequence)
           ))),
-          tidyselect::ends_with(stringr::str_c('_', as.character(
+          tidyselect::ends_with(stringr::str_c("_", as.character(
             1:length(funsequence)
           )))
         )
@@ -116,7 +119,7 @@ parse_geo <- function(x) {
 #' parse_char)
 #'
 parse_char <- function(x, idx) {
-  if (inherits(x, 'data.frame')) {
+  if (inherits(x, "data.frame")) {
     return(idx)
   } else {
     return(x)
@@ -136,7 +139,7 @@ parse_char_funs <- function(x) {
   if (rlang::is_quosure(x)) {
     # deparsing it removes the quo, so add it back
     charfun <- deparse(rlang::quo_get_expr(x))
-    charfun <- paste0(c("rlang::quo(", charfun, ")"), collapse = '')
+    charfun <- paste0(c("rlang::quo(", charfun, ")"), collapse = "")
     return(charfun)
   }
   if (is.character(x)) {
@@ -146,7 +149,6 @@ parse_char_funs <- function(x) {
     charfun <- deparse(x)
     return(charfun)
   }
-
 }
 
 
@@ -229,7 +231,7 @@ parse_aggnum <- function(x, aggsequence) {
 #' is_sf(basin)
 #' is_sf(iris)
 is_sf <- function(x) {
-  inherits(x, 'sf')
+  inherits(x, "sf")
 }
 
 #' Test whether an object is a spatial point sf

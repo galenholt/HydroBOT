@@ -1425,51 +1425,49 @@ test_that("group_until works", {
   expect_true("scenario" %in% names(spatagg$target_5_year_2024))
 
   # a named list, group_until not in groupers and tidyselected grouper
-    # Because
+  # Because
   spatagg <- multi_aggregate(ewr_to_agg,
-                             aggsequence = aggseq,
-                             groupers = tidyselect::starts_with('sce'),
-                             group_until = list(planning_unit_name = is_notpoint),
-                             aggCols = "ewr_achieved",
-                             funsequence = funseq,
-                             causal_edges = causal_ewr,
-                             saveintermediate = TRUE
+    aggsequence = aggseq,
+    groupers = tidyselect::starts_with("sce"),
+    group_until = list(planning_unit_name = is_notpoint),
+    aggCols = "ewr_achieved",
+    funsequence = funseq,
+    causal_edges = causal_ewr,
+    saveintermediate = TRUE
   )
 
   # should have planning units up until we aggregate to sdl
   expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
-                "planning_unit_name" %in% names(spatagg$ewr_code) &
-                "planning_unit_name" %in% names(spatagg$env_obj))
+    "planning_unit_name" %in% names(spatagg$ewr_code) &
+    "planning_unit_name" %in% names(spatagg$env_obj))
 
   expect_true(!"planning_unit_name" %in% names(spatagg$sdl_units) &
-                !"planning_unit_name" %in% names(spatagg$Specific_goal) &
-                !"planning_unit_name" %in% names(spatagg$catchment))
+    !"planning_unit_name" %in% names(spatagg$Specific_goal) &
+    !"planning_unit_name" %in% names(spatagg$catchment))
 
   # make sure the other groupers persisted
   expect_true("scenario" %in% names(spatagg$target_5_year_2024))
 
   # another tidyselect
   spatagg <- multi_aggregate(ewr_to_agg,
-                             aggsequence = aggseq,
-                             groupers = tidyselect::matches("(sce)|(plan)"),
-                             group_until = list(planning_unit_name = is_notpoint),
-                             aggCols = "ewr_achieved",
-                             funsequence = funseq,
-                             causal_edges = causal_ewr,
-                             saveintermediate = TRUE
+    aggsequence = aggseq,
+    groupers = tidyselect::matches("(sce)|(plan)"),
+    group_until = list(planning_unit_name = is_notpoint),
+    aggCols = "ewr_achieved",
+    funsequence = funseq,
+    causal_edges = causal_ewr,
+    saveintermediate = TRUE
   )
 
   # should have planning units up until we aggregate to sdl
   expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
-                "planning_unit_name" %in% names(spatagg$ewr_code) &
-                "planning_unit_name" %in% names(spatagg$env_obj))
+    "planning_unit_name" %in% names(spatagg$ewr_code) &
+    "planning_unit_name" %in% names(spatagg$env_obj))
 
   expect_true(!"planning_unit_name" %in% names(spatagg$sdl_units) &
-                !"planning_unit_name" %in% names(spatagg$Specific_goal) &
-                !"planning_unit_name" %in% names(spatagg$catchment))
+    !"planning_unit_name" %in% names(spatagg$Specific_goal) &
+    !"planning_unit_name" %in% names(spatagg$catchment))
 
   # make sure the other groupers persisted
   expect_true("scenario" %in% names(spatagg$target_5_year_2024))
 })
-
-

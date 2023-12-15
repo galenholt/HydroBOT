@@ -36,7 +36,7 @@ read_and_agg <- function(datpath,
                          type,
                          geopath,
                          causalpath,
-                         groupers = 'scenario',
+                         groupers = "scenario",
                          group_until = rep(NA, length(groupers)),
                          aggCols,
                          aggsequence,
@@ -50,7 +50,6 @@ read_and_agg <- function(datpath,
                          savepath = NULL,
                          extrameta = NULL,
                          ...) {
-
   # The ... pass gauge and scenario filters to `prep_ewr_agg`
 
   if (!returnList & is.null(savepath)) {
@@ -59,19 +58,26 @@ read_and_agg <- function(datpath,
 
   # set up metadata placeholders to know if the run failed
   if (!is.null(savepath)) {
-    if (!dir.exists(savepath)) {dir.create(savepath, recursive = TRUE)}
+    if (!dir.exists(savepath)) {
+      dir.create(savepath, recursive = TRUE)
+    }
     # set up flags for the metadata in case the ewr fails partway
-    init_params <- list(meta_message = "Started run, has not finished. New metadata file will write when it does. If this metadata entry persists, the run failed.",
-                        agg_status = FALSE,
-                        time = format(Sys.time(), digits = 0, usetz = TRUE))
+    init_params <- list(
+      meta_message = "Started run, has not finished. New metadata file will write when it does. If this metadata entry persists, the run failed.",
+      agg_status = FALSE,
+      time = format(Sys.time(), digits = 0, usetz = TRUE)
+    )
     yaml::write_yaml(init_params,
-                     file = file.path(savepath, 'agg_metadata.yml'))
-    if (rlang::is_installed('jsonlite')) {
+      file = file.path(savepath, "agg_metadata.yml")
+    )
+    if (rlang::is_installed("jsonlite")) {
       jsonlite::write_json(init_params,
-                         path = file.path(savepath, 'agg_metadata.json'))
+        path = file.path(savepath, "agg_metadata.json")
+      )
     } else {
-      rlang::inform('json metadata not saved. If desired, install `jsonlite`',
-                    .frequency = 'regularly', .frequency_id = 'jsoncheck')
+      rlang::inform("json metadata not saved. If desired, install `jsonlite`",
+        .frequency = "regularly", .frequency_id = "jsoncheck"
+      )
     }
   }
 
@@ -81,8 +87,10 @@ read_and_agg <- function(datpath,
   aggsequence <- purrr::map(aggsequence, parse_geo)
   themeseq <- aggsequence[purrr::map_lgl(aggsequence, is.character)]
 
-  edges <- make_edges(dflist = causalpath,
-                      fromtos = themeseq)
+  edges <- make_edges(
+    dflist = causalpath,
+    fromtos = themeseq
+  )
 
   # be aggressive about parsing tidyselect into characters or expressions get
   # lost in the stack
@@ -93,38 +101,46 @@ read_and_agg <- function(datpath,
   # to do this is to do it here to make it standard, although it will also
   # happen in multi-aggregate.
 
-  group_until <- parse_group_until(group_until = group_until,
-                                     groupers = groupers,
-                                     aggsequence = aggsequence)
+  group_until <- parse_group_until(
+    group_until = group_until,
+    groupers = groupers,
+    aggsequence = aggsequence
+  )
 
   # Annoying how much of this is just pass-through arguments. Could use dots,
   # but then would need to specify the prep_ewr_agg dots.
   aggout <- multi_aggregate(data,
-                            edges,
-                            groupers = groupers,
-                            group_until = group_until,
-                            aggCols = aggCols,
-                            aggsequence = aggsequence,
-                            funsequence = funsequence,
-                            saveintermediate = saveintermediate,
-                            namehistory = namehistory,
-                            keepAllPolys = keepAllPolys,
-                            failmissing = failmissing,
-                            auto_ewr_PU = auto_ewr_PU)
+    edges,
+    groupers = groupers,
+    group_until = group_until,
+    aggCols = aggCols,
+    aggsequence = aggsequence,
+    funsequence = funsequence,
+    saveintermediate = saveintermediate,
+    namehistory = namehistory,
+    keepAllPolys = keepAllPolys,
+    failmissing = failmissing,
+    auto_ewr_PU = auto_ewr_PU
+  )
 
   # use RDS so can read it in to a different name.
   if (!is.null(savepath)) {
-    if (!dir.exists(savepath)) {dir.create(savepath, recursive = TRUE)}
-    saveRDS(aggout, file.path(savepath, paste0(type, '_aggregated.rds')))
+    if (!dir.exists(savepath)) {
+      dir.create(savepath, recursive = TRUE)
+    }
+    saveRDS(aggout, file.path(savepath, paste0(type, "_aggregated.rds")))
 
-    if (!rlang::is_installed('git2r')) {
-      rlang::inform('git sha not available. Install `git2r`',
-                    .frequency = 'regularly', .frequency_id = 'git2rcheck')
+    if (!rlang::is_installed("git2r")) {
+      rlang::inform("git sha not available. Install `git2r`",
+        .frequency = "regularly", .frequency_id = "git2rcheck"
+      )
       gitcom <- NULL
     }
-    if (rlang::is_installed('git2r')) {
+    if (rlang::is_installed("git2r")) {
       gitcom <- try(git2r::sha(git2r::commits()[[1]]), silent = TRUE)
-      if (inherits(gitcom, 'try-error')) {gitcom <- NULL}
+      if (inherits(gitcom, "try-error")) {
+        gitcom <- NULL
+      }
     }
 
     char_aggsequence <- purrr::imap(aggsequence, parse_char)
@@ -132,23 +148,27 @@ read_and_agg <- function(datpath,
     # using names makes the yaml cleaner
     names(char_funsequence) <- names(char_aggsequence)
 
-    agg_params <- list(agg_input_path = datpath,
-                       aggType = type,
-                       agg_groups = groupers,
-                       agg_group_until = group_until,
-                       agg_var = aggCols,
-                       aggregation_sequence = char_aggsequence,
-                       aggregation_funsequence = char_funsequence,
-                       namehistory = namehistory,
-                       keepAllPolys = keepAllPolys,
-                       auto_ewr_PU = auto_ewr_PU,
-                       aggReturn = returnList,
-                       agg_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
-                       agg_status = TRUE,
-                       agg_git_commit = gitcom)
+    agg_params <- list(
+      agg_input_path = datpath,
+      aggType = type,
+      agg_groups = groupers,
+      agg_group_until = group_until,
+      agg_var = aggCols,
+      aggregation_sequence = char_aggsequence,
+      aggregation_funsequence = char_funsequence,
+      namehistory = namehistory,
+      keepAllPolys = keepAllPolys,
+      auto_ewr_PU = auto_ewr_PU,
+      aggReturn = returnList,
+      agg_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
+      agg_status = TRUE,
+      agg_git_commit = gitcom
+    )
 
     # add any passed metadata info
-    if (is.list(extrameta)) {agg_params <- utils::modifyList(agg_params, extrameta)}
+    if (is.list(extrameta)) {
+      agg_params <- utils::modifyList(agg_params, extrameta)
+    }
 
     # append any module metadata, so it all stays together
     ymlmodpath <- list.files(datpath, pattern = "*.yml")
@@ -160,9 +180,10 @@ read_and_agg <- function(datpath,
     }
 
     yaml::write_yaml(c(ymlmods, agg_params),
-                     file = file.path(savepath, 'agg_metadata.yml'))
+      file = file.path(savepath, "agg_metadata.yml")
+    )
 
-    if (rlang::is_installed('jsonlite')) {
+    if (rlang::is_installed("jsonlite")) {
       jsonmodpath <- list.files(datpath, pattern = "*.json")
       if (length(jsonmodpath) != 0) {
         jsonmods <- file.path(datpath, jsonmodpath) |>
@@ -171,14 +192,18 @@ read_and_agg <- function(datpath,
         jsonmods <- NULL
       }
       jsonlite::write_json(c(jsonmods, agg_params),
-                           path = file.path(savepath, 'agg_metadata.json'))
+        path = file.path(savepath, "agg_metadata.json")
+      )
     } else {
-      rlang::inform('json metadata not saved. If desired, install `jsonlite`',
-                    .frequency = 'regularly', .frequency_id = 'jsoncheck')
+      rlang::inform("json metadata not saved. If desired, install `jsonlite`",
+        .frequency = "regularly", .frequency_id = "jsoncheck"
+      )
     }
-
   }
 
-  if (returnList) {return(aggout)} else {return(NULL)}
-
+  if (returnList) {
+    return(aggout)
+  } else {
+    return(NULL)
+  }
 }

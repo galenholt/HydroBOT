@@ -158,9 +158,11 @@ multi_aggregate <- function(dat,
   # I'm wrong
   groupers <- selectcreator(rlang::enquo(groupers), dat, failmissing)
   # we need to handle different ways of getting `group_until`
-  group_indices <- parse_group_until(group_until = group_until,
-                                     groupers = groupers,
-                                     aggsequence = aggsequence)
+  group_indices <- parse_group_until(
+    group_until = group_until,
+    groupers = groupers,
+    aggsequence = aggsequence
+  )
 
   # a simple fix to leaving group_until out of groupers, but won't work if groupers is fancy
   # If groupers is a character, we can just add the missing
