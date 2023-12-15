@@ -149,6 +149,75 @@ parse_char_funs <- function(x) {
 
 }
 
+
+# Parsing group_until -----------------------------------------------------
+#' Parses group_until into standard form
+#'
+#' @inheritParams multi_aggregate
+#'
+#' @return a named list of the group_until groupers with numeric index.
+#' @examples
+parse_group_until <- function(group_until, groupers, aggsequence) {
+  # get indexing for group_until drops
+  if (!is.list(group_until)) {
+    # Try to fix, but not too hard
+    if (is.character(groupers) & length(group_until) == length(groupers)) {
+      group_until <- as.list(group_until) |> setNames(groupers)
+    } else {
+      rlang::abort("group_until should always be a named list.
+      If used with types other than character or numeric, it *must* be.")
+    }
+  }
+
+  # Try a bit harder with the names; they fall off for unnamed vectors with functions
+  if (is.null(names(group_until)) & length(group_until) == length(groupers) & is.character(groupers)) {
+    names(group_until) <- groupers
+  }
+
+  group_indices <- purrr::map(group_until, \(x) parse_aggnum(x, aggsequence)) |>
+    purrr::discard(is.null)
+
+  return(group_indices)
+}
+
+#' Main function of parse_group_until, finds the index for different ways of specifying group_until
+#'
+#' @param x one of the group_until items
+#' @param aggsequence as in [multi_aggregate()]
+#'
+#' @return numeric index for each group_until
+#'
+#' @examples
+parse_aggnum <- function(x, aggsequence) {
+  # if na, make grouper persist (if we test a closure it `warn`s)
+  if (!rlang::is_function(x) && is.na(x)) {
+    # gind <- length(aggsequence) + 1
+    gind <- NULL
+  } else {
+    # the is.na in an outer level, because we can have NA characters and numeric and etc
+    # if character, find the aggsequence name
+    if (is.character(x)) {
+      if (!x %in% names(aggsequence)) {
+        rlang::warn("not able to infer `group_until`, aggsequence names do not match.
+                    Retaining grouping until the end")
+        gind <- length(aggsequence) + 1
+      } else {
+        gind <- which(names(aggsequence) == x)
+      }
+    }
+    if (rlang::is_function(x)) {
+      # assumes to evaluate to logical
+      gind <- min(which(aggsequence |> purrr::map_lgl(x)))
+    }
+
+    if (is.numeric(x)) {
+      gind <- x
+    }
+  }
+
+  return(gind)
+}
+
 #' Test whether an object is an sf
 #'
 #' @param x anything, but typically a dataframe

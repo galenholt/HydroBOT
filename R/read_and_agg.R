@@ -37,6 +37,7 @@ read_and_agg <- function(datpath,
                          geopath,
                          causalpath,
                          groupers = 'scenario',
+                         group_until = rep(NA, length(groupers)),
                          aggCols,
                          aggsequence,
                          funsequence,
@@ -44,6 +45,7 @@ read_and_agg <- function(datpath,
                          namehistory = TRUE,
                          keepAllPolys = FALSE,
                          failmissing = TRUE,
+                         auto_ewr_PU = FALSE,
                          returnList = TRUE,
                          savepath = NULL,
                          extrameta = NULL,
@@ -87,18 +89,28 @@ read_and_agg <- function(datpath,
   groupers <- selectcreator(rlang::enquo(groupers), data, failmissing)
   aggCols <- selectcreator(rlang::enquo(aggCols), data, failmissing)
 
+  # we need to handle different ways of getting `group_until`. The easiest way
+  # to do this is to do it here to make it standard, although it will also
+  # happen in multi-aggregate.
+
+  group_until <- parse_group_until(group_until = group_until,
+                                     groupers = groupers,
+                                     aggsequence = aggsequence)
+
   # Annoying how much of this is just pass-through arguments. Could use dots,
   # but then would need to specify the prep_ewr_agg dots.
   aggout <- multi_aggregate(data,
                             edges,
                             groupers = groupers,
+                            group_until = group_until,
                             aggCols = aggCols,
                             aggsequence = aggsequence,
                             funsequence = funsequence,
                             saveintermediate = saveintermediate,
                             namehistory = namehistory,
                             keepAllPolys = keepAllPolys,
-                            failmissing = failmissing)
+                            failmissing = failmissing,
+                            auto_ewr_PU = auto_ewr_PU)
 
   # use RDS so can read it in to a different name.
   if (!is.null(savepath)) {
@@ -123,11 +135,13 @@ read_and_agg <- function(datpath,
     agg_params <- list(agg_input_path = datpath,
                        aggType = type,
                        agg_groups = groupers,
+                       agg_group_until = group_until,
                        agg_var = aggCols,
                        aggregation_sequence = char_aggsequence,
                        aggregation_funsequence = char_funsequence,
                        namehistory = namehistory,
                        keepAllPolys = keepAllPolys,
+                       auto_ewr_PU = auto_ewr_PU,
                        aggReturn = returnList,
                        agg_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
                        agg_status = TRUE,

@@ -123,10 +123,10 @@ theme_aggregate <- function(dat,
     if (isewr & !'planning_unit_name' %in% groupers) {
       if (!auto_ewr_PU) {
         rlang::abort("EWR outputs should be grouped by `planning_unit_name` until aggregated to larger spatial areas.
-                  Preferred method of addressing this is with `group_until` in `multi_aggregate()`.")
+                  Preferred method of addressing this is by including as a `grouper` in `theme_aggregate()` or with `group_until` in `multi_aggregate()`.")
       } else {
         rlang::inform("EWR outputs should be grouped by `planning_unit_name` until aggregated to larger spatial areas.
-                  Preferred method of addressing this is with `group_until` in `multi_aggregate()`,
+                  Preferred method of addressing this is by including as a `grouper` in `theme_aggregate()` or with `group_until` in `multi_aggregate()`,
                       but it is being done automatically in `theme_aggregate()`")
         groupers <- c(groupers, 'planning_unit_name')
       }

@@ -24,7 +24,8 @@
 #'   happened. Step can be an index, name, or a function that evaluates to TRUE
 #'   or FALSE when run on the aggregation sequence. Named list does not need to
 #'   contain all groupers, but if so, those that persist throughout should be
-#'   given NA. Vectors the length of groupers usually work, but are less-well
+#'   given NA or numeric values longer than aggsequence.
+#'   Vectors the length of groupers usually work, but are less-well
 #'   supported.
 #' @param aggsequence a named list of aggregation steps in the order to apply
 #'   them. Entries for theme aggregation should be character vectors- e.g. `name
@@ -151,6 +152,25 @@ multi_aggregate <- function(dat,
   }
 
 
+  # I *think* this is safe, because dat should never GROW groups, only lose
+  # them. So turning this to characters here will be the superset of what's ever
+  # encountered. I've left a tidyselect parsing version commented out in case
+  # I'm wrong
+  groupers <- selectcreator(rlang::enquo(groupers), dat, failmissing)
+  # we need to handle different ways of getting `group_until`
+  group_indices <- parse_group_until(group_until = group_until,
+                                     groupers = groupers,
+                                     aggsequence = aggsequence)
+
+  # a simple fix to leaving group_until out of groupers, but won't work if groupers is fancy
+  # If groupers is a character, we can just add the missing
+  if (is.character(groupers) && !(all(names(group_indices) %in% groupers))) {
+    groupers <- c(groupers, names(group_indices)[!(names(group_indices) %in% groupers)])
+  }
+  # # If groupers is *not* a character, we'll have to enforce. We have to check against basegroupers, since that will have the characters
+  # if (!is.character(groupers) && !(all(names(group_indices) %in% basegroupers))) {
+  #   rlang::abort("If not using characters for groupers, groupers needs to cover everything in group_until")
+  # }
 
   # need to track the grouping when switch between theme and spatial- we want to
   # do theme groupings within the current spatial unit, and spatial groupings
@@ -166,54 +186,6 @@ multi_aggregate <- function(dat,
 
   # Don't use a foreach even though it's tempting, since the loop is dependent-
   # the outcome of the first agg needs to be the input of the second
-
-  # get indexing for group_until drops
-  if (!is.list(group_until)) {
-    # Try to fix, but not too hard
-    if (is.character(groupers) & length(group_until) == length(groupers)) {
-      group_until <- as.list(group_until) |> setNames(groupers)
-    } else {
-      rlang::abort("group_until needs to be a named list, at least for now.
-                 There is likely a way to allow a vector of length `groupers`,
-                 but it will run afoul of non-character groupers (e.g. tidyselect)")
-    }
-  }
-
-  # Try a bit harder with the names; they fall off for unnamed vectors with functions
-  if (is.null(names(group_until)) & length(group_until) == length(groupers) & is.character(groupers)) {
-    names(group_until) <- groupers
-  }
-
-  parse_aggnum <- function(x) {
-    # if na, make grouper persist (if we test a closure it `warn`s)
-    if (!rlang::is_function(x) && is.na(x)) {
-      gind <- length(aggsequence) + 1
-    } else {
-      # the is.na in an outer level, because we can have NA characters and numeric and etc
-      # if character, find the aggsequence name
-      if (is.character(x)) {
-        if (!x %in% names(aggsequence)) {
-          rlang::warn("not able to infer `group_until`, aggsequence names do not match.
-                    Retaining grouping until the end")
-          gind <- length(aggsequence) + 1
-        } else {
-          gind <- which(names(aggsequence) == x)
-        }
-      }
-      if (rlang::is_function(x)) {
-        # assumes to evaluate to logical
-        gind <- min(which(aggsequence |> purrr::map_lgl(x)))
-      }
-
-      if (is.numeric(x)) {
-        gind <- x
-      }
-    }
-
-    return(gind)
-  }
-
-  group_indices <- purrr::map(group_until, parse_aggnum)
 
   for (i in 1:length(aggsequence)) {
     # theme aggregations will be defined as from-to pairs of character vectors,
