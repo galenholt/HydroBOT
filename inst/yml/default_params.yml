@@ -44,9 +44,12 @@ aggType: achievement
 
 # Aggregation settings
 agg_groups: scenario
+agg_group_until:
+  planning_unit_name: 3.0
 agg_var: ewr_achieved
 aggReturn: FALSE
 namehistory: FALSE
 keepAllPolys: FALSE
+auto_ewr_PU: FALSE
 
 # we could expose more defaults in `prep_run_save_ewrs` to `param_runner`, but that's so open-ended let's wait.
