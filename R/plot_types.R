@@ -167,7 +167,7 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
       underlay_list <- list(underlay = get(underlay_list), underlay_pal = NA)
     }
     # if flat put it as the first list in a length-one list for generality
-    if ("underlay" %in% names(underlay_list)) {
+    if ("underlay" %in% names(underlay_list) | "underover" %in% names(underlay_list)) {
       underlay_list <- list(underlay_list)
     }
   }
@@ -180,7 +180,7 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
       overlay_list <- list(overlay = get(overlay_list), overlay_pal = "black")
     }
     # if flat put it as the first list in a length-one list for generality
-    if ("overlay" %in% names(overlay_list)) {
+    if ("overlay" %in% names(overlay_list) | "underover" %in% names(overlay_list)) {
       overlay_list <- list(overlay_list)
     }
   }
@@ -469,7 +469,6 @@ plot_heatmap <- function(prepped,
                          contour_arglist,
                          xtype, ytype,
                          setLimits, base_list) {
-
   # build the base plot with x and y (z/fill depend on whether tiles or contours)
   outcome_plot <- prepped$data |>
     ggplot2::ggplot(ggplot2::aes(
@@ -478,9 +477,9 @@ plot_heatmap <- function(prepped,
     ))
 
   # Only do the trans if the axes are numeric
-  if (!ytype %in% c('date', 'qual')) {
+  if (!ytype %in% c("date", "qual")) {
     outcome_plot <- outcome_plot +
-    ggplot2::scale_y_continuous(trans = transy)
+      ggplot2::scale_y_continuous(trans = transy)
   }
 
   if (!(xtype %in% c("date", "qual"))) {
@@ -499,7 +498,6 @@ plot_heatmap <- function(prepped,
       outcome_plot <- outcome_plot +
         ggplot2::geom_tile(mapping = ggplot2::aes(fill = .data[[prepped$outcome_col]]))
     }
-
   }
   # if there are contour args, make contours
   if (!is.null(contour_arglist) & is.null(contour_arglist$interpolate)) {

@@ -83,16 +83,18 @@
 #' * linewidth
 #' * alpha
 #'   If others are desired, we can develop something more general.
-#' @param underlay_list default NULL, otherwise named list (or list of named lists for
-#'   multiple underlay levels) of arguments to plot a map underlying the main
-#'   map data. Names define arguments, `underlay` is required, either character
-#'   or an sf, `underlay_pal` do define colors, can be single color or paletteer
-#'   name, and `underlay_ycol` if coloring the underlay by values. Multiple
-#'   values (e.g. having an `underlay_ycol` and a palette for `underlay_pal`)
-#'   only works if the main data is not the same type- we can't use different
-#'   palettes for underlay fill and main data fill, for example, but can if the
-#'   underlay is fill (polygons) and the main data is points.
-#' @param overlay_list as `underlay_list`, but names `"overlay_*"`
+#' @param underlay_list default NULL, otherwise named list (or list of named
+#'   lists for multiple underlay levels) of arguments to plot a map underlying
+#'   the main map data. Only required value is either `'underlay'` or
+#'   `'underover'` (interchangeable), defining the data to be plotted. Other
+#'   arguments as for the main plot. Typical examples
+#'   * `underlay_list = 'basin'` simply plot the basin outline
+#'   * `underlay_list = list(underlay = 'basin', pal_list = 'azure')` same, but filled
+#'   * `underlay_list = list(underlay = outputs_on_sdl_scale, outcome_col = ewr_achieved, pal_list = 'scico::oslo')` plot the ewr outcomes in the sdls
+#'   A named palette (e.g. variation in color/fill) only works if the main data is not the same type- we can't
+#'   use different palettes for underlay fill and main data fill, for example,
+#'   but can if the underlay is fill (polygons) and the main data is points.
+#' @param overlay_list as `underlay_list`, but first item might be named `"overlay` or `"underover"`
 #' @param contour_arglist default `NULL`
 #'  * NULL builds a heatmap with [ggplot2::geom_tile()],
 #'  * `list(interpolate = TRUE)` builds an interpolated heatmap with [ggplot2::geom_raster(interpolate = TRUE)]
