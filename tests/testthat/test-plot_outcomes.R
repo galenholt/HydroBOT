@@ -1,18 +1,32 @@
 
 # Should be a way to speed this bit up, the first happens again inside the second
 ewr_to_agg <- make_test_ewr_prepped()
-agg_theme_space <- make_test_agg()
+agg_theme_space <- make_test_agg(namehistory = FALSE)
+
+# # temp-do we have waterbirds in both catchments?
+# agg_theme_space$sdl_units |>
+#   dplyr::filter(grepl("^WB", env_obj)) |>
+#   dplyr::group_by(SWSDLName) |>
+#   dplyr::summarise(nbirds = dplyr::n())
+#
+# ggplot2::ggplot() +
+#   ggplot2::geom_sf(data =sdl_units) +
+#   ggplot2::geom_sf(data = (agg_theme_space$env_obj |>
+#                              dplyr::filter(grepl("^WB", env_obj))))
 
 # create a quant description of scenarios
 scenarios <- tibble::tibble(scenario = c('base_base', 'down4_down4', 'up4_up4'), delta = c(1, 0.25, 4))
 
 obj_sdl_to_plot <- agg_theme_space$sdl_units |>
-  dplyr::rename(allArith = 4) |> # readability
+
   dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
   dplyr::filter(!is.na(env_group)) |>
   dplyr::arrange(env_group, env_obj) |>
   # and join the quant descriptions
   dplyr::left_join(scenarios, by = 'scenario')
+
+basin_to_plot <- agg_theme_space$mdb |>
+  dplyr::filter(!is.na(Objective))
 
 
 # palettes
@@ -26,12 +40,10 @@ obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$env_group),
                     palette = 'scico::berlin')
 
 test_that("basin works with single color palette", {
-  basin_to_plot <- agg_theme_space$mdb |>
-    dplyr::rename(allArith = 4, oneLimiting = 5) |> # for readability
-    dplyr::filter(!is.na(Objective))
+
 
   basin_plot <- plot_outcomes(basin_to_plot,
-                              outcome_col = 'allArith',
+                              outcome_col = 'ewr_achieved',
                               colorset = 'Objective',
                               pal_list = list("scico::oslo"),
                               sceneorder = c('down4_down4', 'base_base', 'up4_up4')) +
@@ -41,12 +53,9 @@ test_that("basin works with single color palette", {
 })
 
 test_that("a fixed color works (contrived)", {
-  basin_to_plot <- agg_theme_space$mdb |>
-    dplyr::rename(allArith = 4, oneLimiting = 5) |> # for readability
-    dplyr::filter(!is.na(Objective))
 
   basin_plotred <- plot_outcomes(basin_to_plot,
-                              outcome_col = 'allArith',
+                              outcome_col = 'ewr_achieved',
                               colorset = 'Objective',
                               pal_list = 'firebrick',
                               sceneorder = c('down4_down4', 'base_base', 'up4_up4')) +
@@ -68,7 +77,7 @@ test_that("multi-palette and facetting", {
 
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_plot <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   colorgroups = 'env_group',
                   colorset = 'env_obj',
                   pal_list = grouplist,
@@ -80,7 +89,7 @@ test_that("multi-palette and facetting", {
   # This is really just a test that passing '.' to a facet_row or facet_col
   # behaves as expected
   sdl_plot_facrow <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   colorgroups = 'env_group',
                   colorset = 'env_obj',
                   pal_list = grouplist,
@@ -91,7 +100,7 @@ test_that("multi-palette and facetting", {
   vdiffr::expect_doppelganger("bar_basin_group_sdlrow", sdl_plot_facrow)
 
   sdl_plot_factgroup <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   colorgroups = 'env_group',
                   colorset = 'env_obj',
                   pal_list = grouplist,
@@ -109,7 +118,7 @@ test_that("flipped", {
 
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_plot <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   x_col = 'env_obj',
                   colorgroups = NULL,
                   colorset = 'scenario',
@@ -123,7 +132,7 @@ test_that("flipped", {
 
   # outcome groups
   sdl_plot_g <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   x_col = 'env_obj',
                   colorgroups = 'env_group',
                   colorset = 'scenario',
@@ -136,7 +145,7 @@ test_that("flipped", {
 
   # interesting plot, good for testing labels
   sdl_plot_groupblock <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   x_col = 'scenario',
                   colorset = 'env_group',
                   pal_list = obj_pal,
@@ -149,7 +158,7 @@ test_that("flipped", {
   # change label name
   # interesting plot, good for testing labels
   sdl_plot_groupblock_l <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   x_col = 'scenario',
                   colorset = 'env_group',
                   color_lab = 'Environmental\ngroup',
@@ -161,7 +170,7 @@ test_that("flipped", {
 
   # Drop labels
   sdl_plot_groupblock_n <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   x_col = 'scenario',
                   colorset = 'env_group',
                   color_lab = NULL,
@@ -185,7 +194,7 @@ test_that("quant x", {
 
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_line <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   x_col = 'delta',
                   colorset = 'env_obj',
                   pal_list = list('scico::berlin'),
@@ -196,7 +205,7 @@ test_that("quant x", {
 
   # change a bunch of options
   sdl_line_options <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   x_col = 'delta',
                   outcome_lab = 'Proportion met',
                   x_lab = 'Change in flow',
@@ -215,7 +224,7 @@ test_that("quant x", {
   # check that it works with other things as colors
   # and that the point_group argument works.
   sdl_line_catchment <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   x_col = 'delta',
                   outcome_lab = 'Proportion met',
                   x_lab = 'Change in flow',
@@ -233,7 +242,7 @@ test_that("quant x", {
   # jittering- set the seed each time or the jitters differ
   set.seed(18)
   sdl_smooth_mean_jf <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   x_col = 'delta',
                   outcome_lab = 'Proportion met',
                   x_lab = 'Change in flow',
@@ -254,7 +263,7 @@ test_that("quant x", {
   # jittering- default
   set.seed(18)
   sdl_smooth_mean_jc <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   x_col = 'delta',
                   outcome_lab = 'Proportion met',
                   x_lab = 'Change in flow',
@@ -276,7 +285,7 @@ test_that("quant x", {
   # The loess isn't happy about singularities. I don't want to silence them, but also don't care for this example.
   # I'm not entirely sure why this works- i think I *should* have to say `smooth_arglist = TRUE`, but it seems to work with just `smooth`
   sdl_line_catchment_smooth <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   x_col = 'delta',
                   outcome_lab = 'Proportion met',
                   x_lab = 'Change in flow',
@@ -299,16 +308,13 @@ test_that("quant x", {
 
 test_that("maps", {
 
-  env_obj_points_to_plot <- agg_theme_space$env_obj |>
-    dplyr::rename(allArith = 5)
-
   # Make a minimal map
   sdl_map <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'EF') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'env_obj',
                   facet_row = 'scenario',
@@ -319,11 +325,11 @@ test_that("maps", {
   # Make a minimal map, change the label
   sdl_map_l <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'EF') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   outcome_lab = 'New label',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'env_obj',
                   facet_row = 'scenario',
@@ -335,10 +341,10 @@ test_that("maps", {
   # put the basin in the background
   sdl_basin_background <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'env_obj',
                   facet_row = 'scenario',
@@ -351,10 +357,10 @@ test_that("maps", {
   # Using cewo valleys because then it makes sense to have a fill sometimes.
   expect_warning(sdl_valley_background_warn <- obj_sdl_to_plot |>
                    dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
-                   plot_outcomes(outcome_col = 'allArith',
+                   plot_outcomes(outcome_col = 'ewr_achieved',
                                  plot_type = 'map',
                                  colorgroups = NULL,
-                                 colorset = 'allArith',
+                                 colorset = 'ewr_achieved',
                                  pal_list = list('scico::berlin'),
                                  facet_col = 'env_obj',
                                  facet_row = 'scenario',
@@ -366,12 +372,12 @@ test_that("maps", {
   vdiffr::expect_doppelganger("sdl_valley_background_warn", sdl_valley_background_warn)
 
   # gauges as main focus
-  gauges_map <- env_obj_points_to_plot |> # for readability
+  gauges_map <- agg_theme_space$env_obj|> # for readability
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
@@ -383,13 +389,13 @@ test_that("maps", {
   vdiffr::expect_doppelganger("gauges_map", gauges_map)
 
   # gauges with filled underlay values
-  gauges_map_sdl <- env_obj_points_to_plot |> # for readability
+  gauges_map_sdl <- agg_theme_space$env_obj|> # for readability
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   outcome_lab = 'New label',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
@@ -405,30 +411,30 @@ test_that("maps", {
   # Test with a continuous variable too
   # Have to be careful with these though to not have the underlay overwhelm the main data- see the filtering.
   # Should be able to do that automatically
-  gauges_map_sdl_agg <- env_obj_points_to_plot |> # for readability
+  gauges_map_sdl_agg <- agg_theme_space$env_obj|> # for readability
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
                   sceneorder = c('down4_down4', 'base_base', 'up4_up4'),
                   underlay_list = list(underlay = dplyr::filter(obj_sdl_to_plot, env_obj == 'NF1'),
-                                       underlay_ycol = 'allArith',
+                                       underlay_ycol = 'ewr_achieved',
                                        underlay_pal = 'scico::oslo')) +
     ggplot2::theme(legend.position = 'bottom')
 
   vdiffr::expect_doppelganger("gauges_map_sdl_agg", gauges_map_sdl_agg)
 
   # that one would be good with two levels- basin and sdl
-  gauges_map_2_level <- env_obj_points_to_plot |> # for readability
+  gauges_map_2_level <- agg_theme_space$env_obj|> # for readability
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
@@ -436,7 +442,7 @@ test_that("maps", {
                   underlay_list = list(list(underlay = 'basin',
                                             underlay_pal = 'cornsilk'),
                                        list(underlay = dplyr::filter(obj_sdl_to_plot, env_obj == 'NF1'),
-                                            underlay_ycol = 'allArith',
+                                            underlay_ycol = 'ewr_achieved',
                                             underlay_pal = 'scico::oslo'))) +
     ggplot2::theme(legend.position = 'bottom')
 
@@ -445,10 +451,10 @@ test_that("maps", {
   # include gauges- looks better without facetting
   sdl_gauges_all <- obj_sdl_to_plot |>
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
@@ -462,10 +468,10 @@ test_that("maps", {
   # clipped to the main data
   sdl_gauges_clip <- obj_sdl_to_plot |>
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
@@ -481,10 +487,10 @@ test_that("maps", {
   # with a meaningful palette- simple qualitative to start
   sdl_gauges_qual <- obj_sdl_to_plot |>
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
@@ -501,10 +507,10 @@ test_that("maps", {
   # with a meaningful palette- simple quantitative and an underlay
   sdl_gauges_quant <- obj_sdl_to_plot |>
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
@@ -512,7 +518,7 @@ test_that("maps", {
                   underlay_list = 'basin',
                   overlay_list = list(overlay = dplyr::filter(env_obj_points_to_plot, env_obj == 'NF1'),
                                       overlay_pal = 'scico::oslo',
-                                      overlay_ycol = 'allArith',
+                                      overlay_ycol = 'ewr_achieved',
                                       clip = TRUE)) +
     ggplot2::theme(legend.position = 'bottom')
 
@@ -521,14 +527,13 @@ test_that("maps", {
 
   # Does it work for the basin?
   basin_map <- agg_theme_space$mdb |>
-    dplyr::rename(allArith = 4) |> # for readability
     dplyr::filter(Objective %in% c("Maintain water-dependent species richness",
                                    "Increase opportunities for colonial waterbird breeding*",
                                    "Support instream & floodplain productivity")) |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'Objective',
@@ -540,14 +545,14 @@ test_that("maps", {
 
   # How about multi-overlays
   basin_map_multi <- agg_theme_space$mdb |>
-    dplyr::rename(allArith = 4) |> # for readability
+
     dplyr::filter(Objective %in% c("Maintain water-dependent species richness",
                                    "Increase opportunities for colonial waterbird breeding*",
                                    "Support instream & floodplain productivity")) |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'Objective',
@@ -555,7 +560,7 @@ test_that("maps", {
                   overlay_list = list(list(overlay = 'sdl_units', overlay_pal = NA),
                                       list(overlay = dplyr::filter(env_obj_points_to_plot, env_obj == 'NF1'),
                                            overlay_pal = 'scico::oslo',
-                                           overlay_ycol = 'allArith')))+
+                                           overlay_ycol = 'ewr_achieved')))+
     ggplot2::theme(legend.position = 'bottom')
 
   vdiffr::expect_doppelganger("basin_map_multi", basin_map_multi)
@@ -564,10 +569,10 @@ test_that("maps", {
   # How under- and overlays. nearly identical to above, but make sure palettes work with under
   sdl_gauges_quant_basinpal <- obj_sdl_to_plot |>
     dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'scenario',
                   facet_row = 'env_obj',
@@ -575,21 +580,39 @@ test_that("maps", {
                   underlay_list = list(underlay = 'basin', underlay_pal = "azure"),
                   overlay_list = list(overlay = dplyr::filter(env_obj_points_to_plot, env_obj == 'NF1'),
                                       overlay_pal = 'scico::oslo',
-                                      overlay_ycol = 'allArith',
+                                      overlay_ycol = 'ewr_achieved',
                                       clip = TRUE)) +
     ggplot2::theme(legend.position = 'bottom')
 
   vdiffr::expect_doppelganger("sdl_gauges_quant_basinpal", sdl_gauges_quant_basinpal)
+
+  # TRYING NEW SYNTAX
+  gauges_map_2_level <- agg_theme_space$env_obj|> # for readability
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes(outcome_col = 'ewr_achieved',
+                  plot_type = 'map',
+                  colorgroups = NULL,
+                  colorset = 'ewr_achieved',
+                  pal_list = list('scico::berlin'),
+                  facet_col = 'scenario',
+                  facet_row = 'env_obj',
+                  sceneorder = c('down4_down4', 'base_base', 'up4_up4'),
+                  underlay_list = list(list(underlay = 'basin',
+                                            underlay_pal = 'cornsilk'),
+                                       list(underlay = dplyr::filter(obj_sdl_to_plot, env_obj == 'NF1'),
+                                            underlay_ycol = 'ewr_achieved',
+                                            underlay_pal = 'scico::oslo'))) +
+    ggplot2::theme(legend.position = 'bottom')
 
   # Difference from baseline
   # put the basin in the background
 
   sdl_basin_background_difference <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('ggthemes::Orange-Blue-White Diverging'),
                   facet_col = 'env_obj',
                   facet_row = 'scenario',
@@ -603,10 +626,10 @@ test_that("maps", {
   # Relative to baseline
   sdl_basin_background_rel <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('ggthemes::Orange-Blue-White Diverging'),
                   facet_col = 'env_obj',
                   facet_row = 'scenario',
@@ -633,13 +656,8 @@ test_that("maps", {
 
 test_that("setLimits works", {
 
-  # Bar plots
-  basin_to_plot <- agg_theme_space$mdb |>
-    dplyr::rename(allArith = 4, oneLimiting = 5) |> # for readability
-    dplyr::filter(!is.na(Objective))
-
   basin_plot20 <- plot_outcomes(basin_to_plot,
-                                outcome_col = 'allArith',
+                                outcome_col = 'ewr_achieved',
                                 colorset = 'Objective',
                                 pal_list = list("scico::oslo"),
                                 sceneorder = c('down4_down4', 'base_base', 'up4_up4'),
@@ -649,7 +667,7 @@ test_that("setLimits works", {
   vdiffr::expect_doppelganger("stacked bar 20", basin_plot20)
 
   basin_plot10 <- plot_outcomes(basin_to_plot,
-                                outcome_col = 'allArith',
+                                outcome_col = 'ewr_achieved',
                                 colorset = 'Objective',
                                 pal_list = list("scico::oslo"),
                                 sceneorder = c('down4_down4', 'base_base', 'up4_up4'),
@@ -661,7 +679,7 @@ test_that("setLimits works", {
   # Line plots
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_line_75 <- obj_sdl_to_plot |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   x_col = 'delta',
                   colorgroups = NULL,
                   colorset = 'env_obj',
@@ -678,10 +696,10 @@ test_that("setLimits works", {
   # Make a minimal map
   sdl_mapL <- obj_sdl_to_plot |>
     dplyr::filter(env_group == 'EF') |> # Need to reduce dimensionality
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'map',
                   colorgroups = NULL,
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::berlin'),
                   facet_col = 'env_obj',
                   facet_row = 'scenario',
@@ -716,12 +734,9 @@ test_that("ewr works as in `plot_outcomes_bar`", {
 })
 
 test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better aggregated)", {
-  basin_to_plot <- agg_theme_space$mdb |>
-    dplyr::rename(allArith = 4, oneLimiting = 5) |> # for readability
-    dplyr::filter(!is.na(Objective))
 
   basin_plot <- plot_outcomes(basin_to_plot,
-                              outcome_col = 'allArith',
+                              outcome_col = 'ewr_achieved',
                               x_col = 'scenario',
                               colorset = 'scenario',
                               pal_list = scene_pal,
@@ -731,7 +746,7 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
   vdiffr::expect_doppelganger("bar_basin", basin_plot)
 
   basin_plot_L <- plot_outcomes(basin_to_plot,
-                                outcome_col = 'allArith',
+                                outcome_col = 'ewr_achieved',
                                 outcome_lab = "Aggregated outcome",
                                 facet_wrapper = 'Objective',
                                 colorset = 'scenario',
@@ -745,9 +760,7 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
 test_that("facet addition works", {
 
   sdl_colors_row <- obj_sdl_to_plot |>
-    # dplyr::summarise(allArith = mean(allArith, na.rm = TRUE),
-    #                  .by = c(SWSDLName, scenario, geometry)) |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   outcome_lab = 'Proportion\nEWR achieved',
                   x_col = 'SWSDLName',
                   facet_row = 'env_group + SWSDLName',
@@ -757,9 +770,7 @@ test_that("facet addition works", {
                   setLimits = c(0,1))
 
   sdl_colors_col <- obj_sdl_to_plot |>
-    # dplyr::summarise(allArith = mean(allArith, na.rm = TRUE),
-    #                  .by = c(SWSDLName, scenario, geometry)) |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   outcome_lab = 'Proportion\nEWR achieved',
                   x_col = 'SWSDLName',
                   facet_col = 'env_group + SWSDLName',
@@ -866,9 +877,9 @@ test_that("scenarios aren't special", {
   # roll with it to solve the more general issue.
 
   sdl_colors <- obj_sdl_to_plot |>
-    dplyr::summarise(allArith = mean(allArith, na.rm = TRUE),
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved, na.rm = TRUE),
                      .by = c(SWSDLName, scenario, geometry)) |>
-    plot_outcomes(outcome_col = 'allArith',
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   outcome_lab = 'Proportion\nEWR achieved',
                   x_col = 'SWSDLName',
                   facet_row = 'scenario',
@@ -888,11 +899,11 @@ test_that("heatmaps", {
   # Mock data to have two dimensions. This is silly, but doesn't matter.
   ostp05 <- obj_sdl_to_plot |>
     dplyr::mutate(scenario = stringr::str_c(scenario, 'minus1'),
-                  allArith = allArith - 1,
+                  ewr_achieved = ewr_achieved - 1,
                   adelta = -1)
   ostp2 <- obj_sdl_to_plot |>
     dplyr::mutate(scenario = stringr::str_c(scenario, 'plus1'),
-                  allArith = allArith + 1,
+                  ewr_achieved = ewr_achieved + 1,
                   adelta = 1)
 
   ostp <- obj_sdl_to_plot |>
@@ -907,12 +918,12 @@ test_that("heatmaps", {
   # first, make sure things are unique- later, will need to check they are as in maps. At least for heatmaps. Contours should? be OK?
   sdl_heat <- ostp |>
     sf::st_drop_geometry() |>
-    dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
-    plot_outcomes(outcome_col = 'allArith',
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'heatmap',
                   x_col = 'delta',
                   y_col = 'adelta',
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::turku'),
                   facet_row = 'SWSDLName',
                   facet_col = 'env_group')
@@ -921,13 +932,13 @@ test_that("heatmaps", {
 
   sdl_heat_tx <- ostp |>
     sf::st_drop_geometry() |>
-    dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
-    plot_outcomes(outcome_col = 'allArith',
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'heatmap',
                   x_col = 'delta',
                   y_col = 'adelta',
                   transx = 'log10',
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::turku'),
                   facet_row = 'SWSDLName',
                   facet_col = 'env_group')
@@ -937,12 +948,12 @@ test_that("heatmaps", {
   # same, contour defaults
   sdl_contour <- ostp |>
     sf::st_drop_geometry() |>
-    dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
-    plot_outcomes(outcome_col = 'allArith',
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'heatmap',
                   x_col = 'delta',
                   y_col = 'adelta',
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::turku'),
                   facet_row = 'SWSDLName',
                   facet_col = 'env_group',
@@ -953,12 +964,12 @@ test_that("heatmaps", {
   # baseline, specify breaks
   sdl_contour_base_breaks <- ostp |>
     sf::st_drop_geometry() |>
-    dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
-    plot_outcomes(outcome_col = 'allArith',
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'heatmap',
                   x_col = 'delta',
                   y_col = 'adelta',
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::turku'),
                   facet_row = 'SWSDLName',
                   facet_col = 'env_group',
@@ -973,12 +984,12 @@ test_that("heatmaps", {
   # and check the auto-drop of geometry
   sdl_contour_base_bin <- ostp |>
     # sf::st_drop_geometry() |>
-    dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
-    plot_outcomes(outcome_col = 'allArith',
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    plot_outcomes(outcome_col = 'ewr_achieved',
                   plot_type = 'heatmap',
                   x_col = 'delta',
                   y_col = 'adelta',
-                  colorset = 'allArith',
+                  colorset = 'ewr_achieved',
                   pal_list = list('scico::turku'),
                   facet_row = 'SWSDLName',
                   facet_col = 'env_group',
@@ -996,12 +1007,12 @@ test_that("heatmaps", {
     expect_error(sdl_heat_overplot <- ostp |>
       sf::st_drop_geometry() |>
       # don't do the grouping correctly
-      dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
-      plot_outcomes(outcome_col = 'allArith',
+      dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+      plot_outcomes(outcome_col = 'ewr_achieved',
                     plot_type = 'heatmap',
                     x_col = 'delta',
                     y_col = 'adelta',
-                    colorset = 'allArith',
+                    colorset = 'ewr_achieved',
                     pal_list = list('scico::turku'),
                     facet_row = 'SWSDLName',
                     facet_col = '.'))
@@ -1011,13 +1022,13 @@ test_that("heatmaps", {
     sdl_heat_so <- ostp |>
       sf::st_drop_geometry() |>
       dplyr::filter(SWSDLName == 'Lachlan') |>
-      dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, delta, adelta)) |>
-      plot_outcomes(outcome_col = 'allArith',
+      dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, delta, adelta)) |>
+      plot_outcomes(outcome_col = 'ewr_achieved',
                     plot_type = 'heatmap',
                     x_col = 'delta',
                     y_col = 'adelta',
                     transx = 'log10',
-                    colorset = 'allArith',
+                    colorset = 'ewr_achieved',
                     pal_list = list('scico::turku'),
                     sceneorder = c('down4_down4minus1', 'down4_down4zero', 'down4_down4plus1',
                                    'base_baseminus1', 'base_basezero', 'base_baseplus1',
@@ -1030,12 +1041,12 @@ test_that("heatmaps", {
     # interpolated raster
     sdl_heat_interp <- ostp |>
       sf::st_drop_geometry() |>
-      dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
-      plot_outcomes(outcome_col = 'allArith',
+      dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+      plot_outcomes(outcome_col = 'ewr_achieved',
                     plot_type = 'heatmap',
                     x_col = 'delta',
                     y_col = 'adelta',
-                    colorset = 'allArith',
+                    colorset = 'ewr_achieved',
                     pal_list = list('scico::turku'),
                     transx = 'log10',
                     facet_row = 'SWSDLName',
@@ -1047,14 +1058,14 @@ test_that("heatmaps", {
     # Qualitative x-y (e.g. named scenario types)
     sdl_heat_char <- ostp |>
       sf::st_drop_geometry() |>
-      dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+      dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
       dplyr::mutate(delta = as.character(delta),
                     adelta = as.character(adelta)) |>
-      plot_outcomes(outcome_col = 'allArith',
+      plot_outcomes(outcome_col = 'ewr_achieved',
                     plot_type = 'heatmap',
                     x_col = 'delta',
                     y_col = 'adelta',
-                    colorset = 'allArith',
+                    colorset = 'ewr_achieved',
                     pal_list = list('scico::turku'),
                     facet_row = 'SWSDLName',
                     facet_col = 'env_group')
@@ -1063,14 +1074,14 @@ test_that("heatmaps", {
 
     sdl_heat_fact <- ostp |>
       sf::st_drop_geometry() |>
-      dplyr::summarise(allArith = mean(allArith), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+      dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
       dplyr::mutate(delta = as.factor(delta),
                     adelta = as.factor(adelta)) |>
-      plot_outcomes(outcome_col = 'allArith',
+      plot_outcomes(outcome_col = 'ewr_achieved',
                     plot_type = 'heatmap',
                     x_col = 'delta',
                     y_col = 'adelta',
-                    colorset = 'allArith',
+                    colorset = 'ewr_achieved',
                     pal_list = list('scico::turku'),
                     facet_row = 'SWSDLName',
                     facet_col = 'env_group')
