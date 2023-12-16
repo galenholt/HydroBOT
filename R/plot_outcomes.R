@@ -1,25 +1,35 @@
-#' Plot stacked bar graphs of outcomes across scenarios
+#' Standardized plot functions for toolkit.
 #'
-#' Has several ways to color, including grouped palettes. Lets us choose whether
-#' to stack scenarios with outcome groups on x (`scene_x = FALSE`) or stack
-#' outcome groups with scenarios on x (`scene_x = TRUE`). I do *not* provide an
-#' argument to drop legend labels on purpose- it's dangerous to auto-drop them.
-#' The user can always `+ theme(legend.position = 'none')` to the returned
-#' object.
+#' Provides a common interface to plotting of an `outcome_col`, which may be
+#' plotted on y or fill/color or both. Handles consistent data preparation steps
+#' for that outcome variable, along with error and data checking. This keeps
+#' data arrangement in-function and controlled for consistency and accuracy, no
+#' matter what plot type is desired. Currently supports lines, points, bars,
+#' maps, and heatmaps. All plots are just standardizatons of
+#' [ggplot2::ggplot()], and return `ggplot` objects that can then be tweaked
+#' with standard ggplot calls. **Unlike ggplot, arguments that would typically
+#' go in [ggplot2::aes()] should not be bare names, but characters**.
 #'
-#' @inheritParams plot_prep
+#' I do *not* provide an argument to drop legend labels on purpose- it's
+#' dangerous to auto-drop them. The user can always `+ theme(legend.position =
+#' 'none')` to the returned object. As much as possible, arguments for specific
+#' plot types have been put in `*_list` arguments, which should be NULL
+#' (typically the default) or lists of the arguments that the user wants to
+#' change.
 #'
-#' @param outdf dataframe of outcomes, needs a `scenario` column
+#'
+#' @param outdf dataframe of outcomes
 #' @param outcome_col character, name of outcome column. This is the data of
 #'   interest being plotted. All data operations in [plot_data_prep()] happen to
-#'   this column, and [plot_style_prep()] bases styling on it. For 2d plots, it is
-#'   the y-axis, and for maps, heatmaps, and network plots, it is color/fill. It
-#'   is entirely possible to also use it as color/fill for 2d plots in addition
-#'   to the y-axis.
-#' @param outcome_lab character, default `outcome_col`, allows changing label of the outcome_col (y-axis or color/fill)
+#'   this column, and [plot_style_prep()] bases styling on it. For 2d plots, it
+#'   is the y-axis, and for maps, heatmaps, and network plots, it is color/fill.
+#'   It is entirely possible to also use it as color/fill for 2d plots in
+#'   addition to the y-axis.
+#' @param outcome_lab character, default `outcome_col`, allows changing label of
+#'   the outcome_col (y-axis or color/fill)
 #' @param y_col character, default `outcome_col`. Allows separately specifying
 #'   y-axis from outcome (e.g. maps, heatmaps, networks)
-#' @param y_lab character, default y_col, allows changing y-lable
+#' @param y_lab character, default y_col, allows changing y-label
 #' @param x_col character, name of column for the x-axis. Default `'scenario'`
 #' @param x_lab character, default `x_col`, allows changing x-label
 #' @param facet_row NULL (default) or character for facet row. Can be `'.'` to
@@ -28,40 +38,40 @@
 #'   to have one column and row-facets
 #' @param facet_wrapper NULL (default) or character for column to use for
 #'   `facet_wrap`
-#' @param colorgroups character, column name for grouping `colorset`,
-#'   particularly into different palettes
-#' @param colorset character, column name defining the colors to use (if
-#'   `scene_x = TRUE`) or the x-levels (if `scene_x = FALSE`)- needs to be
-#'   renamed to reflect that it isn't just colors
+#' @param colorset character, column name to use for color or fill
 #' @param color_lab character, default either `colorgroups` or `colorset` (if
 #'   `is.null(colorgroups)`). Allows changing the color legend label
+#' @param colorgroups character, column name for grouping `colorset` to allow
+#'   multiple palettes. Default NULL just uses colorset to define color
 #' @param point_group character, column to add additional point groupings to,
 #'   e.g. if plotting color by an environmental group, but need separate
 #'   lines/points for each environmental objective.
 #' @param pal_list list of palettes for defining colors for `colorset`. Should
 #'   be length of `colorgroups`
-#' @param sceneorder character or factor giving the order to present scenario
-#'   levels
+#' @param sceneorder Default NULL, otherwise, character or factor giving the
+#'   order to present scenario levels
 #' @param scales facet scales, as in [ggplot2::facet_wrap()]. Default `scales =
 #'   'fixed'` holds them the same, most common change will be to `scales =
-#'   'free_y'` if gauges have very different flows.
+#'   'free_y'` if e.g. gauges have very different flows.
 #' @param transoutcome transformation for outcome as in
-#'   [ggplot2::scale_y_continuous()] or [ggplot2::scale_fill_continuous()]. Default `transoutcome = 'identity'` just uses
-#'   the data. Most common change likely `transoutcome = 'log10`
-#' @param transy transformation of y-axis, *if the outcome is not y*. Default `'identity'`, but ignored if outcome_col is on the y-axis
+#'   [ggplot2::scale_y_continuous()] or [ggplot2::scale_fill_continuous()].
+#'   Default `transoutcome = 'identity'` just uses the data. Most common change
+#'   likely `transoutcome = 'log10`
+#' @param transy transformation of y-axis, *if the outcome is not y*. Default
+#'   `'identity'`. Ignored if outcome_col is on the y-axis
 #' @param transx transformation for x axis as in
 #'   [ggplot2::scale_x_continuous()]. Default `transx = 'identity'` just uses
-#'   the data. Most common change likely `transx = 'log10`
+#'   the data. Most common change likely `transx = 'log10`.
 #' @param position character or `position` function, `position` arguments from
 #'   [ggplot2::geom_col()] and [ggplot2::geom_point()] (depending on plot type),
 #'   to change from stacked to dodged bars or jitter points. Can be character,
 #'   e.g. 'jitter' or a function, e.g. `ggplot2::position_jitter(width = 0.1,
 #'   height = 0)`
-#' @param base_list NULL (default) or limited list of arguments to
+#' @param base_list NULL (default) or named list of arguments to
 #'   [baseline_compare()];
 #'  * base_lev
 #'  * comp_fun
-#' * group_cols
+#'  * group_cols
 #'   [plot_prep()] handles `zero_adjust`, and other arguments are inferred or
 #'   not supported
 #' @param smooth_arglist NULL (default) or limited list of arguments to
@@ -71,14 +81,9 @@
 #' * method.args
 #' * se
 #' * linewidth
+#' * alpha
 #'   If others are desired, we can develop something more general.
-#' @param smooth_method `method` argument to [ggplot2::geom_smooth()]. Ignored
-#'   if not smoothing
-#' @param smooth_args `method.args` argument to [ggplot2::stat_smooth()].
-#'   Ignored if not smoothing.
-#' @param smooth_se `se` argument to [ggplot2::geom_smooth()]. Ignored if not
-#'   smoothing
-#' @param underlay_list default NULL, named list (or list of named lists for
+#' @param underlay_list default NULL, otherwise named list (or list of named lists for
 #'   multiple underlay levels) of arguments to plot a map underlying the main
 #'   map data. Names define arguments, `underlay` is required, either character
 #'   or an sf, `underlay_pal` do define colors, can be single color or paletteer
@@ -88,9 +93,21 @@
 #'   palettes for underlay fill and main data fill, for example, but can if the
 #'   underlay is fill (polygons) and the main data is points.
 #' @param overlay_list as `underlay_list`, but names `"overlay_*"`
-#' @param contour_arglist default `NULL`, else a list of arguments to [ggplot2::geom_contour_filled()] (or `interpolate = TRUE` to use [ggplot2::geom_raster()] with `interpolate = TRUE`. If want to use contours and all defaults, set to `list()`.
-#' @param setLimits sets user-supplied color/fill limits for maps, heatmaps, and networks, or y limits
-#'   for other plots. Also sets `underlay` and `overlay` limits for consistency.
+#' @param contour_arglist default `NULL`
+#'  * NULL builds a heatmap with [ggplot2::geom_tile()],
+#'  * `list(interpolate = TRUE)` builds an interpolated heatmap with [ggplot2::geom_raster(interpolate = TRUE)]
+#'  * `list()` builds a [ggplot2::geom_contour()] with all defaults
+#'  * a named list with names other than 'interpolate' passes those as arguments to [ggplot2::geom_contour()]
+#' @param setLimits sets user-supplied color/fill limits for maps, heatmaps, and
+#'   networks, or y limits for other plots. Also sets `underlay` and `overlay`
+#'   limits for consistency.
+#' @param plot_type one of '2d' (default), 'heatmap', 'contour', 'map', or
+#'   'network'. Typically, '2d' can be inferred. Both 'heatmap' and 'contour'
+#'   call `plot_heatmap`, but do so differently. 'network' is being held for
+#'   future use (use `make_causal_plot()` in the interim)
+#' @param zero_adjust adjustment of zeros in [plot_data_prep()], useful
+#'   especially for axis `trans` arguments. See `?plot_data_prep`; this is not
+#'   the same as for baselining, which should go in `base_list`
 #'
 #' @return a ggplot stacked bar plot with standard formatting and data cleaning
 #' @export

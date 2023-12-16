@@ -1,3 +1,13 @@
+#' Make a bar plot (qualitative x, usually)
+#'
+#' main function to make a standard bar plot with [ggplot2::geom_col()]
+#'
+#' @inheritParams plot_outcomes
+#'
+#' @return
+#' @export
+#'
+#' @examples
 plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
                      position, transoutcome) {
   outcome_plot <- prepped$data |>
@@ -20,6 +30,23 @@ plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
 }
 
 
+#' Make a plot with a numeric x
+#'
+#' Often (but not always) this is used when scenario is defined numerically.
+#' Uses [ggplot2::geom_line()] or [ggplot2::geom_smooth()]. Takes a
+#' `smooth_arglist` argument to control that smoother
+#'
+#' @inheritParams plot_outcomes
+#'
+#' @param prepped prepared data from `plot_data_prep() |>  plot_style_prep()`
+#' @param xtype character, if we're here, should be 'numeric' or 'date' (which
+#'   covers several different date types). Dates can't be `trans-ed`, so need to
+#'   be identified.
+#'
+#' @return
+#' @export
+#'
+#' @examples
 plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
                          position, transoutcome, transx,
                          smooth_arglist, xtype = "numeric") {
@@ -98,6 +125,22 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
   )
 }
 
+#' Title
+#'
+#' Plots a standard map, with potentially underlay and overlays, specified by
+#' `underlay_list` and `overlay_list`. These are recursed through the
+#' `plot_*_prep()` functions so the transes and other changes are consistent
+#' across the layers. There are some inherent limitations about color/fill and
+#' points/polygons due to masking and use of multiple color/fill ramps
+#'
+#' @inheritParams plot_outcomes
+#'
+#' @param prepped prepared data from `plot_data_prep() |>  plot_style_prep()`
+#'
+#' @return
+#' @export
+#'
+#' @examples
 plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
                      facet_wrapper, facet_row, facet_col,
                      sceneorder, transoutcome, setLimits, base_list) {
@@ -227,6 +270,25 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
 }
 
 
+#' Helper for plot_map. Essentially recurses it to do the underlay and overlay
+#' lists
+#'
+#' This gets run once each for under and overlays. It is itself agnostic to
+#' whether it is under or over the 'main' plot.
+#'
+#' @inheritParams plot_outcomes
+#'
+#' @param underover_list List of layers to put either under or over the main layer
+#' @param outcome_plot The plot, as it stands before the layers in `underover_list` are added
+#' @param maindata The data going into the primary ('main') layer
+#' @param maindatatype character, 'point' (point, multipoint) or 'areal' (polygon, multipolygon) used to know if the main layer uses a color (if 'point') or fill (if 'areal') aes
+#' @param maincolorpal palette for the main data
+#' @param uotype character, 'overlay', 'underlay', or 'internal' (default, it is an item in 'underover_list'). Not used, except for compatibility
+#'
+#' @return
+#' @export
+#'
+#' @examples
 make_underover <- function(underover_list, outcome_plot, sceneorder,
                            outcome_lab, maindata,
                            maindatatype, maincolorpal, transoutcome,
@@ -385,6 +447,20 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
   return(outcome_plot)
 }
 
+#' Make a heatmap
+#'
+#' @inheritParams plot_outcomes
+#'
+#' @param prepped prepared data from `plot_data_prep() |>  plot_style_prep()`
+#' @param xtype character, 'qual', 'numeric' or 'date' (which
+#'   covers several different date types). Determines how axes are handled
+#' @param ytype character, 'qual', 'numeric' or 'date' (which
+#'   covers several different date types). Determines how axes are handled
+#'
+#' @return
+#' @export
+#'
+#' @examples
 plot_heatmap <- function(prepped,
                          x_col, x_lab,
                          y_col, y_lab,

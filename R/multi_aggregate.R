@@ -18,15 +18,14 @@
 #'   both automatically added to `groupers` according to `aggsequence` before
 #'   passing to [general_aggregate()].
 #' @param group_until named list of groupers and the step to which they should
-#'   be retained. Default NA (retain all groupers for all steps). But most
-#'   commonly for EWR tool `group_until = list('planning_unit_name = is_notpoint)`
-#'   to group by planning unit until larger spatial grouping has
-#'   happened. Step can be an index, name, or a function that evaluates to TRUE
-#'   or FALSE when run on the aggregation sequence. Named list does not need to
-#'   contain all groupers, but if so, those that persist throughout should be
-#'   given NA or numeric values longer than aggsequence.
-#'   Vectors the length of groupers usually work, but are less-well
-#'   supported.
+#'   be retained. Default NA (retain all groupers for all steps). *FOR EWR USE,
+#'   best option is* `group_until = list('planning_unit_name = is_notpoint)`.
+#'   This groups by planning unit until larger spatial grouping has happened.
+#'   Step can be an index, name, or a function that evaluates to TRUE or FALSE
+#'   when run on the aggregation sequence. Named list does not need to contain
+#'   all groupers, but if so, those that persist throughout should be given NA
+#'   or numeric values longer than aggsequence. Vectors the length of groupers
+#'   usually work, but are less-well supported.
 #' @param aggsequence a named list of aggregation steps in the order to apply
 #'   them. Entries for theme aggregation should be character vectors- e.g. `name
 #'   = c('from_theme', 'to_theme')`. Entries for spatial aggregation should be

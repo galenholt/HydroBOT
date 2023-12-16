@@ -1,19 +1,22 @@
+#' Helper to find the type of color specification, so we can call the right `ggplot::scale_color_*`
+#'
+#' Four options:
+#' 1. pal_list is a named `colors` object
+#' return an indication to use scale_*manual(values = pal_list)
+#' 2. pal_list is a paletteer palette name
+#' return an indication to use scale_paletteer_*(pal_list)
+#' 3. pal_list is a list, and we need to deal with grouped colors
+#' find the colors to use, return those in the data along with an indication to use scale_*identity
+#' 4. pal_list is a single color value
+#' Does not automate other things like making the colors
+#' object from data and pal_list; not necessary and is fraught.
+#' @param pal_list as in [plot_outcomes()]
+#'
+#' @return character, one of 'colorobj', 'paletteer_c', 'paletteer_d', 'grouped', 'fixed' that help other functions know what to do wiht color/fill
+#'
 find_color_type <- function(pal_list) {
-  # Four options:
 
-  # 1. pal_list is a named `colors` object
-    # return an indication to use scale_*manual(values = pal_list)
-  # 2. pal_list is a paletteer palette name
-    # return an indication to use scale_paletteer_*(pal_list)
-  # 3. pal_list is a list, and we need to deal with grouped colors
-    # find the colors to use, return those in the data along with an indication to use scale_*identity
-  # 4. pal_list is a single color value
-
-  # I don't want to deal with automating other things like making the colors
-  # object from data and pal_list; I don't think it's necessary and is fraught.
-
-
-
+  # if it's a color object
   if (inherits(pal_list, 'colors')) {
     return('colorobj')
   }
@@ -35,10 +38,13 @@ find_color_type <- function(pal_list) {
     return('paletteer_d')
   }
 
+  # grouped colors (e.g. a list of palettes)
+  # End up getting explicitly assigned in plot_style_prep and scale_*_identity()
   if (length(pal_list) > 1) {
     return('grouped')
   }
 
+  # just a single color
   if (length(pal_list) == 1 &&
       pal_list %in% grDevices::colors() |
       grepl("#", pal_list) |
@@ -46,8 +52,24 @@ find_color_type <- function(pal_list) {
       is.null(pal_list)) {
     return('fixed')
   }
+
 }
 
+#' Makes the calls to `scale_fill_*` and `scale_color_*`, depending on whether color/fill and the palette type needed
+#'
+#' Uses `aes_type` to know the color/fill, and `color_type` (from [find_color_type()]) to know what ggplot function to use to add the color. Needs to handle any color trans as well with `transoutcome`
+#'
+#' @inheritParams plot_outcomes
+#'
+#' @param ggobj The in-construction ggplot object
+#' @param aes_type 'color' or 'fill'
+#' @param color_type from [find_color_type()]
+#' @param nbins number of bins for contours
+#'
+#' @return
+#' @export
+#'
+#' @examples
 handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
                             transoutcome = 'identity', setLimits = NULL,
                             base_list = NULL,
@@ -154,6 +176,19 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
   return(ggobj)
 }
 
+#' Check silent overplotting
+#'
+#' Fill in maps and heatmaps can silently plot multiple values on top of each
+#' other. THis checks data dimension to ensure only a single value is plotted
+#'
+#' @inheritParams plot_outcomes
+#'
+#' @param data the prepped data to be plotted
+#'
+#' @return
+#' @export
+#'
+#' @examples
 test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col = NULL, y_col = NULL) {
 
   # Get the geometry column if there is one (will be NULL otherwise)
@@ -211,12 +246,19 @@ test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col =
   }
 }
 
-# Find limits for the color scale- needs to be a function, so write it here so it inherits variables.
-# allows centering diverging palettes with baseline comparisons
-# by defining this in here, it inherits base_list$comp_fun and other values
-# x is typically prepped$data[[prepped$outcome_col]] (because `prepped$outcome_col` is
-# the new outcome_col name if baselined). Should I just use that? Or can I call it from inside the `scale`
-# x here is a length-2 default set of limits.
+
+#' Finds limits for the color scale, accounting for prepped data and baselining.
+#'
+#' allows (by crude inference) centering diverging palettes with baseline comparisons
+#'
+#' @param x the default data range passed in by the palette
+#' @param lims desired limits
+#' @param base_list as in [plot_outcomes()]
+#'
+#' @return
+#' @export
+#'
+#' @examples
 findlimits <- function(x, lims, base_list) {
   # use hard-set user-supplied limits
   if (!is.null(lims)) {

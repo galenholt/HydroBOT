@@ -1,15 +1,13 @@
 #' Some standard data preparation for plotting
 #'
-#' This is an attempt to pull a lot of copy-paste out of the top of plot
-#' functions. It's likely to continue to evolve quite a bit as we see all the
-#' different things we need to manage in the plot setup. One of the goals here
-#' is to avoid making a million very similar datasets- doing it in functions
-#' keeps those changes sandboxed
+#' Handles common data preparation for plotting. One of the goals here is to
+#' avoid making a million very similar datasets- doing it in functions keeps
+#' those changes sandboxed and allows consistent error checking and formatting.
 #'
 #' @param data dataframe to prep
-#' @param outcome_col character, column name for what's plotted on the y-axis.
+#' @param outcome_col character, column name for outcome variable.
 #' @param sceneorder character or factor giving the order to present scenario
-#'   levels
+#'   levels. Default NULL uses default ordering.
 #' @param base_list NULL (default) or list of arguments for [baseline_compare()]
 #' @param zero_adjust numeric (default 0) or `"auto"`, adjustment to data to
 #'   avoid zeros by adding `zero_adjust` to `abs(data)`, e.g shifting all data
@@ -97,17 +95,14 @@ plot_data_prep <- function(data, outcome_col,
   return(tibble::lst(data, outcome_col, ylab_append))
 }
 
-#' Title
+#' Some data preparation, checking, and type-finding based on the type of data
+#' and the way we want plots to look
 #'
-#' @param prepped
-#' @param colorset
-#' @param colorgroups
-#' @param pal_list
-#' @param transoutcome
-#' @param transx
-#' @param point_group
+#' @inheritParams plot_outcomes
 #'
-#' @return
+#' @param prepped a prepped data list returned by [plot_data_prep()]
+#'
+#' @return a prepped data list with more information needed to make the plots
 #' @export
 #'
 #' @examples
