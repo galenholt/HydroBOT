@@ -58,7 +58,7 @@ make_test_agg <- function(namehistory = TRUE) {
   funseq <- list('CompensatingFactor',
                  'ArithmeticMean',
                  'ArithmeticMean',
-                 c('ArithmeticMean', 'LimitingFactor'),
+                 "ArithmeticMean",
                  list(wm = ~weighted.mean(., w = area,
                                           na.rm = TRUE)),
                  'ArithmeticMean',
