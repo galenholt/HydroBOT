@@ -3,7 +3,7 @@
     {
       "#516888FF": 58,
       "#F3AE6DFF": 175,
-      "#FBE697FF": 541
+      "#FBE697FF": 483
     }
 
 ---
@@ -13,18 +13,18 @@
       "#516888FF": 58,
       "#C9DACAFF": 5,
       "#F3AE6DFF": 47,
-      "#FBE697FF": 24
+      "#FBE697FF": 22
     }
 
 # scalar colors work and font switching
 
     {
-      "forestgreen": 774
+      "forestgreen": 716
     }
 
 ---
 
     {
-      "cornflowerblue": 217
+      "cornflowerblue": 215
     }
 

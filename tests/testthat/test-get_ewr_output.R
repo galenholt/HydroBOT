@@ -116,7 +116,7 @@ test_that("making assessment tibble works", {
 })
 
 test_that("passing in a list from memory works", {
-  ewr_out <- make_test_ewr_output()
+  ewr_out <- make_test_ewr_output(build_dirs = FALSE)
 
    ewrprepped <- get_ewr_output(ewr_out, type = 'achievement')
 })

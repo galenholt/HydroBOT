@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_outcomes.R
 \name{plot_outcomes}
 \alias{plot_outcomes}
-\title{Plot stacked bar graphs of outcomes across scenarios}
+\title{Standardized plot functions for toolkit.}
 \usage{
 plot_outcomes(
   outdf,
@@ -24,6 +24,7 @@ plot_outcomes(
   sceneorder = NULL,
   scales = "fixed",
   transoutcome = "identity",
+  transy = "identity",
   transx = "identity",
   zero_adjust = 0,
   position = "stack",
@@ -31,42 +32,47 @@ plot_outcomes(
   smooth_arglist = NULL,
   underlay_list = NULL,
   overlay_list = NULL,
+  contour_arglist = NULL,
   setLimits = NULL
 )
 }
 \arguments{
-\item{outdf}{dataframe of outcomes, needs a \code{scenario} column}
+\item{outdf}{dataframe of outcomes}
 
 \item{outcome_col}{character, name of outcome column. This is the data of
 interest being plotted. All data operations in \code{\link[=plot_data_prep]{plot_data_prep()}} happen to
-this column, and \code{\link[=plot_style_prep]{plot_style_prep()}} bases styling on it. For 2d plots, it is
-the y-axis, and for maps, heatmaps, and network plots, it is color/fill. It
-is entirely possible to also use it as color/fill for 2d plots in addition
-to the y-axis.}
+this column, and \code{\link[=plot_style_prep]{plot_style_prep()}} bases styling on it. For 2d plots, it
+is the y-axis, and for maps, heatmaps, and network plots, it is color/fill.
+It is entirely possible to also use it as color/fill for 2d plots in
+addition to the y-axis.}
 
-\item{outcome_lab}{character, default \code{outcome_col}, allows changing label of the outcome_col (y-axis or color/fill)}
+\item{outcome_lab}{character, default \code{outcome_col}, allows changing label of
+the outcome_col (y-axis or color/fill)}
 
 \item{y_col}{character, default \code{outcome_col}. Allows separately specifying
 y-axis from outcome (e.g. maps, heatmaps, networks)}
 
-\item{y_lab}{character, default y_col, allows changing y-lable}
+\item{y_lab}{character, default y_col, allows changing y-label}
 
 \item{x_col}{character, name of column for the x-axis. Default \code{'scenario'}}
 
 \item{x_lab}{character, default \code{x_col}, allows changing x-label}
 
-\item{colorset}{character, column name defining the colors to use (if
-\code{scene_x = TRUE}) or the x-levels (if \code{scene_x = FALSE})- needs to be
-renamed to reflect that it isn't just colors}
+\item{colorset}{character, column name to use for color or fill}
 
 \item{pal_list}{list of palettes for defining colors for \code{colorset}. Should
 be length of \code{colorgroups}}
 
-\item{colorgroups}{character, column name for grouping \code{colorset},
-particularly into different palettes}
+\item{colorgroups}{character, column name for grouping \code{colorset} to allow
+multiple palettes. Default NULL just uses colorset to define color}
 
 \item{color_lab}{character, default either \code{colorgroups} or \code{colorset} (if
 \code{is.null(colorgroups)}). Allows changing the color legend label}
+
+\item{plot_type}{one of '2d' (default), 'heatmap', 'contour', 'map', or
+'network'. Typically, '2d' can be inferred. Both 'heatmap' and 'contour'
+call \code{plot_heatmap}, but do so differently. 'network' is being held for
+future use (use \code{make_causal_plot()} in the interim)}
 
 \item{facet_row}{NULL (default) or character for facet row. Can be \code{'.'} to
 have one row and column-facets}
@@ -81,25 +87,33 @@ to have one column and row-facets}
 e.g. if plotting color by an environmental group, but need separate
 lines/points for each environmental objective.}
 
-\item{sceneorder}{character or factor giving the order to present scenario
-levels}
+\item{sceneorder}{Default NULL, otherwise, character or factor giving the
+order to present scenario levels}
 
-\item{scales}{facet scales, as in \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if gauges have very different flows.}
+\item{scales}{facet scales, as in \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if e.g. gauges have very different flows.}
 
-\item{transoutcome}{transformation for y axis as in
-\code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}}. Default \code{transoutcome = 'identity'} just uses
-the data. Most common change likely \verb{transoutcome = 'log10}}
+\item{transoutcome}{transformation for outcome as in
+\code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}} or \code{\link[ggplot2:scale_colour_continuous]{ggplot2::scale_fill_continuous()}}.
+Default \code{transoutcome = 'identity'} just uses the data. Most common change
+likely \verb{transoutcome = 'log10}}
+
+\item{transy}{transformation of y-axis, \emph{if the outcome is not y}. Default
+\code{'identity'}. Ignored if outcome_col is on the y-axis}
 
 \item{transx}{transformation for x axis as in
 \code{\link[ggplot2:scale_continuous]{ggplot2::scale_x_continuous()}}. Default \code{transx = 'identity'} just uses
-the data. Most common change likely \verb{transx = 'log10}}
+the data. Most common change likely \verb{transx = 'log10}.}
+
+\item{zero_adjust}{adjustment of zeros in \code{\link[=plot_data_prep]{plot_data_prep()}}, useful
+especially for axis \code{trans} arguments. See \code{?plot_data_prep}; this is not
+the same as for baselining, which should go in \code{base_list}}
 
 \item{position}{character or \code{position} function, \code{position} arguments from
 \code{\link[ggplot2:geom_bar]{ggplot2::geom_col()}} and \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} (depending on plot type),
 to change from stacked to dodged bars or jitter points. Can be character,
 e.g. 'jitter' or a function, e.g. \code{ggplot2::position_jitter(width = 0.1, height = 0)}}
 
-\item{base_list}{NULL (default) or limited list of arguments to
+\item{base_list}{NULL (default) or named list of arguments to
 \code{\link[=baseline_compare]{baseline_compare()}};
 \itemize{
 \item base_lev
@@ -117,41 +131,56 @@ straight lines. Arguments
 \item method.args
 \item se
 \item linewidth
+\item alpha
 If others are desired, we can develop something more general.
 }}
 
-\item{underlay_list}{default NULL, named list (or list of named lists for
-multiple underlay levels) of arguments to plot a map underlying the main
-map data. Names define arguments, \code{underlay} is required, either character
-or an sf, \code{underlay_pal} do define colors, can be single color or paletteer
-name, and \code{underlay_ycol} if coloring the underlay by values. Multiple
-values (e.g. having an \code{underlay_ycol} and a palette for \code{underlay_pal})
-only works if the main data is not the same type- we can't use different
-palettes for underlay fill and main data fill, for example, but can if the
-underlay is fill (polygons) and the main data is points.}
+\item{underlay_list}{default NULL, otherwise named list (or list of named
+lists for multiple underlay levels) of arguments to plot a map underlying
+the main map data. Only required value is either \code{'underlay'} or
+\code{'underover'} (interchangeable), defining the data to be plotted. Other
+arguments as for the main plot. Typical examples
+\itemize{
+\item \code{underlay_list = 'basin'} simply plot the basin outline
+\item \code{underlay_list = list(underlay = 'basin', pal_list = 'azure')} same, but filled
+\item \code{underlay_list = list(underlay = outputs_on_sdl_scale, outcome_col = ewr_achieved, pal_list = 'scico::oslo')} plot the ewr outcomes in the sdls
+A named palette (e.g. variation in color/fill) only works if the main data is not the same type- we can't
+use different palettes for underlay fill and main data fill, for example,
+but can if the underlay is fill (polygons) and the main data is points.
+}}
 
-\item{overlay_list}{as \code{underlay_list}, but names \code{"overlay_*"}}
+\item{overlay_list}{as \code{underlay_list}, but first item might be named \verb{"overlay} or \code{"underover"}}
 
-\item{setLimits}{sets user-supplied color/fill limits for maps, heatmaps, and networks, or y limits
-for other plots. Also sets \code{underlay} and \code{overlay} limits for consistency.}
+\item{contour_arglist}{default \code{NULL}
+\itemize{
+\item NULL builds a heatmap with \code{\link[ggplot2:geom_tile]{ggplot2::geom_tile()}},
+\item \code{list(interpolate = TRUE)} builds an interpolated heatmap with \link[ggplot2:geom_raster(interpolate = TRUE)]{ggplot2::geom_raster(interpolate = TRUE)}
+\item \code{list()} builds a \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}} with all defaults
+\item a named list with names other than 'interpolate' passes those as arguments to \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}
+}}
 
-\item{smooth_method}{\code{method} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. Ignored
-if not smoothing}
-
-\item{smooth_args}{\code{method.args} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::stat_smooth()}}.
-Ignored if not smoothing.}
-
-\item{smooth_se}{\code{se} argument to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. Ignored if not
-smoothing}
+\item{setLimits}{sets user-supplied color/fill limits for maps, heatmaps, and
+networks, or y limits for other plots. Also sets \code{underlay} and \code{overlay}
+limits for consistency.}
 }
 \value{
 a ggplot stacked bar plot with standard formatting and data cleaning
 }
 \description{
-Has several ways to color, including grouped palettes. Lets us choose whether
-to stack scenarios with outcome groups on x (\code{scene_x = FALSE}) or stack
-outcome groups with scenarios on x (\code{scene_x = TRUE}). I do \emph{not} provide an
-argument to drop legend labels on purpose- it's dangerous to auto-drop them.
-The user can always \code{+ theme(legend.position = 'none')} to the returned
-object.
+Provides a common interface to plotting of an \code{outcome_col}, which may be
+plotted on y or fill/color or both. Handles consistent data preparation steps
+for that outcome variable, along with error and data checking. This keeps
+data arrangement in-function and controlled for consistency and accuracy, no
+matter what plot type is desired. Currently supports lines, points, bars,
+maps, and heatmaps. All plots are just standardizatons of
+\code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}, and return \code{ggplot} objects that can then be tweaked
+with standard ggplot calls. \strong{Unlike ggplot, arguments that would typically
+go in \code{\link[ggplot2:aes]{ggplot2::aes()}} should not be bare names, but characters}.
+}
+\details{
+I do \emph{not} provide an argument to drop legend labels on purpose- it's
+dangerous to auto-drop them. The user can always \code{+ theme(legend.position = 'none')} to the returned object. As much as possible, arguments for specific
+plot types have been put in \verb{*_list} arguments, which should be NULL
+(typically the default) or lists of the arguments that the user wants to
+change.
 }

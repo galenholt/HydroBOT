@@ -27,7 +27,7 @@ test_that("produces desired format for obj-target", {
                                  outdir = NULL,
                                  savename = NULL)
 
-  expect_equal(names(obj2target), c('PlanningUnitID', 'LTWPShortName', 'env_obj',
+  expect_equal(names(obj2target), c('PlanningUnitID', "planning_unit_name", 'LTWPShortName', 'env_obj',
                                     'Specific_goal', 'Objective', 'Target'))
   # test the values are there
   expect_snapshot_value(as.list(unique(obj2target$env_obj[!is.na(obj2target$env_obj)])))

@@ -4,7 +4,13 @@
 \alias{read_hydro}
 \title{Wrapper to read hydrographs into R}
 \usage{
-read_hydro(hydropath, scenariofilter = NULL, long = TRUE, format = "csv")
+read_hydro(
+  hydropath,
+  scenariofilter = NULL,
+  long = TRUE,
+  format = "csv",
+  gaugemap = "iqqm"
+)
 }
 \arguments{
 \item{hydropath}{path to the hydrographs}

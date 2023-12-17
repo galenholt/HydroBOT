@@ -16,10 +16,10 @@ plot_data_prep(
 \arguments{
 \item{data}{dataframe to prep}
 
-\item{outcome_col}{character, column name for what's plotted on the y-axis.}
+\item{outcome_col}{character, column name for outcome variable.}
 
 \item{sceneorder}{character or factor giving the order to present scenario
-levels}
+levels. Default NULL uses default ordering.}
 
 \item{base_list}{NULL (default) or list of arguments for \code{\link[=baseline_compare]{baseline_compare()}}}
 
@@ -28,18 +28,18 @@ avoid zeros by adding \code{zero_adjust} to \code{abs(data)}, e.g shifting all d
 away from zero, either positively or negatively. Zeros themselves are
 shifted up or down randomly. Used for avoiding x/0, NaN, and Inf when
 relativiszing and taking logs, primarily. Auto shifts by
-\code{0.1*min(abs(data[data != 0]))}.}
+\code{0.1*min(abs(data[data != 0]))}.
+\emph{note} the adjustment happens \emph{before} baselining (so the baselining works), but if the baseline reintroduces zeros, they will not be re-adjusted out. This is done under the expectation that zeros returned by baselining are desired, e.g. difference of a baseline with itself.}
 
-\item{onlyzeros}{logical, default \code{FALSE}. Should all values be adjusted away from zero (\code{TRUE}) or only adjust zero values (\code{FALSE})?}
+\item{onlyzeros}{logical, default \code{FALSE}. Should all values be adjusted away
+from zero (\code{TRUE}) or only adjust zero values (\code{FALSE})?}
 }
 \value{
-a list with prepped versions of \code{data}, \code{outcome_col}, \code{ylab_append} to
-be used in plot calls
+a list with prepped versions of \code{data}, \code{outcome_col}, \code{ylab_append}
+to be used in plot calls
 }
 \description{
-This is an attempt to pull a lot of copy-paste out of the top of plot
-functions. It's likely to continue to evolve quite a bit as we see all the
-different things we need to manage in the plot setup. One of the goals here
-is to avoid making a million very similar datasets- doing it in functions
-keeps those changes sandboxed
+Handles common data preparation for plotting. One of the goals here is to
+avoid making a million very similar datasets- doing it in functions keeps
+those changes sandboxed and allows consistent error checking and formatting.
 }

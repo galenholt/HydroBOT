@@ -23,23 +23,24 @@ plot_hydrographs(
 
 \item{outcome_col}{character, name of outcome column. This is the data of
 interest being plotted. All data operations in \code{\link[=plot_data_prep]{plot_data_prep()}} happen to
-this column, and \code{\link[=plot_style_prep]{plot_style_prep()}} bases styling on it. For 2d plots, it is
-the y-axis, and for maps, heatmaps, and network plots, it is color/fill. It
-is entirely possible to also use it as color/fill for 2d plots in addition
-to the y-axis.}
+this column, and \code{\link[=plot_style_prep]{plot_style_prep()}} bases styling on it. For 2d plots, it
+is the y-axis, and for maps, heatmaps, and network plots, it is color/fill.
+It is entirely possible to also use it as color/fill for 2d plots in
+addition to the y-axis.}
 
 \item{gaugefilter}{set of gauges to filter}
 
 \item{colors}{name of palette. Will change in future to match plot_outcomes color defining}
 
-\item{sceneorder}{character or factor giving the order to present scenario
-levels}
+\item{sceneorder}{Default NULL, otherwise, character or factor giving the
+order to present scenario levels}
 
-\item{scales}{facet scales, as in \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if gauges have very different flows.}
+\item{scales}{facet scales, as in \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default \code{scales = 'fixed'} holds them the same, most common change will be to \code{scales = 'free_y'} if e.g. gauges have very different flows.}
 
-\item{transoutcome}{transformation for y axis as in
-\code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}}. Default \code{transoutcome = 'identity'} just uses
-the data. Most common change likely \verb{transoutcome = 'log10}}
+\item{transoutcome}{transformation for outcome as in
+\code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}} or \code{\link[ggplot2:scale_colour_continuous]{ggplot2::scale_fill_continuous()}}.
+Default \code{transoutcome = 'identity'} just uses the data. Most common change
+likely \verb{transoutcome = 'log10}}
 
 \item{...}{passed to \code{\link[=plot_prep]{plot_prep()}}}
 }

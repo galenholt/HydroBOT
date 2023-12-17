@@ -64,7 +64,7 @@ read_hydro_csv <- function(hydropath, scenariofilter, long) {
 #' @examples
 read_hydro_nc <- function(hydropath, scenariofilter, long, gaugemap) {
 
-  rlang::check_installed(c('metR', 'PCICt'), reason = "reading netcdf hydrographs requires `metR`, which requires `PCICt`.")
+  rlang::check_installed(c('metR', 'PCICt', 'ncdf4'), reason = "reading netcdf hydrographs requires `metR`, which requires `PCICt`.")
   hydro_paths <- find_scenario_paths(hydropath, type = 'nc')
 
   if (!is.null(scenariofilter)) {

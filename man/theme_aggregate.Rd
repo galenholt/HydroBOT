@@ -14,14 +14,16 @@ theme_aggregate(
   causal_edges,
   geonames = NULL,
   failmissing = TRUE,
+  auto_ewr_PU = FALSE,
   ...
 )
 }
 \arguments{
 \item{dat}{sf or tibble or dataframe of values to aggregate, with necessary
 grouping information for non-theme axis (e.g. scenario, location). \emph{Not}
-necessarily the same as \code{data} in \code{\link[=general_aggregate]{general_aggregate()}}- this function makes
-necessary adjustments to the data before calling \code{\link[=general_aggregate]{general_aggregate()}}}
+necessarily the same as \code{data} in \code{\link[=general_aggregate]{general_aggregate()}}- this function
+makes necessary adjustments to the data before calling
+\code{\link[=general_aggregate]{general_aggregate()}}}
 
 \item{from_theme}{character, column name of the theme level the data is
 currently in}
@@ -65,6 +67,13 @@ be more general}
 aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
 and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
 \code{tidyselect::any_of()} in \code{tidyselect}}
+
+\item{auto_ewr_PU}{logical, default FALSE. If TRUE, automatically infers
+whether this is an EWR dataset and has not yet been spatially aggregated.
+If so, applies grouping by 'planning_unit_name'. The preferred solution is
+to include it in \code{groupers} here (for on-off), or in \code{\link[=multi_aggregate]{multi_aggregate()}} to
+use \code{group_until}. If none of those solutions happen, though, it aborts to
+prevent incorrect pooling over planning units.}
 
 \item{...}{passed to \code{\link[=general_aggregate]{general_aggregate()}}}
 }

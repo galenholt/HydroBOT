@@ -2,7 +2,7 @@ test_that("long data referencing works", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
                                                 package = 'werptoolkitr'))
   baselong <- baseline_compare(hydlong, compare_col = 'scenario', comp_fun = difference,
-                               base_lev = 'base', values_col = 'flow', group_cols = c('Date', 'gauge'))
+                               base_lev = 'base_base', values_col = 'flow', group_cols = c('Date', 'gauge'))
   # names are right
   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
   # all the bases are 0
@@ -13,7 +13,7 @@ test_that("auto-grouper works", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
                                                 package = 'werptoolkitr'))
   expect_warning(baselong <- baseline_compare(hydlong, compare_col = 'scenario', comp_fun = difference,
-                               base_lev = 'base', values_col = 'flow'))
+                               base_lev = 'base_base', values_col = 'flow'))
   # names are right
   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
   # all the bases are 0
@@ -25,7 +25,7 @@ test_that("multiple values columns works", {
                                                 package = 'werptoolkitr'),
                         long = FALSE)
   expect_warning(basewide <- baseline_compare(hydwide, compare_col = 'scenario', comp_fun = difference,
-                               base_lev = 'base', values_col = tidyselect::starts_with('4'),
+                               base_lev = 'base_base', values_col = tidyselect::starts_with('4'),
                                names_to = 'gauge', values_to = 'flow', group_cols = c('Date', 'gauge')))
   # names are right
   expect_equal(names(basewide), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
@@ -61,7 +61,7 @@ test_that("relative comparison works", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
                                                 package = 'werptoolkitr'))
   baselong <- baseline_compare(hydlong, compare_col = 'scenario', comp_fun = relative,
-                               base_lev = 'base', values_col = 'flow', group_cols = c('Date', 'gauge'))
+                               base_lev = 'base_base', values_col = 'flow', group_cols = c('Date', 'gauge'))
   # names are right
   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'relative_flow'))
   # all the bases should be 1 or div/0
@@ -72,7 +72,7 @@ test_that("relative comparison works with add_eps", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
                                                 package = 'werptoolkitr'))
   baselong <- baseline_compare(hydlong, compare_col = 'scenario', comp_fun = relative, add_eps = 1,
-                               base_lev = 'base', values_col = 'flow', group_cols = c('Date', 'gauge'))
+                               base_lev = 'base_base', values_col = 'flow', group_cols = c('Date', 'gauge'))
   # names are right
   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'relative_flow'))
   # all the bases should be 1 or div/0
@@ -84,7 +84,7 @@ test_that("character functions work", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
                                                 package = 'werptoolkitr'))
   baselong <- baseline_compare(hydlong, compare_col = 'scenario', comp_fun = 'difference',
-                               base_lev = 'base', values_col = 'flow', group_cols = c('Date', 'gauge'))
+                               base_lev = 'base_base', values_col = 'flow', group_cols = c('Date', 'gauge'))
   # names are right
   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
   # all the bases are 0
@@ -97,7 +97,7 @@ test_that("list functions work", {
                                                 package = 'werptoolkitr'))
   baselong <- baseline_compare(hydlong, compare_col = 'scenario',
                                comp_fun = rlang::quo(list(difference = ~difference(., y = ref_flow))),
-                               base_lev = 'base', values_col = 'flow', group_cols = c('Date', 'gauge'))
+                               base_lev = 'base_base', values_col = 'flow', group_cols = c('Date', 'gauge'))
   # names are right
   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
   # all the bases are 0

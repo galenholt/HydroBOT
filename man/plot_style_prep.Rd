@@ -2,7 +2,8 @@
 % Please edit documentation in R/plot_prep.R
 \name{plot_style_prep}
 \alias{plot_style_prep}
-\title{Title}
+\title{Some data preparation, checking, and type-finding based on the type of data
+and the way we want plots to look}
 \usage{
 plot_style_prep(
   prepped,
@@ -15,8 +16,33 @@ plot_style_prep(
 )
 }
 \arguments{
-\item{point_group}{}
+\item{prepped}{a prepped data list returned by \code{\link[=plot_data_prep]{plot_data_prep()}}}
+
+\item{colorset}{character, column name to use for color or fill}
+
+\item{colorgroups}{character, column name for grouping \code{colorset} to allow
+multiple palettes. Default NULL just uses colorset to define color}
+
+\item{pal_list}{list of palettes for defining colors for \code{colorset}. Should
+be length of \code{colorgroups}}
+
+\item{transoutcome}{transformation for outcome as in
+\code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}} or \code{\link[ggplot2:scale_colour_continuous]{ggplot2::scale_fill_continuous()}}.
+Default \code{transoutcome = 'identity'} just uses the data. Most common change
+likely \verb{transoutcome = 'log10}}
+
+\item{transx}{transformation for x axis as in
+\code{\link[ggplot2:scale_continuous]{ggplot2::scale_x_continuous()}}. Default \code{transx = 'identity'} just uses
+the data. Most common change likely \verb{transx = 'log10}.}
+
+\item{point_group}{character, column to add additional point groupings to,
+e.g. if plotting color by an environmental group, but need separate
+lines/points for each environmental objective.}
+}
+\value{
+a prepped data list with more information needed to make the plots
 }
 \description{
-Title
+Some data preparation, checking, and type-finding based on the type of data
+and the way we want plots to look
 }

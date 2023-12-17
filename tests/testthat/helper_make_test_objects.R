@@ -1,16 +1,20 @@
 # Get EWR data, prep it, and aggregate it so we don't have to include it in the package and so we're always testing on up-to-date workflows
 
 # EWR
-make_test_ewr_output <- function() {
-  # Set up some base directory structures
-  temp_hydro_dir <- '_test_data/hydrographs'
-  temp_parent_dir <- '_test_data'
+make_test_ewr_output <- function(build_dirs = TRUE) {
 
-  temp_hydro_multi <- '_test_data/hydrographs'
-  temp_parent_multi <- '_test_data'
+  if (build_dirs) {
+    # Set up some base directory structures
+    temp_hydro_dir <- '_test_data/hydrographs'
+    temp_parent_dir <- '_test_data'
 
-  # create dir so building makes sense
-  make_temp_hydro()
+    temp_hydro_multi <- '_test_data/hydrographs'
+    temp_parent_multi <- '_test_data'
+
+    # create dir so building makes sense
+    make_temp_hydro()
+  }
+
 
   ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
                                 output_parent_dir = temp_parent_dir,

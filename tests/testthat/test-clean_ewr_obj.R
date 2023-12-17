@@ -15,7 +15,7 @@ test_that("no gaugescale produces expected output", {
 
   expect_s3_class(ewr2obj, 'tbl_df')
   # paste(names(ewr2obj), collapse = '", "')
-  ewrnames <- c("LTWPShortName", "ewr_code", "ewr_code_timing", "env_obj")
+  ewrnames <- c("LTWPShortName", "ewr_code", "env_obj", "ewr_code_timing")
   expect_equal(names(ewr2obj), ewrnames)
 
   # being a bit more general here, since the ordering could easily change
@@ -37,7 +37,7 @@ test_that("gaugescale produces expected output", {
 
   expect_s3_class(ewr2obj, 'tbl_df')
   # paste(names(ewr2obj), collapse = '", "')
-  ewrnames <- c('PlanningUnitID', "LTWPShortName", 'gauge', "ewr_code", "ewr_code_timing", "env_obj")
+  ewrnames <- c('PlanningUnitID',"planning_unit_name", "LTWPShortName", 'gauge', "ewr_code", "ewr_code_timing", "env_obj")
   expect_equal(names(ewr2obj), ewrnames)
 
   # being a bit more general here, since the ordering could easily change

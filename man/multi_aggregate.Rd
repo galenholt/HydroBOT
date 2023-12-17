@@ -8,13 +8,15 @@ multi_aggregate(
   dat,
   causal_edges,
   groupers = "scenario",
+  group_until = rep(NA, length(groupers)),
   aggCols,
   aggsequence,
   funsequence,
   saveintermediate = FALSE,
   namehistory = TRUE,
   keepAllPolys = FALSE,
-  failmissing = TRUE
+  failmissing = TRUE,
+  auto_ewr_PU = FALSE
 )
 }
 \arguments{
@@ -29,6 +31,16 @@ the theme grouping}
 be all grouping columns \emph{except} theme and spatial groupings. These are
 both automatically added to \code{groupers} according to \code{aggsequence} before
 passing to \code{\link[=general_aggregate]{general_aggregate()}}.}
+
+\item{group_until}{named list of groupers and the step to which they should
+be retained. Default NA (retain all groupers for all steps). \emph{FOR EWR USE,
+best option is} \verb{group_until = list('planning_unit_name = is_notpoint)}.
+This groups by planning unit until larger spatial grouping has happened.
+Step can be an index, name, or a function that evaluates to TRUE or FALSE
+when run on the aggregation sequence. Named list does not need to contain
+all groupers, but if so, those that persist throughout should be given NA
+or numeric values longer than aggsequence. Vectors the length of groupers
+usually work, but are less-well supported.}
 
 \item{aggCols}{an expression for the columns to aggregate (the data columns).
 See \code{selectcreator} for formats}
@@ -81,6 +93,13 @@ of polys as an \code{underlay} in \code{\link[=plot_outcomes]{plot_outcomes()}}.
 aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
 and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
 \code{tidyselect::any_of()} in \code{tidyselect}}
+
+\item{auto_ewr_PU}{logical, default FALSE. If TRUE, automatically infers
+whether this is an EWR dataset and has not yet been spatially aggregated.
+If so, applies grouping by 'planning_unit_name'. The preferred solution is
+to include it in \code{groupers} here (for on-off), or in \code{\link[=multi_aggregate]{multi_aggregate()}} to
+use \code{group_until}. If none of those solutions happen, though, it aborts to
+prevent incorrect pooling over planning units.}
 }
 \value{
 either a tibble or sf of aggregated values at the final level (if
