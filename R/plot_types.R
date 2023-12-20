@@ -25,8 +25,7 @@ plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
     aes_type = "fill",
     prepped$pal_list,
     prepped$color_type,
-    direction = prepped$direction,
-    limcol = sf::st_drop_geometry(prepped$data[prepped$outcome_col])
+    direction = prepped$direction
   )
 
   return(outcome_plot)
@@ -122,15 +121,13 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
     aes_type = "color",
     pal_list = prepped$pal_list,
     color_type = prepped$color_type,
-    direction = prepped$direction,
-    limcol = sf::st_drop_geometry(prepped$data[prepped$outcome_col])
-  )
+    direction = prepped$direction)
+
   outcome_plot <- handle_palettes(outcome_plot,
     aes_type = "fill",
     prepped$pal_list, prepped$color_type,
-    direction = prepped$direction,
-    limcol = sf::st_drop_geometry(prepped$data[prepped$outcome_col])
-  )
+    direction = prepped$direction)
+
 }
 
 #' Title
@@ -227,8 +224,7 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
       transoutcome = transoutcome,
       setLimits = setLimits,
       direction = prepped$direction,
-      base_list = base_list,
-      limcol = sf::st_drop_geometry(prepped$data[prepped$outcome_col])
+      base_list = base_list
     )
 
     outcome_plot <- outcome_plot + ggplot2::labs(color = paste0(outcome_lab, prepped$ylab_append))
@@ -246,8 +242,7 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
       transoutcome = transoutcome,
       setLimits = setLimits,
       direction = prepped$direction,
-      base_list = base_list,
-      limcol = sf::st_drop_geometry(prepped$data[prepped$outcome_col])
+      base_list = base_list
     )
 
     outcome_plot <- outcome_plot + ggplot2::labs(fill = paste0(outcome_lab, prepped$ylab_append))
@@ -439,8 +434,7 @@ make_underover <- function(underover_list,
           transoutcome = transoutcome,
           setLimits = setLimits,
           direction = uprep$direction,
-          base_list = base_list,
-          limcol = sf::st_drop_geometry(prepped$data[prepped$outcome_col])
+          base_list = base_list
         )
 
         outcome_plot <- outcome_plot +
@@ -464,8 +458,7 @@ make_underover <- function(underover_list,
           transoutcome = transoutcome,
           setLimits = setLimits,
           direction = uprep$direction,
-          base_list = base_list,
-          limcol = sf::st_drop_geometry(prepped$data[prepped$outcome_col])
+          base_list = base_list
         )
 
         outcome_plot <- outcome_plot +
@@ -593,8 +586,7 @@ plot_heatmap <- function(prepped,
     setLimits = setLimits,
     direction = prepped$direction,
     base_list = base_list,
-    nbins = nbins,
-    limcol = sf::st_drop_geometry(prepped$data[prepped$outcome_col])
+    nbins = nbins
   )
   return(outcome_plot)
 }

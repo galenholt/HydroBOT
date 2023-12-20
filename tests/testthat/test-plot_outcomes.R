@@ -1339,7 +1339,7 @@ test_that("heatmaps", {
 
   # baseline, specify breaks
     # NaNs, so expect a warning
-  expect_warning(sdl_contour_base_breaks <- ostp |>
+  sdl_contour_base_breaks <- ostp |>
     sf::st_drop_geometry() |>
     dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     plot_outcomes(
@@ -1357,7 +1357,7 @@ test_that("heatmaps", {
         base_lev = "base_basezero", comp_fun = "relative",
         group_cols = c("env_group", "SWSDLName")
       )
-    ))
+    )
 
   vdiffr::expect_doppelganger("sdl_contour_base_breaks", sdl_contour_base_breaks)
 

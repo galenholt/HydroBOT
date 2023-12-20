@@ -74,8 +74,7 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
                             transoutcome = 'identity', setLimits = NULL,
                             direction = 1,
                             base_list = NULL,
-                            nbins = 10,
-                            limcol = NULL) {
+                            nbins = 10) {
 
   # If nbins is NULL and this is a contour, we cannot infer (currently), so just return
   if (is.null(nbins) & aes_type == 'contour') {
@@ -96,23 +95,20 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
 
 
   if (color_type == 'paletteer_c') {
-    new_col_lims <- find_limits(limcol = limcol,
-                                lims = setLimits,
-                             trans = transoutcome,
-                             base_list = base_list)
+
     # If the above causes issues, it should also work to have \(x) find_limits(x, lims = setLimits, trans = 'identity', base_list = base_list)
     if (aes_type == 'fill') {
       ggobj <- ggobj +
         paletteer::scale_fill_paletteer_c(palette = pal_list[[1]],
                                           trans = transoutcome,
-                                          limit = new_col_lims,
+                                          limit = \(x) find_limits(x, setLimits, 'identity', base_list),
                                           direction = direction)
     }
     if (aes_type == 'color') {
       ggobj <- ggobj +
         paletteer::scale_color_paletteer_c(palette = pal_list[[1]],
                                            trans = transoutcome,
-                                           limit = new_col_lims,
+                                           limit = \(x) find_limits(x, setLimits, 'identity', base_list),
                                            direction = direction)
     }
     if (aes_type == 'contour') {
@@ -274,7 +270,12 @@ find_limits <- function(limcol, lims, trans, base_list) {
   # If null, keep it that way
   if (is.null(lims)) {
     if (is.null(base_list)) {
-      new_lims <- NULL
+      # in a plot function, limcol will be the default limits. for y, NULL gives the defaults and limcol is a vector
+      if (length(limcol) == 2) {
+        new_lims <- limcol
+      } else {
+        new_lims <- NULL
+      }
     }
     if (!is.null(base_list)) {
       if (base_list$comp_fun == 'difference') {
