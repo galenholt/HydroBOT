@@ -269,8 +269,8 @@ plot_outcomes <- function(outdf,
     # Adjustments to all 2d plots
     # y limits
     if (!is.null(setLimits)) {
-      new_y_lims <- find_ylims(lims = setLimits,
-                               ycol = sf::st_drop_geometry(prepped$data[prepped$outcome_col]),
+      new_y_lims <- find_limits(limcol = sf::st_drop_geometry(prepped$data[prepped$outcome_col]),
+                                lims = setLimits,
                                trans = transoutcome,
                                base_list = base_list)
       outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = new_y_lims)

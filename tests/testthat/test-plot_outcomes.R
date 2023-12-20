@@ -863,7 +863,7 @@ test_that("setLimits works", {
   vdiffr::expect_doppelganger("line_25", sdl_line_25)
 
   # triple limit
-  sdl_line_25 <- obj_sdl_to_plot |>
+  sdl_line_3 <- obj_sdl_to_plot |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       x_col = "delta",
@@ -1034,6 +1034,29 @@ test_that("setLimits works", {
 
   vdiffr::expect_doppelganger("sdl_map_limitsR", sdl_mapLR)
 
+  # overrride the auto
+  sdl_mapLRO <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "ewr_achieved",
+      pal_list = list("scico::berlin"),
+      facet_col = "env_obj",
+      facet_row = "scenario",
+      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      base_list = list(
+        base_lev = "base_base",
+        comp_fun = "relative",
+        group_cols = c("env_obj", 'polyID')
+      ),
+      zero_adjust = 'auto',
+      transoutcome = 'log10',
+      setLimits = c(0.01, 100)
+    )
+
+  vdiffr::expect_doppelganger("sdl_map_limitsRO", sdl_mapLRO)
 })
 
 test_that("ewr works as in `plot_outcomes_bar`", {

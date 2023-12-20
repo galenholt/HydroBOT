@@ -74,7 +74,8 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
                             transoutcome = 'identity', setLimits = NULL,
                             direction = 1,
                             base_list = NULL,
-                            nbins = 10) {
+                            nbins = 10,
+                            limcol = NULL) {
 
   # If nbins is NULL and this is a contour, we cannot infer (currently), so just return
   if (is.null(nbins) & aes_type == 'contour') {
@@ -95,26 +96,23 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
 
 
   if (color_type == 'paletteer_c') {
-    new_col_lims <- find_ylims(lims = setLimits,
-                             ycol = sf::st_drop_geometry(prepped$data[prepped$outcome_col]),
+    new_col_lims <- find_limits(limcol = limcol,
+                                lims = setLimits,
                              trans = transoutcome,
                              base_list = base_list)
+    # If the above causes issues, it should also work to have \(x) find_limits(x, lims = setLimits, trans = 'identity', base_list = base_list)
     if (aes_type == 'fill') {
       ggobj <- ggobj +
         paletteer::scale_fill_paletteer_c(palette = pal_list[[1]],
                                           trans = transoutcome,
-                                          limit = \(x) findlimits(x,
-                                                                  lims = setLimits,
-                                                                  base_list = base_list),
-                                          direction = direction)# why does this only work with ~ and not \(x)? I *think* it needs to return a *function*?
+                                          limit = new_col_lims,
+                                          direction = direction)
     }
     if (aes_type == 'color') {
       ggobj <- ggobj +
         paletteer::scale_color_paletteer_c(palette = pal_list[[1]],
                                            trans = transoutcome,
-                                           limit = \(x) findlimits(x,
-                                                                   lims = setLimits,
-                                                                   base_list = base_list),
+                                           limit = new_col_lims,
                                            direction = direction)
     }
     if (aes_type == 'contour') {
@@ -259,9 +257,96 @@ test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col =
 }
 
 
+
+
+#' Finds limits for y-axis and colors
+#'
+#' Very similar to [findlimits()], which has been deprecated
+#'
+#' @param lims desired limits. see `setLimits` in [plot_outcomes()]
+#' @param ycol vector of the y-values, typically `sf::st_drop_geometry(prepped$data[prepped$outcome_col])`
+#' @param base_list as in [plot_outcomes()]
+#' @param trans transform if any
+#'
+#' @return length-2 limits (or NULL)
+#'
+find_limits <- function(limcol, lims, trans, base_list) {
+  # If null, keep it that way
+  if (is.null(lims)) {
+    if (is.null(base_list)) {
+      new_lims <- NULL
+    }
+    if (!is.null(base_list)) {
+      if (base_list$comp_fun == 'difference') {
+        # lims <- 0 # not new_lims yet, let the later conditionals handle these.
+        lims <- max(abs(limcol), na.rm = TRUE) * c(-1,1)
+      }
+      if (base_list$comp_fun == 'relative') {
+        # lims <- 1
+        logvals <- log(limcol)
+        loglims <- max(abs(logvals), na.rm = TRUE) * c(-1,1)
+        lims <- exp(loglims)
+      }
+      if (!base_list$comp_fun %in% c('difference', 'relative')) {
+        new_lims <- NULL
+      }
+    }
+  }
+
+  # if they are just the lims, leave it
+  if (length(lims) == 2) {
+    new_lims <- lims
+  }
+
+  # if there is 1 or 3, deal with centering which will need to know about trans
+  if (!is.null(lims) & length(lims) %in% c(1, 3)) {
+
+    if (length(lims) == 1) {
+      if (!rlang::is_function(get(trans))) {
+        rlang::abort(glue::glue("`transoutcome` ({trans}) is not a named function and so cannot be applied to find y-scales.
+                              If it is an acceptable trans for ggplot/scales, it should be fine, but you will need to set your setLimits more simply (using NULL, or a length-2 vector).\n"))
+      }
+      transdat <- rlang::exec(
+        get(trans),
+        limcol)
+    }
+
+    minval <- ifelse(length(lims) == 1, min(transdat, na.rm = TRUE), lims[1])
+    maxval <- ifelse(length(lims) == 1, max(transdat, na.rm = TRUE), lims[3])
+    mid <- ifelse(length(lims) == 1, lims, lims[2])
+
+    middown <- abs(mid-minval)
+    middup <- abs(maxval - mid)
+    distfrommid <- max(middown, middup)
+
+    if (middown != middup) {
+      rlang::inform(glue::glue("Limits {lims} not symmetrical about the midpoint.
+                               ignoring the one with the smallest difference.
+                               Making them {distfrommid} up and down from the midpoint {mid}."))
+    }
+
+
+    lower <- mid - distfrommid
+    upper <- mid + distfrommid
+    new_lims <- c(lower, upper)
+  }
+
+  return(new_lims)
+}
+
+
+
+# DEPRECATED --------------------------------------------------------------
+
 #' Finds limits for the color scale, accounting for prepped data and baselining.
 #'
-#' allows (by crude inference) centering diverging palettes with baseline comparisons
+#' allows (by crude inference) centering diverging palettes with baseline
+#' comparisons This has been deprectated in favor of [find_limits()], though it
+#' was nice that this could be inserted into the function call directly, since
+#' it took the x as an argument.
+#'
+#' Previous use:
+#' paletteer::scale_fill_paletteer_c(palette = pal_list[[1]], trans = transoutcome, limit = \(x) findlimits(x,lims = setLimits,base_list = base_list),direction = direction)
 #'
 #' @param x the default data range passed in by the palette
 #' @param lims desired limits. see `setLimits` in [plot_outcomes()]
@@ -273,6 +358,7 @@ test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col =
 #' @examples
 findlimits <- function(x, lims, base_list) {
 
+  rlang::abort("findlimits deprecated for now, in favour of the seemingly more general find_limits")
   # use defaults if lims is null or if its length is 1 (that is a midpoint, handled by findrescale)
   if (is.null(lims)) {
     newLimits = x
@@ -355,75 +441,4 @@ findrescale <- function(x,
   }
 
   return(newrescaler)
-}
-
-#' Finds limits for y-axis
-#'
-#' Very similar to [findlimits()], which does colors
-#'
-#' @param lims desired limits. see `setLimits` in [plot_outcomes()]
-#' @param ycol vector of the y-values, typically `sf::st_drop_geometry(prepped$data[prepped$outcome_col])`
-#' @param base_list as in [plot_outcomes()]
-#' @param trans transform if any
-#'
-#' @return length-2 limits (or NULL)
-#'
-find_ylims <- function(lims, ycol, trans, base_list) {
-  # If null, keep it that way
-  if (is.null(lims)) {
-    if (is.null(base_list)) {
-      new_ylims <- NULL
-    }
-    if (!is.null(base_list)) {
-      if (base_list$comp_fun == 'difference') {
-        lims <- 0 # not new_ylims yet, let the later conditionals handle these.
-      }
-      if (base_list$comp_fun == 'relative') {
-        lims <- 1
-      }
-      if (!base_list$comp_fun %in% c('difference', 'relative')) {
-        new_ylims <- NULL
-      }
-    }
-  }
-
-  # if they are just the lims, leave it
-  if (length(lims) == 2) {
-    new_ylims <- lims
-  }
-
-  # if there is 1 or 3, deal with centering which will need to know about trans
-  if (!is.null(lims) & length(lims) %in% c(1, 3)) {
-
-    if (length(lims) == 1) {
-      if (!rlang::is_function(get(trans))) {
-        rlang::abort(glue::glue("`transoutcome` ({trans}) is not a named function and so cannot be applied to find y-scales.
-                              If it is an acceptable trans for ggplot/scales, it should be fine, but you will need to set your setLimits more simply (using NULL, or a length-2 vector).\n"))
-      }
-      transdat <- rlang::exec(
-        get(trans),
-        ycol)
-    }
-
-    minval <- ifelse(length(lims) == 1, min(transdat, na.rm = TRUE), lims[1])
-    maxval <- ifelse(length(lims) == 1, max(transdat, na.rm = TRUE), lims[3])
-    mid <- ifelse(length(lims) == 1, lims, lims[2])
-
-    middown <- abs(mid-minval)
-    middup <- abs(maxval - mid)
-    distfrommid <- max(middown, middup)
-
-    if (middown != middup) {
-      rlang::inform(glue::glue("Limits {lims} not symmetrical about the midpoint.
-                               ignoring the one with the smallest difference.
-                               Making them {distfrommid} up and down from the midpoint {mid}."))
-    }
-
-
-    lower <- mid - distfrommid
-    upper <- mid + distfrommid
-    new_ylims <- c(lower, upper)
-  }
-
-  return(new_ylims)
 }
