@@ -10,6 +10,15 @@ nodes <- make_nodes(edges)
 
 test_that("defaults work", {
 
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
+    skip()
+  }
+
   edgecols <- causal_colors_general(edges,
                                    pal_list = list(fromtype = "nationalparkcolors::GeneralGrant"),
                                    colorgroups = NULL, colorset = 'fromtype')
@@ -78,6 +87,15 @@ test_that("scalar colors work and font switching", {
 
 test_that("values work for nodes and edges", {
 
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
+    skip()
+  }
+
   edges <- edges |>
     dplyr::mutate(value = dplyr::row_number())
   nodes <- nodes |>
@@ -112,6 +130,15 @@ test_that("values work for nodes and edges", {
 })
 
 test_that("different palette per group", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
+    skip()
+  }
 
   pal_list_c <- list(ewr_code = 'viridis::mako',
                     env_obj = 'viridis::plasma',

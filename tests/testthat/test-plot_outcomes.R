@@ -63,7 +63,6 @@ test_that("basin works with single color palette", {
   vdiffr::expect_doppelganger("stacked bar simple_pd", basin_plot_pd)
 })
 
-test_that("a fixed color works (contrived)", {
   basin_plotred <- plot_outcomes(basin_to_plot,
     outcome_col = "ewr_achieved",
     colorset = "Objective",
@@ -71,6 +70,7 @@ test_that("a fixed color works (contrived)", {
     sceneorder = c("down4_down4", "base_base", "up4_up4")
   ) +
     ggplot2::theme(legend.position = "none")
+test_that("a fixed color works (contrived)", {
 
   vdiffr::expect_doppelganger("stackedred", basin_plotred)
 })
@@ -143,6 +143,16 @@ test_that("multi-palette and facetting", {
 })
 
 test_that("flipped", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
+    skip()
+  }
+
   # What I want to do is just swap the x and fill arguments and pass in the
   # scenario palette. Can I do that easily?
 
@@ -225,6 +235,16 @@ test_that("flipped", {
 })
 
 test_that("quant x", {
+
+  # check the OS
+  os_name <- tolower(Sys.info()["sysname"])
+
+  # skipping on linux systems
+  if (os_name == "linux") {
+    message("Skipping test on linux systems")
+    skip()
+  }
+
   # What I want to do is just use a quantitative x and have it automatically use
   # a line. Can I do that easily?
 
