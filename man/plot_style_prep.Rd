@@ -27,6 +27,8 @@ multiple palettes. Default NULL just uses colorset to define color}
 \item{pal_list}{list of palettes for defining colors for \code{colorset}. Should
 be length of \code{colorgroups}}
 
+\item{pal_direction}{vector of length pal_list, either 1 (default) or -1 (reversed) direction of the palettes}
+
 \item{transoutcome}{transformation for outcome as in
 \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}} or \code{\link[ggplot2:scale_colour_continuous]{ggplot2::scale_fill_continuous()}}.
 Default \code{transoutcome = 'identity'} just uses the data. Most common change

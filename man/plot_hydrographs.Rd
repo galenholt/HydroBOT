@@ -30,6 +30,8 @@ addition to the y-axis.}
 
 \item{gaugefilter}{set of gauges to filter}
 
+\item{scenariofilter}{scenarios to select}
+
 \item{colors}{name of palette. Will change in future to match plot_outcomes color defining}
 
 \item{sceneorder}{Default NULL, otherwise, character or factor giving the
@@ -42,7 +44,11 @@ order to present scenario levels}
 Default \code{transoutcome = 'identity'} just uses the data. Most common change
 likely \verb{transoutcome = 'log10}}
 
-\item{...}{passed to \code{\link[=plot_prep]{plot_prep()}}}
+\item{base_lev}{as in \code{\link[=baseline_compare]{baseline_compare()}}}
+
+\item{comp_fun}{as in \code{\link[=baseline_compare]{baseline_compare()}}}
+
+\item{...}{passed to \code{\link[=plot_data_prep]{plot_data_prep()}}}
 }
 \value{
 ggplot object

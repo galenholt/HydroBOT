@@ -26,6 +26,8 @@ make_pal(
 \item{includeRef}{logical, defailt FALSE. Should the colors be chosen including (TRUE) or not including (FALSE, the default) the levels in \code{refvals}. Typically \code{TRUE} if we sometimes want to accentuate a level, and sometimes not.}
 
 \item{returnUnref}{logical, default FALSE. Should we return the base palette with the refvals matched to \code{palette} in addition to the version where they match \code{refcols} (TRUE). Only works if \code{includeRef = TRUE}. If \code{TRUE}, returns a list with the base palette and the palette matching \code{refcols}}
+
+\item{direction}{1 (default) or -1 (reverse the palette), as in \code{\link[paletteer:paletteer_c]{paletteer::paletteer_c()}} and \code{\link[paletteer:paletteer_d]{paletteer::paletteer_d()}}}
 }
 \value{
 typically a named character vector of colors, unless \code{includeRef = TRUE} and \code{returnUnref = TRUE}. In that case, a list of two named color vectors.

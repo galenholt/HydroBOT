@@ -7,13 +7,13 @@
 find_limits(limcol, lims, trans, base_list)
 }
 \arguments{
+\item{limcol}{vector of the y-values, typically \code{sf::st_drop_geometry(prepped$data[prepped$outcome_col])}}
+
 \item{lims}{desired limits. see \code{setLimits} in \code{\link[=plot_outcomes]{plot_outcomes()}}}
 
 \item{trans}{transform if any}
 
 \item{base_list}{as in \code{\link[=plot_outcomes]{plot_outcomes()}}}
-
-\item{ycol}{vector of the y-values, typically \code{sf::st_drop_geometry(prepped$data[prepped$outcome_col])}}
 }
 \value{
 length-2 limits (or NULL)

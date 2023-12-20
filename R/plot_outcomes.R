@@ -48,6 +48,7 @@
 #'   lines/points for each environmental objective.
 #' @param pal_list list of palettes for defining colors for `colorset`. Should
 #'   be length of `colorgroups`
+#' @param pal_direction vector of length pal_list, either 1 (default) or -1 (reversed) direction of the palettes
 #' @param sceneorder Default NULL, otherwise, character or factor giving the
 #'   order to present scenario levels
 #' @param scales facet scales, as in [ggplot2::facet_wrap()]. Default `scales =
@@ -72,7 +73,7 @@
 #'  * base_lev
 #'  * comp_fun
 #'  * group_cols
-#'   [plot_prep()] handles `zero_adjust`, and other arguments are inferred or
+#'   [plot_data_prep()] handles `zero_adjust`, and other arguments are inferred or
 #'   not supported
 #'   If `comp_fun` is 'difference' or 'relative', midpoint auto-set at 0 or 1
 #'   respectively unless otherwise specified with `setLimits`
@@ -101,7 +102,7 @@
 #'   `"overlay` or `"underover"`
 #' @param contour_arglist default `NULL`
 #'  * NULL builds a heatmap with [ggplot2::geom_tile()],
-#'  * `list(interpolate = TRUE)` builds an interpolated heatmap with [ggplot2::geom_raster(interpolate = TRUE)]
+#'  * `list(interpolate = TRUE)` builds an interpolated heatmap with [ggplot2::geom_raster()] with `interpolate = TRUE`
 #'  * `list()` builds a [ggplot2::geom_contour()] with all defaults
 #'  * a named list with names other than 'interpolate' passes those as arguments to [ggplot2::geom_contour()]
 #' @param setLimits sets user-supplied color/fill limits or midpoints for maps,

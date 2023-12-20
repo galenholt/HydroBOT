@@ -7,6 +7,8 @@
 plot_bar(prepped, x_col, x_lab, outcome_lab, position, transoutcome)
 }
 \arguments{
+\item{prepped}{prepared data from \code{plot_data_prep() |>  plot_style_prep()}}
+
 \item{x_col}{character, name of column for the x-axis. Default \code{'scenario'}}
 
 \item{x_lab}{character, default \code{x_col}, allows changing x-label}

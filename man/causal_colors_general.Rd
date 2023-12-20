@@ -7,6 +7,7 @@
 causal_colors_general(
   df,
   pal_list,
+  pal_direction = rep(1, length(pal_list)),
   colorgroups = NULL,
   colorset = NULL,
   setLimits = NULL
@@ -20,6 +21,8 @@ causal_colors_general(
 \item named list: names should match the values in the \code{colorgroups} column, which determine which palettes apply to which rows. If \code{colorgroups = NULL}, the name doesn't matter, but often clearest to match \code{colorset}
 \item character (scalar or vector): short-circuits the palette finding and creates a color column with the given colors.
 }}
+
+\item{pal_direction}{vector of length pal_list, either 1 (default) or -1 (reversed) direction of the palettes}
 
 \item{colorgroups}{NULL (the default) or length-1 character vector specifying a grouping column, with different palettes applied to the different groups. If NULL, one palette is applied across all of the rows}
 

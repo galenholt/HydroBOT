@@ -64,6 +64,8 @@ y-axis from outcome (e.g. maps, heatmaps, networks)}
 \item{pal_list}{list of palettes for defining colors for \code{colorset}. Should
 be length of \code{colorgroups}}
 
+\item{pal_direction}{vector of length pal_list, either 1 (default) or -1 (reversed) direction of the palettes}
+
 \item{colorgroups}{character, column name for grouping \code{colorset} to allow
 multiple palettes. Default NULL just uses colorset to define color}
 
@@ -120,7 +122,7 @@ e.g. 'jitter' or a function, e.g. \code{ggplot2::position_jitter(width = 0.1, he
 \item base_lev
 \item comp_fun
 \item group_cols
-\code{\link[=plot_prep]{plot_prep()}} handles \code{zero_adjust}, and other arguments are inferred or
+\code{\link[=plot_data_prep]{plot_data_prep()}} handles \code{zero_adjust}, and other arguments are inferred or
 not supported
 If \code{comp_fun} is 'difference' or 'relative', midpoint auto-set at 0 or 1
 respectively unless otherwise specified with \code{setLimits}
@@ -159,7 +161,7 @@ the main data is points.
 \item{contour_arglist}{default \code{NULL}
 \itemize{
 \item NULL builds a heatmap with \code{\link[ggplot2:geom_tile]{ggplot2::geom_tile()}},
-\item \code{list(interpolate = TRUE)} builds an interpolated heatmap with \link[ggplot2:geom_raster(interpolate = TRUE)]{ggplot2::geom_raster(interpolate = TRUE)}
+\item \code{list(interpolate = TRUE)} builds an interpolated heatmap with \code{\link[ggplot2:geom_tile]{ggplot2::geom_raster()}} with \code{interpolate = TRUE}
 \item \code{list()} builds a \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}} with all defaults
 \item a named list with names other than 'interpolate' passes those as arguments to \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}
 }}

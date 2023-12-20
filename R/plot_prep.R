@@ -87,7 +87,7 @@ plot_data_prep <- function(data, outcome_col,
   new_nan_inf <- sum(is.nan(data[[outcome_col]])) + sum(is.infinite(data[[outcome_col]]))
   old_nan_inf <- sum(is.nan(data[[outcome_col]])) + sum(is.infinite(data[[outcome_col]]))
   if (new_nan_inf > old_nan_inf) {
-    rlang::warn(glue::glue("NaN and Inf introduced in `plot_prep`, likely due to division by zero. {new_nan_inf - old_nan_inf} values were lost."))
+    rlang::warn(glue::glue("NaN and Inf introduced in `plot_data_prep`, likely due to division by zero. {new_nan_inf - old_nan_inf} values were lost."))
   }
 
   # This names the data the same thing as it was interactively, but fails in the function. Just call it data for consistency

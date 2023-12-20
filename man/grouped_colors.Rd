@@ -18,6 +18,8 @@ grouped_colors(
 
 \item{pal_list}{list of palettes, or color name or color object that maps to \code{colorgroups}, \code{colorset}, or \code{scenario}. Typically a list of names of {palletteer} palettes of the same length as unique values in \code{colorgroups}}
 
+\item{pal_direction}{vector of length pal_list, either 1 (default) or -1 (reversed) direction of the palettes}
+
 \item{colorgroups}{character column name of column defining the groups that define different palettes to use}
 
 \item{colorset}{character column name of the values to assign colors from those palettes}

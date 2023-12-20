@@ -11,7 +11,7 @@ handle_palettes(
   color_type,
   transoutcome = "identity",
   setLimits = NULL,
-  direction = 1,
+  pal_direction = rep(1, length(pal_list)),
   base_list = NULL,
   nbins = 10
 )
@@ -42,13 +42,15 @@ and \code{overlay} limits for consistency.
 \item if base_list is 'difference' or 'relative', midpoints are auto-set at 0 or 1 (respectively) unless otherwise specified here.
 }}
 
+\item{pal_direction}{vector of length pal_list, either 1 (default) or -1 (reversed) direction of the palettes}
+
 \item{base_list}{NULL (default) or named list of arguments to
 \code{\link[=baseline_compare]{baseline_compare()}};
 \itemize{
 \item base_lev
 \item comp_fun
 \item group_cols
-\code{\link[=plot_prep]{plot_prep()}} handles \code{zero_adjust}, and other arguments are inferred or
+\code{\link[=plot_data_prep]{plot_data_prep()}} handles \code{zero_adjust}, and other arguments are inferred or
 not supported
 If \code{comp_fun} is 'difference' or 'relative', midpoint auto-set at 0 or 1
 respectively unless otherwise specified with \code{setLimits}

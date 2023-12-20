@@ -72,7 +72,7 @@ find_color_type <- function(pal_list) {
 #' @examples
 handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
                             transoutcome = 'identity', setLimits = NULL,
-                            direction = 1,
+                            pal_direction = rep(1, length(pal_list)),
                             base_list = NULL,
                             nbins = 10) {
 
@@ -102,19 +102,19 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
         paletteer::scale_fill_paletteer_c(palette = pal_list[[1]],
                                           trans = transoutcome,
                                           limit = \(x) find_limits(x, setLimits, 'identity', base_list),
-                                          direction = direction)
+                                          direction = pal_direction)
     }
     if (aes_type == 'color') {
       ggobj <- ggobj +
         paletteer::scale_color_paletteer_c(palette = pal_list[[1]],
                                            trans = transoutcome,
                                            limit = \(x) find_limits(x, setLimits, 'identity', base_list),
-                                           direction = direction)
+                                           direction = pal_direction)
     }
     if (aes_type == 'contour') {
       # contours are actually bins, despite usually being drawn from a continuous palette.
       binpal <- paletteer::paletteer_c(palette = pal_list[[1]], n = nbins,
-                                       direction = direction)
+                                       direction = pal_direction)
       ggobj <- ggobj +
         ggplot2::scale_fill_manual(values = binpal)
     }
@@ -125,17 +125,17 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
     if (aes_type == 'fill') {
       ggobj <- ggobj +
         paletteer::scale_fill_paletteer_d(palette = pal_list[[1]],
-                                          direction = direction)
+                                          direction = pal_direction)
     }
     if (aes_type == 'color') {
       ggobj <- ggobj +
         paletteer::scale_color_paletteer_d(palette = pal_list[[1]],
-                                           direction = direction)
+                                           direction = pal_direction)
     }
     if (aes_type == 'contour') {
       # contours are actually bins, despite usually being drawn from palettes.
       binpal <- paletteer::paletteer_d(palette = pal_list[[1]], n = nbins,
-                                       direction = direction)
+                                       direction = pal_direction)
       ggobj <- ggobj +
         ggplot2::scale_fill_manual(values = binpal)
     }
@@ -259,8 +259,8 @@ test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col =
 #'
 #' Very similar to [findlimits()], which has been deprecated
 #'
+#' @param limcol vector of the y-values, typically `sf::st_drop_geometry(prepped$data[prepped$outcome_col])`
 #' @param lims desired limits. see `setLimits` in [plot_outcomes()]
-#' @param ycol vector of the y-values, typically `sf::st_drop_geometry(prepped$data[prepped$outcome_col])`
 #' @param base_list as in [plot_outcomes()]
 #' @param trans transform if any
 #'
@@ -347,7 +347,7 @@ find_limits <- function(limcol, lims, trans, base_list) {
 #' it took the x as an argument.
 #'
 #' Previous use:
-#' paletteer::scale_fill_paletteer_c(palette = pal_list[[1]], trans = transoutcome, limit = \(x) findlimits(x,lims = setLimits,base_list = base_list),direction = direction)
+#' `paletteer::scale_fill_paletteer_c(palette = pal_list[[1]], trans = transoutcome, limit = \(x) findlimits(x,lims = setLimits,base_list = base_list),direction = pal_direction)`
 #'
 #' @param x the default data range passed in by the palette
 #' @param lims desired limits. see `setLimits` in [plot_outcomes()]
@@ -396,8 +396,8 @@ findlimits <- function(x, lims, base_list) {
 #' @param x data
 #' @param lims the seLimits, see [plot_outcomes()]
 #' @param base_list see [plot_outcomes()]
-#' @param to passed argument, have to handle
 #' @param from passed argument, have to handle
+#' @param trans transoutcome, as in [plot_outcomes()]
 #'
 #' @return vector
 findrescale <- function(x,

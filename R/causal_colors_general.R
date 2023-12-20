@@ -11,6 +11,7 @@
 #' @param pal_list a named list of paletteer palettes or a scalar character specifying color.
 #'   * named list: names should match the values in the `colorgroups` column, which determine which palettes apply to which rows. If `colorgroups = NULL`, the name doesn't matter, but often clearest to match `colorset`
 #'   * character (scalar or vector): short-circuits the palette finding and creates a color column with the given colors.
+#' @param pal_direction vector of length pal_list, either 1 (default) or -1 (reversed) direction of the palettes
 #' @param colorgroups NULL (the default) or length-1 character vector specifying a grouping column, with different palettes applied to the different groups. If NULL, one palette is applied across all of the rows
 #' @param colorset a length-1 character vector specifying the column to use to define color. Type doesn't matter, but behaviour differs. If numeric it will space the colors for each row according to value, if not numeric, colors for each row are spaced evenly along the palette.
 #' @param setLimits NULL (default) or length-2 numeric vector to force limits of the color scale.

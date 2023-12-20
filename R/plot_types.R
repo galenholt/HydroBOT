@@ -4,6 +4,8 @@
 #'
 #' @inheritParams plot_outcomes
 #'
+#' @param prepped prepared data from `plot_data_prep() |>  plot_style_prep()`
+#'
 #' @return
 #' @export
 #'
@@ -25,7 +27,7 @@ plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
     aes_type = "fill",
     prepped$pal_list,
     prepped$color_type,
-    direction = prepped$direction
+    pal_direction = prepped$direction
   )
 
   return(outcome_plot)
@@ -121,12 +123,12 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
     aes_type = "color",
     pal_list = prepped$pal_list,
     color_type = prepped$color_type,
-    direction = prepped$direction)
+    pal_direction = prepped$direction)
 
   outcome_plot <- handle_palettes(outcome_plot,
     aes_type = "fill",
     prepped$pal_list, prepped$color_type,
-    direction = prepped$direction)
+    pal_direction = prepped$direction)
 
 }
 
@@ -223,7 +225,7 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
       color_type = prepped$color_type,
       transoutcome = transoutcome,
       setLimits = setLimits,
-      direction = prepped$direction,
+      pal_direction = prepped$direction,
       base_list = base_list
     )
 
@@ -241,7 +243,7 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
       color_type = prepped$color_type,
       transoutcome = transoutcome,
       setLimits = setLimits,
-      direction = prepped$direction,
+      pal_direction = prepped$direction,
       base_list = base_list
     )
 
@@ -433,7 +435,7 @@ make_underover <- function(underover_list,
           color_type = uprep$color_type,
           transoutcome = transoutcome,
           setLimits = setLimits,
-          direction = uprep$direction,
+          pal_direction = uprep$direction,
           base_list = base_list
         )
 
@@ -457,7 +459,7 @@ make_underover <- function(underover_list,
           color_type = uprep$color_type,
           transoutcome = transoutcome,
           setLimits = setLimits,
-          direction = uprep$direction,
+          pal_direction = uprep$direction,
           base_list = base_list
         )
 
@@ -584,7 +586,7 @@ plot_heatmap <- function(prepped,
     color_type = prepped$color_type,
     transoutcome = transoutcome,
     setLimits = setLimits,
-    direction = prepped$direction,
+    pal_direction = prepped$direction,
     base_list = base_list,
     nbins = nbins
   )

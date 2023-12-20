@@ -5,7 +5,10 @@
 #' @param hydrolong hydrograph data in long format
 #' @param gaugefilter set of gauges to filter
 #' @param colors name of palette. Will change in future to match plot_outcomes color defining
-#' @param ... passed to [plot_prep()]
+#' @param scenariofilter scenarios to select
+#' @param base_lev as in [baseline_compare()]
+#' @param comp_fun as in [baseline_compare()]
+#' @param ... passed to [plot_data_prep()]
 #'
 #'
 #' @return ggplot object

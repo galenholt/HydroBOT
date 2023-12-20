@@ -51,7 +51,7 @@ the data. Most common change likely \verb{transx = 'log10}.}
 \item{contour_arglist}{default \code{NULL}
 \itemize{
 \item NULL builds a heatmap with \code{\link[ggplot2:geom_tile]{ggplot2::geom_tile()}},
-\item \code{list(interpolate = TRUE)} builds an interpolated heatmap with \link[ggplot2:geom_raster(interpolate = TRUE)]{ggplot2::geom_raster(interpolate = TRUE)}
+\item \code{list(interpolate = TRUE)} builds an interpolated heatmap with \code{\link[ggplot2:geom_tile]{ggplot2::geom_raster()}} with \code{interpolate = TRUE}
 \item \code{list()} builds a \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}} with all defaults
 \item a named list with names other than 'interpolate' passes those as arguments to \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}
 }}
@@ -79,7 +79,7 @@ and \code{overlay} limits for consistency.
 \item base_lev
 \item comp_fun
 \item group_cols
-\code{\link[=plot_prep]{plot_prep()}} handles \code{zero_adjust}, and other arguments are inferred or
+\code{\link[=plot_data_prep]{plot_data_prep()}} handles \code{zero_adjust}, and other arguments are inferred or
 not supported
 If \code{comp_fun} is 'difference' or 'relative', midpoint auto-set at 0 or 1
 respectively unless otherwise specified with \code{setLimits}

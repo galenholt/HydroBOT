@@ -6,6 +6,7 @@
 #' @param refcols character vector (names or hex) of colors to set manually in order matching `refvals`
 #' @param includeRef logical, defailt FALSE. Should the colors be chosen including (TRUE) or not including (FALSE, the default) the levels in `refvals`. Typically `TRUE` if we sometimes want to accentuate a level, and sometimes not.
 #' @param returnUnref logical, default FALSE. Should we return the base palette with the refvals matched to `palette` in addition to the version where they match `refcols` (TRUE). Only works if `includeRef = TRUE`. If `TRUE`, returns a list with the base palette and the palette matching `refcols`
+#' @param direction 1 (default) or -1 (reverse the palette), as in [paletteer::paletteer_c()] and [paletteer::paletteer_d()]
 #'
 #' @return typically a named character vector of colors, unless `includeRef = TRUE` and `returnUnref = TRUE`. In that case, a list of two named color vectors.
 #' @export

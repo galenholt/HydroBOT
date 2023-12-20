@@ -21,7 +21,7 @@ findrescale(
 
 \item{from}{passed argument, have to handle}
 
-\item{to}{passed argument, have to handle}
+\item{trans}{transoutcome, as in \code{\link[=plot_outcomes]{plot_outcomes()}}}
 }
 \value{
 vector

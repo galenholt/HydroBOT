@@ -12,6 +12,8 @@ read_hydro_nc(hydropath, scenariofilter, long, gaugemap)
 \item{scenariofilter}{character vector of scenario names to include. Default \code{NULL} includes all}
 
 \item{long}{logical, default TRUE. Do we want the data long (with a column for gauge number) or wide (FALSE, with gauge numbers as columns)}
+
+\item{gaugemap}{mapping of gauges from nodes. Default 'iqqm' gets it from EWR tool, otherwise, a dataframe with columns 'node' and 'gauge'}
 }
 \value{
 tibble of hydrographs

@@ -21,5 +21,5 @@ it took the x as an argument.
 }
 \details{
 Previous use:
-paletteer::scale_fill_paletteer_c(palette = pal_list[\link{1}], trans = transoutcome, limit = \(x) findlimits(x,lims = setLimits,base_list = base_list),direction = direction)
+\verb{paletteer::scale_fill_paletteer_c(palette = pal_list[[1]], trans = transoutcome, limit = \\(x) findlimits(x,lims = setLimits,base_list = base_list),direction = pal_direction)}
 }
