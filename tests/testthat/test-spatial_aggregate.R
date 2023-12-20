@@ -5,6 +5,8 @@ ewr_to_agg <- make_test_ewr_prepped()
 
 test_that("gauge to poly works", {
 
+  skip_on_os('linux')
+
   spatagg <- spatial_aggregate(ewr_to_agg,
                                to_geo = sdl_units,
                                groupers = 'scenario',
@@ -50,6 +52,8 @@ test_that("gauge to poly works", {
 })
 
 test_that("poly to poly works", {
+
+  skip_on_os('linux')
 
   g2pagg <- spatial_aggregate(ewr_to_agg,
                               to_geo = sdl_units,

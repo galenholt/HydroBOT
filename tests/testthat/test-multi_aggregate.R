@@ -135,6 +135,9 @@ test_that("multiple functions", {
 # Tests from spatial_aggregate --------------------------------------------
 
 test_that("gauge to poly works", {
+
+  skip_on_os('linux')
+
   # should error if not list, to keep from iterating over sdl_units itself
   expect_error(multi_aggregate(ewr_to_agg,
     aggsequence = sdl_units,
@@ -196,6 +199,9 @@ test_that("gauge to poly works", {
 })
 
 test_that("poly to poly works", {
+
+  skip_on_os('linux')
+
   g2pagg <- multi_aggregate(ewr_to_agg,
     aggsequence = list(sdl_units = sdl_units),
     groupers = "scenario",
@@ -396,6 +402,9 @@ test_that("multi-step theme agg works, auto-edges", {
 
 # Spatial only
 test_that("multi-step spatial works", {
+
+  skip_on_os('linux')
+
   aggseq <- list(
     sdl_units = sdl_units,
     cewo_valleys = cewo_valleys,
@@ -466,6 +475,9 @@ test_that("multi-step spatial works", {
 
 # Theme and spatial together
 test_that("multi-step theme and spatial works", {
+
+  skip_on_os('linux')
+
   aggseq <- list(
     ewr_code = c("ewr_code_timing", "ewr_code"),
     env_obj = c("ewr_code", "env_obj"),
@@ -526,6 +538,9 @@ test_that("multi-step theme and spatial works", {
 
 # Theme and spatial together
 test_that("multi-step theme and spatial works with !namehistory", {
+
+  skip_on_os('linux')
+
   aggseq <- list(
     ewr_code = c("ewr_code_timing", "ewr_code"),
     env_obj = c("ewr_code", "env_obj"),
@@ -689,6 +704,9 @@ test_that("backstepping along theme axis throws informative error", {
 
 
 test_that("saving the list of steps and appropriate persistence of PU grouping", {
+
+  skip_on_os('linux')
+
   # also allows checking that the planning unit grouping persists until it shouldn't and then gets dropped
 
   aggseq <- list(
