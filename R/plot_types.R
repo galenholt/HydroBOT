@@ -23,7 +23,9 @@ plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
 
   outcome_plot <- handle_palettes(outcome_plot,
     aes_type = "fill",
-    prepped$pal_list, prepped$color_type
+    prepped$pal_list,
+    prepped$color_type,
+    direction = prepped$direction
   )
 
   return(outcome_plot)
@@ -117,11 +119,14 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
   # do I need to do this for fill as well when I have smooth?
   outcome_plot <- handle_palettes(outcome_plot,
     aes_type = "color",
-    prepped$pal_list, prepped$color_type
+    pal_list = prepped$pal_list,
+    color_type = prepped$color_type,
+    direction = prepped$direction
   )
   outcome_plot <- handle_palettes(outcome_plot,
     aes_type = "fill",
-    prepped$pal_list, prepped$color_type
+    prepped$pal_list, prepped$color_type,
+    direction = prepped$direction
   )
 }
 
@@ -193,10 +198,13 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
   outcome_plot <- make_underover(
     underover_list = underlay_list,
     outcome_plot = outcome_plot,
-    sceneorder = sceneorder, outcome_lab = outcome_lab,
+    sceneorder = sceneorder,
+    outcome_lab = outcome_lab,
     maindata = prepped$data,
-    maindatatype = maindatatype, maincolorpal = prepped$pal_list,
-    transoutcome = transoutcome, setLimits = setLimits,
+    maindatatype = maindatatype,
+    maincolorpal = prepped$pal_list,
+    transoutcome = transoutcome,
+    setLimits = setLimits,
     base_list = base_list, uotype = "underlay"
   )
 
@@ -215,6 +223,7 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
       color_type = prepped$color_type,
       transoutcome = transoutcome,
       setLimits = setLimits,
+      direction = prepped$direction,
       base_list = base_list
     )
 
@@ -232,6 +241,7 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
       color_type = prepped$color_type,
       transoutcome = transoutcome,
       setLimits = setLimits,
+      direction = prepped$direction,
       base_list = base_list
     )
 
@@ -258,11 +268,13 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
   outcome_plot <- make_underover(
     underover_list = overlay_list,
     outcome_plot = outcome_plot,
-    sceneorder = sceneorder, outcome_lab = outcome_lab,
+    sceneorder = sceneorder,
+    outcome_lab = outcome_lab,
     maindata = prepped$data,
     maindatatype = maindatatype,
     maincolorpal = prepped$pal_list,
-    transoutcome = transoutcome, setLimits = setLimits,
+    transoutcome = transoutcome,
+    setLimits = setLimits,
     base_list = base_list, uotype = "overlay"
   )
 
@@ -289,14 +301,22 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
 #' @export
 #'
 #' @examples
-make_underover <- function(underover_list, outcome_plot, sceneorder,
-                           outcome_lab, maindata,
-                           maindatatype, maincolorpal, transoutcome,
-                           setLimits, base_list, uotype = "internal") {
+make_underover <- function(underover_list,
+                           outcome_plot,
+                           sceneorder,
+                           outcome_lab,
+                           maindata,
+                           maindatatype,
+                           maincolorpal,
+                           transoutcome,
+                           setLimits,
+                           base_list,
+                           uotype = "internal") {
   # A full list to allow partial specification with null-filling
   full_list <- list(
     underover = NULL, outcome_col = NULL,
     pal_list = NA, # NA will show something, NULL just fails
+    pal_direction = 1,
     colorgroups = NULL,
     outcome_lab = outcome_lab, # inherit from outer, but can be overwritten
     base_list = NULL, zero_adjust = 0,
@@ -389,6 +409,7 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
       colorset = uo$outcome_col,
       colorgroups = uo$colorgroups,
       pal_list = uo$pal_list,
+      pal_direction = uo$pal_direction,
       transoutcome = uo$transoutcome,
       transx = uo$transx,
       point_group = uo$point_group
@@ -412,6 +433,7 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
           color_type = uprep$color_type,
           transoutcome = transoutcome,
           setLimits = setLimits,
+          direction = uprep$direction,
           base_list = base_list
         )
 
@@ -435,6 +457,7 @@ make_underover <- function(underover_list, outcome_plot, sceneorder,
           color_type = uprep$color_type,
           transoutcome = transoutcome,
           setLimits = setLimits,
+          direction = uprep$direction,
           base_list = base_list
         )
 
@@ -561,6 +584,7 @@ plot_heatmap <- function(prepped,
     color_type = prepped$color_type,
     transoutcome = transoutcome,
     setLimits = setLimits,
+    direction = prepped$direction,
     base_list = base_list,
     nbins = nbins
   )

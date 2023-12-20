@@ -106,7 +106,7 @@ plot_data_prep <- function(data, outcome_col,
 #' @export
 #'
 #' @examples
-plot_style_prep <- function(prepped, colorset, colorgroups, pal_list,
+plot_style_prep <- function(prepped, colorset, colorgroups, pal_list, pal_direction,
                             transoutcome, transx, point_group) {
   # Warn about conflicts with outcome trans
   if (!is.null(prepped$outcome_col)) {
@@ -124,6 +124,17 @@ plot_style_prep <- function(prepped, colorset, colorgroups, pal_list,
   # Handle different color options
   color_type <- find_color_type(pal_list)
 
+  # abort if direction is the wrong length
+  if ((grepl('paletteer', color_type) | grepl('grouped', color_type)) &
+      (length(pal_list) != length(pal_direction))) {
+    rlang::abort(glue::glue("pal_list is trying to choose paletteer colors from a list {length(pal_list)} long,
+                            but pal_direction is {length(pal_direction)} long. They need to match."))
+  }
+
+  # Name the direction vector This should be fine in all cases, but really only
+  # needs to happen if paletteer or grouped if it starts causing problems
+  names(pal_direction) <- names(pal_list)
+
   # if the data is qualitative but the palette is continuous, we need to make a named palette
   if (!is.null(colorset)) {
     if (is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,colorset])))) {
@@ -136,7 +147,8 @@ plot_style_prep <- function(prepped, colorset, colorgroups, pal_list,
   }
 
   if (color_type == 'paletteer_c' & dataqualquant == 'qual') {
-    pal_list <- make_pal(prepped$data[[colorset]], pal_list[[1]])
+    pal_list <- make_pal(prepped$data[[colorset]], pal_list[[1]],
+                         direction = pal_direction[1])
     color_type <- 'colorobj'
   }
 
@@ -147,7 +159,12 @@ plot_style_prep <- function(prepped, colorset, colorgroups, pal_list,
 
   # This is annoying, but having a column with the same name lets us avoid a lot of duplicated code
   if (color_type == 'grouped') {
-    prepped$data <- grouped_colors(prepped$data, pal_list, colorgroups, colorset)
+    prepped$data <- grouped_colors(prepped$data,
+                                   pal_list = pal_list,
+                                   colorgroups = colorgroups,
+                                   colorset = colorset,
+                                   pal_direction = pal_direction)
+
     prepped$data <- prepped$data |>
       dplyr::mutate(color = forcats::fct_inorder(color)) # Works, but explictly making it line up with colordef might be better?
   } else if (color_type == 'fixed') {
@@ -171,6 +188,8 @@ plot_style_prep <- function(prepped, colorset, colorgroups, pal_list,
       dplyr::mutate(pointgroup = interaction(.data[[colorset]], .data[[point_group]]))
   }
 
-  prepped <- utils::modifyList(prepped, list(color_type = color_type, pal_list = pal_list))
+  prepped <- utils::modifyList(prepped, list(color_type = color_type,
+                                             pal_list = pal_list,
+                                             direction = pal_direction))
 
 }

@@ -11,6 +11,7 @@
 #'
 #' @examples
 grouped_colors <- function(df, pal_list,
+                           pal_direction = rep(1, length(pal_list)),
                             colorgroups = NULL,
                             colorset = NULL,
                             setLimits = NULL) {
@@ -66,7 +67,10 @@ grouped_colors <- function(df, pal_list,
     dplyr::distinct(colordef) |>
     dplyr::mutate(palname = ifelse(is.null(colorgroups),
                                    unlist(pal_list),
-                                   pal_list[[.data[[colorgroups]][1]]]))
+                                   pal_list[[.data[[colorgroups]][1]]])) |>
+    dplyr::mutate(paldir = ifelse(is.null(colorgroups),
+                                  pal_direction,
+                                  pal_direction[.data[[colorgroups]][1]]))
 
   # We get the color value by telling the palette how many colors and then
   # grabbing an index. If colordef is a non-numeric, we should choose as many
@@ -115,9 +119,11 @@ grouped_colors <- function(df, pal_list,
   colmap <- foreach::foreach(i = 1:nrow(dfcols)) %do% {
     thispal <- dfcols$palname[i]
     if (thispal %in% cnames) {
-      thiscol <- paletteer::paletteer_c(thispal, n = dfcols$pallength[i])[dfcols$palindex[i]]
+      thiscol <- paletteer::paletteer_c(thispal, n = dfcols$pallength[i],
+                                        direction = dfcols$paldir[i])[dfcols$palindex[i]]
     } else if (thispal %in% dnames) {
-      thiscol <- paletteer::paletteer_d(thispal, n = dfcols$pallength[i])[dfcols$palindex[i]]
+      thiscol <- paletteer::paletteer_d(thispal, n = dfcols$pallength[i],
+                                        direction = dfcols$paldir[i])[dfcols$palindex[i]]
     } else {
       # try to inform a bit- I could auto-set palettes this way, but I'd rather
       # make the user do it right

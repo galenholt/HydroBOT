@@ -43,6 +43,23 @@ test_that("returnunref works", {
   expect_equal(class(refpal$unrefcols), 'colors')
 })
 
+test_that("changing direction works", {
+  levnames <- c('one', 'two', 'three')
+  simplepal <- make_pal(levnames, palette = 'calecopal::superbloom3', direction = -1)
+  expect_equal(names(simplepal), levnames)
+  expect_equal(class(simplepal), 'colors')
+  expect_equal(simplepal, as_colors(stats::setNames(c("#3B4F8EFF", "#D3105CFF", "#E69512FF"), levnames)))
+
+  # with a continuous
+  simplepal_c <- make_pal(levnames, palette = 'scico::oslo', direction = 1)
+  expect_equal(simplepal_c, as_colors(stats::setNames(c("#000000FF", "#4F7ABBFF", "#FFFFFFFF"), levnames)))
+
+  simplepal_r <- make_pal(levnames, palette = 'scico::oslo', direction = -1)
+  expect_equal(simplepal_r, rev(simplepal_c) |> setNames(names(simplepal_c)))
+
+})
+
+
 test_that("informative errors with unknown palettes", {
 
   # try just a simple case issue

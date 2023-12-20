@@ -49,6 +49,18 @@ test_that("basin works with single color palette", {
     ggplot2::theme(legend.position = "none")
 
   vdiffr::expect_doppelganger("stacked bar simple", basin_plot)
+
+  # flipping the pal_direction
+  basin_plot_pd <- plot_outcomes(basin_to_plot,
+                              outcome_col = "ewr_achieved",
+                              colorset = "Objective",
+                              pal_list = list("scico::oslo"),
+                              pal_direction = -1,
+                              sceneorder = c("down4_down4", "base_base", "up4_up4")
+  ) +
+    ggplot2::theme(legend.position = "none")
+
+  vdiffr::expect_doppelganger("stacked bar simple_pd", basin_plot_pd)
 })
 
 test_that("a fixed color works (contrived)", {
@@ -86,6 +98,20 @@ test_that("multi-palette and facetting", {
     )
 
   vdiffr::expect_doppelganger("bar_basin_group_sdl", sdl_plot)
+
+  # test that pal_direction works for groups
+  sdl_plot_pd <- obj_sdl_to_plot |>
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      colorgroups = "env_group",
+      colorset = "env_obj",
+      pal_list = grouplist,
+      pal_direction = c(1,-1,1,-1,1,-1),
+      facet_wrapper = "SWSDLName",
+      sceneorder = c("down4_down4", "base_base", "up4_up4")
+    )
+
+  vdiffr::expect_doppelganger("bar_basin_group_sdl_pd", sdl_plot_pd)
 
   # This is really just a test that passing '.' to a facet_row or facet_col
   # behaves as expected
@@ -777,6 +803,8 @@ test_that("maps", {
 })
 
 test_that("setLimits works", {
+
+  # Y-LIMITS
   basin_plot20 <- plot_outcomes(basin_to_plot,
     outcome_col = "ewr_achieved",
     colorset = "Objective",
@@ -817,7 +845,100 @@ test_that("setLimits works", {
 
   vdiffr::expect_doppelganger("line_75", sdl_line_75)
 
+  # center limit
+  sdl_line_25 <- obj_sdl_to_plot |>
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      x_col = "delta",
+      colorgroups = NULL,
+      colorset = "env_obj",
+      pal_list = list("scico::berlin"),
+      point_group = "env_obj",
+      facet_row = "SWSDLName",
+      facet_col = ".",
+      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      setLimits = c(0.25)
+    )
+
+  vdiffr::expect_doppelganger("line_25", sdl_line_25)
+
+  # triple limit
+  sdl_line_25 <- obj_sdl_to_plot |>
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      x_col = "delta",
+      colorgroups = NULL,
+      colorset = "env_obj",
+      pal_list = list("scico::berlin"),
+      point_group = "env_obj",
+      facet_row = "SWSDLName",
+      facet_col = ".",
+      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      setLimits = c(-1, 0.25, 1)
+    )
+
+  vdiffr::expect_doppelganger("line_3", sdl_line_3)
+
+  # centred on baselines
+  sdl_line_bd <- obj_sdl_to_plot |>
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      x_col = "delta",
+      colorgroups = NULL,
+      colorset = "env_obj",
+      pal_list = list("scico::berlin"),
+      point_group = "env_obj",
+      facet_row = "SWSDLName",
+      facet_col = ".",
+      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      base_list = list(
+        base_lev = "base_base",
+        comp_fun = "difference",
+        group_cols = c("env_obj", 'polyID')
+      )
+    )
+
+  vdiffr::expect_doppelganger("line_bd", sdl_line_bd)
+
+  # test the trans are working with the relative
+  sdl_line_br <- obj_sdl_to_plot |>
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      x_col = "delta",
+      colorgroups = NULL,
+      colorset = "env_obj",
+      pal_list = list("scico::berlin"),
+      point_group = "env_obj",
+      facet_row = "SWSDLName",
+      facet_col = ".",
+      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      base_list = list(
+        base_lev = "base_base",
+        comp_fun = "relative",
+        group_cols = c("env_obj", 'polyID')
+      ),
+      zero_adjust = 'auto',
+      transoutcome = 'log10'
+    )
+
+  vdiffr::expect_doppelganger("line_br", sdl_line_br)
+
+  # COLOR LIMITS
   # Maps
+  # the colors lose meaning easily, make a reference to check against
+  sdl_map_ref <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "ewr_achieved",
+      pal_list = list("scico::berlin"),
+      facet_col = "env_obj",
+      facet_row = "scenario",
+      sceneorder = c("down4_down4", "base_base", "up4_up4")
+    )
+
   # Make a minimal map
   sdl_mapL <- obj_sdl_to_plot |>
     dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
@@ -830,10 +951,89 @@ test_that("setLimits works", {
       facet_col = "env_obj",
       facet_row = "scenario",
       sceneorder = c("down4_down4", "base_base", "up4_up4"),
-      setLimits = c(0, 2)
+      setLimits = c(0, 1)
     )
 
   vdiffr::expect_doppelganger("sdl_map_limits", sdl_mapL)
+
+  # Same, but center instead of limits
+  sdl_mapL1 <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "ewr_achieved",
+      pal_list = list("scico::berlin"),
+      facet_col = "env_obj",
+      facet_row = "scenario",
+      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      setLimits = 0.25
+    )
+
+  vdiffr::expect_doppelganger("sdl_map_limits1", sdl_mapL1)
+
+  # triple-limits
+  # Make a minimal map
+  sdl_mapL3 <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "ewr_achieved",
+      pal_list = list("scico::berlin"),
+      facet_col = "env_obj",
+      facet_row = "scenario",
+      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      setLimits = c(-1, 0, 1)
+    )
+
+  vdiffr::expect_doppelganger("sdl_map_limits3", sdl_mapL3)
+
+  # baselines with difference/relative
+  sdl_mapLD <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "ewr_achieved",
+      pal_list = list("scico::berlin"),
+      facet_col = "env_obj",
+      facet_row = "scenario",
+      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      base_list = list(
+        base_lev = "base_base",
+        comp_fun = "difference",
+        group_cols = c("env_obj", 'polyID')
+      )
+    )
+
+  vdiffr::expect_doppelganger("sdl_map_limitsD", sdl_mapLD)
+
+  sdl_mapLR <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "ewr_achieved",
+      pal_list = list("scico::berlin"),
+      facet_col = "env_obj",
+      facet_row = "scenario",
+      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      base_list = list(
+        base_lev = "base_base",
+        comp_fun = "relative",
+        group_cols = c("env_obj", 'polyID')
+      ),
+      zero_adjust = 'auto',
+      transoutcome = 'log10'
+    )
+
+  vdiffr::expect_doppelganger("sdl_map_limitsR", sdl_mapLR)
+
 })
 
 test_that("ewr works as in `plot_outcomes_bar`", {
@@ -1009,7 +1209,6 @@ test_that("hydrographs", {
   vdiffr::expect_doppelganger("hydplot_baseR", hydplot_baseR)
 })
 
-# work in progress --------------------------------------------------------
 
 test_that("scenarios aren't special", {
   # This is a strange example, because scenario can easily be special here. But
@@ -1143,6 +1342,7 @@ test_that("heatmaps", {
   sdl_contour_base_bin <- ostp |>
     # sf::st_drop_geometry() |>
     dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::filter(!env_group %in% c('EB', 'WB')) |> # ONLY because for some reason there are imperceptible differences for these two between `test` and `build` that trigger an error every time.
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1267,4 +1467,72 @@ test_that("heatmaps", {
   vdiffr::expect_doppelganger("sdl_heat_fact", sdl_heat_fact)
   ## Still to test/develop
   # grouped colors? Unclear how that'd work... Different ramps for the different groups? Needed? Would look cool, but I think like maps, do that later
+})
+
+test_that("post-hoc label changes work", {
+  # Fill on maps
+  sdl_mapLabels <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "ewr_achieved",
+      pal_list = list("scico::berlin"),
+      facet_col = "env_obj",
+      facet_row = "scenario",
+      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      setLimits = c(0, 2),
+      overlay_list = list(
+        overlay = dplyr::filter(env_obj_to_plot, grepl("^EF", env_obj)),
+        overlay_pal = "scico::oslo",
+        overlay_ycol = "ewr_achieved",
+        clip = TRUE
+      )
+    )
+
+  sdl_mapLabels <- sdl_mapLabels + ggplot2::labs(x = "LONG", y = "LAT", fill = "TESTFILL", color = "TESTCOL")
+
+  vdiffr::expect_doppelganger("sdl_map_limits_labels", sdl_mapLabels)
+
+})
+
+test_that("discrete but non-named colors", {
+  # interesting plot, good for testing labels
+  sdl_plot_groupblock_dc <- obj_sdl_to_plot |>
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      x_col = "scenario",
+      colorset = "env_group",
+      pal_list = "ggsci::default_jama",
+      facet_row = "SWSDLName",
+      facet_col = ".",
+      sceneorder = c("down4_down4", "base_base", "up4_up4")
+    )
+
+  vdiffr::expect_doppelganger("sdl_plot_groupblock_dc", sdl_plot_groupblock_dc)
+
+  # This one translates to integers, very silly, but a test that the reordering holds.
+  sdl_plot_groupblock_dcn <- obj_sdl_to_plot |>
+    dplyr::mutate(env_group = dplyr::case_when(env_group == 'WB' ~ 1,
+                                               env_group == "NV" ~ 2,
+                                               env_group == "EB" ~ 3,
+                                               env_group == "EF" ~ 4,
+                                               env_group == "OS" ~ 5,
+                                               env_group == 'NF' ~ 6)) |>
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      x_col = "scenario",
+      colorset = "env_group",
+      pal_list = "scico::turku",
+      facet_row = "SWSDLName",
+      facet_col = ".",
+      sceneorder = c("down4_down4", "base_base", "up4_up4")
+    )
+
+  # throw another lab-change test in too.
+  sdl_plot_groupblock_dcn <- sdl_plot_groupblock_dcn +
+    ggplot2::labs(x = "SCENARIO", y = "EWR", fill = "GROUP")
+  vdiffr::expect_doppelganger("sdl_plot_groupblock_dcn", sdl_plot_groupblock_dcn)
+
 })

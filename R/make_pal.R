@@ -13,7 +13,8 @@
 #' @examples
 make_pal <- function(levels, palette,
                      refvals = NULL, refcols = NULL,
-                     includeRef = FALSE, returnUnref = FALSE) {
+                     includeRef = FALSE, returnUnref = FALSE,
+                     direction = 1) {
 
   # only use unique levels. I can't think of a reason to give the same value different colors if it appears more than once
   levels <- unique(levels)
@@ -40,9 +41,9 @@ make_pal <- function(levels, palette,
 
 
   if (palette %in% cnames) {
-    cols <- paletteer::paletteer_c(palette, length(levels))
+    cols <- paletteer::paletteer_c(palette, length(levels), direction = direction)
   } else if (palette %in% dnames) {
-    cols <- paletteer::paletteer_d(palette, length(levels))
+    cols <- paletteer::paletteer_d(palette, length(levels), direction = direction)
   } else {
     # try to inform a bit- I could auto-set palettes this way, but I'd rather
     # make the user do it right
