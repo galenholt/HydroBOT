@@ -17,9 +17,10 @@
 #' @export
 #'
 #' @examples
-get_ewr_output <- function(dir, type = "achievement", year_roll = "best",
-                           gaugefilter = NULL, scenariofilter = NULL) {
-  if (type != "achievement") {
+get_ewr_output <- function(dir, type = 'achievement', year_roll = 'best',
+                           gaugefilter = NULL, scenariofilter = NULL, add_max = TRUE) {
+
+  if (type != 'achievement') {
     outdf <- get_any_ewr_output(dir, type = type, gaugefilter = gaugefilter, scenariofilter = scenariofilter)
   }
 
@@ -33,7 +34,13 @@ get_ewr_output <- function(dir, type = "achievement", year_roll = "best",
       year_roll <- year_roll
     }
 
-    outdf <- assess_ewr_achievement(yeardat, sumdat, year_roll = year_roll)
+    if (add_max == TRUE) {
+      outdf <- assess_ewr_achievement(yeardat, sumdat, year_roll = year_roll)
+      outdf <- add_max(outdf)
+
+    } else {
+      outdf <- assess_ewr_achievement(yeardat, sumdat, year_roll = year_roll)
+    }
   }
 
 
@@ -357,3 +364,22 @@ assess_ewr_achievement <- function(annualdf, summarydf, year_roll = ifelse(nrow(
 
   return(EWR_results)
 }
+
+#' Add max scenario
+#'
+#' @param outdf #EWR summary output with pass fail results
+#'
+#' @return
+#' @export
+#'
+#' @examples
+add_max <- function(outdf) {
+  MAX_scenario <- outdf |>
+    dplyr::filter(scenario == unique(outdf$scenario)[1])|>
+    dplyr::mutate(scenario = "MAX",
+           ewr_achieved = 1)|>
+    dplyr::select(scenario, gauge, ewr_achieved, ewr_code, ewr_code_timing)
+  outdf <- dplyr::bind_rows(outdf, MAX_scenario)
+  return(outdf)
+}
+

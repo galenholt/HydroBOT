@@ -151,3 +151,10 @@ test_that("ewr_code separation works", {
     ucs[!ucs %in% ues]
     expect_snapshot_value(as.list(ucs))
 })
+
+test_that("making MAX scenario works", {
+  assessed <- get_ewr_output(ewrpath)|>
+    dplyr::filter(scenario == "MAX")
+  expect_equal(nrow(assessed)> 0,TRUE)
+})
+
