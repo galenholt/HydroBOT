@@ -3,14 +3,15 @@
 # EWR
 make_test_ewr_output <- function(build_dirs = TRUE) {
 
+  # Set up some base directory structures
+  temp_hydro_dir <- '_test_data/hydrographs'
+  temp_parent_dir <- '_test_data'
+
+  temp_hydro_multi <- '_test_data/hydrographs'
+  temp_parent_multi <- '_test_data'
+
+
   if (build_dirs) {
-    # Set up some base directory structures
-    temp_hydro_dir <- '_test_data/hydrographs'
-    temp_parent_dir <- '_test_data'
-
-    temp_hydro_multi <- '_test_data/hydrographs'
-    temp_parent_multi <- '_test_data'
-
     # create dir so building makes sense
     make_temp_hydro()
   }

@@ -9,10 +9,17 @@ findlimits(x, lims, base_list)
 \arguments{
 \item{x}{the default data range passed in by the palette}
 
-\item{lims}{desired limits}
+\item{lims}{desired limits. see \code{setLimits} in \code{\link[=plot_outcomes]{plot_outcomes()}}}
 
 \item{base_list}{as in \code{\link[=plot_outcomes]{plot_outcomes()}}}
 }
 \description{
-allows (by crude inference) centering diverging palettes with baseline comparisons
+allows (by crude inference) centering diverging palettes with baseline
+comparisons This has been deprectated in favor of \code{\link[=find_limits]{find_limits()}}, though it
+was nice that this could be inserted into the function call directly, since
+it took the x as an argument.
+}
+\details{
+Previous use:
+paletteer::scale_fill_paletteer_c(palette = pal_list[\link{1}], trans = transoutcome, limit = \(x) findlimits(x,lims = setLimits,base_list = base_list),direction = direction)
 }

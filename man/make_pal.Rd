@@ -10,7 +10,8 @@ make_pal(
   refvals = NULL,
   refcols = NULL,
   includeRef = FALSE,
-  returnUnref = FALSE
+  returnUnref = FALSE,
+  direction = 1
 )
 }
 \arguments{

@@ -30,12 +30,14 @@ arguments as for the main plot. Typical examples
 \item \code{underlay_list = 'basin'} simply plot the basin outline
 \item \code{underlay_list = list(underlay = 'basin', pal_list = 'azure')} same, but filled
 \item \code{underlay_list = list(underlay = outputs_on_sdl_scale, outcome_col = ewr_achieved, pal_list = 'scico::oslo')} plot the ewr outcomes in the sdls
-A named palette (e.g. variation in color/fill) only works if the main data is not the same type- we can't
-use different palettes for underlay fill and main data fill, for example,
-but can if the underlay is fill (polygons) and the main data is points.
+A named palette (e.g. variation in color/fill) only works if the main data
+is not the same type- we can't use different palettes for underlay fill and
+main data fill, for example, but can if the underlay is fill (polygons) and
+the main data is points.
 }}
 
-\item{overlay_list}{as \code{underlay_list}, but first item might be named \verb{"overlay} or \code{"underover"}}
+\item{overlay_list}{as \code{underlay_list}, but first item might be named
+\verb{"overlay} or \code{"underover"}}
 
 \item{outcome_lab}{character, default \code{outcome_col}, allows changing label of
 the outcome_col (y-axis or color/fill)}
@@ -57,9 +59,16 @@ order to present scenario levels}
 Default \code{transoutcome = 'identity'} just uses the data. Most common change
 likely \verb{transoutcome = 'log10}}
 
-\item{setLimits}{sets user-supplied color/fill limits for maps, heatmaps, and
-networks, or y limits for other plots. Also sets \code{underlay} and \code{overlay}
-limits for consistency.}
+\item{setLimits}{sets user-supplied color/fill limits or midpoints for maps,
+heatmaps, and networks, or y limits for other plots. Also sets \code{underlay}
+and \code{overlay} limits for consistency.
+\itemize{
+\item NULL (default) use internally-calculated limits
+\item length-1 numeric, sets midpoint, limits stay auto-calculated. V. useful for divergent
+\item length-2 numeric, sets lower and upper limits
+\item length-3 numeric, sets limits and midpoint \code{c(lower, mid, upper)}, with caveat that one limit may be ignored (must be symmetrical about the midpoint)
+\item if base_list is 'difference' or 'relative', midpoints are auto-set at 0 or 1 (respectively) unless otherwise specified here.
+}}
 
 \item{base_list}{NULL (default) or named list of arguments to
 \code{\link[=baseline_compare]{baseline_compare()}};
@@ -69,6 +78,8 @@ limits for consistency.}
 \item group_cols
 \code{\link[=plot_prep]{plot_prep()}} handles \code{zero_adjust}, and other arguments are inferred or
 not supported
+If \code{comp_fun} is 'difference' or 'relative', midpoint auto-set at 0 or 1
+respectively unless otherwise specified with \code{setLimits}
 }}
 }
 \description{

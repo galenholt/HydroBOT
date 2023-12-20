@@ -7,6 +7,7 @@
 grouped_colors(
   df,
   pal_list,
+  pal_direction = rep(1, length(pal_list)),
   colorgroups = NULL,
   colorset = NULL,
   setLimits = NULL

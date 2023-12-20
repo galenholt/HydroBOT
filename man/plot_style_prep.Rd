@@ -10,6 +10,7 @@ plot_style_prep(
   colorset,
   colorgroups,
   pal_list,
+  pal_direction,
   transoutcome,
   transx,
   point_group

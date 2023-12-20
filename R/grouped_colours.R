@@ -17,7 +17,6 @@ grouped_colors <- function(df, pal_list,
                             setLimits = NULL) {
 
 
-
   # short-circuit if pal_list is just a color name or a named color object-
   # accepts single values, a named object of class color or a vector of length
   # nrow(df)
@@ -60,6 +59,11 @@ grouped_colors <- function(df, pal_list,
   # For consistency, rename the column to a fixed name `colordef`
   df <- df |>
     dplyr::mutate(dplyr::across(tidyselect::all_of(colorset), identity, .names = 'colordef'))
+
+  # pal_direction needs to be named as pal_list
+  if (!is.null(pal_direction) && is.null(names(pal_direction))) {
+    names(pal_direction) <- names(pal_list)
+  }
 
   # Make a df without dups and dplyr::left_join
   dfcols <- df |>

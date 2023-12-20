@@ -148,3 +148,4 @@ test_that("different palette per group", {
   vdiffr::expect_doppelganger("colors within node groups", nodeplot)
 
 })
+

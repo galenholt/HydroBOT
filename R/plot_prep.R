@@ -161,9 +161,9 @@ plot_style_prep <- function(prepped, colorset, colorgroups, pal_list, pal_direct
   if (color_type == 'grouped') {
     prepped$data <- grouped_colors(prepped$data,
                                    pal_list = pal_list,
+                                   pal_direction = pal_direction,
                                    colorgroups = colorgroups,
-                                   colorset = colorset,
-                                   pal_direction = pal_direction)
+                                   colorset = colorset)
 
     prepped$data <- prepped$data |>
       dplyr::mutate(color = forcats::fct_inorder(color)) # Works, but explictly making it line up with colordef might be better?

@@ -21,6 +21,7 @@
 #' @examples
 #'
 causal_colors_general <- function(df, pal_list,
+                                  pal_direction = rep(1, length(pal_list)),
                                   colorgroups = NULL,
                                   colorset = NULL,
                                   setLimits = NULL) {
@@ -30,7 +31,11 @@ causal_colors_general <- function(df, pal_list,
   # and change the colorset to 'colordef' since we just auto-set
 
   # Then call the general `grouped_colors`
-  dfcolor <- grouped_colors(df, pal_list, colorgroups, 'colordef', setLimits = setLimits)
+  dfcolor <- grouped_colors(df, pal_list = pal_list,
+                            pal_direction = pal_direction,
+                            colorgroups = colorgroups,
+                            colorset = 'colordef',
+                            setLimits = setLimits)
 
   # names have to be different for nodes and edges. and nodes need text color
   # This is annoying we need the switch, and I don't like making it depend on column names
