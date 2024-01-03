@@ -32,6 +32,8 @@ get_ewr_output(
 \item{gaugefilter}{subset of gauges, default NULL}
 
 \item{scenariofilter}{subset of scenarios, default NULL}
+
+\item{add_max}{logical, default TRUE. Add a 'MAX' scenario that passes all EWRs, usable as a reference}
 }
 \value{
 a tibble with ewr_achieved
