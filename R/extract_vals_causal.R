@@ -58,10 +58,10 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
                               # previous stages were.
 
                               for (j in 1:(i-1)) {
-                                aggcol <- glue::glue("aggfun_{j}")
+                                aggcol <- paste0("aggfun_", as.character(j))
+                                colind <- which(names(simpledf) == aggcol)
                                 simpledf <- simpledf |>
-                                  # FIX THIS so it grabs the right aggfuns- noting that step 1 isn't agged. so there's a step-1
-                                  dplyr::filter(dplyr::across(tidyselect::all_of(aggcol)) == whichaggs[j])
+                                  dplyr::filter(.data[[aggcol]] == whichaggs[[j]])
                               }
 
                             }

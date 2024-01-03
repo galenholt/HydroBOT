@@ -41,8 +41,6 @@ obj_pal <- make_pal(
 
 test_that("basin works with single color palette", {
 
-  skip_on_os('linux')
-
   basin_plot <- plot_outcomes(basin_to_plot,
     outcome_col = "ewr_achieved",
     colorset = "Objective",
@@ -1393,7 +1391,9 @@ test_that("heatmaps", {
   # and check the auto-drop of geometry
   sdl_contour_base_bin <- ostp |>
     dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    sf::st_drop_geometry() |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     dplyr::filter(!env_group %in% c('EB', 'WB')) |> # ONLY because for some reason there are imperceptible differences for these two between `test` and `build` that trigger an error every time.
     plot_outcomes(
       outcome_col = "ewr_achieved",
@@ -1421,7 +1421,8 @@ test_that("heatmaps", {
   expect_error(sdl_heat_overplot <- ostp |>
     sf::st_drop_geometry() |>
     # don't do the grouping correctly
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1439,7 +1440,8 @@ test_that("heatmaps", {
     dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     sf::st_drop_geometry() |>
     dplyr::filter(SWSDLName == "Lachlan") |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, delta, adelta)) |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, delta, adelta)) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1463,7 +1465,8 @@ test_that("heatmaps", {
   sdl_heat_interp <- ostp |>
     dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1482,7 +1485,8 @@ test_that("heatmaps", {
   # Qualitative x-y (e.g. named scenario types)
   sdl_heat_char <- ostp |>
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     dplyr::mutate(
       delta = as.character(delta),
       adelta = as.character(adelta)
@@ -1502,7 +1506,8 @@ test_that("heatmaps", {
 
   sdl_heat_fact <- ostp |>
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     dplyr::mutate(
       delta = as.factor(delta),
       adelta = as.factor(adelta)

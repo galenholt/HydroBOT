@@ -56,9 +56,11 @@ make_causal_plot <- function(nodes, edges,
                              edge_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
                              edge_colorgroups = NULL,
                              edge_colorset = 'fromtype',
+                             edge_pal_direction = rep(1, length(edge_pal)),
                              node_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
                              node_colorgroups = NULL,
                              node_colorset = 'NodeType',
+                             node_pal_direction = rep(1, length(node_pal)),
                              setLimits = NULL,
                              wrap_names = TRUE,
                              render = TRUE,
@@ -97,16 +99,18 @@ make_causal_plot <- function(nodes, edges,
   }
 
   # colors
-  edges <- causal_colors_general(edges,
-                                 edge_pal,
-                                 edge_colorgroups,
-                                 edge_colorset,
+  edges <- causal_colors_general(df = edges,
+                                 pal_list = edge_pal,
+                                 pal_direction = edge_pal_direction,
+                                   colorgroups = edge_colorgroups,
+                                 colorset = edge_colorset,
                                  setLimits = setLimits)
 
-  nodes <- causal_colors_general(nodes,
-                                 node_pal,
-                                 node_colorgroups,
-                                 node_colorset,
+  nodes <- causal_colors_general(df = nodes,
+                                 pal_list = node_pal,
+                                 pal_direction = node_pal_direction,
+                                 colorgroups = node_colorgroups,
+                                 colorset = node_colorset,
                                  setLimits = setLimits)
 
   # deal with names, position, shape etc

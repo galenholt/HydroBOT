@@ -79,7 +79,8 @@
 #'   respectively unless otherwise specified with `setLimits`
 #' @param smooth_arglist NULL (default) or limited list of arguments to
 #'   [ggplot2::geom_smooth()]. If NULL and x is quantitative, defaults to
-#'   straight lines. Arguments
+#'   straight lines. If just `list()`, it uses the defaults in [ggplot2::geom_smooth()].
+#'   Available arguments:
 #' * method
 #' * method.args
 #' * se
