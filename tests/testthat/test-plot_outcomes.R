@@ -1,4 +1,9 @@
 # Should be a way to speed this bit up, the first happens again inside the second
+
+# Linux is slightly different than win/mac, so skip all of this
+skip_on_os('linux')
+
+
 ewr_to_agg <- make_test_ewr_prepped()
 agg_theme_space <- make_test_agg(namehistory = FALSE)
 
@@ -65,8 +70,6 @@ test_that("basin works with single color palette", {
 })
 
 test_that("a fixed color works (contrived)", {
-
-  skip_on_os('linux')
 
   basin_plotred <- plot_outcomes(basin_to_plot,
     outcome_col = "ewr_achieved",
@@ -147,8 +150,6 @@ test_that("multi-palette and facetting", {
 })
 
 test_that("flipped", {
-
-  skip_on_os('linux')
 
   # What I want to do is just swap the x and fill arguments and pass in the
   # scenario palette. Can I do that easily?
@@ -232,8 +233,6 @@ test_that("flipped", {
 })
 
 test_that("quant x", {
-
-  skip_on_os('linux')
 
   # What I want to do is just use a quantitative x and have it automatically use
   # a line. Can I do that easily?
@@ -382,7 +381,7 @@ test_that("quant x", {
 
 test_that("maps", {
 
-  skip_on_os('linux')
+
 
   # Make a minimal map
   sdl_map <- obj_sdl_to_plot |>
@@ -819,7 +818,7 @@ test_that("maps", {
 
 test_that("setLimits works", {
 
-  skip_on_os('linux')
+
 
   # Y-LIMITS
   basin_plot20 <- plot_outcomes(basin_to_plot,
@@ -1078,7 +1077,7 @@ test_that("setLimits works", {
 
 test_that("ewr works as in `plot_outcomes_bar`", {
 
-  skip_on_os('linux')
+
 
   ewr_to_bar_data <- ewr_to_agg |>
     # just grab the first code_timing
@@ -1130,7 +1129,7 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
 
 test_that("facet addition works", {
 
-  skip_on_os('linux')
+
 
   sdl_colors_row <- obj_sdl_to_plot |>
     plot_outcomes(

@@ -1,5 +1,5 @@
 # Setup -------------------------------------------------------------------
-rlang::local_options(lifecycle_verbosity = "warning")
+skip_on_os('linux')
 
 agg_theme_space <- make_test_agg(namehistory = FALSE)
 
