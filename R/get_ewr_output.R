@@ -381,4 +381,3 @@ bind_max <- function(outdf) {
   outdf <- dplyr::bind_rows(outdf, MAX_scenario)
   return(outdf)
 }
-
