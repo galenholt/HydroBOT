@@ -12,6 +12,7 @@
 #'  * 'all_successful_interEvents'
 #' @param gaugefilter subset of gauges, default NULL
 #' @param scenariofilter subset of scenarios, default NULL
+#' @param add_max logical, default TRUE. Add a 'MAX' scenario that passes all EWRs, usable as a reference
 #'
 #' @return a tibble with ewr_achieved
 #' @export
@@ -34,15 +35,13 @@ get_ewr_output <- function(dir, type = 'achievement', year_roll = 'best',
       year_roll <- year_roll
     }
 
+    # assess achievement
+    outdf <- assess_ewr_achievement(yeardat, sumdat, year_roll = year_roll)
+    # add max
     if (add_max == TRUE) {
-      outdf <- assess_ewr_achievement(yeardat, sumdat, year_roll = year_roll)
-      outdf <- add_max(outdf)
-
-    } else {
-      outdf <- assess_ewr_achievement(yeardat, sumdat, year_roll = year_roll)
-    }
+      outdf <- bind_max(outdf)
   }
-
+}
 
   return(outdf)
 }
@@ -373,12 +372,12 @@ assess_ewr_achievement <- function(annualdf, summarydf, year_roll = ifelse(nrow(
 #' @export
 #'
 #' @examples
-add_max <- function(outdf) {
+bind_max <- function(outdf) {
   MAX_scenario <- outdf |>
     dplyr::filter(scenario == unique(outdf$scenario)[1])|>
     dplyr::mutate(scenario = "MAX",
            ewr_achieved = 1)|>
-    dplyr::select(scenario, gauge, ewr_achieved, ewr_code, ewr_code_timing)
+    dplyr::select(scenario, gauge, planning_unit_name, ewr_achieved, ewr_code, ewr_code_timing)
   outdf <- dplyr::bind_rows(outdf, MAX_scenario)
   return(outdf)
 }

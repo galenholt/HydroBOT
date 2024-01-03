@@ -9,7 +9,8 @@ get_ewr_output(
   type = "achievement",
   year_roll = "best",
   gaugefilter = NULL,
-  scenariofilter = NULL
+  scenariofilter = NULL,
+  add_max = TRUE
 )
 }
 \arguments{

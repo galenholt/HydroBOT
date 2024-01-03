@@ -76,7 +76,7 @@ test_that("multi-step theme and spatial works", {
   )
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, "sf")
-  expect_equal(nrow(spatagg), 228)
+  expect_equal(nrow(spatagg), 304)
 
   # Plots are useful for checking spatial outcomes.
   # There are a million targets. Pick one
@@ -137,7 +137,7 @@ test_that("parsing geo and char work for aggsequence", {
   )
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, "sf")
-  expect_equal(nrow(spatagg), 228)
+  expect_equal(nrow(spatagg), 304)
 })
 
 test_that("parsing bare and char and rlang::quo for funsequence", {
@@ -184,7 +184,7 @@ test_that("parsing bare and char and rlang::quo for funsequence", {
   )
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, "sf")
-  expect_equal(nrow(spatagg), 228)
+  expect_equal(nrow(spatagg), 304)
 })
 
 test_that("Various group_until formats work", {

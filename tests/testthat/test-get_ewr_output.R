@@ -113,12 +113,16 @@ test_that("making assessment tibble works", {
 
   expect_equal(names(assessed), c('ewr_code', 'ewr_code_timing', 'gauge',
                                   'scenario', 'planning_unit_name', 'ewr_achieved', 'ewr_achieved_timeframe'))
+  expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
 })
 
 test_that("passing in a list from memory works", {
   ewr_out <- make_test_ewr_output(build_dirs = FALSE)
 
-   ewrprepped <- get_ewr_output(ewr_out, type = 'achievement')
+  ewrprepped <- get_ewr_output(ewr_out, type = 'achievement')
+  expect_equal(names(ewrprepped), c('ewr_code', 'ewr_code_timing', 'gauge',
+                                  'scenario', 'planning_unit_name', 'ewr_achieved', 'ewr_achieved_timeframe'))
+  expect_equal(sum(is.na(ewrprepped$planning_unit_name)), 0)
 })
 
 test_that("ewr_code separation works", {

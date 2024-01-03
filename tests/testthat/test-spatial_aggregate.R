@@ -16,7 +16,7 @@ test_that("gauge to poly works", {
   namestring <- c('scenario', 'polyID', 'spatial_mean_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 6)
+  expect_equal(nrow(spatagg), 8)
 
   # Keeping the whole set of polys
   spataggkeep <- spatial_aggregate(ewr_to_agg,
@@ -72,7 +72,7 @@ test_that("poly to poly works", {
                   'ValleyName', 'ValleyID', 'ValleyCode', 'geometry')
   expect_equal(names(p2pagg), namestring)
   expect_s3_class(p2pagg, 'sf')
-  expect_equal(nrow(p2pagg), 21)
+  expect_equal(nrow(p2pagg), 28)
 
   # Plots are useful for checking spatial outcomes
   g2sdl2cewo_plot <- ggplot2::ggplot() +
@@ -101,7 +101,7 @@ test_that("bare functions", {
   namestring <- c('scenario', 'polyID', 'spatial_mean_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 6)
+  expect_equal(nrow(spatagg), 8)
 })
 
 test_that("list functions", {
@@ -115,7 +115,7 @@ test_that("list functions", {
   namestring <- c('scenario', 'polyID', 'spatial_mean_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 6)
+  expect_equal(nrow(spatagg), 8)
 })
 
 test_that("multiple functions", {
@@ -131,7 +131,7 @@ test_that("multiple functions", {
                   'spatial_sd_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg_c), namestring)
   expect_s3_class(spatagg_c, 'sf')
-  expect_equal(nrow(spatagg_c), 6)
+  expect_equal(nrow(spatagg_c), 8)
 
   # multiple bare names works if done in the call
   spatagg_b <- spatial_aggregate(ewr_to_agg,
@@ -144,7 +144,7 @@ test_that("multiple functions", {
                   'spatial_sd_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg_b), namestring)
   expect_s3_class(spatagg_b, 'sf')
-  expect_equal(nrow(spatagg_b), 6)
+  expect_equal(nrow(spatagg_b), 8)
 
   # multiple bare names does not work if declared externally
   bare2 <- c(mean, sd)
@@ -165,7 +165,7 @@ test_that("multiple functions", {
 
   expect_equal(names(spatagg_l), namestring)
   expect_s3_class(spatagg_l, 'sf')
-  expect_equal(nrow(spatagg_l), 6)
+  expect_equal(nrow(spatagg_l), 8)
 
   # # Should also work with other anonymous function, but only actually has once.
   # # list- typically specified outside the call
@@ -182,7 +182,7 @@ test_that("multiple functions", {
   #
   # expect_equal(names(spatagg_lx), namestring)
   # expect_s3_class(spatagg_lx, 'sf')
-  # expect_equal(nrow(spatagg_lx), 6)
+  # expect_equal(nrow(spatagg_lx), 8)
 
 
   # vector arguments (e.g. weighting)
@@ -204,7 +204,7 @@ test_that("multiple functions", {
                    'spatial_wm_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg_lw), namestringw)
   expect_s3_class(spatagg_lw, 'sf')
-  expect_equal(nrow(spatagg_lw), 6)
+  expect_equal(nrow(spatagg_lw), 8)
 
 
   # Same, but keeping polys?
@@ -237,7 +237,7 @@ test_that("bare functions", {
                   'spatial_mean_ewr_achieved_timeframe', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 87)
+  expect_equal(nrow(spatagg), 116)
 })
 
 test_that("bare names", {
@@ -252,7 +252,7 @@ test_that("bare names", {
                   'spatial_mean_ewr_achieved_timeframe', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 87)
+  expect_equal(nrow(spatagg), 116)
 })
 
 test_that("tidyselect and mixed", {
@@ -269,7 +269,7 @@ test_that("tidyselect and mixed", {
                   'spatial_mean_ewr_achieved_timeframe', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 87)
+  expect_equal(nrow(spatagg), 116)
 })
 
 # character vectors for groups and aggCols
@@ -295,7 +295,7 @@ test_that("failmissing", {
                   'spatial_mean_ewr_achieved_timeframe', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 87)
+  expect_equal(nrow(spatagg), 116)
 })
 
 # todo --------------------------------------------------------------------

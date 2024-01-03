@@ -3,7 +3,7 @@ ewr_to_agg <- make_test_ewr_prepped()
 agg_theme_space <- make_test_agg(namehistory = FALSE)
 
 # create a quant description of scenarios
-scenarios <- tibble::tibble(scenario = c("base_base", "down4_down4", "up4_up4"), delta = c(1, 0.25, 4))
+scenarios <- tibble::tibble(scenario = c("base_base", "down4_down4", "up4_up4", 'MAX'), delta = c(1, 0.25, 4, Inf))
 
 obj_sdl_to_plot <- agg_theme_space$sdl_units |>
   dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
@@ -303,6 +303,7 @@ test_that("quant x", {
   # jittering- set the seed each time or the jitters differ
   set.seed(18)
   sdl_smooth_mean_jf <- obj_sdl_to_plot |>
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     plot_outcomes(
       outcome_col = "ewr_achieved",
       x_col = "delta",
@@ -328,6 +329,7 @@ test_that("quant x", {
   # jittering- default
   set.seed(18)
   sdl_smooth_mean_jc <- obj_sdl_to_plot |>
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     plot_outcomes(
       outcome_col = "ewr_achieved",
       x_col = "delta",
@@ -1290,6 +1292,7 @@ test_that("heatmaps", {
       ewr_achieved = ewr_achieved - 1,
       adelta = -1
     )
+
   ostp2 <- obj_sdl_to_plot |>
     dplyr::mutate(
       scenario = stringr::str_c(scenario, "plus1"),
@@ -1344,6 +1347,7 @@ test_that("heatmaps", {
 
   # same, contour defaults
   sdl_contour <- ostp |>
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     sf::st_drop_geometry() |>
     dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     plot_outcomes(
@@ -1363,6 +1367,7 @@ test_that("heatmaps", {
   # baseline, specify breaks
     # NaNs, so expect a warning
   sdl_contour_base_breaks <- ostp |>
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     sf::st_drop_geometry() |>
     dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     plot_outcomes(
@@ -1387,7 +1392,7 @@ test_that("heatmaps", {
   # specify bins, use transx, transoutcome. Using a difference from lowest to avoid negative numbers so the trnas works
   # and check the auto-drop of geometry
   sdl_contour_base_bin <- ostp |>
-    # sf::st_drop_geometry() |>
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     dplyr::filter(!env_group %in% c('EB', 'WB')) |> # ONLY because for some reason there are imperceptible differences for these two between `test` and `build` that trigger an error every time.
     plot_outcomes(
@@ -1431,6 +1436,7 @@ test_that("heatmaps", {
 
   # check sceneorder is transferring where needed. This is contrived and looks terrible, but that's not the point.
   sdl_heat_so <- ostp |>
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     sf::st_drop_geometry() |>
     dplyr::filter(SWSDLName == "Lachlan") |>
     dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, delta, adelta)) |>
@@ -1455,6 +1461,7 @@ test_that("heatmaps", {
 
   # interpolated raster
   sdl_heat_interp <- ostp |>
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     sf::st_drop_geometry() |>
     dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     plot_outcomes(
