@@ -9,7 +9,8 @@ packages = [{include = "werp_toolkit"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-py-ewr = {git = "https://github.com/MDBAuth/EWR_tool.git", branch = "GalenH"}
+py-ewr = {path = "../EWR_tool"}
+tqdm = "^4.66.1"
 
 
 [build-system]

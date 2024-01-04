@@ -1,9 +1,9 @@
-from py_ewr.scenario_handling import ScenarioHandler
 import os
 import copy
 import zipfile
 import shutil
 
+from py_ewr.scenario_handling import ScenarioHandler
 
 def clean_ewrs(ewr_results, scenario_name):
   # There are some case issues between the types. Some variables have camelCase, so I don't want to goof that up, but I want 'gauge' and 'scenario' in particular to be lower. So just change the first letter
@@ -73,7 +73,7 @@ def unzip_and_pathparse(pathlist, output_path):
 
 # Main function to run and save the EWRs
 def run_save_ewrs(pathlist, output_path, model_format, outputType = 'none', returnType = 'none', scenario_name = '_UNNAMEDSCENARIO_', datesuffix = False):
-    
+      
     # I'm not convinced we want to support in-function unzipping, but it would work, I guess.
     # The goal here is to unzip only the needed file, and so paralleling does that once per process
     # and we still only pass paths between functions, so the processes themselves don't have a ton of data thrash
@@ -110,7 +110,7 @@ def run_save_ewrs(pathlist, output_path, model_format, outputType = 'none', retu
         ewr_successInter = clean_ewrs(ewr_successInter, scenario_name)
     
     # cleanup the extracted zips- if the user wanted them around, they'd just unzip first, I think.
-    if ('.zip' in pathlist):
+    if ('hydrozipextract' in pathlist):
         shutil.rmtree(os.path.join(output_path, 'hydrozipextract'))
 
     # only save the parts we want

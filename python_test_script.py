@@ -1,4 +1,4 @@
-from py_ewr import scenario_handling
+# from py_ewr import scenario_handling
 
 
 # # # Testing the netcdf format:
@@ -54,7 +54,9 @@ from py_ewr import scenario_handling
 # # Testing the controller
 # from inst.python import controller_functions
 # ewr_sh = controller_functions.run_save_ewrs(scenarios, output_path = '', model_format = 'IQQM - NSW 10,000 years', outputType = ['none'], returnType = ['summary'])
-
+# This bit kills the progress bars
+# import os
+# os.environ["TQDM_DISABLE"] = "1"
 # zips
 scenarios = 'inst/extdata/ncdfexample/zipcdf.zip/zipcdf/S1/Straight Node (Gauge).nc'
 # model_format = 'IQQM - netcdf'
