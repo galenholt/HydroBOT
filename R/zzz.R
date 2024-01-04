@@ -10,6 +10,7 @@
 
   if (interactive()) {
     rlang::inform(c("EWR progress bars can be disabled.",
+                    "*" = "They are off by default in non-interactive sessions",
                     "*" = "In an interactive session, run",
                   "i" = "`Sys.setenv('TQDM_DISABLE' = '1')`",
                   "*" = "before running `prep_run_save_ewrs()`
