@@ -12,9 +12,11 @@ make_causal_plot(
   edge_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
   edge_colorgroups = NULL,
   edge_colorset = "fromtype",
+  edge_pal_direction = rep(1, length(edge_pal)),
   node_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
   node_colorgroups = NULL,
   node_colorset = "NodeType",
+  node_pal_direction = rep(1, length(node_pal)),
   setLimits = NULL,
   wrap_names = TRUE,
   render = TRUE,
@@ -49,6 +51,8 @@ See \code{\link{causal_colors_general}}}
 \item{edge_colorset}{a column name (character) giving the column to define
 edge color. See \code{\link{causal_colors_general}}}
 
+\item{edge_pal_direction}{either 1 (default) or -1 (reversed) direction of the palettes}
+
 \item{node_pal}{a named list of color palettes or color values for the
 nodes. Currently only supports paletteer palettes, vectors of colors, or
 single colors. See \code{\link{causal_colors_general}}}
@@ -59,6 +63,8 @@ See \code{\link{causal_colors_general}}}
 
 \item{node_colorset}{a column name (character) giving the column to define
 node color. See \code{\link{causal_colors_general}}}
+
+\item{node_pal_direction}{either 1 (default) or -1 (reversed) direction of the palettes}
 
 \item{setLimits}{NULL (default) or length-2 numeric vector to force limits of the color scale.}
 

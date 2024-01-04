@@ -44,6 +44,11 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
                             # by which group is aggregated into
                             thesenodes <- targetlevels[i]
 
+                            if (length(thesenodes) > 1) {
+                              rlang::abort(glue::glue("Expect each node level to have one value,
+                                                      this one {agglist[i]} is {thesenodes}"))
+                            }
+
                             # Filter to the right sort of aggregation- noting
                             # that agglist[1] is the raw data and so not
                             # aggregated
@@ -72,7 +77,7 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
                               dplyr::select(tidyselect::any_of(c('scenario', 'gauge')),
                                             tidyselect::all_of(c(thesenodes, valcol))) |>
                               dplyr::rename(Name = tidyselect::all_of(thesenodes)) |>
-                              dplyr::mutate(NodeType = tidyselect::all_of(thesenodes))
+                              dplyr::mutate(NodeType = thesenodes)
 
                             simpledf
 

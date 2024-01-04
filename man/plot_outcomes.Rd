@@ -130,7 +130,8 @@ respectively unless otherwise specified with \code{setLimits}
 
 \item{smooth_arglist}{NULL (default) or limited list of arguments to
 \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. If NULL and x is quantitative, defaults to
-straight lines. Arguments
+straight lines. If just \code{list()}, it uses the defaults in \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}.
+Available arguments:
 \itemize{
 \item method
 \item method.args

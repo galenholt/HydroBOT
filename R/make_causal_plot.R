@@ -45,6 +45,8 @@
 #'   TRUE`
 #' @param savename character, filename for the output plots.
 #'    .pdf and .png are automatically appended.
+#' @param edge_pal_direction either 1 (default) or -1 (reversed) direction of the palettes
+#' @param node_pal_direction either 1 (default) or -1 (reversed) direction of the palettes
 #'
 #' @return
 #' @export
