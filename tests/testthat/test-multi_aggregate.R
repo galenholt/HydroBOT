@@ -539,8 +539,6 @@ test_that("multi-step theme and spatial works", {
 # Theme and spatial together
 test_that("multi-step theme and spatial works with !namehistory", {
 
-  skip_on_os('linux')
-
   aggseq <- list(
     ewr_code = c("ewr_code_timing", "ewr_code"),
     env_obj = c("ewr_code", "env_obj"),
@@ -557,9 +555,9 @@ test_that("multi-step theme and spatial works with !namehistory", {
     "ArithmeticMean",
     "ArithmeticMean",
     "ArithmeticMean",
+    "SpatialWeightedMean",
     "ArithmeticMean",
-    "ArithmeticMean",
-    "ArithmeticMean",
+    "SpatialWeightedMean",
     "ArithmeticMean"
   )
 
@@ -588,6 +586,87 @@ test_that("multi-step theme and spatial works with !namehistory", {
   expect_s3_class(spatagg, "sf")
   expect_equal(nrow(spatagg), 304)
 
+  # Check the values are actually right
+  funs_in_df <- spatagg |>
+    sf::st_drop_geometry() |>
+    dplyr::slice(1) |>
+    dplyr::select(tidyselect::starts_with('aggfun_')) |>
+    unlist()
+
+  aggs_in_df <- spatagg |>
+    sf::st_drop_geometry() |>
+    dplyr::slice(1) |>
+    dplyr::select(tidyselect::starts_with('aggLevel_')) |>
+    unlist()
+
+
+  expect_equal(unname(funs_in_df), unlist(funseq))
+  expect_equal(unname(aggs_in_df), names(aggseq))
+
+  # does the parsing work for 'list' funseqs? lambda functions? other anonymous?
+
+  # lambda
+  funseq_wm <- list(
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    list(wm = ~weighted.mean(., w = area,
+                             na.rm = TRUE)),
+    "ArithmeticMean",
+    list(wm = ~weighted.mean(., w = area,
+                             na.rm = TRUE)),
+    "ArithmeticMean"
+  )
+
+  # funseq_wm <- list(
+  #   "ArithmeticMean",
+  #   "ArithmeticMean",
+  #   "ArithmeticMean",
+  #   "ArithmeticMean",
+  #   wm = \(x) weighted.mean(x, w = area,
+  #                            na.rm = TRUE),
+  #   "ArithmeticMean",
+  #   wm = \(x) weighted.mean(x, w = area,
+  #                            na.rm = TRUE),
+  #   "ArithmeticMean"
+  # )
+
+
+  spatagg_wm <- multi_aggregate(ewr_to_agg,
+                               aggsequence = aggseq,
+                               groupers = "scenario",
+                               aggCols = "ewr_achieved",
+                               funsequence = funseq_wm,
+                               causal_edges = causal_ewr,
+                               namehistory = FALSE,
+                               auto_ewr_PU = TRUE
+  )
+
+  # Check the values are actually right
+  funs_in_df_wm <- spatagg_wm |>
+    sf::st_drop_geometry() |>
+    dplyr::slice(1) |>
+    dplyr::select(tidyselect::starts_with('aggfun_')) |>
+    unlist()
+
+  aggs_in_df_wm <- spatagg_wm |>
+    sf::st_drop_geometry() |>
+    dplyr::slice(1) |>
+    dplyr::select(tidyselect::starts_with('aggLevel_')) |>
+    unlist()
+
+
+  # Ge the name of the lambda
+  fs <- purrr::map_lgl(funseq_wm, is.character)
+  fse <- funseq_wm
+  fse[!fs] <- names(unlist(funseq_wm[!fs]))
+
+  expect_equal(unname(funs_in_df_wm), unlist(fse))
+  expect_equal(unname(aggs_in_df_wm), names(aggseq))
+
+  ## THIS HAS NOT CHECKED A SITUATION WITH MULTIPLE AGGREGATION FUNCTIONS. presumably if one parses ok, they all will, but that should be checked.
+
   # Plots are useful for checking spatial outcomes.
   # There are a million targets. Pick one
   target_5 <- spatagg |>
@@ -600,6 +679,9 @@ test_that("multi-step theme and spatial works with !namehistory", {
     ggplot2::geom_sf(data = ewr_to_agg) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = "bottom")
+
+
+  skip_on_os('linux')
 
   vdiffr::expect_doppelganger("spatial-theme_multi_namehistory", g2sdl_plot)
 })

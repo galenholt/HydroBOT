@@ -25,6 +25,16 @@
 #'
 agg_names_to_cols <-
   function(aggdf, aggsequence, funsequence, aggCols) {
+
+    # we actually want the names of the functions. That's easy if they come in as characters, but not if they come in bare or a lambda function or ...
+
+    fs <- purrr::map_lgl(funsequence, is.character)
+    if (any(!fs)) {
+      rlang::inform(c("Attempting to deparse lambda function in funsequence. ",
+      "i" = "It is better to use named functions than lambdas in the funsequence, because they are more clearly defined and can be more easily known later."))
+      funsequence[!fs] <- names(unlist(funsequence[!fs]))
+    }
+
     # suppressWarnings probably a bad idea, but there's a lot of really
     # pointless warnings that get thrown
     suppressWarnings(
