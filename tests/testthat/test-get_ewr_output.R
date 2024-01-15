@@ -9,7 +9,7 @@ ewroutlist <- list('summary',
                    'yearly',
                    'all_events',
                    'all_successful_events',
-                   # 'all_interEvents',
+                   'all_interEvents',
                    'all_successful_interEvents')
 
 ewr_out <- prep_run_save_ewrs(hydro_dir = file.path(temp_parent_dir, 'hydrographs'),
