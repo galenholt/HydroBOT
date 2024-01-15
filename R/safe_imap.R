@@ -39,7 +39,7 @@ safe_imap <- function(.x, .f, ..., retries = 0, parallel = FALSE) {
     results_out <- purrr::map(im_out, purrr::pluck('result'))
 
     # if we want the errors, we could put in a debug here
-    error_out <- purrr::map(im_out, purrr::pluck('result'))
+    error_out <- purrr::map(im_out, purrr::pluck('error'))
 
     # replace the indices that were errors with new data. Some might still be errors, they will fill subsequently
     full_results[orig_indices] <- results_out
@@ -53,7 +53,7 @@ safe_imap <- function(.x, .f, ..., retries = 0, parallel = FALSE) {
     # Cut the data to the fails
     .x <- .x[whicherrors]
 
-    # which ORIGINAL indices are we left with?
+    # which ORIGINAL indices are we left failing?
     orig_indices <- orig_indices[whicherrors]
 
     counter <- counter + 1
@@ -62,7 +62,7 @@ safe_imap <- function(.x, .f, ..., retries = 0, parallel = FALSE) {
 
   if (length(whicherrors) > 0) {
     rlang::inform(glue::glue("The EWR tool has run, but the scenario(s) {names(whicherrors)} have failed and have been bypassed after {retries} retries."))
-    full_results <- full_results[-whicherrors]
+    full_results <- full_results[-orig_indices]
   }
 
   return(full_results)
