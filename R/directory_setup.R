@@ -17,7 +17,7 @@ find_scenario_paths <- function(hydro_dir, type = 'csv') {
     hydro_paths <- unzip(hydro_dir, list = TRUE)$Name
     hydro_paths <- hydro_paths[grepl('Straight Node \\(Gauge\\)\\.nc', hydro_paths)]
   } else {
-    hydro_paths <- list.files(hydro_dir, pattern = type, recursive = TRUE)
+    hydro_paths <- list.files(hydro_dir, pattern = paste0('.', type, '$'), recursive = TRUE)
   }
 
   unique_names <- hydro_paths |>

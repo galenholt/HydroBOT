@@ -125,6 +125,10 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
     hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
   }
 
+  # a specific bit of cleanup
+  names(hydro_paths) <- gsub(' |\\(|\\)', '', names(hydro_paths))
+  names(hydro_paths) <- gsub('_StraightNodeGauge', '', names(hydro_paths))
+
   # We need to check the files have unique names (and fix if not), since the EWR
   # tool makes them the 'scenario' column.
   # hydro_paths <- fix_file_scenarios(hydro_paths, scenarios)
@@ -180,6 +184,14 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
     )
   }
 
+
+  # There's an approximately 260 character path limit on windows for python. Try to detect here (I do it there too)
+  unout <- unlist(outputType)
+  unout <- unout[which(nchar(unout) == max(nchar(unout)))]
+  approx_py_path <- paste0(output_path, '\\', names(hydro_paths[1]),'\\', unout, '\\', names(hydro_paths[1]), '.csv')
+  if (nchar(approx_py_path) >= 260 & .Platform$OS.type == 'windows') {
+    rlang::warn(glue::glue('Output path is {nchar(approx_py_path)}, windows has about a 260 limit. If files are not saving, try a shorter path.'))
+  }
 
   # Run the EWR tool over all hydro_paths
   ewr_out <- safe_imap(hydro_paths, ewrfun, retries = retries, parallel = rparallel)
@@ -313,6 +325,15 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
 }
 
 make_ewr_consistent <- function(typearg) {
+  if (length(typearg) == 1 && typearg[[1]] == 'everything') {
+    typearg <- list('summary',
+                    'yearly',
+                    'all_events',
+                    'all_successful_events',
+                    'all_interEvents',
+                    'all_successful_interEvents')
+  }
+
   typearg <- unlist(typearg)
   typearg <- dplyr::case_when(typearg == "all" ~ "all_events",
     typearg == "annual" ~ "yearly",
