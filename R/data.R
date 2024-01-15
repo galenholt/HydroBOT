@@ -97,6 +97,19 @@
 #' <https://data.gov.au/data/dataset/75910bc5-6c3e-40e8-9c8a-1e895274badb/resource/a7053ee7-8e20-4f2c-b594-cb88c6ed9406/download/cewo_mdb_valleys.shp.zip>
 "cewo_valleys"
 
+#' Planning Units for long-term watering plans
+#'
+#' Polygons defining planning units. Currently just for NSW, sourced from MDBA
+#' Environmental Assets and Functions Database
+#'
+#' @format ## `planning_units` An {sf} object:
+#' \describe{
+#'   \item{LTWPShortName, PlanningUnitName, geometry}{The long-term watering plan area and planning unit name matching, to the extent possible, the EWR table. Geometry is polygons. Other columns for reference.}
+#' }
+#' @source
+#' MDBA Environmental Assets and Functions Database
+#'"planning_units"
+
 #' Example output from EWR tool
 #'
 #' Example output of EWR tool using the simple hydrographs provided in

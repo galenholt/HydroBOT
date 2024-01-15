@@ -179,6 +179,125 @@ ggplot(sdl_units) +
 
 The 'Macquarie' file I got from David R. is the Macquarie-Castlereagh there, so just use this to avoid having even more files to lug around.
 
+## Planning units
+
+These are what the EWRs are indexed to. I currently have a geoJSON from Ben Bradshaw for NSW, hopefully will soon get a complete original shapefile. These are lat/long, put in same crs as others.
+
+```{r}
+PUs <- read_sf(file.path(datarawdir, 'planning_units',
+                         'EAFDBrowserBackup22v0Dlatlon.json')) |> 
+  st_make_valid() |> 
+  st_set_crs(4326) |> 
+  st_transform(crs = st_crs(basin))
+```
+
+How many vertices is that?
+
+```{r}
+print(vertcount(PUs))
+```
+
+That's a lot, but there are also a lot more polygons here. I'll still smooth a bit, because it makes the spatial operations so much smoother.
+
+```{r}
+planning_units <- PUs |> 
+  rmapshaper::ms_simplify(keep = 0.01)
+
+print(vertcount(planning_units))
+```
+
+We want the names to match the ewr table
+
+The names are close but not always the same.
+
+One issue is whether or not 'to' is capitalised, there are ampersands, and other strange inconsistencies. It's hard to check because the PUs are only NSW, but I'll do what I can.
+
+```{r}
+planning_units <- planning_units |> 
+  dplyr::mutate(PU_Name = stringr::str_replace_all(PU_Name, ' To ', ' to ')) |> 
+  dplyr::mutate(PU_Name = stringr::str_replace_all(PU_Name, '&', 'and')) |> 
+  dplyr::mutate(PU_Name = stringr::str_replace_all(PU_Name, '\\(', '')) |> 
+  dplyr::mutate(PU_Name = stringr::str_replace_all(PU_Name, '\\)', '')) |> 
+  dplyr::mutate(PU_Name = stringr::str_replace_all(PU_Name,
+                                                   'Murrumbidgee River - ',
+                                                   'Murrumbidgee River_')) |> 
+  dplyr::mutate(PU_Name = stringr::str_replace_all(PU_Name,
+                                                   'Upper Murrumbidgee River - ',
+                                                   'Upper Murrumbidgee River_')) |> 
+  dplyr::mutate(PU_Name = stringr::str_replace_all(PU_Name,
+                                                   'Tumut River Below Blowering Dam',
+                                                   'Tumut River below Blowering Dam')) |> 
+  dplyr::mutate(PU_Name = stringr::str_replace_all(PU_Name,
+                                                   'Cambells Creek',
+                                                   'Campbells Creek'))
+
+
+```
+
+```{r}
+ewrtab <- get_ewr_table()
+unique(ewrtab$PlanningUnitName) %in% unique(planning_units$PU_Name)
+```
+
+These are the EWR PUs that are not in the polygons. Most are not in NSW, so assume they're not in this set of polygons.
+
+```{r}
+unique(ewrtab$PlanningUnitName[!ewrtab$PlanningUnitName %in% unique(planning_units$PU_Name)]) |> sort()
+```
+
+The IDs do not seem to exist in the json- there's no 215 in the planning_units
+
+```{r}
+ewrtab |> dplyr::filter(PlanningUnitName == "Mungindi to Boomi River Confluence") |> dplyr::slice(1)
+planning_units |> dplyr::filter(PU_Name == "Mungindi to Boomi River Confluence") |> dplyr::slice(1)
+```
+
+The LTWP names are also inconsistent
+
+```{r}
+unique(ewrtab$LTWPShortName) |> sort()
+```
+
+```{r}
+unique(planning_units$LTWP_Area) |> sort()
+```
+
+We can straighten that up fairly easily
+
+```{r}
+planning_units <- planning_units |> 
+  dplyr::mutate(LTWP_Area = stringr::str_replace_all(LTWP_Area,
+                                                     'Barwon Darling',
+                                                     'Barwon-Darling')) |> 
+  dplyr::mutate(LTWP_Area = stringr::str_replace_all(LTWP_Area,
+                                                     'Intersecting Streams',
+                                                     'Intersecting_Streams')) |> dplyr::mutate(LTWP_Area = stringr::str_replace_all(LTWP_Area,
+                                                     'Macquarie',
+                                                     'Macquarie-Castlereagh')) |> 
+  dplyr::mutate(LTWP_Area = stringr::str_replace_all(LTWP_Area,
+                                                     'Murray',
+                                                     'Murray Lower Darling'))
+```
+
+```{r}
+unique(planning_units$LTWP_Area) %in% unique(ewrtab$LTWPShortName)
+```
+
+Let's make the columns that do match have the same name
+
+```{r}
+planning_units <- planning_units |> 
+  dplyr::select(-id) |> # Nothing in there
+  dplyr::rename(PlanningUnitName = PU_Name,
+                LTWPShortName = LTWP_Area)
+```
+
+```{r}
+ggplot(planning_units) +
+  geom_sf(aes(fill = PlanningUnitName), show.legend = FALSE) + 
+  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+```
+
 ## Gauges
 
 There are gauge locations from the MDBA gis zip (HydrologicIndicatorSites) and BOM (included in EWR tool- bom_gauge_data). I can get the hydrologic indicator sites online, but the only source I can find for the BOM locations is a manual link at <http://www.bom.gov.au/waterdata/>. It's a csv (I got from old version of EWR), so I'm just going to include it for now.
@@ -304,6 +423,11 @@ if (REBUILD_DATA) {
   st_write(cewo_valleys, 
            file.path(dataextdir, 'cewo_valleys.shp'), 
            append = FALSE)
+    st_write(planning_units, 
+           file.path(dataextdir, 'planning_units.shp'), 
+           append = FALSE)
+  
+  
   
   # The R objects to /data/
   usethis::use_data(basin, overwrite = TRUE)
@@ -311,6 +435,7 @@ if (REBUILD_DATA) {
   usethis::use_data(sdl_units, overwrite = TRUE)
   usethis::use_data(bom_basin_gauges, overwrite = TRUE)
   usethis::use_data(cewo_valleys, overwrite = TRUE)
+  usethis::use_data(planning_units, overwrite = TRUE)
 }
 
 ```
