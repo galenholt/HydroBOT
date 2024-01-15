@@ -399,6 +399,21 @@ test_that("maps", {
 
   vdiffr::expect_doppelganger("sdl_map_simple", sdl_map)
 
+  # Make a minimal map, qual colors (not really outcomes, but still, should work.)
+  sdl_map_name <- obj_sdl_to_plot |>
+    dplyr::group_by(SWSDLName) |>
+    dplyr::summarise(dplyr::across(tidyselect::everything(), dplyr::first)) |>
+    dplyr::ungroup() |>
+    plot_outcomes(
+      outcome_col = "SWSDLName",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "SWSDLName",
+      pal_list = SDL_pal
+    )
+
+  vdiffr::expect_doppelganger("sdl_map_name", sdl_map_name)
+
   # Make a minimal map, change the label
   sdl_map_l <- obj_sdl_to_plot |>
     dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality

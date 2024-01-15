@@ -34,8 +34,17 @@ read_hydro_csv <- function(hydropath, scenariofilter, long) {
   hydro_paths <- find_scenario_paths(hydropath, type = 'csv')
 
   if (!is.null(scenariofilter)) {
+    hll <- length(hydro_paths)
     hydro_paths <- hydro_paths[names(hydro_paths) %in% scenariofilter]
+    if (hll > 0 & length(hydro_paths) == 0) {
+      rlang::abort(c("No hydrographs read.",
+                     "i" = glue::glue("{hll} hydrographs found in {hydropath}, but none meet scenariofilter."),
+                     "i" = "Are the scenariofilter values full scenario names?",
+                     "i" = glue::glue("A common issue is that the toolkit will read these in as 'scenarioname_scenarioname' when they are files in folders with the same name. Try `scenariofilter = {stringr::str_c(scenariofilter, '_', scenariofilter)}`")))
+    }
   }
+
+
 
   # read-in and extract the names
   hydros <- purrr::imap(hydro_paths,

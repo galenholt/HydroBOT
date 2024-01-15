@@ -311,7 +311,7 @@ plot_outcomes <- function(outdf,
   }
 
   if (plot_type == "map") {
-    if (length(pal_list) > 1) {
+    if (!inherits(pal_list, 'colors') && length(pal_list) > 1) {
       rlang::warn(glue::glue("using first palette for {outcome_col}.
                              Splitting up palettes in maps needs more thought"))
     }

@@ -19,7 +19,7 @@
 #'   passing to [general_aggregate()].
 #' @param group_until named list of groupers and the step to which they should
 #'   be retained. Default NA (retain all groupers for all steps). *FOR EWR USE,
-#'   best option is* `group_until = list('planning_unit_name = is_notpoint)`.
+#'   best option is* `group_until = list('planning_unit_name' = is_notpoint)`.
 #'   This groups by planning unit until larger spatial grouping has happened.
 #'   Step can be an index, name, or a function that evaluates to TRUE or FALSE
 #'   when run on the aggregation sequence. Named list does not need to contain
@@ -49,8 +49,8 @@
 #' @param saveintermediate logical, default `FALSE`. * `FALSE` (the default):
 #'   Save only the final result as a tibble or sf * `TRUE`: Save every step of
 #'   the aggregation as a tibble or sf in a list
-#' @param namehistory logical, default `TRUE`. * `TRUE` (the default): The name
-#'   of the aggregated column(s) retain the full aggregation history of the form
+#' @param namehistory logical, default `TRUE`.
+#'   * `TRUE` (the default): The name of the aggregated column(s) retain the full aggregation history of the form
 #'   `agglevelN_aggfunctionN_...agglevel1_aggfunction1_originalcolumn`. This is
 #'   ugly, but saves memory and says exactly what the values in each column are.
 #'   * `FALSE`: The aggregation history is moved out of the column names and
