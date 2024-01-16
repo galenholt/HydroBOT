@@ -70,6 +70,11 @@ data_load <- function(dirname, datadir, sourceurl,
         dir.create(file.path(datadir, dirname), recursive = TRUE)
         }
     zippath <- file.path(datadir, paste0(dirname, '.zip'))
+    
+    # Curl only tested wiht ftp, but probably works everywhere. download.file failing with ftp
+    if (grepl('ftp:', sourceurl)) {
+      curl::curl_download(sourceurl, destfile = zippath)
+    }
     download.file(sourceurl, destfile = zippath)
     
     unzip(zippath, exdir = file.path(datadir, dirname))
@@ -396,6 +401,66 @@ ggplot(cewo_valleys) +
   geom_sf(aes(fill = ValleyName))
 ```
 
+## River lines
+
+The toolkit does not (at present) use river lines for processing, but they are very useful for visualisation.
+
+```{r}
+data_load('downloaded/SH_Network_GDB', 
+          datarawdir,
+          "ftp://ftp.bom.gov.au/anon/home/geofabric/SH_Network_GDB_V3_3.zip")
+```
+
+```{r}
+st_layers(file.path('data-raw/downloaded', 'SH_Network_GDB', 'SH_Network.gdb'))
+```
+
+```{r}
+rivers <- st_read(file.path('data-raw/downloaded', 'SH_Network_GDB', 'SH_Network.gdb'), layer = 'AHGFNetworkStream')
+```
+
+Subset to major rivers
+
+```{r}
+major_rivers <- rivers |> 
+  dplyr::filter(Hierarchy == 'Major')
+```
+
+Already in the same crs as the others
+
+```{r}
+st_crs(major_rivers) == st_crs(basin)
+```
+
+Clip to the basin
+
+```{r}
+basin_rivers <- major_rivers |> 
+  st_intersection(basin)
+```
+
+We should probably smooth that out again
+
+```{r}
+print(vertcount(basin_rivers))
+```
+
+```{r}
+basin_rivers <- basin_rivers |> 
+  rmapshaper::ms_simplify(keep = 0.01)
+
+print(vertcount(basin_rivers))
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = basin, fill = 'grey96') +
+  geom_sf(data = basin_rivers, aes(color = log(UpstrGeoLn))) +
+  scale_color_viridis_c() +
+  theme_void() +
+  theme(legend.position = 'none')
+```
+
 # Save clean files
 
 No changes to basin, simplified rpa, bom gauges in the basin, and ltim valleys extracted from anae.
@@ -426,6 +491,9 @@ if (REBUILD_DATA) {
     st_write(planning_units, 
            file.path(dataextdir, 'planning_units.shp'), 
            append = FALSE)
+    st_write(basin_rivers, 
+           file.path(dataextdir, 'basin_rivers.shp'), 
+           append = FALSE)
   
   
   
@@ -436,6 +504,8 @@ if (REBUILD_DATA) {
   usethis::use_data(bom_basin_gauges, overwrite = TRUE)
   usethis::use_data(cewo_valleys, overwrite = TRUE)
   usethis::use_data(planning_units, overwrite = TRUE)
+  usethis::use_data(basin_rivers, overwrite = TRUE)
+
 }
 
 ```

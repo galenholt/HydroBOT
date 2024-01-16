@@ -34,7 +34,7 @@ passing to \code{\link[=general_aggregate]{general_aggregate()}}.}
 
 \item{group_until}{named list of groupers and the step to which they should
 be retained. Default NA (retain all groupers for all steps). \emph{FOR EWR USE,
-best option is} \verb{group_until = list('planning_unit_name = is_notpoint)}.
+best option is} \code{group_until = list('planning_unit_name' = is_notpoint)}.
 This groups by planning unit until larger spatial grouping has happened.
 Step can be an index, name, or a function that evaluates to TRUE or FALSE
 when run on the aggregation sequence. Named list does not need to contain
@@ -68,11 +68,11 @@ character and other forms in the same sub-list (single aggregation step).}
 Save only the final result as a tibble or sf * \code{TRUE}: Save every step of
 the aggregation as a tibble or sf in a list}
 
-\item{namehistory}{logical, default \code{TRUE}. * \code{TRUE} (the default): The name
-of the aggregated column(s) retain the full aggregation history of the form
+\item{namehistory}{logical, default \code{TRUE}.
+\itemize{
+\item \code{TRUE} (the default): The name of the aggregated column(s) retain the full aggregation history of the form
 \code{agglevelN_aggfunctionN_...agglevel1_aggfunction1_originalcolumn}. This is
 ugly, but saves memory and says exactly what the values in each column are.
-\itemize{
 \item \code{FALSE}: The aggregation history is moved out of the column names and
 into new columns that define it using \code{\link[=agg_names_to_cols]{agg_names_to_cols()}}. The column
 name(s) become(s) the original column name(s) specified by \code{aggCols}. This

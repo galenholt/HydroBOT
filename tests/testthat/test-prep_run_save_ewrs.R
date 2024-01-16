@@ -810,6 +810,34 @@ test_that("NETCDF saving and returning works for all (or nearly all) ewr outputs
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
   expect_snapshot(realised_structure)
 
+
+  # eslt
+  qaelpath <- '~/../Deakin University/QAEL - WERP in house - WERP'
+  # python can't use the tildes, so have to expand
+  qaelpath <- path.expand(qaelpath)
+
+  # Outer directory for project data
+  project_dir = file.path(qaelpath, 'Toolkit', 'eslt-data-2')
+
+  # Hydrographs (expected to exist already; created here with Ash_data_sorting.qmd)
+  hydro_dir = file.path(project_dir, 'hydrographs')
+
+  # Generated data
+  # EWR outputs (will be created here in controller, read from here in aggregator)
+  ewr_results <- file.path(project_dir, 'module_output', 'EWR')
+
+  # outputs of aggregator. There may be multiple modules
+  agg_results <- file.path(project_dir, 'aggregator_output')
+
+  outputType <- list('summary', 'yearly')
+  returnType <- list('none')
+  ewr_time <- system.time(ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir,
+                                                        output_parent_dir = project_dir,
+                                                        model_format = 'IQQM - netcdf',
+                                                        outputType = outputType,
+                                                        returnType = returnType,
+                                                        rparallel = TRUE))
+
 })
 
 test_that("zipped NETCDF saving and returning works for all (or nearly all) ewr outputs", {

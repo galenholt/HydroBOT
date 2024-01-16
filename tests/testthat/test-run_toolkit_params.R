@@ -24,6 +24,7 @@ test_that("parameter file works with character aggregation", {
   expect_null(test)
 })
 
+
 # since the package_params.yml calls for temp, overwrite with temp_multi as a passed_arg.
 # This will fail if the overwrite doesn't happen, since temp won't exist.
 # This also has the benefit of testing the multifile
@@ -116,21 +117,8 @@ test_that("Single scenario among many, no access to the outer directory", {
   expect_null(test)
 
   # Expect only the single output, not for all the scenarios
-  expected_structure <- c(
-    "aggregator_output/achievement_aggregated.rds",
-    "aggregator_output/agg_metadata.json",
-    "aggregator_output/agg_metadata.yml",
-    "base.csv",
-    "base.json",
-    "module_output/EWR/base/all_events/base.csv",
-    "module_output/EWR/base/all_successful_events/base.csv",
-    "module_output/EWR/base/all_successful_interEvents/base.csv",
-    "module_output/EWR/base/summary/base.csv",
-    "module_output/EWR/base/yearly/base.csv",
-    "module_output/EWR/ewr_metadata.json",
-    "module_output/EWR/ewr_metadata.yml"
-  )
-  expect_equal(list.files("_test_data/hydrographs/base", recursive = TRUE), expected_structure)
+  realised_structure <- list.files("_test_data/hydrographs/base", recursive = TRUE)
+  expect_snapshot(realised_structure)
 
   # Tear down
 })
@@ -163,21 +151,8 @@ test_that("Single scenario among many, no access to the outer directory, differe
   expect_null(test)
 
   # Expect only the single output, not for all the scenarios
-  expected_structure <- c(
-    "aggregator_output/achievement_aggregated.rds",
-    "aggregator_output/agg_metadata.json",
-    "aggregator_output/agg_metadata.yml",
-    "base.csv",
-    "base.json",
-    "module_output/EWR/base/all_events/base.csv",
-    "module_output/EWR/base/all_successful_events/base.csv",
-    "module_output/EWR/base/all_successful_interEvents/base.csv",
-    "module_output/EWR/base/summary/base.csv",
-    "module_output/EWR/base/yearly/base.csv",
-    "module_output/EWR/ewr_metadata.json",
-    "module_output/EWR/ewr_metadata.yml"
-  )
-  expect_equal(list.files("_test_data/hydrographs/results", recursive = TRUE), expected_structure)
+  realised_structure <- list.files("_test_data/hydrographs/results", recursive = TRUE)
+  expect_snapshot(realised_structure)
 
   # Tear down
 })

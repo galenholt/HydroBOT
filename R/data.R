@@ -108,7 +108,20 @@
 #' }
 #' @source
 #' MDBA Environmental Assets and Functions Database
-#'"planning_units"
+"planning_units"
+
+#' River lines in the basin
+#'
+#' Spatial lines for the major rivers in the basin, from geofabric. Has been clipped to basin and paths simplified.
+#'
+#' @format ## `basin_rivers` An {sf} object:
+#' \describe{
+#'   \item{Shape}{The geometry}
+#'   \item{other values}{As documented at http://www.bom.gov.au/water/geofabric/}
+#' }
+#' @source
+#' BOM, <http://www.bom.gov.au/water/geofabric/>
+"basin_rivers"
 
 #' Example output from EWR tool
 #'

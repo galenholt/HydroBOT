@@ -8,7 +8,7 @@ make_output_dir(
   parent_dir,
   scenarios,
   module_name = "EWR",
-  ewr_outtypes = c("summary", "annual", "all_events")
+  ewr_outtypes = c("summary", "yearly")
 )
 }
 \arguments{

@@ -7,11 +7,8 @@ test_that("long hydrograph csv works", {
 
   hydlong_b <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'),
                         scenariofilter = 'base_base')
-  expect_equal(ncol(hydlong), 4)
-  expect_equal(nrow(hydlong), 10950)
-
-  hydlong_b <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'),
-                          scenariofilter = 'base')
+  expect_equal(ncol(hydlong_b), 4)
+  expect_equal(nrow(hydlong_b), 10950)
 
 })
 

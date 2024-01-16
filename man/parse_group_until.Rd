@@ -9,7 +9,7 @@ parse_group_until(group_until, groupers, aggsequence)
 \arguments{
 \item{group_until}{named list of groupers and the step to which they should
 be retained. Default NA (retain all groupers for all steps). \emph{FOR EWR USE,
-best option is} \verb{group_until = list('planning_unit_name = is_notpoint)}.
+best option is} \code{group_until = list('planning_unit_name' = is_notpoint)}.
 This groups by planning unit until larger spatial grouping has happened.
 Step can be an index, name, or a function that evaluates to TRUE or FALSE
 when run on the aggregation sequence. Named list does not need to contain
