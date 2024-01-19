@@ -9,6 +9,7 @@
 
 \describe{
 \item{LTWPShortName, PlanningUnitName, geometry}{The long-term watering plan area and planning unit name matching, to the extent possible, the EWR table. Geometry is polygons. Other columns for reference.}
+\item{planning_unit_name}{same as PlanningUnitName, but matches toolkit naming instead of EWR naming, allowing easier joining to either}
 }
 }
 }
@@ -20,6 +21,6 @@ planning_units
 }
 \description{
 Polygons defining planning units. Currently just for NSW, sourced from MDBA
-Environmental Assets and Functions Database
+Environmental Assets and Functions Database. Have been merged across resource plan areas, allowing them to be split into other, arbitrary polygons
 }
 \keyword{datasets}

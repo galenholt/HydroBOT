@@ -8,7 +8,7 @@
 \subsection{\code{basin_rivers} An {sf} object:}{
 
 \describe{
-\item{Shape}{The geometry}
+\item{geometry}{The geometry, all LINESTRING or MULTILINESTRING}
 \item{other values}{As documented at http://www.bom.gov.au/water/geofabric/}
 }
 }

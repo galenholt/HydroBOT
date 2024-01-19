@@ -288,13 +288,66 @@ planning_units <- planning_units |>
 unique(planning_units$LTWP_Area) %in% unique(ewrtab$LTWPShortName)
 ```
 
-Let's make the columns that do match have the same name
+But, there are duplicates that arise from the SWWRPANAME
+
+```{r}
+duplicate_plan <- planning_units |> 
+  dplyr::group_by(PU_Name) |> 
+  dplyr::filter(dplyr::n() > 1) |> 
+  dplyr::arrange(PU_Name)
+
+duplicate_plan
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = resource_plan_areas, mapping = aes(color = SWWRPANAME), fill = 'grey90') +
+  geom_sf(data = duplicate_plan, mapping = aes(fill = PU_Name)) + 
+  guides(fill = 'none')
+  # theme(legend.position = 'none')
+```
+
+We don't actually want these to be distinct; the splitting is great, but we want to split based on the polygons we want, not necessarily the resource plan areas. So, let's put the planning units back together.
+
+First, fix a state placeholder that yields more duplications
 
 ```{r}
 planning_units <- planning_units |> 
-  dplyr::select(-id) |> # Nothing in there
+  dplyr::mutate(PU_Name = ifelse(PU_Name == 'To be determined', 
+                paste0(PU_Name, STATE), 
+                PU_Name))
+```
+
+Now do the unions
+
+```{r}
+planning_units <- planning_units |> 
+  dplyr::group_by(PU_Name) |> 
+  dplyr::summarise(LTWP_Area = unique(LTWP_Area),
+                   PU_Region = unique(PU_Region),
+                   PU_Code = unique(PU_Code),
+                   STATE = unique(STATE),
+                   geometry = st_union(geometry)) |> 
+  dplyr::ungroup()
+```
+
+```{r}
+duplicate_plan2 <- planning_units |> 
+  dplyr::group_by(PU_Name) |> 
+  dplyr::filter(dplyr::n() > 1) |> 
+  dplyr::arrange(PU_Name)
+
+duplicate_plan2
+```
+
+Let's make the columns that do match have the same name. We also want a planning_unit_name column to match the cleaned names the toolkit uses. That's a bit silly, but it will be good to be able to join to ewrs or toolkit outputs.
+
+```{r}
+planning_units <- planning_units |> 
+  # dplyr::select(-id) |> # Nothing in there
   dplyr::rename(PlanningUnitName = PU_Name,
-                LTWPShortName = LTWP_Area)
+                LTWPShortName = LTWP_Area) |> 
+  dplyr::mutate(planning_unit_name = PlanningUnitName)
 ```
 
 ```{r}
@@ -450,6 +503,13 @@ basin_rivers <- basin_rivers |>
   rmapshaper::ms_simplify(keep = 0.01)
 
 print(vertcount(basin_rivers))
+```
+
+Change the Shape to geometry for consistency
+
+```{r}
+basin_rivers <- basin_rivers |> 
+  dplyr::rename(geometry = Shape)
 ```
 
 ```{r}
