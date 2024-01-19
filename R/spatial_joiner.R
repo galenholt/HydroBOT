@@ -31,6 +31,8 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
       add_polyID(failduplicate = FALSE)
   }
 
+  # To speed things up, only do a spatial join on *unique* polygons, and join
+  # the rest back on later with a join on the polyID.
   from_poly <- from_geo |>
     dplyr::select(polyID_f = polyID) |>
     dplyr::group_by(polyID_f) |>

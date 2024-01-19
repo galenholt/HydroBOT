@@ -14,7 +14,8 @@ spatial_aggregate(
   whichcrs = sf::st_crs(to_geo),
   keepAllPolys = FALSE,
   failmissing = TRUE,
-  prefix = "spatial_"
+  prefix = "spatial_",
+  joinby = "spatial"
 )
 }
 \arguments{
@@ -70,6 +71,8 @@ and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
 
 \item{prefix}{character, differs from \code{\link[=general_aggregate]{general_aggregate()}} in that default
 is \code{'spatial_'} instead of \code{'agg_'}.}
+
+\item{joinby}{character, default 'spatial' performs the expected spatial join using geometry, 'nonspatial' performs a \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} by common column names, typically as a result of calling \code{\link[=multi_aggregate]{multi_aggregate()}} with \code{pseudo_spatial = 'planning_units'}.}
 }
 \value{
 an \code{sf} with columns for the grouping variables aggregated into the

@@ -94,6 +94,93 @@ test_that("multi-step theme and spatial works", {
   vdiffr::expect_doppelganger("spatial-theme multi withreadin", g2sdl_plot)
 })
 
+
+test_that("nonspatial joins of spatial data (as in multi_agg)", {
+  # this is copied over from multi_aggregate testing, just making sure things pass correctly.
+  aggseq <- list(
+    ewr_code = c("ewr_code_timing", "ewr_code"),
+    planning_units = planning_units,
+    env_obj = c("ewr_code", "env_obj"),
+    sdl_units = sdl_units,
+    Specific_goal = c("env_obj", "Specific_goal"),
+    catchment = cewo_valleys,
+    Objective = c("Specific_goal", "Objective"),
+    mdb = basin,
+    target_5_year_2024 = c("Objective", "target_5_year_2024")
+  )
+
+  funseq <- list(
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "SpatialWeightedMean",
+    "ArithmeticMean",
+    "SpatialWeightedMean",
+    "ArithmeticMean",
+    "SpatialWeightedMean",
+    "ArithmeticMean"
+  )
+
+  spatagg <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq,
+    funsequence = funseq,
+    saveintermediate = TRUE,
+    namehistory = FALSE,
+    auto_ewr_PU = TRUE,
+    pseudo_spatial = "planning_units"
+  )
+
+  # stringr::str_flatten(names(spatagg), "', '")
+  expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
+  expect_s3_class(spatagg$planning_units, "sf")
+
+  # Check the values are actually right
+  funs_in_df <- spatagg$target_5_year_2024 |>
+    sf::st_drop_geometry() |>
+    dplyr::slice(1) |>
+    dplyr::select(tidyselect::starts_with('aggfun_')) |>
+    unlist()
+
+  aggs_in_df <- spatagg$target_5_year_2024 |>
+    sf::st_drop_geometry() |>
+    dplyr::slice(1) |>
+    dplyr::select(tidyselect::starts_with('aggLevel_')) |>
+    unlist()
+
+
+  expect_equal(unname(funs_in_df), unlist(funseq))
+  expect_equal(unname(aggs_in_df), names(aggseq))
+
+
+  ## This test doesn't cover some corner cases because the test data doesn't have any PUs with multiple gauges. But it does have multiple PUs per a couple gauges. So, it should have the same number of rows as the non-PU version, just differently indexed. And the ones from the same gauge should have the same value.
+  # for testing, in multi_aggregate after fromto_pair:
+  # fromto_pair |> dplyr::group_by(gauge) |> dplyr::reframe(gauge = unique(planning_unit_name))
+  # fromto_pair |> dplyr::group_by(gauge) |> dplyr::reframe(pun = unique(planning_unit_name))
+  expect_equal(nrow(spatagg$ewr_code), nrow(spatagg$planning_units))
+  # This is *very* specific to test data, so if that ever changes, this might too
+  gauge412005 <- spatagg$ewr_code |>
+    sf::st_drop_geometry() |>
+    dplyr::filter(scenario == 'base_base' & gauge == 412005) |>
+    dplyr::select(scenario, planning_unit_name, ewr_code, ewr_achieved) |>
+    dplyr::arrange(planning_unit_name, ewr_code, ewr_achieved)
+
+
+  for (i in unique(gauge412005$planning_unit_name)) {
+    pudf <- spatagg$planning_units |>
+      sf::st_drop_geometry() |>
+      dplyr::filter(scenario == 'base_base' & planning_unit_name == i) |>
+      dplyr::select(scenario, planning_unit_name, ewr_code, ewr_achieved) |>
+      dplyr::arrange(planning_unit_name, ewr_code, ewr_achieved)
+    expect_equal(gauge412005 |> dplyr::filter(planning_unit_name == i), pudf)
+  }
+})
+
 test_that("parsing geo and char work for aggsequence", {
   aggseq <- list(
     ewr_code = c("ewr_code_timing", "ewr_code"),

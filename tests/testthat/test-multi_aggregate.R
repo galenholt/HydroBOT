@@ -823,7 +823,7 @@ test_that("saving the list of steps and appropriate persistence of PU grouping",
     auto_ewr_PU = TRUE
   )
 
-  # should have planning units up until we aggregate to sdl
+  # should have planning units and gauge up until we aggregate to sdl
   expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
     "planning_unit_name" %in% names(spatagg$ewr_code) &
     "planning_unit_name" %in% names(spatagg$env_obj))
@@ -831,6 +831,14 @@ test_that("saving the list of steps and appropriate persistence of PU grouping",
   expect_true(!"planning_unit_name" %in% names(spatagg$sdl_units) &
     !"planning_unit_name" %in% names(spatagg$Specific_goal) &
     !"planning_unit_name" %in% names(spatagg$catchment))
+
+  expect_true("gauge" %in% names(spatagg$ewr_code_timing) &
+                "gauge" %in% names(spatagg$ewr_code) &
+                "gauge" %in% names(spatagg$env_obj))
+
+  expect_true(!"gauge" %in% names(spatagg$sdl_units) &
+                !"gauge" %in% names(spatagg$Specific_goal) &
+                !"gauge" %in% names(spatagg$catchment))
   # There are more, but that should cover it
 
   expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
@@ -855,6 +863,153 @@ test_that("saving the list of steps and appropriate persistence of PU grouping",
   vdiffr::expect_doppelganger("spatial-theme multi_endoflist", g2sdl_plot)
 })
 
+# Nonspatial joining of spatial data
+test_that("nonspatial joins of spatial data", {
+
+  aggseq <- list(
+    ewr_code = c("ewr_code_timing", "ewr_code"),
+    planning_units = planning_units,
+    env_obj = c("ewr_code", "env_obj"),
+    sdl_units = sdl_units,
+    Specific_goal = c("env_obj", "Specific_goal"),
+    catchment = cewo_valleys,
+    Objective = c("Specific_goal", "Objective"),
+    mdb = basin,
+    target_5_year_2024 = c("Objective", "target_5_year_2024")
+  )
+
+  funseq <- list(
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "SpatialWeightedMean",
+    "ArithmeticMean",
+    "SpatialWeightedMean",
+    "ArithmeticMean",
+    "SpatialWeightedMean",
+    "ArithmeticMean"
+  )
+
+  spatagg <- multi_aggregate(ewr_to_agg,
+                             aggsequence = aggseq,
+                             groupers = "scenario",
+                             aggCols = "ewr_achieved",
+                             funsequence = funseq,
+                             causal_edges = causal_ewr,
+                             saveintermediate = TRUE,
+                             namehistory = FALSE,
+                             auto_ewr_PU = TRUE,
+                             pseudo_spatial = "planning_units"
+  )
+
+  # stringr::str_flatten(names(spatagg), "', '")
+  expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
+  expect_s3_class(spatagg$planning_units, "sf")
+
+  # Check the values are actually right
+  funs_in_df <- spatagg$target_5_year_2024 |>
+    sf::st_drop_geometry() |>
+    dplyr::slice(1) |>
+    dplyr::select(tidyselect::starts_with('aggfun_')) |>
+    unlist()
+
+  aggs_in_df <- spatagg$target_5_year_2024 |>
+    sf::st_drop_geometry() |>
+    dplyr::slice(1) |>
+    dplyr::select(tidyselect::starts_with('aggLevel_')) |>
+    unlist()
+
+
+  expect_equal(unname(funs_in_df), unlist(funseq))
+  expect_equal(unname(aggs_in_df), names(aggseq))
+
+
+  ## This test doesn't cover some corner cases because the test data doesn't have any PUs with multiple gauges. But it does have multiple PUs per a couple gauges. So, it should have the same number of rows as the non-PU version, just differently indexed. And the ones from the same gauge should have the same value.
+  # for testing, in multi_aggregate after fromto_pair:
+  # fromto_pair |> dplyr::group_by(gauge) |> dplyr::reframe(gauge = unique(planning_unit_name))
+  # fromto_pair |> dplyr::group_by(gauge) |> dplyr::reframe(pun = unique(planning_unit_name))
+  expect_equal(nrow(spatagg$ewr_code), nrow(spatagg$planning_units))
+  # This is *very* specific to test data, so if that ever changes, this might too
+  gauge412005 <- spatagg$ewr_code |>
+    sf::st_drop_geometry() |>
+    dplyr::filter(scenario == 'base_base' & gauge == 412005) |>
+    dplyr::select(scenario, planning_unit_name, ewr_code, ewr_achieved) |>
+    dplyr::arrange(planning_unit_name, ewr_code, ewr_achieved)
+
+
+for (i in unique(gauge412005$planning_unit_name)) {
+ pudf <- spatagg$planning_units |>
+    sf::st_drop_geometry() |>
+    dplyr::filter(scenario == 'base_base' & planning_unit_name == i) |>
+    dplyr::select(scenario, planning_unit_name, ewr_code, ewr_achieved) |>
+    dplyr::arrange(planning_unit_name, ewr_code, ewr_achieved)
+  expect_equal(gauge412005 |> dplyr::filter(planning_unit_name == i), pudf)
+}
+
+  # testing the splitting up with higher levels
+
+  # get the PU in the PU level
+  puinpu <- spatagg$planning_units |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved, na.rm = T),
+                     .by = c(planning_unit_name, geometry))
+  # each planning unit should appear once (e.g. they are 1:1 with geometry)
+  expect_true(!any(duplicated(puinpu$planning_unit_name)))
+
+  # This helps see if there is any splitting- do any of the PU actually cross
+  # sdl boundaries? Yes, barely? Lower darling shows up in the sdls?
+  g2puplot <- ggplot2::ggplot() +
+    ggplot2::geom_sf(data = dplyr::filter(sdl_units, SWSDLName %in% unique(spatagg$sdl_units$SWSDLName))) +
+    ggplot2::geom_sf(
+      data = puinpu,
+      ggplot2::aes(fill = planning_unit_name)
+    ) +
+    ggplot2::geom_sf(data = ewr_to_agg |> dplyr::select(geometry) |> dplyr::distinct()) +
+    ggplot2::theme(legend.position = "bottom")
+
+  # to actually test the intersection (and correct areas), we need to test
+  # spatial_joiner, since those intersections won't be preserved
+  # post-aggregation. that's done in the spatial_joiner testing.
+
+  ## and what happens to overflow if we pre-cut the sdls?
+  # spatagg above gains an sdl (lower darling)
+
+  expect_equal(unique(spatagg$sdl_units$SWSDLName), c('Lower Darling', 'Lachlan', 'Murrumbidgee', 'Macquarie–Castlereagh'))
+
+  # but if we pre-cut to the appropriate sdls, that should limit it.
+  # *THIS SHOULD BE DONE BY USER*, since it is appropriate behaviour to do the intersection properly. but we want to make sure it works for the user.
+  aggseqc <- list(
+    ewr_code = c("ewr_code_timing", "ewr_code"),
+    planning_units = planning_units,
+    env_obj = c("ewr_code", "env_obj"),
+    sdl_units = dplyr::filter(sdl_units, SWSDLName %in% c('Lachlan', 'Murrumbidgee', 'Macquarie–Castlereagh')),
+    Specific_goal = c("env_obj", "Specific_goal"),
+    catchment = cewo_valleys,
+    Objective = c("Specific_goal", "Objective"),
+    mdb = basin,
+    target_5_year_2024 = c("Objective", "target_5_year_2024")
+  )
+
+  spataggc <- multi_aggregate(ewr_to_agg,
+                             aggsequence = aggseqc,
+                             groupers = "scenario",
+                             aggCols = "ewr_achieved",
+                             funsequence = funseq,
+                             causal_edges = causal_ewr,
+                             saveintermediate = TRUE,
+                             namehistory = FALSE,
+                             auto_ewr_PU = TRUE,
+                             pseudo_spatial = "planning_units"
+  )
+
+  expect_equal(unique(spataggc$sdl_units$SWSDLName), c('Lachlan', 'Murrumbidgee', 'Macquarie–Castlereagh'))
+
+
+
+  # Plots are useful for checking spatial outcomes
+  skip_on_os('linux')
+
+  vdiffr::expect_doppelganger("planning_unit_agg", g2puplot)
+})
 
 # Types of functions ------------------------------------------------------
 
@@ -1379,16 +1534,18 @@ test_that("group_until works", {
 
   # first, expect it to fail without auto_ewr_PU or group_until
 
-  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
+  # Need to wrap twice because there are two steps that throw warnings.
+  expect_warning(expect_warning(spatagg <- multi_aggregate(ewr_to_agg,
     aggsequence = aggseq,
     groupers = c("scenario"),
     aggCols = "ewr_achieved",
     funsequence = funseq,
     causal_edges = causal_ewr,
     saveintermediate = TRUE
-  ))
+  )))
 
   # By name, vctor
+  # not listing gauge, but geometry makes the data persist
   spatagg <- multi_aggregate(ewr_to_agg,
     aggsequence = aggseq,
     groupers = c("scenario", "planning_unit_name"),
@@ -1407,6 +1564,43 @@ test_that("group_until works", {
   expect_true(!"planning_unit_name" %in% names(spatagg$sdl_units) &
     !"planning_unit_name" %in% names(spatagg$Specific_goal) &
     !"planning_unit_name" %in% names(spatagg$catchment))
+
+  # We've lost the 'gauge' name, but the geometry holds the rows together
+  expect_true('gauge' %in% names(spatagg$ewr_code_timing))
+  expect_true(!'gauge' %in% names(spatagg$ewr_code))
+  expect_equal(nrow(spatagg$ewr_code), 356)
+
+  # with gauge explicitly
+  spatagg <- multi_aggregate(ewr_to_agg,
+                             aggsequence = aggseq,
+                             groupers = c("scenario", "planning_unit_name", "gauge"),
+                             group_until = c(NA, "sdl_units", "sdl_units"),
+                             aggCols = "ewr_achieved",
+                             funsequence = funseq,
+                             causal_edges = causal_ewr,
+                             saveintermediate = TRUE
+  )
+
+  # should have planning units up until we aggregate to sdl
+  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+                "planning_unit_name" %in% names(spatagg$ewr_code) &
+                "planning_unit_name" %in% names(spatagg$env_obj))
+
+  expect_true(!"planning_unit_name" %in% names(spatagg$sdl_units) &
+                !"planning_unit_name" %in% names(spatagg$Specific_goal) &
+                !"planning_unit_name" %in% names(spatagg$catchment))
+
+  # now we should have gauge in the same places as plannign units
+  expect_true("gauge" %in% names(spatagg$ewr_code_timing) &
+                "gauge" %in% names(spatagg$ewr_code) &
+                "gauge" %in% names(spatagg$env_obj))
+
+  expect_true(!"gauge" %in% names(spatagg$sdl_units) &
+                !"gauge" %in% names(spatagg$Specific_goal) &
+                !"gauge" %in% names(spatagg$catchment))
+  # and the rows should be the same as above, because this just recapitulates geometry
+  expect_equal(nrow(spatagg$ewr_code), 356)
+
 
   # By name, a list, as it should be
   spatagg <- multi_aggregate(ewr_to_agg,
@@ -1525,11 +1719,11 @@ test_that("group_until works", {
   expect_true("scenario" %in% names(spatagg$target_5_year_2024))
 
   # a named list, group_until not in groupers and tidyselected grouper
-  # Because
+  # Putting 'gauge' in here too, since it usually should be, and checks it works with two
   spatagg <- multi_aggregate(ewr_to_agg,
     aggsequence = aggseq,
     groupers = tidyselect::starts_with("sce"),
-    group_until = list(planning_unit_name = is_notpoint),
+    group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint),
     aggCols = "ewr_achieved",
     funsequence = funseq,
     causal_edges = causal_ewr,
@@ -1544,6 +1738,18 @@ test_that("group_until works", {
   expect_true(!"planning_unit_name" %in% names(spatagg$sdl_units) &
     !"planning_unit_name" %in% names(spatagg$Specific_goal) &
     !"planning_unit_name" %in% names(spatagg$catchment))
+
+  # now we should have gauge in the same places as plannign units
+  expect_true("gauge" %in% names(spatagg$ewr_code_timing) &
+                "gauge" %in% names(spatagg$ewr_code) &
+                "gauge" %in% names(spatagg$env_obj))
+
+  expect_true(!"gauge" %in% names(spatagg$sdl_units) &
+                !"gauge" %in% names(spatagg$Specific_goal) &
+                !"gauge" %in% names(spatagg$catchment))
+  # and the rows should be the same as above, because this just recapitulates geometry
+  expect_equal(nrow(spatagg$ewr_code), 356)
+
 
   # make sure the other groupers persisted
   expect_true("scenario" %in% names(spatagg$target_5_year_2024))

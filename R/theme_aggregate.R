@@ -122,13 +122,17 @@ theme_aggregate <- function(dat,
     isewr <- to_theme %in% ewrnames
     if (isewr & !'planning_unit_name' %in% groupers) {
       if (!auto_ewr_PU) {
-        rlang::abort("EWR outputs should be grouped by `planning_unit_name` until aggregated to larger spatial areas.
-                  Preferred method of addressing this is by including as a `grouper` in `theme_aggregate()` or with `group_until` in `multi_aggregate()`.")
+        rlang::warn(c("!" = "EWR outputs detected without `group_until`!",
+                      "i" = "EWR outputs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
+                      "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
+                      "i" = "Lower-level processing should include as `grouper` in `theme_aggregate()`"))
       } else {
-        rlang::inform("EWR outputs should be grouped by `planning_unit_name` until aggregated to larger spatial areas.
-                  Preferred method of addressing this is by including as a `grouper` in `theme_aggregate()` or with `group_until` in `multi_aggregate()`,
-                      but it is being done automatically in `theme_aggregate()`")
-        groupers <- c(groupers, 'planning_unit_name')
+        rlang::inform(c("EWR outputs auto-grouped!",
+        "i" = "EWRs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
+        "*" = "gauge is less important, since it has the geometry, but the gauge column will be lost otherwise.",
+        "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
+        "i" = "Lower-level processing handles by including as `grouper` in `theme_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."))
+        groupers <- c(groupers, 'planning_unit_name', 'gauge')
       }
 
 

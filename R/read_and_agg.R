@@ -46,6 +46,7 @@ read_and_agg <- function(datpath,
                          keepAllPolys = FALSE,
                          failmissing = TRUE,
                          auto_ewr_PU = FALSE,
+                         pseudo_spatial = NULL,
                          returnList = TRUE,
                          savepath = NULL,
                          extrameta = NULL,
@@ -120,7 +121,8 @@ read_and_agg <- function(datpath,
     namehistory = namehistory,
     keepAllPolys = keepAllPolys,
     failmissing = failmissing,
-    auto_ewr_PU = auto_ewr_PU
+    auto_ewr_PU = auto_ewr_PU,
+    pseudo_spatial = pseudo_spatial
   )
 
   # use RDS so can read it in to a different name.

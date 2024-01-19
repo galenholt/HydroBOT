@@ -26,6 +26,7 @@
 #'   of polys as an `underlay` in [plot_outcomes()].
 #' @param prefix character, differs from [general_aggregate()] in that default
 #'   is `'spatial_'` instead of `'agg_'`.
+#' @param joinby character, default 'spatial' performs the expected spatial join using geometry, 'nonspatial' performs a [dplyr::left_join()] by common column names, typically as a result of calling [multi_aggregate()] with `pseudo_spatial = 'planning_units'`.
 #'
 #' @return an `sf` with columns for the grouping variables aggregated into the
 #'   polygons in `to_geo` and retaining desired theme-level information
@@ -37,7 +38,8 @@ spatial_aggregate <- function(dat, to_geo, groupers,
                            whichcrs = sf::st_crs(to_geo),
                            keepAllPolys = FALSE,
                            failmissing = TRUE,
-                           prefix = 'spatial_') {
+                           prefix = 'spatial_',
+                           joinby = 'spatial') {
 
 
   # making valid and adding polyID here and not inside spatial_joiner because
@@ -51,7 +53,20 @@ spatial_aggregate <- function(dat, to_geo, groupers,
     add_polyID()
 
   # make the intersected df for aggregating
-  fromto_pair <- spatial_joiner(dat, to_geo, whichcrs = whichcrs)
+  # usually spatial join, but sometimes we want to do a traditional left join (e.g. EWR gauges to planning units)
+  if (joinby == 'spatial') {
+    fromto_pair <- spatial_joiner(dat, to_geo, whichcrs = whichcrs)
+  } else if (joinby == 'nonspatial') {
+    dat <- dat |> dplyr::select(-any_of('polyID'))
+      fromto_pair <- dplyr::left_join(sf::st_drop_geometry(dat),
+                                      sf::st_drop_geometry(to_geo))
+    } else {
+      rlang::abort("code set up to pass column names with joinby, but not fully. If needed, write the last bits to make it work generally.")
+      # fromto_pair <- dplyr::left_join(sf::st_drop_geometry(dat),
+      #                                 sf::st_drop_geometry(to_geo),
+      #                                 by = joinby)
+    }
+
 
   # Clean up groupers and aggCols from various formats and ensure only present
   # columns are included.

@@ -51,7 +51,9 @@ make_test_ewr_prepped <- function() {
 make_test_agg <- function(namehistory = TRUE) {
   sumspat <- make_test_ewr_prepped()
 
+  # Group_until and other sorts of agg tests are done separately in the relevant file tests
   aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                 planning_units = planning_units,
                  env_obj =  c('ewr_code', "env_obj"),
                  sdl_units = sdl_units,
                  Specific_goal = c('env_obj', "Specific_goal"),
@@ -63,6 +65,7 @@ make_test_agg <- function(namehistory = TRUE) {
   funseq <- list('CompensatingFactor',
                  'ArithmeticMean',
                  'ArithmeticMean',
+                 'SpatialWeightedMean',
                  "ArithmeticMean",
                  list(wm = ~weighted.mean(., w = area,
                                           na.rm = TRUE)),
@@ -74,8 +77,8 @@ make_test_agg <- function(namehistory = TRUE) {
   # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
   agg_theme_space <- multi_aggregate(sumspat,
                                      aggsequence = aggseq,
-                                     groupers = c('scenario', 'planning_unit_name'),
-                                     group_until = list(planning_unit_name = is_notpoint),
+                                     groupers = c('scenario', 'planning_unit_name', 'gauge'),
+                                     group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint),
                                      aggCols = 'ewr_achieved',
                                      funsequence = funseq,
                                      causal_edges = causal_ewr,

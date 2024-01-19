@@ -16,7 +16,8 @@ multi_aggregate(
   namehistory = TRUE,
   keepAllPolys = FALSE,
   failmissing = TRUE,
-  auto_ewr_PU = FALSE
+  auto_ewr_PU = FALSE,
+  pseudo_spatial = NULL
 )
 }
 \arguments{
@@ -100,6 +101,16 @@ If so, applies grouping by 'planning_unit_name'. The preferred solution is
 to include it in \code{groupers} here (for on-off), or in \code{\link[=multi_aggregate]{multi_aggregate()}} to
 use \code{group_until}. If none of those solutions happen, though, it aborts to
 prevent incorrect pooling over planning units.}
+
+\item{pseudo_spatial}{a character or numeric vector giving the names or
+indices of aggsequence that should have 'psuedo-spatial' aggregation. This
+is when we go from one spatial data level to another, but do the join and
+aggregation with a non-spatial \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}. It is developed for
+the EWR situation, where the incoming data is indexed to gauges and
+planning units, but has gauge point geometry, and spatial joining to
+planning units is not appropriate, because single gauges affect multiple
+units. So it would join to the \code{planning_units} by name instead of
+spatially, and then aggregate according to those units.}
 }
 \value{
 either a tibble or sf of aggregated values at the final level (if
