@@ -384,7 +384,7 @@ make_underover <- function(underover_list,
     # get the type of this underover
     if (all(sf::st_is(uo$underover, c("POLYGON", "MULTIPOLYGON")))) {
       uo_datatype <- "areal"
-    } else if (all(sf::st_is(uo$underover, c("POINT", "LINESTRING", "MULTIPOINT")))) {
+    } else if (all(sf::st_is(uo$underover, c("POINT", "LINESTRING", "MULTIPOINT", "MULTILINESTRING")))) {
       uo_datatype <- "point"
     }
 

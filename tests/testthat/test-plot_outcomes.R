@@ -5,7 +5,9 @@ skip_on_os('linux')
 
 
 ewr_to_agg <- make_test_ewr_prepped()
-agg_theme_space <- make_test_agg(namehistory = FALSE)
+
+# use the noPU style that ignores planning units because it yields better tests (gauges as points over polygons, etc)
+agg_theme_space <- make_test_agg(namehistory = FALSE, style = 'noPU')
 
 # create a quant description of scenarios
 scenarios <- tibble::tibble(scenario = c("base_base", "down4_down4", "up4_up4", 'MAX'), delta = c(1, 0.25, 4, Inf))
