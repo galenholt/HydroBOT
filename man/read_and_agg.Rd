@@ -48,13 +48,14 @@ passing to \code{\link[=general_aggregate]{general_aggregate()}}.}
 
 \item{group_until}{named list of groupers and the step to which they should
 be retained. Default NA (retain all groupers for all steps). \emph{FOR EWR USE,
-best option is} \code{group_until = list('planning_unit_name' = is_notpoint)}.
-This groups by planning unit until larger spatial grouping has happened.
-Step can be an index, name, or a function that evaluates to TRUE or FALSE
-when run on the aggregation sequence. Named list does not need to contain
-all groupers, but if so, those that persist throughout should be given NA
-or numeric values longer than aggsequence. Vectors the length of groupers
-usually work, but are less-well supported.}
+best option is} \code{group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint)}. This groups by planning unit and gauge until larger
+spatial grouping has happened. Leaving 'gauge' off is mathematically safe,
+since the gauge geometry forces that grouping, but then the 'gauge' column
+gets dropped. Step can be an index, name, or a function that evaluates to
+TRUE or FALSE when run on the aggregation sequence. Named list does not
+need to contain all groupers, but if so, those that persist throughout
+should be given NA or numeric values longer than aggsequence. Vectors the
+length of groupers usually work, but are less-well supported.}
 
 \item{aggCols}{an expression for the columns to aggregate (the data columns).
 See \code{selectcreator} for formats}

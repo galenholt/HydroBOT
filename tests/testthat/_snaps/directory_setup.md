@@ -1,17 +1,11 @@
 # scenario paths works for single csvs in each
 
     Code
-      scenario_paths
+      relative_part
     Output
-      $base_base
-      [1] "C:/Users/galen/Documents/code/WERP/WERP_toolkit/inst/extdata/testsmall/hydrographs/base/base.csv"
-      
-      $down4_down4
-      [1] "C:/Users/galen/Documents/code/WERP/WERP_toolkit/inst/extdata/testsmall/hydrographs/down4/down4.csv"
-      
-      $up4_up4
-      [1] "C:/Users/galen/Documents/code/WERP/WERP_toolkit/inst/extdata/testsmall/hydrographs/up4/up4.csv"
-      
+      [1] "extdata/testsmall/hydrographs/base/base.csv"  
+      [2] "extdata/testsmall/hydrographs/down4/down4.csv"
+      [3] "extdata/testsmall/hydrographs/up4/up4.csv"    
 
 # scenario paths and the name fixer works for multiple csvs in each
 

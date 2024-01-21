@@ -16,7 +16,9 @@ test_that("no scenario names if inside scenario", {
 
 test_that("scenario paths works for single csvs in each", {
   scenario_paths <- find_scenario_paths(hydro_dir)
-  expect_snapshot(scenario_paths)
+  # only test the last bit, because the full path changes between `test` and `check`
+  relative_part <- stringr::str_extract(scenario_paths, 'extdata.*')
+  expect_snapshot(relative_part)
 })
 
 test_that("scenario paths and the name fixer works for multiple csvs in each", {
