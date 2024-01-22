@@ -833,6 +833,47 @@ test_that("maps", {
   vdiffr::expect_doppelganger("sdl_basin_background_rel", sdl_basin_background_rel)
 })
 
+test_that("adding color to filled maps", {
+
+
+
+  # Make a minimal map
+  sdl_map_outline <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "ewr_achieved",
+      pal_list = list("scico::berlin"),
+      map_outlinecolor = 'red',
+      facet_col = "env_obj",
+      facet_row = "scenario",
+      sceneorder = c("down4_down4", "base_base", "up4_up4")
+    )
+
+  vdiffr::expect_doppelganger("sdl_map_outline", sdl_map_outline)
+
+  # with underlays, and checking it will remove on the main layer
+  # Make a minimal map
+  sdl_map_outline2 <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "ewr_achieved",
+      pal_list = list("scico::berlin"),
+      map_outlinecolor = NA,
+      facet_col = "env_obj",
+      facet_row = "scenario",
+      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      underlay_list = list(underlay = basin, pal_list = 'azure', map_outlinecolor = 'red')
+    )
+
+  vdiffr::expect_doppelganger("sdl_map_outline2", sdl_map_outline2)
+})
+
 test_that("setLimits works", {
 
 
