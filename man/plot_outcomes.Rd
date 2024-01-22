@@ -29,6 +29,7 @@ plot_outcomes(
   transx = "identity",
   zero_adjust = 0,
   position = "stack",
+  map_outlinecolor = "grey35",
   base_list = NULL,
   smooth_arglist = NULL,
   underlay_list = NULL,
@@ -115,6 +116,8 @@ the same as for baselining, which should go in \code{base_list}}
 \code{\link[ggplot2:geom_bar]{ggplot2::geom_col()}} and \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} (depending on plot type),
 to change from stacked to dodged bars or jitter points. Can be character,
 e.g. 'jitter' or a function, e.g. \code{ggplot2::position_jitter(width = 0.1, height = 0)}}
+
+\item{map_outlinecolor}{color specification for the outline of filled areas on maps. Default 'grey35' seems to be the sf default. NA removes the outline.}
 
 \item{base_list}{NULL (default) or named list of arguments to
 \code{\link[=baseline_compare]{baseline_compare()}};

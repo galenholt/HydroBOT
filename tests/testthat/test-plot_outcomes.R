@@ -1421,10 +1421,13 @@ test_that("heatmaps", {
 
   # baseline, specify breaks
     # NaNs, so expect a warning
+  # some of the values are really just relative to 0, so the random number flips things around very dramatically.
+  set.seed(19)
   sdl_contour_base_breaks <- ostp |>
     dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",

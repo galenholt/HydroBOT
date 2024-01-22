@@ -454,8 +454,8 @@ make_underover <- function(underover_list,
         outcome_plot <- outcome_plot +
           ggplot2::geom_sf(
             data = uprep$data,
-            ggplot2::aes(fill = .data$color,
-                         color = uo$map_outlinecolor)
+            ggplot2::aes(fill = .data$color),
+            color = uo$map_outlinecolor
           )
         outcome_plot <- handle_palettes(outcome_plot,
           aes_type = "fill",

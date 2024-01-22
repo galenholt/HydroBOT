@@ -8,6 +8,7 @@ plot_map(
   prepped,
   underlay_list,
   overlay_list,
+  map_outlinecolor = "grey35",
   outcome_lab,
   facet_wrapper,
   facet_row,
@@ -38,6 +39,8 @@ the main data is points.
 
 \item{overlay_list}{as \code{underlay_list}, but first item might be named
 \verb{"overlay} or \code{"underover"}}
+
+\item{map_outlinecolor}{color specification for the outline of filled areas on maps. Default 'grey35' seems to be the sf default. NA removes the outline.}
 
 \item{outcome_lab}{character, default \code{outcome_col}, allows changing label of
 the outcome_col (y-axis or color/fill)}
