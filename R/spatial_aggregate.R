@@ -57,9 +57,7 @@ spatial_aggregate <- function(dat, to_geo, groupers,
   if (joinby == 'spatial') {
     fromto_pair <- spatial_joiner(dat, to_geo, whichcrs = whichcrs)
   } else if (joinby == 'nonspatial') {
-    dat <- dat |> dplyr::select(-any_of('polyID'))
-      fromto_pair <- dplyr::left_join(sf::st_drop_geometry(dat),
-                                      sf::st_drop_geometry(to_geo))
+    fromto_pair <- pseudo_spatial_joiner(dat, to_geo, prefix)
     } else {
       rlang::abort("code set up to pass column names with joinby, but not fully. If needed, write the last bits to make it work generally.")
       # fromto_pair <- dplyr::left_join(sf::st_drop_geometry(dat),

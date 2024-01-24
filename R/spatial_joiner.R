@@ -111,3 +111,54 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
   return(fromto_data)
 }
 
+
+#' Join two spatial dataframes non-spatially
+#'
+#' This is really just a left join that bypasses the geometry, and has some checks.
+#'
+#' @param from_geo `sf` of the input data to be aggregated
+#' @param to_geo `sf` to aggregate into
+#' @param prefix from spatial_aggregate, only used in error-checking
+#'
+#' @return an sf on the scale of to_geo
+#'
+#' @examples
+pseudo_spatial_joiner <- function(from_geo, to_geo, prefix) {
+  from_geo <- from_geo |> dplyr::select(-any_of('polyID'))
+
+  # There are some situations where the join isnt' present. Normally, this returns NA for unmatched columns, which should be expected behaviour, but we should warn about it, especially because it yields NA geometries.
+  commonnames <- intersect(names(from_geo), names(to_geo))
+  commonnames <- commonnames[!commonnames %in% c('polyID', 'geometry')]
+
+  for (i in 1:length(commonnames)) {
+    uniquefrom_geo <- from_geo |>
+      sf::st_drop_geometry() |>
+      dplyr::select(tidyselect::all_of(commonnames[i])) |>
+      dplyr::distinct() |>
+      dplyr::pull()
+
+    uniqueto <- to_geo |>
+      sf::st_drop_geometry() |>
+      dplyr::select(tidyselect::all_of(commonnames[i])) |>
+      dplyr::distinct() |>
+      dplyr::pull()
+
+    # this is one-way; check anything in from_geo is going to be lost. There can
+    # easily be things in to_geo that don't have anything fed to them.
+    missing_to <- setdiff(uniquefrom_geo, uniqueto)
+
+    if (length(missing_to) > 0) {
+      rlang::warn(glue::glue(c(
+        "Missing matches in join",
+        "!" = "{missing_to} is present in {commonnames} of the input from_geoa, but is not present in the from_geoa being joined (likely {prefix})",
+        "i" = "This will yield NA for joined columns (as it should), but because the from_geoa is spatial, this can cause later issues due to lacking geometry.",
+        "i" = "Because this is expected behaviour from a join, we leave it to the user to decide to pre-drop this from_geoa, expand the joining from_geoaset to include the needed links, or otherwise address it."
+      )))
+    }
+  }
+
+  fromto_pair <- dplyr::left_join(sf::st_drop_geometry(from_geo),
+                                  sf::st_drop_geometry(to_geo))
+
+  return(fromto_pair)
+}
