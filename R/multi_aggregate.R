@@ -19,7 +19,8 @@
 #'   passing to [general_aggregate()].
 #' @param group_until named list of groupers and the step to which they should
 #'   be retained. Default NA (retain all groupers for all steps). *FOR EWR USE,
-#'   best option is* `group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint)`. This groups by planning unit and gauge until larger
+#'   best option is* `group_until = list(planning_unit_name = is_notpoint, gauge
+#'   = is_notpoint)`. This groups by planning unit and gauge until larger
 #'   spatial grouping has happened. Leaving 'gauge' off is mathematically safe,
 #'   since the gauge geometry forces that grouping, but then the 'gauge' column
 #'   gets dropped. Step can be an index, name, or a function that evaluates to
@@ -70,6 +71,9 @@
 #'   functions at a particular step), but increases the size of the dataset and
 #'   the meaning of the values in the aggregation column have to be interpreted
 #'   with the values in the new columns defining history.
+#' @param auto_ewr_PU logical, default `FALSE`. Auto-detect EWRs and enforce
+#'   appropriate theme and spatial scaling related to gauges and planning units,
+#'   as defined in [theme_aggregate()] and [spatial_aggregate()]
 #'
 #' @return either a tibble or sf of aggregated values at the final level (if
 #'   `saveintermediate = FALSE`) or a list of tibbles or sfs with aggregated

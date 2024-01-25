@@ -102,7 +102,6 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
   }
 
 
-  # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
   agg_theme_space <- multi_aggregate(sumspat,
                                      aggsequence = aggseq,
                                      groupers = c('scenario', 'planning_unit_name', 'gauge'),
@@ -111,6 +110,7 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
                                      funsequence = funseq,
                                      causal_edges = causal_ewr,
                                      namehistory = namehistory,
+                                     pseudo_spatial = 'planning_units',
                                      saveintermediate = TRUE)
 
   return(agg_theme_space)

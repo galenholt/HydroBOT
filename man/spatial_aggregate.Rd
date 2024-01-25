@@ -15,7 +15,8 @@ spatial_aggregate(
   keepAllPolys = FALSE,
   failmissing = TRUE,
   prefix = "spatial_",
-  joinby = "spatial"
+  joinby = "spatial",
+  auto_ewr_PU = FALSE
 )
 }
 \arguments{
@@ -73,6 +74,13 @@ and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
 is \code{'spatial_'} instead of \code{'agg_'}.}
 
 \item{joinby}{character, default 'spatial' performs the expected spatial join using geometry, 'nonspatial' performs a \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} by common column names, typically as a result of calling \code{\link[=multi_aggregate]{multi_aggregate()}} with \code{pseudo_spatial = 'planning_units'}.}
+
+\item{auto_ewr_PU}{logical, default FALSE. If TRUE, automatically infers
+whether this is an EWR dataset is undergoing gauge to planning unit aggregation.
+If so, joins data non-spatially (sets \code{joinby = 'nonspatial'}). The preferred solution is
+to use \code{joinby} in \code{\link[=spatial_aggregate]{spatial_aggregate()}} or \code{pseudo_spatial} in \code{\link[=multi_aggregate]{multi_aggregate()}}.
+If none of those solutions happen, though, it aborts to
+prevent incorrectly spatial joining of gauges to planning units.}
 }
 \value{
 an \code{sf} with columns for the grouping variables aggregated into the

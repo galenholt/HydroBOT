@@ -96,12 +96,9 @@ aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
 and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
 \code{tidyselect::any_of()} in \code{tidyselect}}
 
-\item{auto_ewr_PU}{logical, default FALSE. If TRUE, automatically infers
-whether this is an EWR dataset and has not yet been spatially aggregated.
-If so, applies grouping by 'planning_unit_name'. The preferred solution is
-to include it in \code{groupers} here (for on-off), or in \code{\link[=multi_aggregate]{multi_aggregate()}} to
-use \code{group_until}. If none of those solutions happen, though, it aborts to
-prevent incorrect pooling over planning units.}
+\item{auto_ewr_PU}{logical, default \code{FALSE}. Auto-detect EWRs and enforce
+appropriate theme and spatial scaling related to gauges and planning units,
+as defined in \code{\link[=theme_aggregate]{theme_aggregate()}} and \code{\link[=spatial_aggregate]{spatial_aggregate()}}}
 
 \item{pseudo_spatial}{a character or numeric vector giving the names or
 indices of aggsequence that should have 'psuedo-spatial' aggregation. This
