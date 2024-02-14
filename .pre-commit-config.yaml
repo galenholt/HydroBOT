@@ -1,0 +1,11 @@
+# All available hooks: https://pre-commit.com/hooks.html
+# R specific hooks: https://github.com/lorenzwalthert/precommit
+repos:
+-   repo: https://github.com/lorenzwalthert/precommit
+    rev: v0.4.0.9
+    hooks:
+    -   id: style-files
+        args: [--style_pkg=styler, --style_fun=tidyverse_style]
+#    -   id: roxygenize
+    -   id: use-tidy-description
+#    -   id: lintr
