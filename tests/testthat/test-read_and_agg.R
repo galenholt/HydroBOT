@@ -29,7 +29,8 @@ ewr_results <- file.path(temp_parent_dir, "module_output", "EWR")
 # Saving tends to get tested in run_toolkit_params, which is kind of silly, but doing it both places seems silly too
 
 test_that("multi-step theme and spatial works", {
-  skip_on_os("linux")
+
+  skip_on_os('linux')
 
   aggseq <- list(
     ewr_code = c("ewr_code_timing", "ewr_code"),

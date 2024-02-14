@@ -76,3 +76,4 @@ ArithmeticMean <- function(x, na.rm = TRUE) {
 SpatialWeightedMean <- function(x, na.rm = TRUE) {
   y <- stats::weighted.mean(x = x, w = area, na.rm = na.rm)
 }
+

@@ -17,46 +17,41 @@
 clean_long_term <- function(yrpath,
                             saveout = FALSE,
                             outdir, savename) {
+
   # Need to know where this comes from
   obj2yrtargets <- readr::read_csv(yrpath, col_types = readr::cols())
 
   # make the names usable
   names(obj2yrtargets) <- names(obj2yrtargets) |>
-    stringr::str_remove_all("target") |>
-    stringr::str_remove_all(" \\(|\\)") |>
-    stringr::str_replace_all("(^[0-9]+)", "target_\\1") |>
-    stringr::str_replace_all(" ", "_") |>
-    stringr::str_replace_all("years", "year") |>
-    stringr::str_replace("Env_obj", "env_obj")
+    stringr::str_remove_all('target') |>
+    stringr::str_remove_all(' \\(|\\)') |>
+    stringr::str_replace_all('(^[0-9]+)', 'target_\\1') |>
+    stringr::str_replace_all(' ', '_') |>
+    stringr::str_replace_all('years', 'year') |>
+    stringr::str_replace('Env_obj', 'env_obj')
 
   # clean up weird characters
   suppressWarnings(obj2yrtargets <- obj2yrtargets |>
-    dplyr::select(-c(NodeType, env_obj_main, env_obj_number)) |> # Why was this here?
-    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~ stringi::stri_enc_toascii(.))) |>
-    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~ stringr::str_replace_all(., "\032", "-"))) |>
-    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~ stringr::str_replace_all(., "-$", ""))) |>
-    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~ stringr::str_squish(.))))
+                     dplyr::select(-c(NodeType, env_obj_main, env_obj_number)) |> # Why was this here?
+                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringi::stri_enc_toascii(.))) |>
+                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'\032', '-'))) |>
+                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'-$', ''))) |>
+                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_squish(.))))
 
   # save
-  if (saveout == "r") {
+  if (saveout == 'r') {
+
     # Rdata for package structure
-    saveRDS(obj2yrtargets, file = file.path(outdir, "obj2yrtargets.rds"))
-  } else if (saveout == "csv") {
+    saveRDS(obj2yrtargets, file = file.path(outdir, 'obj2yrtargets.rds'))
+  } else if (saveout == 'csv') {
+
     # csv for other
-    readr::write_csv(
-      obj2yrtargets,
-      file.path(
-        outdir,
-        paste0(
-          savename,
-          format(
-            Sys.time(),
-            "%Y%m%d%H%M"
-          ),
-          ".csv"
-        )
-      )
-    )
+    readr::write_csv(obj2yrtargets,
+              file.path(outdir,
+                        paste0(savename,
+                               format(Sys.time(),
+                                      "%Y%m%d%H%M"),
+                               ".csv")))
   }
 
 

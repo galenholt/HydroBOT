@@ -120,7 +120,7 @@ theme_aggregate <- function(dat,
     # Infer EWR from presence in causal_ewr
     ewrnames <- purrr::map(causal_ewr, names) |> unlist()
     isewr <- to_theme %in% ewrnames
-    if (isewr & !"planning_unit_name" %in% groupers) {
+    if (isewr & !'planning_unit_name' %in% groupers) {
       if (!auto_ewr_PU) {
         rlang::abort("EWR outputs should be grouped by `planning_unit_name` until aggregated to larger spatial areas.
                   Preferred method of addressing this is by including as a `grouper` in `theme_aggregate()` or with `group_until` in `multi_aggregate()`.")
@@ -128,8 +128,10 @@ theme_aggregate <- function(dat,
         rlang::inform("EWR outputs should be grouped by `planning_unit_name` until aggregated to larger spatial areas.
                   Preferred method of addressing this is by including as a `grouper` in `theme_aggregate()` or with `group_until` in `multi_aggregate()`,
                       but it is being done automatically in `theme_aggregate()`")
-        groupers <- c(groupers, "planning_unit_name")
+        groupers <- c(groupers, 'planning_unit_name')
       }
+
+
     }
   }
 

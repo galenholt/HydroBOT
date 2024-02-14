@@ -192,6 +192,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   # csv. Some of these steps can take a while, so don't do them if not
   # returning.
   if (returnType[[1]] != "none") {
+
     # some ewr outputs have list-columns, and sometimes within those columns are
     # python datetime objects. Why isn't reticulate translating them? One option
     # is to turn them into characters in python. The other is to do it with

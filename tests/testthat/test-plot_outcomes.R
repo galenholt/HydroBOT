@@ -1,14 +1,14 @@
 # Should be a way to speed this bit up, the first happens again inside the second
 
 # Linux is slightly different than win/mac, so skip all of this
-skip_on_os("linux")
+skip_on_os('linux')
 
 
 ewr_to_agg <- make_test_ewr_prepped()
 agg_theme_space <- make_test_agg(namehistory = FALSE)
 
 # create a quant description of scenarios
-scenarios <- tibble::tibble(scenario = c("base_base", "down4_down4", "up4_up4", "MAX"), delta = c(1, 0.25, 4, Inf))
+scenarios <- tibble::tibble(scenario = c("base_base", "down4_down4", "up4_up4", 'MAX'), delta = c(1, 0.25, 4, Inf))
 
 obj_sdl_to_plot <- agg_theme_space$sdl_units |>
   dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
@@ -45,6 +45,7 @@ obj_pal <- make_pal(
 )
 
 test_that("basin works with single color palette", {
+
   basin_plot <- plot_outcomes(basin_to_plot,
     outcome_col = "ewr_achieved",
     colorset = "Objective",
@@ -57,11 +58,11 @@ test_that("basin works with single color palette", {
 
   # flipping the pal_direction
   basin_plot_pd <- plot_outcomes(basin_to_plot,
-    outcome_col = "ewr_achieved",
-    colorset = "Objective",
-    pal_list = list("scico::oslo"),
-    pal_direction = -1,
-    sceneorder = c("down4_down4", "base_base", "up4_up4")
+                              outcome_col = "ewr_achieved",
+                              colorset = "Objective",
+                              pal_list = list("scico::oslo"),
+                              pal_direction = -1,
+                              sceneorder = c("down4_down4", "base_base", "up4_up4")
   ) +
     ggplot2::theme(legend.position = "none")
 
@@ -69,6 +70,7 @@ test_that("basin works with single color palette", {
 })
 
 test_that("a fixed color works (contrived)", {
+
   basin_plotred <- plot_outcomes(basin_to_plot,
     outcome_col = "ewr_achieved",
     colorset = "Objective",
@@ -111,7 +113,7 @@ test_that("multi-palette and facetting", {
       colorgroups = "env_group",
       colorset = "env_obj",
       pal_list = grouplist,
-      pal_direction = c(1, -1, 1, -1, 1, -1),
+      pal_direction = c(1,-1,1,-1,1,-1),
       facet_wrapper = "SWSDLName",
       sceneorder = c("down4_down4", "base_base", "up4_up4")
     )
@@ -148,6 +150,7 @@ test_that("multi-palette and facetting", {
 })
 
 test_that("flipped", {
+
   # What I want to do is just swap the x and fill arguments and pass in the
   # scenario palette. Can I do that easily?
 
@@ -230,6 +233,7 @@ test_that("flipped", {
 })
 
 test_that("quant x", {
+
   # What I want to do is just use a quantitative x and have it automatically use
   # a line. Can I do that easily?
 
@@ -296,7 +300,7 @@ test_that("quant x", {
   # jittering- set the seed each time or the jitters differ
   set.seed(18)
   sdl_smooth_mean_jf <- obj_sdl_to_plot |>
-    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     plot_outcomes(
       outcome_col = "ewr_achieved",
       x_col = "delta",
@@ -322,7 +326,7 @@ test_that("quant x", {
   # jittering- default
   set.seed(18)
   sdl_smooth_mean_jc <- obj_sdl_to_plot |>
-    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     plot_outcomes(
       outcome_col = "ewr_achieved",
       x_col = "delta",
@@ -376,6 +380,9 @@ test_that("quant x", {
 })
 
 test_that("maps", {
+
+
+
   # Make a minimal map
   sdl_map <- obj_sdl_to_plot |>
     dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
@@ -810,6 +817,9 @@ test_that("maps", {
 })
 
 test_that("setLimits works", {
+
+
+
   # Y-LIMITS
   basin_plot20 <- plot_outcomes(basin_to_plot,
     outcome_col = "ewr_achieved",
@@ -900,7 +910,7 @@ test_that("setLimits works", {
       base_list = list(
         base_lev = "base_base",
         comp_fun = "difference",
-        group_cols = c("env_obj", "polyID")
+        group_cols = c("env_obj", 'polyID')
       )
     )
 
@@ -921,10 +931,10 @@ test_that("setLimits works", {
       base_list = list(
         base_lev = "base_base",
         comp_fun = "relative",
-        group_cols = c("env_obj", "polyID")
+        group_cols = c("env_obj", 'polyID')
       ),
-      zero_adjust = "auto",
-      transoutcome = "log10"
+      zero_adjust = 'auto',
+      transoutcome = 'log10'
     )
 
   vdiffr::expect_doppelganger("line_br", sdl_line_br)
@@ -1012,7 +1022,7 @@ test_that("setLimits works", {
       base_list = list(
         base_lev = "base_base",
         comp_fun = "difference",
-        group_cols = c("env_obj", "polyID")
+        group_cols = c("env_obj", 'polyID')
       )
     )
 
@@ -1032,10 +1042,10 @@ test_that("setLimits works", {
       base_list = list(
         base_lev = "base_base",
         comp_fun = "relative",
-        group_cols = c("env_obj", "polyID")
+        group_cols = c("env_obj", 'polyID')
       ),
-      zero_adjust = "auto",
-      transoutcome = "log10"
+      zero_adjust = 'auto',
+      transoutcome = 'log10'
     )
 
   vdiffr::expect_doppelganger("sdl_map_limitsR", sdl_mapLR)
@@ -1055,10 +1065,10 @@ test_that("setLimits works", {
       base_list = list(
         base_lev = "base_base",
         comp_fun = "relative",
-        group_cols = c("env_obj", "polyID")
+        group_cols = c("env_obj", 'polyID')
       ),
-      zero_adjust = "auto",
-      transoutcome = "log10",
+      zero_adjust = 'auto',
+      transoutcome = 'log10',
       setLimits = c(0.01, 100)
     )
 
@@ -1066,6 +1076,9 @@ test_that("setLimits works", {
 })
 
 test_that("ewr works as in `plot_outcomes_bar`", {
+
+
+
   ewr_to_bar_data <- ewr_to_agg |>
     # just grab the first code_timing
     dplyr::group_by(ewr_code, gauge, scenario) |>
@@ -1115,6 +1128,9 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
 
 
 test_that("facet addition works", {
+
+
+
   sdl_colors_row <- obj_sdl_to_plot |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
@@ -1328,7 +1344,7 @@ test_that("heatmaps", {
 
   # same, contour defaults
   sdl_contour <- ostp |>
-    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     sf::st_drop_geometry() |>
     dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     plot_outcomes(
@@ -1346,9 +1362,9 @@ test_that("heatmaps", {
   vdiffr::expect_doppelganger("sdl_contour", sdl_contour)
 
   # baseline, specify breaks
-  # NaNs, so expect a warning
+    # NaNs, so expect a warning
   sdl_contour_base_breaks <- ostp |>
-    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     sf::st_drop_geometry() |>
     dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     plot_outcomes(
@@ -1373,13 +1389,11 @@ test_that("heatmaps", {
   # specify bins, use transx, transoutcome. Using a difference from lowest to avoid negative numbers so the trnas works
   # and check the auto-drop of geometry
   sdl_contour_base_bin <- ostp |>
-    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     sf::st_drop_geometry() |>
-    dplyr::summarise(
-      ewr_achieved = mean(ewr_achieved),
-      .by = c(env_group, scenario, SWSDLName, delta, adelta)
-    ) |>
-    dplyr::filter(!env_group %in% c("EB", "WB")) |> # ONLY because for some reason there are imperceptible differences for these two between `test` and `build` that trigger an error every time.
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::filter(!env_group %in% c('EB', 'WB')) |> # ONLY because for some reason there are imperceptible differences for these two between `test` and `build` that trigger an error every time.
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1406,10 +1420,8 @@ test_that("heatmaps", {
   expect_error(sdl_heat_overplot <- ostp |>
     sf::st_drop_geometry() |>
     # don't do the grouping correctly
-    dplyr::summarise(
-      ewr_achieved = mean(ewr_achieved),
-      .by = c(env_group, scenario, SWSDLName, delta, adelta)
-    ) |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1424,13 +1436,11 @@ test_that("heatmaps", {
 
   # check sceneorder is transferring where needed. This is contrived and looks terrible, but that's not the point.
   sdl_heat_so <- ostp |>
-    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     sf::st_drop_geometry() |>
     dplyr::filter(SWSDLName == "Lachlan") |>
-    dplyr::summarise(
-      ewr_achieved = mean(ewr_achieved),
-      .by = c(env_group, scenario, delta, adelta)
-    ) |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, delta, adelta)) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1452,12 +1462,10 @@ test_that("heatmaps", {
 
   # interpolated raster
   sdl_heat_interp <- ostp |>
-    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
     sf::st_drop_geometry() |>
-    dplyr::summarise(
-      ewr_achieved = mean(ewr_achieved),
-      .by = c(env_group, scenario, SWSDLName, delta, adelta)
-    ) |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1476,10 +1484,8 @@ test_that("heatmaps", {
   # Qualitative x-y (e.g. named scenario types)
   sdl_heat_char <- ostp |>
     sf::st_drop_geometry() |>
-    dplyr::summarise(
-      ewr_achieved = mean(ewr_achieved),
-      .by = c(env_group, scenario, SWSDLName, delta, adelta)
-    ) |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     dplyr::mutate(
       delta = as.character(delta),
       adelta = as.character(adelta)
@@ -1499,10 +1505,8 @@ test_that("heatmaps", {
 
   sdl_heat_fact <- ostp |>
     sf::st_drop_geometry() |>
-    dplyr::summarise(
-      ewr_achieved = mean(ewr_achieved),
-      .by = c(env_group, scenario, SWSDLName, delta, adelta)
-    ) |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     dplyr::mutate(
       delta = as.factor(delta),
       adelta = as.factor(adelta)
@@ -1548,6 +1552,7 @@ test_that("post-hoc label changes work", {
   sdl_mapLabels <- sdl_mapLabels + ggplot2::labs(x = "LONG", y = "LAT", fill = "TESTFILL", color = "TESTCOL")
 
   vdiffr::expect_doppelganger("sdl_map_limits_labels", sdl_mapLabels)
+
 })
 
 test_that("discrete but non-named colors", {
@@ -1567,14 +1572,12 @@ test_that("discrete but non-named colors", {
 
   # This one translates to integers, very silly, but a test that the reordering holds.
   sdl_plot_groupblock_dcn <- obj_sdl_to_plot |>
-    dplyr::mutate(env_group = dplyr::case_when(
-      env_group == "WB" ~ 1,
-      env_group == "NV" ~ 2,
-      env_group == "EB" ~ 3,
-      env_group == "EF" ~ 4,
-      env_group == "OS" ~ 5,
-      env_group == "NF" ~ 6
-    )) |>
+    dplyr::mutate(env_group = dplyr::case_when(env_group == 'WB' ~ 1,
+                                               env_group == "NV" ~ 2,
+                                               env_group == "EB" ~ 3,
+                                               env_group == "EF" ~ 4,
+                                               env_group == "OS" ~ 5,
+                                               env_group == 'NF' ~ 6)) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       x_col = "scenario",
@@ -1589,4 +1592,5 @@ test_that("discrete but non-named colors", {
   sdl_plot_groupblock_dcn <- sdl_plot_groupblock_dcn +
     ggplot2::labs(x = "SCENARIO", y = "EWR", fill = "GROUP")
   vdiffr::expect_doppelganger("sdl_plot_groupblock_dcn", sdl_plot_groupblock_dcn)
+
 })

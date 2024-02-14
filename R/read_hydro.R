@@ -10,11 +10,11 @@
 #' @export
 #'
 #' @examples
-read_hydro <- function(hydropath, scenariofilter = NULL, long = TRUE, format = "csv", gaugemap = "iqqm") {
-  if (format == "csv") {
+read_hydro <- function(hydropath, scenariofilter = NULL, long = TRUE, format = 'csv', gaugemap = 'iqqm') {
+  if (format == 'csv') {
     return(read_hydro_csv(hydropath, scenariofilter, long))
   }
-  if (format == "nc") {
+  if (format == 'nc') {
     return(read_hydro_nc(hydropath, scenariofilter, long, gaugemap = gaugemap))
   }
 }
@@ -31,19 +31,17 @@ read_hydro <- function(hydropath, scenariofilter = NULL, long = TRUE, format = "
 #'
 #' @examples
 read_hydro_csv <- function(hydropath, scenariofilter, long) {
-  hydro_paths <- find_scenario_paths(hydropath, type = "csv")
+  hydro_paths <- find_scenario_paths(hydropath, type = 'csv')
 
   if (!is.null(scenariofilter)) {
     hydro_paths <- hydro_paths[names(hydro_paths) %in% scenariofilter]
   }
 
   # read-in and extract the names
-  hydros <- purrr::imap(
-    hydro_paths,
-    \(x, idx) readr::read_csv(x, show_col_types = FALSE) |>
-      dplyr::mutate(scenario = idx) |>
-      dplyr::select(scenario, tidyselect::everything())
-  ) |>
+  hydros <- purrr::imap(hydro_paths,
+                        \(x, idx) readr::read_csv(x, show_col_types = FALSE) |>
+                          dplyr::mutate(scenario = idx) |>
+                          dplyr::select(scenario, tidyselect::everything())) |>
     dplyr::bind_rows()
 
 
@@ -66,8 +64,9 @@ read_hydro_csv <- function(hydropath, scenariofilter, long) {
 #'
 #' @examples
 read_hydro_nc <- function(hydropath, scenariofilter, long, gaugemap) {
-  rlang::check_installed(c("metR", "PCICt", "ncdf4"), reason = "reading netcdf hydrographs requires `metR`, which requires `PCICt`.")
-  hydro_paths <- find_scenario_paths(hydropath, type = "nc")
+
+  rlang::check_installed(c('metR', 'PCICt', 'ncdf4'), reason = "reading netcdf hydrographs requires `metR`, which requires `PCICt`.")
+  hydro_paths <- find_scenario_paths(hydropath, type = 'nc')
 
   if (!is.null(scenariofilter)) {
     hydro_paths <- hydro_paths[names(hydro_paths) %in% scenariofilter]
@@ -77,29 +76,29 @@ read_hydro_nc <- function(hydropath, scenariofilter, long, gaugemap) {
   # nco <- ncdf4::nc_open(fp)
   # metR::GlanceNetCDF(fp)
 
-  if (!inherits(gaugemap, "data.frame") && gaugemap == "iqqm") {
+  if (!inherits(gaugemap, "data.frame") && gaugemap == 'iqqm') {
     gaugemap <- get_iqqm_gauges() |>
       dplyr::mutate(node = as.integer(iqqm_node)) |>
       dplyr::select(-iqqm_node)
   }
 
   # we need to purrr over hydro_paths
-  readscenes <- function(x, idx) {
+  readscenes <- function(x,idx) {
     # this is fairly specific to Ash's naming conventions. If that changes, we'll need to be more general
-    if (inherits(gaugemap, "data.frame")) {
+    if (inherits(gaugemap, 'data.frame')) {
       # A major downside of `metR` is that it grabs the closest value. So if we ask for nodes that aren't there, it just grabs something that *is*.
       truenodes <- metR::GlanceNetCDF(x)$dims$node$vals
-      sh <- metR::ReadNetCDF(x, vars = "Simulated flow", subset = list(node = as.list(gaugemap$node[gaugemap$node %in% truenodes]))) |>
-        dplyr::left_join(gaugemap, by = "node") |>
+      sh <- metR::ReadNetCDF(x, vars = 'Simulated flow', subset = list(node = as.list(gaugemap$node[gaugemap$node %in% truenodes]))) |>
+        dplyr::left_join(gaugemap, by = 'node') |>
         dplyr::select(gauge, everything())
     } else {
-      sh <- metR::ReadNetCDF(x, vars = "Simulated flow")
+      sh <- metR::ReadNetCDF(x, vars = 'Simulated flow')
     }
 
     sh <- sh |>
       dplyr::mutate(scenario = idx) |>
       dplyr::select(scenario, tidyselect::everything()) |>
-      dplyr::rename(flow = "Simulated flow")
+      dplyr::rename(flow = 'Simulated flow')
 
     return(sh)
   }
@@ -111,7 +110,7 @@ read_hydro_nc <- function(hydropath, scenariofilter, long, gaugemap) {
   # make the same as the csv version, but retain the node column
   # The any_of there is if we aren't mapping to gauge
   hydros <- hydros |>
-    dplyr::select(scenario, Date = time, any_of("gauge"), flow, node)
+    dplyr::select(scenario, Date = time, any_of('gauge'), flow, node)
 
   if (!long) {
     hydros <- tidyr::pivot_wider(hydros, id_cols = c(scenario, Date), names_from = gauge, values_from = flow)

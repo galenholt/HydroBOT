@@ -24,7 +24,8 @@
 #'
 #' @examples
 spatial_joiner <- function(from_geo, to_geo, whichcrs) {
-  if (!("polyID" %in% names(from_geo))) {
+
+  if (!('polyID' %in% names(from_geo))) {
     # we expect there may be duplicates here
     from_geo <- from_geo |>
       add_polyID(failduplicate = FALSE)
@@ -39,7 +40,7 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
     crs_clean(whichcrs) |>
     sf::st_make_valid()
 
-  to_poly <- to_geo |>
+  to_poly <- to_geo  |>
     dplyr::select(polyID_t = polyID) |>
     dplyr::group_by(polyID_t) |>
     dplyr::slice(1) |> # usual use of dplyr::distinct() checks the polys factorially. slice just indexes.
@@ -54,7 +55,7 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
   # This conditional is annoying, and st_intersection works for points, but
   # it's much slower. And this also lets us auto-calculate area only when needed
   # (e.g. when the input scale *has* area)
-  if (all(sf::st_is(from_geo, "POINT"))) {
+  if (all(sf::st_is(from_geo, 'POINT'))) {
     fromto_pair <- sf::st_join(from_poly, to_poly) |>
       sf::st_drop_geometry()
   } else {
@@ -99,11 +100,12 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
     fromto_pair <- sf::st_drop_geometry(fromto_pair)
   }
 
-  # join the data back on from the relevant polyIDs
-  fromto_data <- from_data |>
-    dplyr::left_join(fromto_pair, by = "polyID_f", relationship = "many-to-many") |>
-    dplyr::left_join(to_data, by = "polyID_t", relationship = "many-to-many") |>
-    dplyr::select(everything(), polyID = polyID_t, -polyID_f)
+    # join the data back on from the relevant polyIDs
+    fromto_data <- from_data |>
+      dplyr::left_join(fromto_pair, by = 'polyID_f', relationship = "many-to-many") |>
+      dplyr::left_join(to_data, by = 'polyID_t', relationship = "many-to-many") |>
+      dplyr::select(everything(), polyID = polyID_t, -polyID_f)
 
   return(fromto_data)
 }
+

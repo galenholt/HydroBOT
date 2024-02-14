@@ -12,20 +12,19 @@
 #' @export
 #'
 #' @examples
-#' safe_imap(as.list(1:10) |> setNames(letters[1:10]),
-#'   \(x, y) ifelse(sample(c(1, 2), 1) == 1,
-#'     stop(), paste(x, y)
-#'   ),
-#'   retries = 10
-#' ) |>
-#'   unlist()
+#'safe_imap(as.list(1:10) |> setNames(letters[1:10]),
+#'                   \(x, y) ifelse(sample(c(1,2), 1) == 1,
+#'                               stop(), paste(x, y)),
+#'                   retries = 10) |>
+#'  unlist()
+#'
 #'
 safe_imap <- function(.x, .f, ..., retries = 0, parallel = FALSE) {
   whicherrors <- 1:length(.x)
-  full_results <- vector(mode = "list", length = length(.x))
+  full_results <- vector(mode = 'list', length = length(.x))
   # the indices, to track which are being filled/left
   orig_indices <- 1:length(.x)
-  counter <- 0
+  counter = 0
 
   while (length(whicherrors) > 0 & counter <= retries) {
     # run the purrr
@@ -34,23 +33,20 @@ safe_imap <- function(.x, .f, ..., retries = 0, parallel = FALSE) {
     }
     if (parallel) {
       im_out <- furrr::future_imap(.x, purrr::safely(.f),
-        .options = furrr::furrr_options(seed = TRUE)
-      )
+                               .options = furrr::furrr_options(seed = TRUE))
     }
     # get the results, dropping the NULLs
-    results_out <- purrr::map(im_out, purrr::pluck("result"))
+    results_out <- purrr::map(im_out, purrr::pluck('result'))
 
     # if we want the errors, we could put in a debug here
-    error_out <- purrr::map(im_out, purrr::pluck("result"))
+    error_out <- purrr::map(im_out, purrr::pluck('result'))
 
     # replace the indices that were errors with new data. Some might still be errors, they will fill subsequently
     full_results[orig_indices] <- results_out
 
     # where are the errors
-    whicherrors <- purrr::map(
-      im_out,
-      \(x) rlang::is_error(x$error)
-    ) |>
+    whicherrors <- purrr::map(im_out,
+                              \(x) rlang::is_error(x$error)) |>
       unlist() |>
       which()
 
@@ -61,6 +57,7 @@ safe_imap <- function(.x, .f, ..., retries = 0, parallel = FALSE) {
     orig_indices <- orig_indices[whicherrors]
 
     counter <- counter + 1
+
   }
 
   if (length(whicherrors) > 0) {

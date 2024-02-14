@@ -47,11 +47,14 @@
 #' @export
 #'
 #' @examples
+#'
 general_aggregate <- function(data, groupers,
                               aggCols, funlist,
-                              prefix = "agg_",
+                              prefix = 'agg_',
                               failmissing = TRUE,
                               ...) {
+
+
   # Clean up groupers and aggCols from various formats and ensure only present
   # columns are included as character vectors. We're in this mess because some
   # of the rlang breaks with depth
@@ -59,19 +62,18 @@ general_aggregate <- function(data, groupers,
   aggCols <- selectcreator(rlang::enquo(aggCols), data, failmissing)
 
   if (!is.character(groupers) || !is.character(aggCols)) {
-    rlang::abort("the new way of enforcing characters is not working, we have tidyselect still. back to `{{}}` in the `across`")
+    rlang::abort('the new way of enforcing characters is not working, we have tidyselect still. back to `{{}}` in the `across`')
   }
 
   # typical name parsing
-  nameparser <- paste0(prefix, "{.fn}_{.col}")
+  nameparser = paste0(prefix, '{.fn}_{.col}')
 
   # if a quosure, just do the processing and return
   if (rlang::is_quosure(funlist)) {
     data_agg <- data |>
       dplyr::group_by(dplyr::across(all_of(groupers))) |>
       dplyr::summarise(dplyr::across(all_of(aggCols), !!funlist, ...,
-        .names = nameparser
-      )) |>
+                                     .names = nameparser)) |>
       dplyr::ungroup()
 
     return(data_agg)
@@ -82,60 +84,56 @@ general_aggregate <- function(data, groupers,
     # make funlist a named list whether it comes in that way or as a character vector
     if (is.null(names(funlist))) {
       funnam <- as.character(substitute(funlist))
-      if (funnam[1] == "c") {
-        funnam <- funnam[2:length(funnam)]
-      }
+      if(funnam[1] == "c") {funnam <- funnam[2:length(funnam)]}
     } else {
       funnam <- names(funlist)
     }
 
-    funlist <- functionlister({{ funlist }}, forcenames = funnam)
+    funlist <- functionlister({{funlist}}, forcenames = funnam)
+
   } else {
     # if funlist is a bare function, leave it alone but get its name
     # https://stackoverflow.com/questions/1567718/getting-a-function-name-as-a-string
     funname <- as.character(substitute(funlist))
     # https://cran.r-project.org/web/packages/dplyr/vignettes/programming.html
-    nameparser <- paste0(prefix, funname, "_{.col}")
+    nameparser <- paste0(prefix, funname,'_{.col}')
   }
 
 
   # Try, and if fail, force with characters. Should I just go straight for characters? It seems so clunky I'd rather not.
-  data_agg <- try(
-    data |>
-      dplyr::group_by(dplyr::across(all_of(groupers))) |>
-      dplyr::summarise(dplyr::across(all_of(aggCols), {{ funlist }}, ...,
-        .names = nameparser
-      )) |>
-      dplyr::ungroup(),
-    silent = TRUE
-  )
+  data_agg <- try(data |>
+    dplyr::group_by(dplyr::across(all_of(groupers))) |>
+    dplyr::summarise(dplyr::across(all_of(aggCols), {{funlist}}, ...,
+                                   .names = nameparser)) |>
+    dplyr::ungroup(),
+    silent = TRUE)
 
-  if (inherits(data_agg, "try-error")) {
+  if (inherits(data_agg, 'try-error')) {
     # turn the list into characters. Eval can't handle `return`, so make an
     # attempt to get rid of it, though this is likely fragile.
     if (is.character(funlist)) {
       charfun <- funlist
     } else {
-      charfun <- paste0(deparse(funlist), collapse = "")
+      charfun <- paste0(deparse(funlist), collapse = '')
     }
 
     # add rlang::quo unless it's already there.
     if (!grepl("quo", charfun)) {
-      charfun <- paste0(c("rlang::quo(", charfun, ")"), collapse = "")
+      charfun <- paste0(c("rlang::quo(", charfun, ")"), collapse = '')
     }
-    charfun <- stringr::str_remove_all(charfun, "return\\([A-z]\\)")
+    charfun <- stringr::str_remove_all(charfun, 'return\\([A-z]\\)')
     # FUNS2 <- eval(parse(text = charfun)) # base R
     FUNS_quo <- rlang::eval_tidy(rlang::parse_expr(charfun)) # rlang claims to be faster?
 
     # go again
     data_agg <- data |>
       dplyr::group_by(dplyr::across(all_of(groupers))) |>
-      dplyr::summarise(dplyr::across(all_of(aggCols), {{ FUNS_quo }}, ...,
-        .names = nameparser
-      )) |>
+      dplyr::summarise(dplyr::across(all_of(aggCols), {{FUNS_quo}}, ...,
+                                     .names = nameparser)) |>
       dplyr::ungroup()
   }
 
 
   return(data_agg)
 }
+

@@ -14,9 +14,7 @@
 #' @export
 #'
 #' @examples
-difference <- function(x, y) {
-  x - y
-}
+difference <- function(x,y) {x-y}
 
 # Relative provides an add_eps argument to prevent divide by zero. need to add
 # to both, because otherwise at low flows the others drop below when they
@@ -34,14 +32,13 @@ difference <- function(x, y) {
 #' @export
 #'
 #' @examples
-relative <- function(x, y, add_eps = 0) {
-  if (add_eps == "auto") {
-    allvals <- c(x, y)
+relative <- function(x,y, add_eps = 0) {
+  if (add_eps == 'auto') {
+    allvals <- c(x,y)
     add_eps <- min(allvals[allvals > 0],
-      na.rm = TRUE
-    ) / 2
+                   na.rm = TRUE)/2
   }
-  (x + add_eps) / (y + add_eps)
+  (x + add_eps)/(y + add_eps)
 }
 
 
@@ -57,20 +54,19 @@ relative <- function(x, y, add_eps = 0) {
 #' @export
 #'
 #' @examples
-oddsratio <- function(x, y, add_eps = 0) {
+oddsratio <- function(x,y, add_eps = 0) {
   if (any(x > 1 | x < 0 | y > 1 | y < 0)) {
     rlang::abort("odds ratios need data on 0-1")
   }
-  if (add_eps == "auto") {
+  if (add_eps == 'auto') {
     # get the minimum
-    allvals <- c(x, y)
+    allvals <- c(x,y)
     add_eps <- min(allvals[allvals > 0],
-      na.rm = TRUE
-    ) / 2
+                   na.rm = TRUE)/2
   }
   x[x == 0] <- add_eps
   y[y == 0] <- add_eps
-  x[x == 1] <- 1 - add_eps
-  y[y == 1] <- 1 - add_eps
-  (x / (1 - x)) / (y / (1 - y))
+  x[x == 1] <- 1-add_eps
+  y[y == 1] <- 1-add_eps
+  (x / (1-x)) / (y / (1-y))
 }

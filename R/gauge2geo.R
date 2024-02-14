@@ -1,6 +1,6 @@
 #' Pairs gauge numbers with geographic locations to make an `sf`
 #'
-#' Typically used for EWR outputs, but anything with a `gauge` column with gauge numbers as characters will work.
+#'Typically used for EWR outputs, but anything with a `gauge` column with gauge numbers as characters will work.
 #'
 #' @param gaugedf A tibble or dataframe with a `gauge` column with gauge numbers as characters
 #' @param gaugelocs sf or path to the csv with gauge numbers paired with lat-long.
@@ -15,29 +15,24 @@ gauge2geo <- function(gaugedf, gaugelocs, whichcrs = 4283) {
   # the parsing failure warnings are because of the undefineds that i then remove
 
   # Get filetype if needed to read-in
-  if (!inherits(gaugelocs, "sf")) {
-    if (grepl("*.csv", gaugelocs)) {
-      filetype <- "csv"
-    }
-    if (grepl("*.shp", gaugelocs)) {
-      filetype <- "shp"
-    }
+  if(!inherits(gaugelocs, 'sf')) {
+    if (grepl('*.csv', gaugelocs)) {filetype <- 'csv'}
+    if (grepl('*.shp', gaugelocs)) {filetype <- 'shp'}
 
-    if (filetype == "csv") {
+    if (filetype == 'csv') {
       gaugelocs <- readr::read_csv(gaugelocs) |>
-        dplyr::rename(site = "site name", gauge = "gauge number") |>
+        dplyr::rename(site = 'site name', gauge = 'gauge number') |>
         # lat an long come in as chr because there is a line for 'undefined'
-        dplyr::filter(.data$site != "undefined") |>
-        dplyr::mutate(
-          lat = as.numeric(.data$lat),
-          lon = as.numeric(.data$lon)
-        ) |>
-        sf::st_as_sf(coords = c("lon", "lat"), crs = 4326)
+        dplyr::filter(.data$site != 'undefined') |>
+        dplyr::mutate(lat = as.numeric(.data$lat),
+                      lon = as.numeric(.data$lon)) |>
+        sf::st_as_sf(coords = c('lon', 'lat'), crs = 4326)
     }
 
-    if (filetype == "shp") {
+    if (filetype == 'shp') {
       gaugelocs <- sf::read_sf(gaugelocs)
     }
+
   }
 
   # # handle either an sf of gauge locations or a character filepath.
@@ -57,7 +52,8 @@ gauge2geo <- function(gaugedf, gaugelocs, whichcrs = 4283) {
   #   }
   # }
 
-  gaugedf <- dplyr::left_join(gaugedf, gaugelocs, by = "gauge") |>
+  gaugedf <- dplyr::left_join(gaugedf, gaugelocs, by = 'gauge') |>
     sf::st_as_sf() |>
     sf::st_transform(whichcrs)
 }
+
