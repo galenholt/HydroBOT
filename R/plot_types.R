@@ -123,13 +123,14 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
     aes_type = "color",
     pal_list = prepped$pal_list,
     color_type = prepped$color_type,
-    pal_direction = prepped$direction)
+    pal_direction = prepped$direction
+  )
 
   outcome_plot <- handle_palettes(outcome_plot,
     aes_type = "fill",
     prepped$pal_list, prepped$color_type,
-    pal_direction = prepped$direction)
-
+    pal_direction = prepped$direction
+  )
 }
 
 #' Title

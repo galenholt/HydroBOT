@@ -8,13 +8,14 @@
 #'
 #' @examples
 functionlister <- function(funs, forcenames = NULL) {
-
   # if this is nested, there's no good way to get names for the cases with bare
   # functions, so allow forcing.
   if (is.null(forcenames)) {
     funnames <- as.character(substitute(funs))
     # if bare names are c(name, name), the c gets included, so cut it
-    if(funnames[1] == "c") {funnames <- funnames[2:length(funnames)]}
+    if (funnames[1] == "c") {
+      funnames <- funnames[2:length(funnames)]
+    }
   } else {
     funnames <- forcenames
   }
@@ -22,7 +23,7 @@ functionlister <- function(funs, forcenames = NULL) {
   # I could parse character-wrapped lists here, e.g. I'm not sure if this is too
   # much complication, and we should just let the parsing in general_aggregate
   # handle the characters or not.
-  if (length(funs) == 1 && is.character(funs) && grepl('^list', funs)) {
+  if (length(funs) == 1 && is.character(funs) && grepl("^list", funs)) {
     funs <- rlang::eval_tidy(rlang::parse_expr(funs))
   }
 
@@ -34,11 +35,10 @@ functionlister <- function(funs, forcenames = NULL) {
     if (is.function(funs[[1]])) {
       names(funlist) <- funnames
     }
-
   } else if (is.character(funs)) {
     funlist <- try(mget(funs, inherits = TRUE), silent = TRUE)
     # Handle the situation of nothing to mget- try just returning the character and hope it works in an `eval` in `general_aggregate`
-    if (inherits(funlist, 'try-error')) {
+    if (inherits(funlist, "try-error")) {
       funlist <- funs
     }
   } else if (is.function(funs)) {

@@ -8,6 +8,6 @@
 #'
 #' @examples
 as_colors <- function(colvec) {
-  class(colvec) <- 'colors'
+  class(colvec) <- "colors"
   return(colvec)
 }
