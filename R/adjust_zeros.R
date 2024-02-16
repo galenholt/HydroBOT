@@ -9,28 +9,30 @@
 #' @return dataframe with no zeros in `adjust_col`
 
 adjust_zeros <- function(data, adjust_col, amount, onlyzeros = FALSE) {
-
   # handle 'auto' adjustment
-  if (grepl('auto', amount)) {
-    amount <- min(abs(data[[adjust_col]])[data[[adjust_col]] != 0], na.rm = TRUE)*0.1
+  if (grepl("auto", amount)) {
+    amount <- min(abs(data[[adjust_col]])[data[[adjust_col]] != 0], na.rm = TRUE) * 0.1
   }
 
   # a function to do the adjust in a mutate
   adjfun <- function(x) {
-    adjust_dir <- dplyr::case_when(all(x >= 0, na.rm = TRUE) ~ 'pos',
-                                   all(x <= 0, na.rm = TRUE) ~ 'neg',
-                                   .default = 'both')
+    adjust_dir <- dplyr::case_when(all(x >= 0, na.rm = TRUE) ~ "pos",
+      all(x <= 0, na.rm = TRUE) ~ "neg",
+      .default = "both"
+    )
     if (onlyzeros) {
       zeroamount <- 0
     } else {
-        zeroamount <- amount
+      zeroamount <- amount
     }
 
-    adjx <- dplyr::case_when(x > 0 ~ x + zeroamount,
-                             x < 0 ~ x - zeroamount,
-                             x == 0  & adjust_dir == 'pos' ~ x + amount,
-                             x == 0  & adjust_dir == 'neg' ~ x - amount,
-                             x == 0  & adjust_dir == 'both' ~ x + sample(c(amount, -1*amount), 1))
+    adjx <- dplyr::case_when(
+      x > 0 ~ x + zeroamount,
+      x < 0 ~ x - zeroamount,
+      x == 0 & adjust_dir == "pos" ~ x + amount,
+      x == 0 & adjust_dir == "neg" ~ x - amount,
+      x == 0 & adjust_dir == "both" ~ x + sample(c(amount, -1 * amount), 1)
+    )
   }
 
   # mutate
@@ -38,6 +40,4 @@ adjust_zeros <- function(data, adjust_col, amount, onlyzeros = FALSE) {
     dplyr::mutate(dplyr::across(tidyselect::all_of(adjust_col), adjfun))
 
   return(data)
-
-
 }

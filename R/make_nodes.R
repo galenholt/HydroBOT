@@ -20,15 +20,15 @@
 #' @export
 #'
 #' @examples
-#'
-make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
-
+make_nodes <- function(edgedf, groupers = NULL, typeorder = "werp") {
   # make the default node order- some may not be passed in, but this defines how
   # they should appear on the graph if they exist
-  if (typeorder == 'werp') {
-    typeorder <- c('ewr_code', 'env_obj', 'Env_obj_main',
-                   'Specific_goal', 'Objective', 'Target',
-                   'target_5_year_2024', 'target_10_year_2029', 'target_20_year_2039')
+  if (typeorder == "werp") {
+    typeorder <- c(
+      "ewr_code", "env_obj", "Env_obj_main",
+      "Specific_goal", "Objective", "Target",
+      "target_5_year_2024", "target_10_year_2029", "target_20_year_2039"
+    )
   }
 
   # typeorder could be a df or a character vector
@@ -38,7 +38,7 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
   } else if (is.data.frame(typeorder)) {
     nodetib <- typeorder
   } else {
-    stop('typeorder not a df or character vector')
+    stop("typeorder not a df or character vector")
   }
 
 
@@ -63,19 +63,19 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
   # based on nodetype
   realisedorders <- nodetib |>
     dplyr::filter(NodeType %in% unique(allnodes$NodeType)) |>
-    dplyr::mutate(shiftorders = (nodeorder - min(nodeorder)) + 1,
-           ordersteps = cumsum(c(0, (diff(shiftorders)-1))),
-           neworders = shiftorders - ordersteps) |>
+    dplyr::mutate(
+      shiftorders = (nodeorder - min(nodeorder)) + 1,
+      ordersteps = cumsum(c(0, (diff(shiftorders) - 1))),
+      neworders = shiftorders - ordersteps
+    ) |>
     dplyr::select(NodeType, nodeorder = neworders)
 
   # Join o get the orders set
-  allnodes <- dplyr::left_join(allnodes, realisedorders, by = 'NodeType')
+  allnodes <- dplyr::left_join(allnodes, realisedorders, by = "NodeType")
 
   # Remove nodes with NA names- that's not usable
   allnodes <- allnodes |>
     dplyr::filter(!is.na(Name))
 
   return(allnodes)
-
 }
-

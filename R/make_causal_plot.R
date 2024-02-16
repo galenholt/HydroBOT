@@ -57,11 +57,11 @@ make_causal_plot <- function(nodes, edges,
                              drop_unused_nodes = TRUE,
                              edge_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
                              edge_colorgroups = NULL,
-                             edge_colorset = 'fromtype',
+                             edge_colorset = "fromtype",
                              edge_pal_direction = rep(1, length(edge_pal)),
                              node_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
                              node_colorgroups = NULL,
-                             node_colorset = 'NodeType',
+                             node_colorset = "NodeType",
                              node_pal_direction = rep(1, length(node_pal)),
                              setLimits = NULL,
                              wrap_names = TRUE,
@@ -79,8 +79,10 @@ make_causal_plot <- function(nodes, edges,
   # IF WE"RE GOING TO WRAP NAMES IT NEEDS TO HAPPEN BY HERE or the rest of this doesn't match
   if (wrap_names) {
     edges <- edges |>
-      dplyr::mutate(from = stringr::str_wrap(from, 40),
-             to = stringr::str_wrap(to, 40))
+      dplyr::mutate(
+        from = stringr::str_wrap(from, 40),
+        to = stringr::str_wrap(to, 40)
+      )
     nodes <- nodes |>
       dplyr::mutate(Name = stringr::str_wrap(Name, 40))
   }
@@ -101,19 +103,23 @@ make_causal_plot <- function(nodes, edges,
   }
 
   # colors
-  edges <- causal_colors_general(df = edges,
-                                 pal_list = edge_pal,
-                                 pal_direction = edge_pal_direction,
-                                   colorgroups = edge_colorgroups,
-                                 colorset = edge_colorset,
-                                 setLimits = setLimits)
+  edges <- causal_colors_general(
+    df = edges,
+    pal_list = edge_pal,
+    pal_direction = edge_pal_direction,
+    colorgroups = edge_colorgroups,
+    colorset = edge_colorset,
+    setLimits = setLimits
+  )
 
-  nodes <- causal_colors_general(df = nodes,
-                                 pal_list = node_pal,
-                                 pal_direction = node_pal_direction,
-                                 colorgroups = node_colorgroups,
-                                 colorset = node_colorset,
-                                 setLimits = setLimits)
+  nodes <- causal_colors_general(
+    df = nodes,
+    pal_list = node_pal,
+    pal_direction = node_pal_direction,
+    colorgroups = node_colorgroups,
+    colorset = node_colorset,
+    setLimits = setLimits
+  )
 
   # deal with names, position, shape etc
   nodes <- node_plot_atts(nodes)
@@ -131,36 +137,41 @@ make_causal_plot <- function(nodes, edges,
     DiagrammeR::add_nodes_from_table(
       table = nodes,
       label_col = Name,
-      type_col = NodeType) |>
+      type_col = NodeType
+    ) |>
     DiagrammeR::add_edges_from_table(
       table = edges,
       from_col = from,
       to_col = to,
-      from_to_map = label) |>
-
+      from_to_map = label
+    ) |>
     DiagrammeR::add_global_graph_attrs(
       attr = c("layout", "splines"),
       value = c("neato", "true"),
-      attr_type = c("graph", "graph"))
+      attr_type = c("graph", "graph")
+    )
 
   if (render) {
     print(causalnetwork |>
-            DiagrammeR::render_graph())
+      DiagrammeR::render_graph())
   }
 
   if (save) {
     causalnetwork |>
-      DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(savename,
-                                                        '.png')))
+      DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(
+        savename,
+        ".png"
+      )))
 
 
     causalnetwork |>
-      DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(savename,
-                                                        '.pdf')))
+      DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(
+        savename,
+        ".pdf"
+      )))
   }
 
   if (returnnetwork) {
     return(causalnetwork)
   }
-
 }

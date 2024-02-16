@@ -15,7 +15,6 @@ params:
 #| echo: false
 
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
-
 ```
 
 ```{r}
@@ -77,10 +76,12 @@ The code here currently reads the EWR definitions table from the MDBA, the table
 These will need to be set whether used as a notebook or be passed in as arguments to a wrapper function. They just set the location of the relevant input files and creates a directory for the outputs. Once on the MDBA system, this might be able to be hardcoded, or at least given default values. *I'm setting it up currently as is standard practice for an R package*.
 
 ```{r}
-datarawdir <- 'data-raw/causal_networks'
-dataoutdir <- 'data'
+datarawdir <- "data-raw/causal_networks"
+dataoutdir <- "data"
 
-if (!dir.exists(dataoutdir)) {dir.create(dataoutdir, recursive = TRUE)} 
+if (!dir.exists(dataoutdir)) {
+  dir.create(dataoutdir, recursive = TRUE)
+}
 ```
 
 Known file sources- the ewr definitions and the ltwp table.
@@ -89,18 +90,20 @@ Known file sources- the ewr definitions and the ltwp table.
 
 ```{r}
 # Get ewr defs from MDBA- This is a cached version, since WatReqID has gone
-ewrs <- file.path(datarawdir, 'ewr_obj_codes_nsw/obj_codes_dec22.csv')
+ewrs <- file.path(datarawdir, "ewr_obj_codes_nsw/obj_codes_dec22.csv")
 ```
 
 Unknown file sources- these give nearly all links above environmental objectives (Theme group, Species, yearly targets). Some incorporate manual QC by Renee, but it's still not clear where the originals came from either sometimes.
 
 ```{r}
-tarpath <- file.path(datarawdir, 'unknown', "Env_objectives_Target_species_nodes.csv")
+tarpath <- file.path(datarawdir, "unknown", "Env_objectives_Target_species_nodes.csv")
 
-qcs <- c(file.path(datarawdir, 'unknown', "Target_species_per_PU_Murray.csv"),
-         file.path(datarawdir, 'unknown', "PUs.csv"))
+qcs <- c(
+  file.path(datarawdir, "unknown", "Target_species_per_PU_Murray.csv"),
+  file.path(datarawdir, "unknown", "PUs.csv")
+)
 
-timepath <- file.path(datarawdir, 'unknown', "EObjYrTargets.csv")
+timepath <- file.path(datarawdir, "unknown", "EObjYrTargets.csv")
 ```
 
 Do we want to look at those? They're pretty ugly. Easy enough to throw a cell in here if so.
@@ -116,33 +119,36 @@ I've gone back and forth on a saving default. I think I'll default to not save t
 Links between EWRs and environmental objectives. I'm returning at the gauge scale, but we could also map at the LTWP areas only if we wanted (that's the scale of the NSW mapping).
 
 ```{r}
-
-ewr2obj <- clean_ewr_obj(ewrobjpath = ewrs,
-               gaugescale = TRUE,
-               saveout = saver,
-               outdir = datout,
-               savename = "ewr_to_objectives_")
+ewr2obj <- clean_ewr_obj(
+  ewrobjpath = ewrs,
+  gaugescale = TRUE,
+  saveout = saver,
+  outdir = datout,
+  savename = "ewr_to_objectives_"
+)
 ```
 
 Clean links from Objectives to 'targets'
 
 ```{r}
-
-obj2target <- clean_obj_target(ewrobjs = ewr2obj,
-                               targetpath = tarpath,
-                               qcfiles = qcs,
-                               saveout = saver,
-                               outdir = datout,
-                               savename = "obj_to_target_")
+obj2target <- clean_obj_target(
+  ewrobjs = ewr2obj,
+  targetpath = tarpath,
+  qcfiles = qcs,
+  saveout = saver,
+  outdir = datout,
+  savename = "obj_to_target_"
+)
 ```
 
 Clean links from Objectives to long-term planning
 
 ```{r}
 yrtarget <- clean_long_term(timepath,
-                               saveout = saver,
-                               outdir = datout,
-                               savename = "obj_to_yrtarget_")
+  saveout = saver,
+  outdir = datout,
+  savename = "obj_to_yrtarget_"
+)
 ```
 
 Looking forward to having more than just the EWRs, it's likely we'll want to be able to have each set of causal relationships packaged up into a single file, likely as a list. `saveRDS` allows reading in with a different name.
@@ -157,7 +163,6 @@ if (params$REBUILD_DATA) {
   # saveRDS(causal_ewr,
   #    file = file.path(datout, 'causal_ewr.rds'))
 }
-
 ```
 
 I think rather than a wrapper, we leave this as a long qmd/script, so we can see where the data is coming from and it's processing- this isn't analysis, it's background package work.
@@ -181,7 +186,7 @@ obj2target |> dplyr::select(PlanningUnitID, env_obj, Specific_goal, Objective, T
 The `yrtarget` dataset has environmental objectives mapped to `Target` and `Objective` (again), and the 5, 10, and 20 year targets. This is not referenced to either gauges or Planning Units.
 
 ```{r}
-yrtarget |> dplyr::select(env_obj, Target, Objective, tidyselect::starts_with('target'), everything())
+yrtarget |> dplyr::select(env_obj, Target, Objective, tidyselect::starts_with("target"), everything())
 ```
 
 ### Next

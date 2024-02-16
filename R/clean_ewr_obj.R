@@ -18,19 +18,20 @@ clean_ewr_obj <- function(ewrobjpath,
                           gaugescale = TRUE,
                           saveout = FALSE,
                           outdir, savename) {
-
   # read in and minor cleanup
-  ewr2obj <- readr::read_csv(ewrobjpath, show_col_types = FALSE)  |>
-    dplyr::rename(ewr_code = EWR,
-                  # These are nearly sdl units, but the name 'LTWPShortName' comes from the EWR tool itself
-                  LTWPShortName = Planning_area) |>
+  ewr2obj <- readr::read_csv(ewrobjpath, show_col_types = FALSE) |>
+    dplyr::rename(
+      ewr_code = EWR,
+      # These are nearly sdl units, but the name 'LTWPShortName' comes from the EWR tool itself
+      LTWPShortName = Planning_area
+    ) |>
     dplyr::distinct()
 
   # separate out the Objectives into rows- we want a row for each Plannin_area, EWR, Objective combo.
   ewr2obj <- ewr2obj |>
     # Some annoying typos with spaces and ., and we need to split the comma seps
-    dplyr::mutate(env_obj = stringr::str_remove_all(Objectives, ' ')) |>
-    dplyr::mutate(env_obj = stringr::str_split(env_obj, ',|\\.')) |>
+    dplyr::mutate(env_obj = stringr::str_remove_all(Objectives, " ")) |>
+    dplyr::mutate(env_obj = stringr::str_split(env_obj, ",|\\.")) |>
     dplyr::select(-Objectives) |>
     tidyr::unnest_longer(env_obj)
 
@@ -44,8 +45,7 @@ clean_ewr_obj <- function(ewrobjpath,
       dplyr::select(PlanningUnitID, planning_unit_name = PlanningUnitName, LTWPShortName, gauge = Gauge, ewr_code = Code) |>
       separate_ewr_codes()
 
-    ewr2obj <- dplyr::left_join(ewrs_in_pyewr, ewr2obj, by = c('LTWPShortName', 'ewr_code', 'ewr_code_timing'))
-
+    ewr2obj <- dplyr::left_join(ewrs_in_pyewr, ewr2obj, by = c("LTWPShortName", "ewr_code", "ewr_code_timing"))
   }
 
   # don't save NAs and make it a tibble
@@ -56,22 +56,26 @@ clean_ewr_obj <- function(ewrobjpath,
   attr(ewr2obj, "pandas.index") <- NULL
 
   # save
-  if (saveout == 'r') {
-
+  if (saveout == "r") {
     # Rdata for package structure
-    saveRDS(ewr2obj, file = file.path(outdir, 'ewr2obj.rds'))
-
-  } else if (saveout == 'csv') {
-
+    saveRDS(ewr2obj, file = file.path(outdir, "ewr2obj.rds"))
+  } else if (saveout == "csv") {
     # csv for other
-    readr::write_csv(ewr2obj,
-              file.path(outdir,
-                        paste0(savename,
-                               format(Sys.time(),
-                                      "%Y%m%d%H%M"),
-                               ".csv")))
+    readr::write_csv(
+      ewr2obj,
+      file.path(
+        outdir,
+        paste0(
+          savename,
+          format(
+            Sys.time(),
+            "%Y%m%d%H%M"
+          ),
+          ".csv"
+        )
+      )
+    )
   }
 
   return(ewr2obj)
-
 }

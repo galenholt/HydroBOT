@@ -17,7 +17,6 @@ Rebuilding data is done with params. To rebuild, at the terminal run `quarto ren
 #| warning: false
 #| message: false
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
-
 ```
 
 ```{r}
@@ -51,9 +50,9 @@ Use the `testsmall/` directory for development. 6 gauges in 2 catchments.
 # 'testscenarios' is 10 years and 40+ gauges, slower but better for testing whole toolkit, especially aggregation
 # hydro_dir = os.path.join(repo, 'demo_data', 'testsmall')
 
-hydro_dir = file.path("inst/extdata/testsmall/hydrographs")
+hydro_dir <- file.path("inst/extdata/testsmall/hydrographs")
 
-project_dir =file.path("inst/extdata/testsmall")
+project_dir <- file.path("inst/extdata/testsmall")
 ```
 
 ### Format
@@ -66,7 +65,7 @@ Tell it the format- typically will be IQQM, at least for a while
 # 'IQQM - NSW 10,000 years'
 # 'Source - NSW (res.csv)'
 
-model_format = 'IQQM - NSW 10,000 years'
+model_format <- "IQQM - NSW 10,000 years"
 ```
 
 ### Climate info
@@ -77,15 +76,15 @@ These have been deprecated in `py-ewr` as of 2.1
 
 ```{r}
 #| eval: false
-MINT = (100 - 0)/100
-MAXT = (100 + 0 )/100
-DUR = (100 - 0 )/100
-DRAW = (100 -0 )/100
+MINT <- (100 - 0) / 100
+MAXT <- (100 + 0) / 100
+DUR <- (100 - 0) / 100
+DRAW <- (100 - 0) / 100
 
 # hoping this works to pass a list instead of a dict
-allowance = list('minThreshold' = MINT, 'maxThreshold' = MAXT, 'duration' = DUR, 'drawdown' = DRAW)
+allowance <- list("minThreshold" = MINT, "maxThreshold" = MAXT, "duration" = DUR, "drawdown" = DRAW)
 
-climate = 'Standard - 1911 to 2018 climate categorisation'
+climate <- "Standard - 1911 to 2018 climate categorisation"
 ```
 
 ## Wrapper internals
@@ -103,20 +102,20 @@ This was assuming there would be gauge-files, and now there's not. Still seems t
 I expect all of this to change once we have a set data format.
 
 ```{r}
-# # Gives file locations as a dict- 
+# # Gives file locations as a dict-
 # sceneinfodict = make_scenario_info_R(hydro_dir)
 # # make the output directory structure
 # outpath = make_project_dir_R(project_dir, sceneinfodict)
 # # unfold the sceneinfodict to make it easy to get the lists of paths and gauges
 # # everyhydro = paths_gauges(sceneinfodict)[0]
-# 
+#
 # # The inner level turned into characters in R and needs to stay as a list. This is annoying but needed *only in R*
 # for (i in 1:length(sceneinfodict)) {
 #   for (j in 1:2) {
 #     sceneinfodict[[i]][[j]] <- as.list(sceneinfodict[[i]][[j]])
 #   }
 # }
-# 
+#
 # # more list-making to work from R-Python
 # everyhydro = as.list(paths_gauges_R(sceneinfodict)[[1]])
 ```
@@ -143,12 +142,14 @@ To make a `list` in python, need to have unnamed lists in R
 #   outputType = list('summary', 'all')
 # }
 
-outputType <- list('none')
+outputType <- list("none")
 
-ewr_out = prep_run_save_ewrs(hydro_dir = hydro_dir, 
-                             output_parent_dir = project_dir, 
-                             outputType = outputType, 
-                             returnType = list('summary', 'all'))
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = hydro_dir,
+  output_parent_dir = project_dir,
+  outputType = outputType,
+  returnType = list("summary", "all")
+)
 ```
 
 # Still do to

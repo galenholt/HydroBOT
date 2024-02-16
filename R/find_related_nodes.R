@@ -16,9 +16,7 @@
 #' @export
 #'
 #' @examples
-#'
 find_related_nodes <- function(edgedf, nodenames) {
-
   # Basically recursive, but with directionality- we don't want all nodes going
   # into or out of the connected nodes- we only want to trace paths that include
   # the selected initial nodes.
@@ -31,9 +29,10 @@ find_related_nodes <- function(edgedf, nodenames) {
   it <- 0
   # we can't step longer than the network
   maxcount <- length(unique(c(edgedf$fromtype, edgedf$totype)))
-  while(length(tonodes) > 0 && it < maxcount) {
-    tonodes <- edgedf[edgedf$from %in% tonodes, 'to'] |>
-      unique() |> dplyr::pull()
+  while (length(tonodes) > 0 && it < maxcount) {
+    tonodes <- edgedf[edgedf$from %in% tonodes, "to"] |>
+      unique() |>
+      dplyr::pull()
     alltos <- c(alltos, tonodes)
     it <- it + 1
   }
@@ -41,9 +40,10 @@ find_related_nodes <- function(edgedf, nodenames) {
   fromnodes <- nodenames
   allfroms <- fromnodes
   it <- 0
-  while(length(fromnodes) > 0 && it < maxcount) {
-    fromnodes <- edgedf[edgedf$to %in% fromnodes, 'from'] |>
-      unique() |> dplyr::pull()
+  while (length(fromnodes) > 0 && it < maxcount) {
+    fromnodes <- edgedf[edgedf$to %in% fromnodes, "from"] |>
+      unique() |>
+      dplyr::pull()
     allfroms <- c(allfroms, fromnodes)
     it <- it + 1
   }
@@ -52,8 +52,4 @@ find_related_nodes <- function(edgedf, nodenames) {
 
   related_nodes <- c(alltos, allfroms) |> unique()
   return(related_nodes)
-
 }
-
-
-

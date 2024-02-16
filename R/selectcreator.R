@@ -25,7 +25,6 @@
 #'
 #' @examples
 selectcreator <- function(selectvals, data, failmissing = TRUE) {
-
   # Simple if they're characters
   if (is.character(selectvals)) {
     if (failmissing) {
@@ -33,12 +32,10 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
     } else {
       s1g <- rlang::expr(tidyselect::any_of(selectvals))
     }
-
   }
 
   # Deal with quosures and tidyselect
   if (is.language(selectvals)) {
-
     # If it directly evaluates as a character vector, just get it and wrap as above
     if (is.character(rlang::get_expr(selectvals))) {
       charvec <- rlang::get_expr(selectvals)
@@ -76,7 +73,6 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
         }
       }
     }
-
   }
 
   # a secondary check in case s1g evals to just a character vector. This
@@ -103,9 +99,8 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
   # different order of operations, but the check whether it evals to character
   # is necessary and does it.
   suppressWarnings(s1g <- s1g |>
-                     tidyselect::eval_select(data, strict = failmissing) |>
-                     names())
+    tidyselect::eval_select(data, strict = failmissing) |>
+    names())
 
   return(s1g)
 }
-
