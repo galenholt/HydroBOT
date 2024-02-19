@@ -8,14 +8,14 @@
 #'
 #' @return dataframe with no zeros in `adjust_col`
 
-adjust_zeros <- function(data, adjust_col,              amount, onlyzeros = FALSE) {
+adjust_zeros <- function(data, adjust_col, amount, onlyzeros = FALSE) {
   # handle 'auto' adjustment
   if (grepl("auto", amount)) {
     amount <- min(abs(data[[adjust_col]])[data[[adjust_col]] != 0], na.rm = TRUE) * 0.1
   }
 
   # a function to do the adjust in a mutate
-  adjfun <- function(               x) {
+  adjfun <- function(x) {
     adjust_dir <- dplyr::case_when(all(x >= 0, na.rm = TRUE) ~ "pos",
       all(x <= 0, na.rm = TRUE) ~ "neg",
       .default = "both"
