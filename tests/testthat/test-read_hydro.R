@@ -4,6 +4,12 @@ test_that("long hydrograph csv works", {
   expect_equal(class(hydlong), c("tbl_df", "tbl", "data.frame"))
   expect_equal(ncol(hydlong), 4)
   expect_equal(nrow(hydlong), 32850)
+
+  hydlong_b <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs', package = 'werptoolkitr'),
+                        scenariofilter = 'base_base')
+  expect_equal(ncol(hydlong_b), 4)
+  expect_equal(nrow(hydlong_b), 10950)
+
 })
 
 test_that("wide hydrograph csv works", {

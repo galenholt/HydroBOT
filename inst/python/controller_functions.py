@@ -39,16 +39,20 @@ def save_ewrs(ewr_results, ewr_type, output_path, datesuffix = True):
     ewr_scenarionames = ewr_results['scenario'].unique()
 
     for i in ewr_scenarionames:
-        scene_outpath = os.path.join(output_path, i, ewr_type)
+        scene_outpath = os.path.join(output_path, i)
         
         # This is a workaround for the case where we only have access to the
         # results directory and its name is not the same as the scenarios.
         if not os.path.exists(scene_outpath):
           os.makedirs(scene_outpath)
           
-        outfile = os.path.join(scene_outpath, (i + suff + '.csv'))
+        outfile = os.path.join(scene_outpath, (ewr_type + suff + '.csv'))
         # outfile = Output_path + "/" + gscol + "_" + time.strftime("%Y%m%d-%H%M%S") + '.csv'
         
+        # paths longer than 259 seem to fail on Windows, but do so silently. Try to be informative
+        if (len(outfile) > 250) & (os.name == 'nt'):
+            print(f'''path length {len(outfile)} longer than 250, may not save output. 260 is typical cutoff, +-. If saving is failing, shorten paths or disable the path length limit for your system.''')
+
         # Tried chaining the methods but didn't work well- some want to save, and others operate in place  
 
         sceneresults = ewr_results.query('scenario == @i')

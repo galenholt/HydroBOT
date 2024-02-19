@@ -97,6 +97,33 @@
 #' <https://data.gov.au/data/dataset/75910bc5-6c3e-40e8-9c8a-1e895274badb/resource/a7053ee7-8e20-4f2c-b594-cb88c6ed9406/download/cewo_mdb_valleys.shp.zip>
 "cewo_valleys"
 
+#' Planning Units for long-term watering plans
+#'
+#' Polygons defining planning units. Currently just for NSW, sourced from MDBA
+#' Environmental Assets and Functions Database. Have been merged across resource plan areas, allowing them to be split into other, arbitrary polygons
+#'
+#' @format ## `planning_units` An {sf} object:
+#' \describe{
+#'   \item{LTWPShortName, PlanningUnitName, geometry}{The long-term watering plan area and planning unit name matching, to the extent possible, the EWR table. Geometry is polygons. Other columns for reference.}
+#'   \item{planning_unit_name}{same as PlanningUnitName, but matches toolkit naming instead of EWR naming, allowing easier joining to either}
+#' }
+#' @source
+#' MDBA Environmental Assets and Functions Database
+"planning_units"
+
+#' River lines in the basin
+#'
+#' Spatial lines for the major rivers in the basin, from geofabric. Has been clipped to basin and paths simplified.
+#'
+#' @format ## `basin_rivers` An {sf} object:
+#' \describe{
+#'   \item{geometry}{The geometry, all LINESTRING or MULTILINESTRING}
+#'   \item{other values}{As documented at http://www.bom.gov.au/water/geofabric/}
+#' }
+#' @source
+#' BOM, <http://www.bom.gov.au/water/geofabric/>
+"basin_rivers"
+
 #' Example output from EWR tool
 #'
 #' Example output of EWR tool using the simple hydrographs provided in

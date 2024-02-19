@@ -5,7 +5,9 @@ skip_on_os("linux")
 
 
 ewr_to_agg <- make_test_ewr_prepped()
-agg_theme_space <- make_test_agg(namehistory = FALSE)
+
+# use the noPU style that ignores planning units because it yields better tests (gauges as points over polygons, etc)
+agg_theme_space <- make_test_agg(namehistory = FALSE, style = 'noPU')
 
 # create a quant description of scenarios
 scenarios <- tibble::tibble(scenario = c("base_base", "down4_down4", "up4_up4", "MAX"), delta = c(1, 0.25, 4, Inf))
@@ -391,6 +393,21 @@ test_that("maps", {
     )
 
   vdiffr::expect_doppelganger("sdl_map_simple", sdl_map)
+
+  # Make a minimal map, qual colors (not really outcomes, but still, should work.)
+  sdl_map_name <- obj_sdl_to_plot |>
+    dplyr::group_by(SWSDLName) |>
+    dplyr::summarise(dplyr::across(tidyselect::everything(), dplyr::first)) |>
+    dplyr::ungroup() |>
+    plot_outcomes(
+      outcome_col = "SWSDLName",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "SWSDLName",
+      pal_list = SDL_pal
+    )
+
+  vdiffr::expect_doppelganger("sdl_map_name", sdl_map_name)
 
   # Make a minimal map, change the label
   sdl_map_l <- obj_sdl_to_plot |>
@@ -807,6 +824,47 @@ test_that("maps", {
   # what's going on, I think. And leave the bare call here just to make sure it doesn't start throwing a warning in normal use.
   sdl_basin_background_rel
   vdiffr::expect_doppelganger("sdl_basin_background_rel", sdl_basin_background_rel)
+})
+
+test_that("adding color to filled maps", {
+
+
+
+  # Make a minimal map
+  sdl_map_outline <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "ewr_achieved",
+      pal_list = list("scico::berlin"),
+      map_outlinecolor = 'red',
+      facet_col = "env_obj",
+      facet_row = "scenario",
+      sceneorder = c("down4_down4", "base_base", "up4_up4")
+    )
+
+  vdiffr::expect_doppelganger("sdl_map_outline", sdl_map_outline)
+
+  # with underlays, and checking it will remove on the main layer
+  # Make a minimal map
+  sdl_map_outline2 <- obj_sdl_to_plot |>
+    dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
+    plot_outcomes(
+      outcome_col = "ewr_achieved",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "ewr_achieved",
+      pal_list = list("scico::berlin"),
+      map_outlinecolor = NA,
+      facet_col = "env_obj",
+      facet_row = "scenario",
+      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      underlay_list = list(underlay = basin, pal_list = 'azure', map_outlinecolor = 'red')
+    )
+
+  vdiffr::expect_doppelganger("sdl_map_outline2", sdl_map_outline2)
 })
 
 test_that("setLimits works", {
@@ -1346,11 +1404,14 @@ test_that("heatmaps", {
   vdiffr::expect_doppelganger("sdl_contour", sdl_contour)
 
   # baseline, specify breaks
-  # NaNs, so expect a warning
+    # NaNs, so expect a warning
+  # some of the values are really just relative to 0, so the random number flips things around very dramatically.
+  set.seed(19)
   sdl_contour_base_breaks <- ostp |>
     dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
+                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",

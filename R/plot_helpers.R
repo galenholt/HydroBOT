@@ -170,11 +170,8 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
     }
     if (aes_type == "color") {
       ggobj <- ggobj +
-        ggplot2::scale_color_identity(
-          guide = "legend",
-          labels = labfind,
-          name = \(x) labfind(x, ggobj$data)
-        )
+        ggplot2::scale_color_identity(guide = 'legend',
+                                     labels = \(x) labfind(x, ggobj$data))
     }
   }
 

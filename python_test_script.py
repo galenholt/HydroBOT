@@ -58,8 +58,12 @@
 # import os
 # os.environ["TQDM_DISABLE"] = "1"
 # zips
-scenarios = 'inst/extdata/ncdfexample/zipcdf.zip/zipcdf/S1/Straight Node (Gauge).nc'
+# scenarios = 'inst/extdata/ncdfexample/zipcdf.zip/zipcdf/S1/Straight Node (Gauge).nc'
+# op = 'PYTEST'
+scenarios = 'C:/Users/galen/Documents/../Deakin University/QAEL - WERP in house - WERP/Toolkit/eslt-data-2/hydrographs/historical_scale_rain_0_8_evap_1_0/licvolfactor_0_5/0/Straight Node (Gauge).nc'
+op = 'C:/Users/galen/Documents/../Deakin University/QAEL - WERP in house - WERP/Toolkit/eslt-data-2/module_output/EWR'
+sn = 'historical_scale_rain_0_8_evap_1_0_licvolfactor_0_5_0'
 # model_format = 'IQQM - netcdf'
 # Testing the controller
 from inst.python import controller_functions
-ewr_sh = controller_functions.run_save_ewrs(scenarios, output_path = '', model_format = 'IQQM - netcdf', outputType = ['none'], returnType = ['summary'])
+ewr_sh = controller_functions.run_save_ewrs(scenarios, output_path = op, model_format = 'IQQM - netcdf', outputType = ['summary', 'yearly'], returnType = ['none'], scenario_name = sn)

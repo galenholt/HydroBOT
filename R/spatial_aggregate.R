@@ -26,6 +26,13 @@
 #'   of polys as an `underlay` in [plot_outcomes()].
 #' @param prefix character, differs from [general_aggregate()] in that default
 #'   is `'spatial_'` instead of `'agg_'`.
+#' @param joinby character, default 'spatial' performs the expected spatial join using geometry, 'nonspatial' performs a [dplyr::left_join()] by common column names, typically as a result of calling [multi_aggregate()] with `pseudo_spatial = 'planning_units'`.
+#' @param auto_ewr_PU logical, default FALSE. If TRUE, automatically infers
+#'   whether this is an EWR dataset is undergoing gauge to planning unit aggregation.
+#'   If so, joins data non-spatially (sets `joinby = 'nonspatial'`). The preferred solution is
+#'   to use `joinby` in [spatial_aggregate()] or `pseudo_spatial` in [multi_aggregate()].
+#'   If none of those solutions happen, though, it aborts to
+#'   prevent incorrectly spatial joining of gauges to planning units.
 #'
 #' @return an `sf` with columns for the grouping variables aggregated into the
 #'   polygons in `to_geo` and retaining desired theme-level information
@@ -33,11 +40,15 @@
 #'
 #' @examples
 spatial_aggregate <- function(dat, to_geo, groupers,
-                              aggCols, funlist, ...,
-                              whichcrs = sf::st_crs(to_geo),
-                              keepAllPolys = FALSE,
-                              failmissing = TRUE,
-                              prefix = "spatial_") {
+                             aggCols, funlist, ...,
+                           whichcrs = sf::st_crs(to_geo),
+                           keepAllPolys = FALSE,
+                           failmissing = TRUE,
+                           prefix = 'spatial_',
+                           joinby = 'spatial',
+                           auto_ewr_PU = FALSE) {
+
+
   # making valid and adding polyID here and not inside spatial_joiner because
   # need to be valid with IDs later too. I should really do these with the input
   # polygons, not here. I need the to_geo again later, but not the dat. And
@@ -49,7 +60,42 @@ spatial_aggregate <- function(dat, to_geo, groupers,
     add_polyID()
 
   # make the intersected df for aggregating
-  fromto_pair <- spatial_joiner(dat, to_geo, whichcrs = whichcrs)
+  # usually spatial join, but sometimes we want to do a traditional left join (e.g. EWR gauges to planning units)
+
+  # and we might want to automate for EWRs (or at least catch)
+  isewrgaugepu <- any(grepl('ewr', names(dat))) &
+    any(grepl('gauge', names(dat))) &
+    any(grepl('planning_unit_name', names(to_geo)))
+
+  if (isewrgaugepu & joinby != 'nonspatial') {
+    if (!auto_ewr_PU) {
+      rlang::warn(c("EWR gauge to planning units detected without `pseudo_spatial`!",
+                    "!" = "Gauges inform multiple PUs, and this will be lost.",
+                    "i" = "EWR outputs should be joined to `planning_unit_name` pseudo-spatially, not with a spatial join",
+                    "i" = "Preferred method of addressing this is with `pseudo_spatial = 'planning_units'` in `multi_aggregate()` or `read_and_agg()`.",
+                    "i" = "Lower-level processing should include as `joinby = 'nonspatial'` in `spatial_aggregate()`"))
+    } else {
+      rlang::inform(c("EWR gauge to planning units join automatically done pseudo-spatially.",
+                      "i" = "EWR outputs should be joined to `planning_unit_name` pseudo-spatially, not with a spatial join",
+                    "i" = "Preferred method of addressing this is with `pseudo_spatial = 'planning_units'` in `multi_aggregate()` or `read_and_agg()`.",
+                    "i" = "Lower-level processing should include as `joinby = 'nonspatial'` in `spatial_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."))
+      joinby = 'nonspatial'
+    }
+
+
+  }
+
+  if (joinby == 'spatial') {
+    fromto_pair <- spatial_joiner(dat, to_geo, whichcrs = whichcrs)
+  } else if (joinby == 'nonspatial') {
+    fromto_pair <- pseudo_spatial_joiner(dat, to_geo, prefix)
+    } else {
+      rlang::abort("code set up to pass column names with joinby, but not fully. If needed, write the last bits to make it work generally.")
+      # fromto_pair <- dplyr::left_join(sf::st_drop_geometry(dat),
+      #                                 sf::st_drop_geometry(to_geo),
+      #                                 by = joinby)
+    }
+
 
   # Clean up groupers and aggCols from various formats and ensure only present
   # columns are included.

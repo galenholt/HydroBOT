@@ -4,33 +4,27 @@ skip_on_os("linux")
 agg_theme_space <- make_test_agg(namehistory = FALSE)
 
 # the sequences used in make_test_agg
-aggseq <- list(
-  ewr_code = c("ewr_code_timing", "ewr_code"),
-  env_obj = c("ewr_code", "env_obj"),
-  sdl_units = sdl_units,
-  Specific_goal = c("env_obj", "Specific_goal"),
-  catchment = cewo_valleys,
-  Objective = c("Specific_goal", "Objective"),
-  mdb = basin,
-  target_5_year_2024 = c("Objective", "target_5_year_2024")
-)
+aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+               planning_units = planning_units,
+               env_obj =  c('ewr_code', "env_obj"),
+               sdl_units = sdl_units,
+               Specific_goal = c('env_obj', "Specific_goal"),
+               catchment = cewo_valleys,
+               Objective = c('Specific_goal', 'Objective'),
+               mdb = basin,
+               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
 
-funseq <- list(
-  "CompensatingFactor",
-  "ArithmeticMean",
-  "ArithmeticMean",
-  "ArithmeticMean",
-  list(wm = ~ weighted.mean(.,
-    w = area,
-    na.rm = TRUE
-  )),
-  "ArithmeticMean",
-  list(wm = ~ weighted.mean(.,
-    w = area,
-    na.rm = TRUE
-  )),
-  "ArithmeticMean"
-)
+funseq <- list('CompensatingFactor',
+               'SpatialWeightedMean',
+               'ArithmeticMean',
+               'ArithmeticMean',
+               "ArithmeticMean",
+               list(wm = ~weighted.mean(., w = area,
+                                        na.rm = TRUE)),
+               'ArithmeticMean',
+               list(wm = ~weighted.mean(., w = area,
+                                        na.rm = TRUE)),
+               'ArithmeticMean')
 
 # extract theme steps
 themesteps <- purrr::map_lgl(aggseq, is.character)

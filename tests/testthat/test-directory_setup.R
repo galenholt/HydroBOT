@@ -16,7 +16,9 @@ test_that("no scenario names if inside scenario", {
 
 test_that("scenario paths works for single csvs in each", {
   scenario_paths <- find_scenario_paths(hydro_dir)
-  # expect_equal(2 * 2, 4)
+  # only test the last bit, because the full path changes between `test` and `check`
+  relative_part <- stringr::str_extract(scenario_paths, 'extdata.*')
+  expect_snapshot(relative_part)
 })
 
 test_that("scenario paths and the name fixer works for multiple csvs in each", {
@@ -56,35 +58,8 @@ test_that("creating output dirs works with hydro_dir having all scenarios", {
   outpath <- make_output_dir(parent_dir = project_dir, scenarios = scenarios)
 
   realised_structure <- list.files(project_dir, recursive = TRUE, include.dirs = TRUE)
-  expected_structure <- c(
-    "hydrographs", "hydrographs/base",
-    "hydrographs/base/base.csv",
-    "hydrographs/base/base.json",
-    "hydrographs/down4",
-    "hydrographs/down4/down4.csv",
-    "hydrographs/down4/down4.json",
-    "hydrographs/scenario_metadata.json",
-    "hydrographs/scenario_metadata.yml",
-    "hydrographs/up4",
-    "hydrographs/up4/up4.csv",
-    "hydrographs/up4/up4.json",
-    "module_output",
-    "module_output/EWR",
-    "module_output/EWR/base",
-    "module_output/EWR/base/all_events",
-    "module_output/EWR/base/annual",
-    "module_output/EWR/base/summary",
-    "module_output/EWR/down4",
-    "module_output/EWR/down4/all_events",
-    "module_output/EWR/down4/annual",
-    "module_output/EWR/down4/summary",
-    "module_output/EWR/up4",
-    "module_output/EWR/up4/all_events",
-    "module_output/EWR/up4/annual",
-    "module_output/EWR/up4/summary"
-  )
+  expect_snapshot(realised_structure)
 
-  expect_equal(realised_structure, expected_structure)
 })
 
 test_that("creating output dirs works with hydro_dir as a single scenario", {
@@ -98,27 +73,7 @@ test_that("creating output dirs works with hydro_dir as a single scenario", {
   outpath <- make_output_dir(parent_dir = single_hydro_scenario, scenarios = scenarios)
 
   # check the full structure of the parent tree to make sure we're not adding extra stuff elsewhere
-  realised_structure <- list.files("_test_data", recursive = TRUE, include.dirs = TRUE)
-  expected_structure <- c(
-    "hydrographs",
-    "hydrographs/base",
-    "hydrographs/base/base.csv",
-    "hydrographs/base/base.json",
-    "hydrographs/base/module_output",
-    "hydrographs/base/module_output/EWR",
-    "hydrographs/base/module_output/EWR/base",
-    "hydrographs/base/module_output/EWR/base/all_events",
-    "hydrographs/base/module_output/EWR/base/annual",
-    "hydrographs/base/module_output/EWR/base/summary",
-    "hydrographs/down4",
-    "hydrographs/down4/down4.csv",
-    "hydrographs/down4/down4.json",
-    "hydrographs/scenario_metadata.json",
-    "hydrographs/scenario_metadata.yml",
-    "hydrographs/up4",
-    "hydrographs/up4/up4.csv",
-    "hydrographs/up4/up4.json"
-  )
+  realised_structure <- list.files('_test_data', recursive = TRUE, include.dirs = TRUE)
+  expect_snapshot(realised_structure)
 
-  expect_equal(realised_structure, expected_structure)
 })

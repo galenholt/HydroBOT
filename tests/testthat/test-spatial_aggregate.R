@@ -6,6 +6,8 @@ ewr_to_agg <- make_test_ewr_prepped()
 test_that("gauge to poly works", {
   skip_on_os("linux")
 
+
+
   spatagg <- spatial_aggregate(ewr_to_agg,
     to_geo = sdl_units,
     groupers = "scenario",
@@ -52,6 +54,7 @@ test_that("gauge to poly works", {
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = "bottom")
 
+  skip_on_os('linux')
   vdiffr::expect_doppelganger("gauge to sdl", g2sdl_plot)
   vdiffr::expect_doppelganger("gauge to sdl all", g2sdl_all_plot)
 })
@@ -92,7 +95,44 @@ test_that("poly to poly works", {
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = "bottom")
 
+  skip_on_os('linux')
   vdiffr::expect_doppelganger("g2sdl2cewo", g2sdl2cewo_plot)
+})
+
+test_that("psuedo-spatial works", {
+
+  spatagg <- spatial_aggregate(ewr_to_agg,
+                               to_geo = planning_units,
+                               groupers = 'scenario',
+                               aggCols = 'ewr_achieved',
+                               funlist = 'mean',
+                               joinby = 'nonspatial')
+  # stringr::str_flatten(names(spatagg), "', '")
+  namestring <- c('scenario', 'polyID', 'spatial_mean_ewr_achieved', 'PlanningUnitName', 'LTWPShortName', 'PU_Region', 'PU_Code', 'STATE', 'geometry', 'planning_unit_name')
+  expect_equal(names(spatagg), namestring)
+  expect_s3_class(spatagg, 'sf')
+  expect_equal(nrow(spatagg), 36)
+
+
+  # Fail if nothing in common
+  expect_error(spatagg_no_common <- spatial_aggregate(ewr_to_agg,
+                                   to_geo = sdl_units,
+                                   groupers = 'scenario',
+                                   aggCols = 'ewr_achieved',
+                                   funlist = 'mean',
+                                   keepAllPolys = TRUE,
+                                   joinby = 'nonspatial'))
+
+  # Plots are useful for checking spatial outcomes
+  g2pu_plot <- ggplot2::ggplot() +
+    ggplot2::geom_sf(data =spatagg,
+                     ggplot2::aes(fill = spatial_mean_ewr_achieved)) +
+    ggplot2::geom_sf(data = ewr_to_agg) +
+    ggplot2::facet_wrap(~scenario) +
+    ggplot2::theme(legend.position = 'bottom')
+
+  skip_on_os('linux')
+  vdiffr::expect_doppelganger("gauge to PU", g2pu_plot)
 })
 
 

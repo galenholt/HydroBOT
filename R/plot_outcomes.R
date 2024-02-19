@@ -68,6 +68,7 @@
 #'   to change from stacked to dodged bars or jitter points. Can be character,
 #'   e.g. 'jitter' or a function, e.g. `ggplot2::position_jitter(width = 0.1,
 #'   height = 0)`
+#' @param map_outlinecolor color specification for the outline of filled areas on maps. Default 'grey35' seems to be the sf default. NA removes the outline.
 #' @param base_list NULL (default) or named list of arguments to
 #'   [baseline_compare()];
 #'  * base_lev
@@ -150,6 +151,7 @@ plot_outcomes <- function(outdf,
                           transx = "identity",
                           zero_adjust = 0,
                           position = "stack",
+                          map_outlinecolor = 'grey35',
                           base_list = NULL,
                           smooth_arglist = NULL,
                           underlay_list = NULL,
@@ -313,7 +315,7 @@ plot_outcomes <- function(outdf,
   }
 
   if (plot_type == "map") {
-    if (length(pal_list) > 1) {
+    if (!inherits(pal_list, 'colors') && length(pal_list) > 1) {
       rlang::warn(glue::glue("using first palette for {outcome_col}.
                              Splitting up palettes in maps needs more thought"))
     }
@@ -322,7 +324,9 @@ plot_outcomes <- function(outdf,
     # plots in the under/overlays
     outcome_plot <- plot_map(
       prepped = prepped,
-      underlay_list = underlay_list, overlay_list = overlay_list,
+      underlay_list = underlay_list,
+      overlay_list = overlay_list,
+      map_outlinecolor = map_outlinecolor,
       outcome_lab = outcome_lab,
       facet_wrapper = facet_wrapper,
       facet_row = facet_row, facet_col = facet_col,

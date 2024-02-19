@@ -128,9 +128,10 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
 
   outcome_plot <- handle_palettes(outcome_plot,
     aes_type = "fill",
-    prepped$pal_list, prepped$color_type,
-    pal_direction = prepped$direction
-  )
+    pal_list = prepped$pal_list,
+    color_type = prepped$color_type,
+    pal_direction = prepped$direction)
+
 }
 
 #' Title
@@ -149,7 +150,7 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
 #' @export
 #'
 #' @examples
-plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
+plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = 'grey35', outcome_lab,
                      facet_wrapper, facet_row, facet_col,
                      sceneorder, transoutcome, setLimits, base_list) {
   # Check whether we're accidentally overplotting. This either completes
@@ -236,8 +237,7 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
     outcome_plot <- outcome_plot +
       ggplot2::geom_sf(
         data = prepped$data,
-        ggplot2::aes(fill = .data$color)
-      )
+        ggplot2::aes(fill = .data$color), color = map_outlinecolor) + ggplot2::theme_bw()
     outcome_plot <- handle_palettes(outcome_plot,
       aes_type = "fill",
       pal_list = prepped$pal_list,
@@ -247,6 +247,7 @@ plot_map <- function(prepped, underlay_list, overlay_list, outcome_lab,
       pal_direction = prepped$direction,
       base_list = base_list
     )
+
 
     outcome_plot <- outcome_plot + ggplot2::labs(fill = paste0(outcome_lab, prepped$ylab_append))
   }
@@ -321,6 +322,7 @@ make_underover <- function(underover_list,
     pal_list = NA, # NA will show something, NULL just fails
     pal_direction = 1,
     colorgroups = NULL,
+    map_outlinecolor = 'grey35',
     outcome_lab = outcome_lab, # inherit from outer, but can be overwritten
     base_list = NULL, zero_adjust = 0,
     onlyzeros = FALSE,
@@ -385,7 +387,7 @@ make_underover <- function(underover_list,
     # get the type of this underover
     if (all(sf::st_is(uo$underover, c("POLYGON", "MULTIPOLYGON")))) {
       uo_datatype <- "areal"
-    } else if (all(sf::st_is(uo$underover, c("POINT", "LINESTRING", "MULTIPOINT")))) {
+    } else if (all(sf::st_is(uo$underover, c("POINT", "LINESTRING", "MULTIPOINT", "MULTILINESTRING")))) {
       uo_datatype <- "point"
     }
 
@@ -447,12 +449,14 @@ make_underover <- function(underover_list,
     if (uo_datatype == "areal") {
       if (uprep$color_type == "fixed") {
         outcome_plot <- outcome_plot +
-          ggplot2::geom_sf(data = uprep$data, fill = uprep$pal_list)
+          ggplot2::geom_sf(data = uprep$data, fill = uprep$pal_list,
+                           color = uo$map_outlinecolor)
       } else {
         outcome_plot <- outcome_plot +
           ggplot2::geom_sf(
             data = uprep$data,
-            ggplot2::aes(fill = .data$color)
+            ggplot2::aes(fill = .data$color),
+            color = uo$map_outlinecolor
           )
         outcome_plot <- handle_palettes(outcome_plot,
           aes_type = "fill",

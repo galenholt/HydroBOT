@@ -16,7 +16,8 @@ multi_aggregate(
   namehistory = TRUE,
   keepAllPolys = FALSE,
   failmissing = TRUE,
-  auto_ewr_PU = FALSE
+  auto_ewr_PU = FALSE,
+  pseudo_spatial = NULL
 )
 }
 \arguments{
@@ -34,13 +35,14 @@ passing to \code{\link[=general_aggregate]{general_aggregate()}}.}
 
 \item{group_until}{named list of groupers and the step to which they should
 be retained. Default NA (retain all groupers for all steps). \emph{FOR EWR USE,
-best option is} \verb{group_until = list('planning_unit_name = is_notpoint)}.
-This groups by planning unit until larger spatial grouping has happened.
-Step can be an index, name, or a function that evaluates to TRUE or FALSE
-when run on the aggregation sequence. Named list does not need to contain
-all groupers, but if so, those that persist throughout should be given NA
-or numeric values longer than aggsequence. Vectors the length of groupers
-usually work, but are less-well supported.}
+best option is} \code{group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint)}. This groups by planning unit and gauge until larger
+spatial grouping has happened. Leaving 'gauge' off is mathematically safe,
+since the gauge geometry forces that grouping, but then the 'gauge' column
+gets dropped. Step can be an index, name, or a function that evaluates to
+TRUE or FALSE when run on the aggregation sequence. Named list does not
+need to contain all groupers, but if so, those that persist throughout
+should be given NA or numeric values longer than aggsequence. Vectors the
+length of groupers usually work, but are less-well supported.}
 
 \item{aggCols}{an expression for the columns to aggregate (the data columns).
 See \code{selectcreator} for formats}
@@ -68,11 +70,11 @@ character and other forms in the same sub-list (single aggregation step).}
 Save only the final result as a tibble or sf * \code{TRUE}: Save every step of
 the aggregation as a tibble or sf in a list}
 
-\item{namehistory}{logical, default \code{TRUE}. * \code{TRUE} (the default): The name
-of the aggregated column(s) retain the full aggregation history of the form
+\item{namehistory}{logical, default \code{TRUE}.
+\itemize{
+\item \code{TRUE} (the default): The name of the aggregated column(s) retain the full aggregation history of the form
 \code{agglevelN_aggfunctionN_...agglevel1_aggfunction1_originalcolumn}. This is
 ugly, but saves memory and says exactly what the values in each column are.
-\itemize{
 \item \code{FALSE}: The aggregation history is moved out of the column names and
 into new columns that define it using \code{\link[=agg_names_to_cols]{agg_names_to_cols()}}. The column
 name(s) become(s) the original column name(s) specified by \code{aggCols}. This
@@ -94,12 +96,19 @@ aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
 and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
 \code{tidyselect::any_of()} in \code{tidyselect}}
 
-\item{auto_ewr_PU}{logical, default FALSE. If TRUE, automatically infers
-whether this is an EWR dataset and has not yet been spatially aggregated.
-If so, applies grouping by 'planning_unit_name'. The preferred solution is
-to include it in \code{groupers} here (for on-off), or in \code{\link[=multi_aggregate]{multi_aggregate()}} to
-use \code{group_until}. If none of those solutions happen, though, it aborts to
-prevent incorrect pooling over planning units.}
+\item{auto_ewr_PU}{logical, default \code{FALSE}. Auto-detect EWRs and enforce
+appropriate theme and spatial scaling related to gauges and planning units,
+as defined in \code{\link[=theme_aggregate]{theme_aggregate()}} and \code{\link[=spatial_aggregate]{spatial_aggregate()}}}
+
+\item{pseudo_spatial}{a character or numeric vector giving the names or
+indices of aggsequence that should have 'psuedo-spatial' aggregation. This
+is when we go from one spatial data level to another, but do the join and
+aggregation with a non-spatial \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}. It is developed for
+the EWR situation, where the incoming data is indexed to gauges and
+planning units, but has gauge point geometry, and spatial joining to
+planning units is not appropriate, because single gauges affect multiple
+units. So it would join to the \code{planning_units} by name instead of
+spatially, and then aggregate according to those units.}
 }
 \value{
 either a tibble or sf of aggregated values at the final level (if

@@ -19,13 +19,15 @@
 #'   passing to [general_aggregate()].
 #' @param group_until named list of groupers and the step to which they should
 #'   be retained. Default NA (retain all groupers for all steps). *FOR EWR USE,
-#'   best option is* `group_until = list('planning_unit_name = is_notpoint)`.
-#'   This groups by planning unit until larger spatial grouping has happened.
-#'   Step can be an index, name, or a function that evaluates to TRUE or FALSE
-#'   when run on the aggregation sequence. Named list does not need to contain
-#'   all groupers, but if so, those that persist throughout should be given NA
-#'   or numeric values longer than aggsequence. Vectors the length of groupers
-#'   usually work, but are less-well supported.
+#'   best option is* `group_until = list(planning_unit_name = is_notpoint, gauge
+#'   = is_notpoint)`. This groups by planning unit and gauge until larger
+#'   spatial grouping has happened. Leaving 'gauge' off is mathematically safe,
+#'   since the gauge geometry forces that grouping, but then the 'gauge' column
+#'   gets dropped. Step can be an index, name, or a function that evaluates to
+#'   TRUE or FALSE when run on the aggregation sequence. Named list does not
+#'   need to contain all groupers, but if so, those that persist throughout
+#'   should be given NA or numeric values longer than aggsequence. Vectors the
+#'   length of groupers usually work, but are less-well supported.
 #' @param aggsequence a named list of aggregation steps in the order to apply
 #'   them. Entries for theme aggregation should be character vectors- e.g. `name
 #'   = c('from_theme', 'to_theme')`. Entries for spatial aggregation should be
@@ -46,11 +48,20 @@
 #'   to be wrapped in [rlang::quo()], e.g. `rlang::quo(list(wm =
 #'   ~weighted.mean(., w = area, na.rm = TRUE))`. And we can no longer mix
 #'   character and other forms in the same sub-list (single aggregation step).
+#' @param pseudo_spatial a character or numeric vector giving the names or
+#'   indices of aggsequence that should have 'psuedo-spatial' aggregation. This
+#'   is when we go from one spatial data level to another, but do the join and
+#'   aggregation with a non-spatial [dplyr::left_join()]. It is developed for
+#'   the EWR situation, where the incoming data is indexed to gauges and
+#'   planning units, but has gauge point geometry, and spatial joining to
+#'   planning units is not appropriate, because single gauges affect multiple
+#'   units. So it would join to the `planning_units` by name instead of
+#'   spatially, and then aggregate according to those units.
 #' @param saveintermediate logical, default `FALSE`. * `FALSE` (the default):
 #'   Save only the final result as a tibble or sf * `TRUE`: Save every step of
 #'   the aggregation as a tibble or sf in a list
-#' @param namehistory logical, default `TRUE`. * `TRUE` (the default): The name
-#'   of the aggregated column(s) retain the full aggregation history of the form
+#' @param namehistory logical, default `TRUE`.
+#'   * `TRUE` (the default): The name of the aggregated column(s) retain the full aggregation history of the form
 #'   `agglevelN_aggfunctionN_...agglevel1_aggfunction1_originalcolumn`. This is
 #'   ugly, but saves memory and says exactly what the values in each column are.
 #'   * `FALSE`: The aggregation history is moved out of the column names and
@@ -60,6 +71,9 @@
 #'   functions at a particular step), but increases the size of the dataset and
 #'   the meaning of the values in the aggregation column have to be interpreted
 #'   with the values in the new columns defining history.
+#' @param auto_ewr_PU logical, default `FALSE`. Auto-detect EWRs and enforce
+#'   appropriate theme and spatial scaling related to gauges and planning units,
+#'   as defined in [theme_aggregate()] and [spatial_aggregate()]
 #'
 #' @return either a tibble or sf of aggregated values at the final level (if
 #'   `saveintermediate = FALSE`) or a list of tibbles or sfs with aggregated
@@ -78,7 +92,8 @@ multi_aggregate <- function(dat,
                             namehistory = TRUE,
                             keepAllPolys = FALSE,
                             failmissing = TRUE,
-                            auto_ewr_PU = FALSE) {
+                            auto_ewr_PU = FALSE,
+                            pseudo_spatial = NULL) {
   # Check for common sources of errors
   if (!inherits(aggsequence, "list") || !inherits(funsequence, "list")) {
     rlang::abort("aggsequence and funsequence should both be lists, even if there is only one item. Otherwise iterating over their length causes unexpected behaviour.")
@@ -173,6 +188,9 @@ multi_aggregate <- function(dat,
   #   rlang::abort("If not using characters for groupers, groupers needs to cover everything in group_until")
   # }
 
+  # get the index for any pseudo-spatial joins and aggs
+  pseudo_indices <- purrr::map_int(pseudo_spatial, \(x) parse_aggnum(x, aggsequence = aggsequence))
+
   # need to track the grouping when switch between theme and spatial- we want to
   # do theme groupings within the current spatial unit, and spatial groupings
   # within the current theme level. Spatial groups (geometry column) are kept
@@ -226,7 +244,7 @@ multi_aggregate <- function(dat,
         dat = dat,
         from_theme = aggsequence[[i]][1],
         to_theme = aggsequence[[i]][2],
-        groupers = c(thisgroup, "gauge"),
+        groupers = thisgroup,
         aggCols = thisagg, # Does not need the tidyselect::ends_with here because it happens in theme_aggregate
         funlist = funsequence[[i]],
         causal_edges = causal_edges,
@@ -246,7 +264,8 @@ multi_aggregate <- function(dat,
         funlist = funsequence[[i]],
         prefix = paste0(names(aggsequence)[i], "_"),
         failmissing = failmissing,
-        keepAllPolys = keepAllPolys
+        keepAllPolys = keepAllPolys,
+        joinby = ifelse(i %in% pseudo_indices, 'nonspatial', 'spatial')
       )
 
       spatial_to_info <- names(aggsequence[[i]])[names(aggsequence[[i]]) != "geometry"]

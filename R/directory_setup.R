@@ -15,7 +15,7 @@ find_scenario_paths <- function(hydro_dir, type = "csv") {
     hydro_paths <- unzip(hydro_dir, list = TRUE)$Name
     hydro_paths <- hydro_paths[grepl("Straight Node \\(Gauge\\)\\.nc", hydro_paths)]
   } else {
-    hydro_paths <- list.files(hydro_dir, pattern = type, recursive = TRUE)
+    hydro_paths <- list.files(hydro_dir, pattern = paste0('.', type, '$'), recursive = TRUE)
   }
 
   unique_names <- hydro_paths |>
@@ -48,9 +48,9 @@ find_scenario_paths <- function(hydro_dir, type = "csv") {
 #' @return path to output directory
 #'
 #' @examples
-make_output_dir <- function(parent_dir, scenarios, module_name = "EWR",
-                            ewr_outtypes = c("summary", "annual", "all_events")) {
-  output_path <- file.path(parent_dir, "module_output", module_name)
+make_output_dir <- function(parent_dir, scenarios, module_name = 'EWR',
+                            ewr_outtypes = c('summary', 'yearly')) {
+  output_path <- file.path(parent_dir, 'module_output', module_name)
 
   # if parent_dir is the scenario dir (we're in a single run), use `scenarios = ''` to not make a subdir
   sceneout <- file.path(output_path, scenarios)
@@ -67,11 +67,10 @@ make_output_dir <- function(parent_dir, scenarios, module_name = "EWR",
   # We could do this in the loop above, but that will just get hard to read.
   if (module_name == "EWR") {
     for (i in sceneout) {
-      for (j in ewr_outtypes) {
-        if (!dir.exists(file.path(i, j))) {
-          dir.create(file.path(i, j), recursive = TRUE)
-        }
-      }
+      if (!dir.exists(file.path(i))) {dir.create(file.path(i), recursive = TRUE)}
+      # for (j in ewr_outtypes) {
+      #   if (!dir.exists(file.path(i, j))) {dir.create(file.path(i,j), recursive = TRUE)}
+      # }
     }
   }
 
