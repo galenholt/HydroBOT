@@ -4,23 +4,22 @@
 
 # Aggregation sequence
 aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+               planning_unit = planning_units,
                env_obj =  c('ewr_code', "env_obj"),
                sdl_units = sdl_units,
                Specific_goal = c('env_obj', "Specific_goal"),
                cewo_valleys = cewo_valleys,
                Objective = c('Specific_goal', 'Objective'),
-               basin = basin,
+               mdb = basin,
                target_5_year_2024 = c('Objective', 'target_5_year_2024'))
 
 # Functions for each aggregation
-funseq <- list(c('CompensatingFactor'),
-               c('ArithmeticMean'),
-               c('ArithmeticMean'),
-               c('ArithmeticMean'),
-               rlang::quo(list(wm = ~weighted.mean(., w = area,
-                                                   na.rm = TRUE))),
-               c('ArithmeticMean'),
-
-               rlang::quo(list(wm = ~weighted.mean(., w = area,
-                                                   na.rm = TRUE))),
-               c('ArithmeticMean'))
+funseq <- list('CompensatingFactor',
+               'ArithmeticMean',
+               'ArithmeticMean',
+               'SpatialWeightedMean',
+               'ArithmeticMean',
+               'SpatialWeightedMean',
+               'ArithmeticMean',
+               'SpatialWeightedMean',
+               'ArithmeticMean')

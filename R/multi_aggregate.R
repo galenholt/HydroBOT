@@ -73,7 +73,7 @@
 #'   with the values in the new columns defining history.
 #' @param auto_ewr_PU logical, default `FALSE`. Auto-detect EWRs and enforce
 #'   appropriate theme and spatial scaling related to gauges and planning units,
-#'   as defined in [theme_aggregate()] and [spatial_aggregate()]
+#'   as defined in [theme_aggregate()] and [spatial_aggregate()]. Specifically, if `TRUE`, this automatically manages the `group_until` and `pseudo_spatial` arguments.
 #'
 #' @return either a tibble or sf of aggregated values at the final level (if
 #'   `saveintermediate = FALSE`) or a list of tibbles or sfs with aggregated
@@ -265,7 +265,8 @@ multi_aggregate <- function(dat,
         prefix = paste0(names(aggsequence)[i], "_"),
         failmissing = failmissing,
         keepAllPolys = keepAllPolys,
-        joinby = ifelse(i %in% pseudo_indices, 'nonspatial', 'spatial')
+        joinby = ifelse(i %in% pseudo_indices, 'nonspatial', 'spatial'),
+        auto_ewr_PU = auto_ewr_PU
       )
 
       spatial_to_info <- names(aggsequence[[i]])[names(aggsequence[[i]]) != "geometry"]
