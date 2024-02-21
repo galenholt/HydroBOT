@@ -2,7 +2,7 @@
 #'
 #' @param hydropath path to the hydrographs
 #' @param long logical, default TRUE. Do we want the data long (with a column for gauge number) or wide (FALSE, with gauge numbers as columns)
-#' @param format character, default 'csv'. Format of the hydrographs, determines which reading function gets called.
+#' @param format character, default 'csv'. Format of the hydrographs, determines which reading function gets called. Other options include 'nc' for netcdfs.
 #' @param scenariofilter character vector of scenario names to include. Default `NULL` includes all
 #' @param gaugemap mapping of gauges from nodes. Default 'iqqm' gets it from EWR tool, otherwise, a dataframe with columns 'node' and 'gauge'
 #'
