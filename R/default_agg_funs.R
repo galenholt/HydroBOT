@@ -77,3 +77,50 @@ SpatialWeightedMean <- function(x, na.rm = TRUE) {
   y <- stats::weighted.mean(x = x, w = area, na.rm = na.rm)
 }
 
+#' Length aggregation
+#'
+#' Finds the number of values. Lightweight wrapper of `length` with removal of NA values to match other functions.
+#'
+#' @inheritParams CompensatingFactor
+#'
+#' @return summarised data
+#' @export
+#'
+#' @examples
+NumberOfValues <- function(x, na.rm = TRUE) {
+  if(na.rm == TRUE){
+    y <- length(x[!is.na(x)])}
+  else if(na.rm == FALSE){
+    y <- length(x)}
+  return(y)
+}
+
+#' Variance  aggregation
+#'
+#' Finds the variance of the values. Lightweight wrapper of `var` with `na.rm = TRUE` to match other functions.
+#'
+#' @inheritParams CompensatingFactor
+#'
+#' @return summarised data
+#' @export
+#'
+#' @examples
+Variance <- function(x, na.rm = TRUE) {
+  y <- var(x, na.rm = na.rm)
+  return(y)
+}
+
+#' Sum  aggregation
+#'
+#' Finds the sum of the values. Lightweight wrapper of `sum` with `na.rm = TRUE` to match other functions.
+#'
+#' @inheritParams CompensatingFactor
+#'
+#' @return summarised data
+#' @export
+#'
+#' @examples
+Sum <- function(x, na.rm = TRUE) {
+  y <- sum(x, na.rm = na.rm)
+  return(y)
+}
