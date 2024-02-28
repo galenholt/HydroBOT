@@ -1,5 +1,5 @@
 Package: werptoolkitr
-Title: Integrated Modelling Toolkit for Water Management in River Basins
+Title: Toolkit For Flow-Dependent Outcomes in MDB
 Version: 0.1.1
 Authors@R: 
     person("Galen", "Holt", , "g.holt@deakin.edu.au", role = c("aut", "cre"),
