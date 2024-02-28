@@ -4,7 +4,7 @@
 \name{werptoolkitr-package}
 \alias{werptoolkitr}
 \alias{werptoolkitr-package}
-\title{werptoolkitr: What the Package Does (One Line, Title Case)}
+\title{werptoolkitr: Toolkit For Flow-Dependent Outcomes in MDB}
 \description{
 What the package does (one paragraph).
 }
