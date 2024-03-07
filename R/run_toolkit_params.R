@@ -108,6 +108,12 @@ run_toolkit_params <- function(yamlpath = NULL,
   # Type cleanup
   arglist <- type_cleanup(arglist)
 
+  # a simple EWR error catch (the aggregator does a more complete job internally)
+  if (grepl('ewr', arglist$output_parent_dir) & is.null(arglist$agg_group_until) & is.null(arglist$agg_pseudo_spatial) & !arglist$auto_ewr_PU) {
+    rlang::warn(c("It appears that you're processing EWRs and not managing planning units with `auto_ewr_PU = TRUE` or with a combination of group_until and pseudo_spatial."))
+  }
+
+  # Run EWR tool
   ewr_out <- prep_run_save_ewrs(
     hydro_dir = arglist$hydro_dir,
     output_parent_dir = arglist$output_parent_dir,
@@ -122,6 +128,7 @@ run_toolkit_params <- function(yamlpath = NULL,
     )
   )
 
+  # Aggregate
   aggout <- read_and_agg(
     datpath = arglist$agg_input_path,
     type = arglist$aggType,
@@ -129,6 +136,7 @@ run_toolkit_params <- function(yamlpath = NULL,
     causalpath = causal_ewr,
     groupers = arglist$agg_groups,
     group_until = arglist$agg_group_until,
+    pseudo_spatial = arglist$agg_pseudo_spatial,
     aggCols = arglist$agg_var,
     aggsequence = aggseq,
     funsequence = funseq,
@@ -171,6 +179,10 @@ make_default_args <- function(arglist) {
 
   if (arglist$agg_results == "default" || is.null(arglist$agg_results)) {
     arglist$agg_results <- file.path(arglist$output_parent_dir, "aggregator_output")
+  }
+
+  if (is.null(arglist$agg_group_until)) {
+    arglist$agg_group_until <- rep(NA, length(arglist$agg_groups))
   }
 
   return(arglist)

@@ -148,12 +148,13 @@ pseudo_spatial_joiner <- function(from_geo, to_geo, prefix) {
     missing_to <- setdiff(uniquefrom_geo, uniqueto)
 
     if (length(missing_to) > 0) {
-      rlang::warn(glue::glue(c(
+      rlang::warn(c(
         "Missing matches in join",
-        "!" = "{missing_to} is present in {commonnames} of the input from_geoa, but is not present in the from_geoa being joined (likely {prefix})",
-        "i" = "This will yield NA for joined columns (as it should), but because the from_geoa is spatial, this can cause later issues due to lacking geometry.",
-        "i" = "Because this is expected behaviour from a join, we leave it to the user to decide to pre-drop this from_geoa, expand the joining from_geoaset to include the needed links, or otherwise address it."
-      )))
+        "!" = glue::glue("{missing_to} is present in {commonnames} of the input from_geo, but is not present in the to_geo being joined (likely {prefix})"),
+        "i" = "This will yield NA for joined columns (as it should), but because the from_geo is spatial, this can cause later issues due to lacking geometry.",
+        "i" = "Because this is expected behaviour from a join, we leave it to the user to decide to pre-drop this from_geo, expand the joining from_geo set to include the needed links, or otherwise address it."
+      ))
+
     }
   }
 

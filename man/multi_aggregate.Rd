@@ -98,7 +98,7 @@ and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
 
 \item{auto_ewr_PU}{logical, default \code{FALSE}. Auto-detect EWRs and enforce
 appropriate theme and spatial scaling related to gauges and planning units,
-as defined in \code{\link[=theme_aggregate]{theme_aggregate()}} and \code{\link[=spatial_aggregate]{spatial_aggregate()}}}
+as defined in \code{\link[=theme_aggregate]{theme_aggregate()}} and \code{\link[=spatial_aggregate]{spatial_aggregate()}}. Specifically, if \code{TRUE}, this automatically manages the \code{group_until} and \code{pseudo_spatial} arguments.}
 
 \item{pseudo_spatial}{a character or numeric vector giving the names or
 indices of aggsequence that should have 'psuedo-spatial' aggregation. This
