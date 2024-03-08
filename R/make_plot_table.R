@@ -19,7 +19,6 @@ make_plot_table <- function(werp_plot) {
 #' @inheritParams make_plot_table
 #'
 get_data_agg <- function(werp_plot) {
-
   # expects !namehistory. we could generate it wiht agg_names_to_cols, but then
   # we'd need the sequences. so I think just make the user do this for now.
 
@@ -30,10 +29,11 @@ get_data_agg <- function(werp_plot) {
 
   # Check there's anything (ie are there columsn with the aggregations?)
   if (ncol(dataseq) == 0 | nrow(dataseq) == 0) {
-    rlang::abort(c('Data used for this plot does not contain aggregation information.',
-                 'i' = 'If this is werp data, has it been processed after the aggregator?',
-                 'i' = 'If this is werp data, does it still have the history in names? If so, use `agg_names_to_cols()`',
-                 'i' = 'If this is not werp data, this function is not appropriate.'))
+    rlang::abort(c("Data used for this plot does not contain aggregation information.",
+      "i" = "If this is werp data, has it been processed after the aggregator?",
+      "i" = "If this is werp data, does it still have the history in names? If so, use `agg_names_to_cols()`",
+      "i" = "If this is not werp data, this function is not appropriate."
+    ))
   }
 
   # I should include a 'startingLevel' or 'aggLevel_0', but it's not obvious how in general. If we always start with a theme-scale agg, we could pass in the full aggsequence rather than just the names, and use the first item in the first one. But that won't work if we immediately aggregate spatially. For now, let's see if we can auto-set based on the data type.
@@ -55,10 +55,14 @@ get_data_agg <- function(werp_plot) {
     )
 
   # add the starting level
-  dataseqtab <- dplyr::bind_rows(tibble::tibble(step = '0',
-                                                `aggregation function` = NA,
-                                                `aggregation level` = startinglevel),
-                                 dataseqtab)
+  dataseqtab <- dplyr::bind_rows(
+    tibble::tibble(
+      step = "0",
+      `aggregation function` = NA,
+      `aggregation level` = startinglevel
+    ),
+    dataseqtab
+  )
 
   return(dataseqtab)
 }

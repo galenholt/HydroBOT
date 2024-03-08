@@ -135,8 +135,7 @@ test_that("multiple functions", {
 # Tests from spatial_aggregate --------------------------------------------
 
 test_that("gauge to poly works", {
-
-  skip_on_os('linux')
+  skip_on_os("linux")
 
   # should error if not list, to keep from iterating over sdl_units itself
   expect_error(multi_aggregate(ewr_to_agg,
@@ -199,8 +198,7 @@ test_that("gauge to poly works", {
 })
 
 test_that("poly to poly works", {
-
-  skip_on_os('linux')
+  skip_on_os("linux")
 
   g2pagg <- multi_aggregate(ewr_to_agg,
     aggsequence = list(sdl_units = sdl_units),
@@ -402,8 +400,7 @@ test_that("multi-step theme agg works, auto-edges", {
 
 # Spatial only
 test_that("multi-step spatial works", {
-
-  skip_on_os('linux')
+  skip_on_os("linux")
 
   aggseq <- list(
     sdl_units = sdl_units,
@@ -475,8 +472,7 @@ test_that("multi-step spatial works", {
 
 # Theme and spatial together
 test_that("multi-step theme and spatial works", {
-
-  skip_on_os('linux')
+  skip_on_os("linux")
 
   aggseq <- list(
     ewr_code = c("ewr_code_timing", "ewr_code"),
@@ -538,7 +534,6 @@ test_that("multi-step theme and spatial works", {
 
 # Theme and spatial together
 test_that("multi-step theme and spatial works with !namehistory", {
-
   aggseq <- list(
     ewr_code = c("ewr_code_timing", "ewr_code"),
     env_obj = c("ewr_code", "env_obj"),
@@ -590,13 +585,13 @@ test_that("multi-step theme and spatial works with !namehistory", {
   funs_in_df <- spatagg |>
     sf::st_drop_geometry() |>
     dplyr::slice(1) |>
-    dplyr::select(tidyselect::starts_with('aggfun_')) |>
+    dplyr::select(tidyselect::starts_with("aggfun_")) |>
     unlist()
 
   aggs_in_df <- spatagg |>
     sf::st_drop_geometry() |>
     dplyr::slice(1) |>
-    dplyr::select(tidyselect::starts_with('aggLevel_')) |>
+    dplyr::select(tidyselect::starts_with("aggLevel_")) |>
     unlist()
 
 
@@ -611,11 +606,15 @@ test_that("multi-step theme and spatial works with !namehistory", {
     "ArithmeticMean",
     "ArithmeticMean",
     "ArithmeticMean",
-    list(wm = ~weighted.mean(., w = area,
-                             na.rm = TRUE)),
+    list(wm = ~ weighted.mean(.,
+      w = area,
+      na.rm = TRUE
+    )),
     "ArithmeticMean",
-    list(wm = ~weighted.mean(., w = area,
-                             na.rm = TRUE)),
+    list(wm = ~ weighted.mean(.,
+      w = area,
+      na.rm = TRUE
+    )),
     "ArithmeticMean"
   )
 
@@ -634,26 +633,26 @@ test_that("multi-step theme and spatial works with !namehistory", {
 
 
   spatagg_wm <- multi_aggregate(ewr_to_agg,
-                               aggsequence = aggseq,
-                               groupers = "scenario",
-                               aggCols = "ewr_achieved",
-                               funsequence = funseq_wm,
-                               causal_edges = causal_ewr,
-                               namehistory = FALSE,
-                               auto_ewr_PU = TRUE
+    aggsequence = aggseq,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    funsequence = funseq_wm,
+    causal_edges = causal_ewr,
+    namehistory = FALSE,
+    auto_ewr_PU = TRUE
   )
 
   # Check the values are actually right
   funs_in_df_wm <- spatagg_wm |>
     sf::st_drop_geometry() |>
     dplyr::slice(1) |>
-    dplyr::select(tidyselect::starts_with('aggfun_')) |>
+    dplyr::select(tidyselect::starts_with("aggfun_")) |>
     unlist()
 
   aggs_in_df_wm <- spatagg_wm |>
     sf::st_drop_geometry() |>
     dplyr::slice(1) |>
-    dplyr::select(tidyselect::starts_with('aggLevel_')) |>
+    dplyr::select(tidyselect::starts_with("aggLevel_")) |>
     unlist()
 
 
@@ -681,7 +680,7 @@ test_that("multi-step theme and spatial works with !namehistory", {
     ggplot2::theme(legend.position = "bottom")
 
 
-  skip_on_os('linux')
+  skip_on_os("linux")
 
   vdiffr::expect_doppelganger("spatial-theme_multi_namehistory", g2sdl_plot)
 })
@@ -786,8 +785,7 @@ test_that("backstepping along theme axis throws informative error", {
 
 
 test_that("saving the list of steps and appropriate persistence of PU grouping", {
-
-  skip_on_os('linux')
+  skip_on_os("linux")
 
   # also allows checking that the planning unit grouping persists until it shouldn't and then gets dropped
 

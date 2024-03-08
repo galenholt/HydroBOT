@@ -18,10 +18,9 @@
 #' @export
 #'
 #' @examples
-get_ewr_output <- function(dir, type = 'achievement', year_roll = 'best',
+get_ewr_output <- function(dir, type = "achievement", year_roll = "best",
                            gaugefilter = NULL, scenariofilter = NULL, add_max = TRUE) {
-
-  if (type != 'achievement') {
+  if (type != "achievement") {
     outdf <- get_any_ewr_output(dir, type = type, gaugefilter = gaugefilter, scenariofilter = scenariofilter)
   }
 
@@ -40,8 +39,8 @@ get_ewr_output <- function(dir, type = 'achievement', year_roll = 'best',
     # add max
     if (add_max == TRUE) {
       outdf <- bind_max(outdf)
+    }
   }
-}
 
   return(outdf)
 }
@@ -293,7 +292,8 @@ assess_ewr_achievement <- function(annualdf, summarydf, year_roll = ifelse(nrow(
     EWR_results <- annualdf |>
       dplyr::group_by(ewr_code, ewr_code_timing, gauge, scenario, planning_unit_name) |>
       dplyr::filter(!is.na(frequency_check_n_years)) |>
-      dplyr::summarise(ewr_achieved = sum(frequency_check_n_years) == dplyr::n()) |> # do all pass?
+      # dplyr::summarise(ewr_achieved = sum(frequency_check_n_years) == dplyr::n()) |> # do all pass?
+      dplyr::summarise(ewr_achieved = mean(frequency_check_n_years)) |> # what proportion passes?
       dplyr::mutate(ewr_achieved_timeframe = year_roll) |>
       dplyr::ungroup()
   } else if (year_roll <= 1) {
@@ -330,7 +330,8 @@ assess_ewr_achievement <- function(annualdf, summarydf, year_roll = ifelse(nrow(
       # less than 10 years data (uses all years as time frame window)
       EWR_results <- annualdf |>
         dplyr::group_by(ewr_code, ewr_code_timing, gauge, scenario, planning_unit_name) |>
-        dplyr::summarise(ewr_achieved = sum(frequency_check_all_years) == dplyr::n()) |> # do all pass?
+        # dplyr::summarise(ewr_achieved = sum(frequency_check_all_years) == dplyr::n()) |> # do all pass?
+        dplyr::summarise(ewr_achieved = mean(frequency_check_all_years)) |> # what proportion passes?
         dplyr::mutate(ewr_achieved_timeframe = nYdata) |>
         dplyr::ungroup()
     } else if (nYdata >= 10 & nYdata < 20) {
@@ -338,7 +339,8 @@ assess_ewr_achievement <- function(annualdf, summarydf, year_roll = ifelse(nrow(
       EWR_results <- annualdf |>
         dplyr::group_by(ewr_code, ewr_code_timing, gauge, scenario, planning_unit_name) |>
         dplyr::filter(!is.na(frequency_check_10_years)) |>
-        dplyr::summarise(ewr_achieved = sum(frequency_check_10_years) == dplyr::n()) |> # do all pass?
+        # dplyr::summarise(ewr_achieved = sum(frequency_check_10_years) == dplyr::n()) |> # do all pass?
+        dplyr::summarise(ewr_achieved = mean(frequency_check_10_years)) |> # what proportion passes?
         dplyr::mutate(ewr_achieved_timeframe = 10) |>
         dplyr::ungroup()
     } else if (nYdata >= 20) {
@@ -351,7 +353,8 @@ assess_ewr_achievement <- function(annualdf, summarydf, year_roll = ifelse(nrow(
         ) |>
         dplyr::filter(!is.na(frequency_check_10and20_years)) |>
         dplyr::summarise(
-          ewr_achieved = sum(frequency_check_10and20_years) == dplyr::n(), # do all pass?
+          # ewr_achieved = sum(frequency_check_10and20_years) == dplyr::n(), # do all pass?
+          ewr_achieved = mean(frequency_check_10and20_years), # what proportion passes?
           ewr_achieved_timeframe = unique(ewr_achieved_timeframe)
         ) |>
         dplyr::ungroup()
@@ -374,9 +377,11 @@ assess_ewr_achievement <- function(annualdf, summarydf, year_roll = ifelse(nrow(
 #' @examples
 bind_max <- function(outdf) {
   MAX_scenario <- outdf |>
-    dplyr::filter(scenario == unique(outdf$scenario)[1])|>
-    dplyr::mutate(scenario = "MAX",
-           ewr_achieved = 1)|>
+    dplyr::filter(scenario == unique(outdf$scenario)[1]) |>
+    dplyr::mutate(
+      scenario = "MAX",
+      ewr_achieved = 1
+    ) |>
     dplyr::select(scenario, gauge, planning_unit_name, ewr_achieved, ewr_code, ewr_code_timing)
   outdf <- dplyr::bind_rows(outdf, MAX_scenario)
   return(outdf)

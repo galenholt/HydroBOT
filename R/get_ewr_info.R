@@ -14,7 +14,7 @@ get_ewr_gauges <- function() {
   names(gauges_in_pyewr) <- stringr::str_to_lower(names(gauges_in_pyewr))
 
   gauges_in_pyewr <- gauges_in_pyewr |>
-   dplyr::left_join(bom_basin_gauges)
+    dplyr::left_join(bom_basin_gauges)
 
   return(gauges_in_pyewr)
 }
@@ -27,17 +27,21 @@ get_ewr_gauges <- function() {
 #' @export
 #'
 #' @examples
-get_ewr_table <- function(type = 'good') {
+get_ewr_table <- function(type = "good") {
   pdi <- reticulate::import("py_ewr.data_inputs")
   ewrs_in_pyewr <- pdi$get_EWR_table()
-  names(ewrs_in_pyewr) <- c('good', 'bad')
-  if (type == 'good') {ewrs_in_pyewr <- ewrs_in_pyewr[[1]]}
-  if (type == 'bad') {ewrs_in_pyewr <- ewrs_in_pyewr[[2]]}
+  names(ewrs_in_pyewr) <- c("good", "bad")
+  if (type == "good") {
+    ewrs_in_pyewr <- ewrs_in_pyewr[[1]]
+  }
+  if (type == "bad") {
+    ewrs_in_pyewr <- ewrs_in_pyewr[[2]]
+  }
   return(ewrs_in_pyewr)
 }
 
 get_raw_ewrsheet <- function() {
-  rawsheet <- readr::read_csv('.venv/Lib/site-packages/py_ewr/parameter_metadata/parameter_sheet.csv')
+  rawsheet <- readr::read_csv(".venv/Lib/site-packages/py_ewr/parameter_metadata/parameter_sheet.csv")
 }
 
 #' Check the ewr version.
@@ -46,18 +50,16 @@ get_raw_ewrsheet <- function() {
 #'
 check_ewr_version <- function() {
   pypkgs <- reticulate::py_list_packages()
-  ewrversion <- pypkgs$version[which(pypkgs$package == 'py_ewr')]
+  ewrversion <- pypkgs$version[which(pypkgs$package == "py_ewr")]
 
   if (length(ewrversion) == 0) {
     rlang::inform("reticulate can't find version. Trying brute force")
-    path_to_pypkgs <- file.path(Sys.getenv("VIRTUAL_ENV"), 'Lib/site-packages')
+    path_to_pypkgs <- file.path(Sys.getenv("VIRTUAL_ENV"), "Lib/site-packages")
     dirs <- list.files(path_to_pypkgs)
-    pyverdir <- dirs[grep('py_ewr-', dirs)]
+    pyverdir <- dirs[grep("py_ewr-", dirs)]
     # could get this from METADATA text file, but easier to just deal with the directory name
-    ewrversion <- stringr::str_remove_all(pyverdir, 'py_ewr-') |>
-      stringr::str_remove_all('.dist-info')
-
-
+    ewrversion <- stringr::str_remove_all(pyverdir, "py_ewr-") |>
+      stringr::str_remove_all(".dist-info")
   }
   return(ewrversion)
 }

@@ -17,7 +17,6 @@ Rebuilding data is done with params. To rebuild, at the terminal run `quarto ren
 #| warning: false
 #| message: false
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
-
 ```
 
 ```{r}
@@ -44,33 +43,31 @@ The read-in does some cleaning, so save, read in, and then toss.
 
 ```{r}
 #| label: run the ewr tool
-hydro_dir = file.path("inst/extdata/testsmall/hydrographs")
+hydro_dir <- file.path("inst/extdata/testsmall/hydrographs")
 
-project_dir =file.path("inst/extdata/testsmall")
+project_dir <- file.path("inst/extdata/testsmall")
 
-model_format = 'IQQM - NSW 10,000 years'
+model_format <- "IQQM - NSW 10,000 years"
 
-outputType <- list('summary')
+outputType <- list("summary")
 
-ewr_out = prep_run_save_ewrs(hydro_dir = hydro_dir, 
-                             output_parent_dir = project_dir, 
-                             outputType = outputType, 
-                             returnType = list('summary', 'all'))
-
-
-  
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = hydro_dir,
+  output_parent_dir = project_dir,
+  outputType = outputType,
+  returnType = list("summary", "all")
+)
 ```
 
 ```{r}
 #| label: read in and save
 
-ewrpath <- file.path(project_dir, 'module_output', 'EWR')
-summary_ewr_output <- get_ewr_output(ewrpath, type = 'achievement')
+ewrpath <- file.path(project_dir, "module_output", "EWR")
+summary_ewr_output <- get_ewr_output(ewrpath, type = "achievement")
 
 usethis::use_data(summary_ewr_output, overwrite = params$REBUILD_DATA)
 
-file.remove(file.path(project_dir, 'module_output'), recursive = TRUE)
-
+file.remove(file.path(project_dir, "module_output"), recursive = TRUE)
 ```
 
 
@@ -82,41 +79,51 @@ This is taken similar to the tests, with the addition of more appropriate weight
 
 ```{r}
 sumspat <- gauge2geo(summary_ewr_output,
-                     gaugelocs = bom_basin_gauges)
+  gaugelocs = bom_basin_gauges
+)
 
-aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
-               env_obj =  c('ewr_code', "env_obj"),
-               sdl_units = sdl_units,
-               Specific_goal = c('env_obj', "Specific_goal"),
-               catchment = cewo_valleys,
-               Objective = c('Specific_goal', 'Objective'),
-               mdb = basin,
-               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+aggseq <- list(
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  env_obj = c("ewr_code", "env_obj"),
+  sdl_units = sdl_units,
+  Specific_goal = c("env_obj", "Specific_goal"),
+  catchment = cewo_valleys,
+  Objective = c("Specific_goal", "Objective"),
+  mdb = basin,
+  target_5_year_2024 = c("Objective", "target_5_year_2024")
+)
 
-funseq <- list('CompensatingFactor',
-               'ArithmeticMean',
-               'ArithmeticMean',
-               c('ArithmeticMean', 'LimitingFactor'),
-               list(wm = ~weighted.mean(., w = area, 
-                                        na.rm = TRUE)),
-               'ArithmeticMean',
-               list(wm = ~weighted.mean(., w = area, 
-                                        na.rm = TRUE)),
-               'ArithmeticMean')
+funseq <- list(
+  "CompensatingFactor",
+  "ArithmeticMean",
+  "ArithmeticMean",
+  c("ArithmeticMean", "LimitingFactor"),
+  list(wm = ~ weighted.mean(.,
+    w = area,
+    na.rm = TRUE
+  )),
+  "ArithmeticMean",
+  list(wm = ~ weighted.mean(.,
+    w = area,
+    na.rm = TRUE
+  )),
+  "ArithmeticMean"
+)
 
 # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
 agg_theme_space <- multi_aggregate(sumspat,
-                           aggsequence = aggseq,
-                           groupers = 'scenario',
-                           aggCols = 'ewr_achieved',
-                           funsequence = funseq,
-                           causal_edges = causal_ewr,
-                           saveintermediate = TRUE)
+  aggsequence = aggseq,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  funsequence = funseq,
+  causal_edges = causal_ewr,
+  saveintermediate = TRUE
+)
 ```
 
 Should we stop using these? They're enormous but quick to generate if we need them for other tests.
 ```{r}
-  # usethis::use_data(agg_theme_space, overwrite = params$REBUILD_DATA)
+# usethis::use_data(agg_theme_space, overwrite = params$REBUILD_DATA)
 ```
 
 ```{r}
@@ -128,13 +135,14 @@ We want an example of that with the sequence in columns too
 ```{r}
 # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
 agg_theme_space_colsequence <- multi_aggregate(sumspat,
-                           aggsequence = aggseq,
-                           groupers = 'scenario',
-                           aggCols = 'ewr_achieved',
-                           funsequence = funseq,
-                           causal_edges = causal_ewr,
-                           saveintermediate = TRUE,
-                           namehistory = FALSE)
+  aggsequence = aggseq,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  funsequence = funseq,
+  causal_edges = causal_ewr,
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
 ```
 
 ```{r}
@@ -142,5 +150,5 @@ names(agg_theme_space_colsequence$mdb)
 ```
 
 ```{r}
-  # usethis::use_data(agg_theme_space_colsequence, overwrite = params$REBUILD_DATA)
+# usethis::use_data(agg_theme_space_colsequence, overwrite = params$REBUILD_DATA)
 ```

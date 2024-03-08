@@ -15,19 +15,21 @@
 #'
 #' @examples
 node_plot_atts <- function(nodedf) {
-
   # The way I'm getting x is crude, and likely will fail once we have more complex networks
   nodedf <- nodedf |>
-    dplyr::mutate(shape = 'rectangle',
-           tooltip = Name,
-           # Name = stringr::str_wrap(Name, 40),
-           fontsize = 25,
-           # width = 5, #stringr::str_length(Name)/2,
-           width = ifelse(stringr::str_length(Name) < 40,
-                          stringr::str_length(Name)/5,
-                          40/5),
-           # x = nodeorder * 15,
-           height = (stringr::str_count(Name, '\\n') + 1)/2)
+    dplyr::mutate(
+      shape = "rectangle",
+      tooltip = Name,
+      # Name = stringr::str_wrap(Name, 40),
+      fontsize = 25,
+      # width = 5, #stringr::str_length(Name)/2,
+      width = ifelse(stringr::str_length(Name) < 40,
+        stringr::str_length(Name) / 5,
+        40 / 5
+      ),
+      # x = nodeorder * 15,
+      height = (stringr::str_count(Name, "\\n") + 1) / 2
+    )
 
   # If we want things centered, need to get y with grouping
   nodedf <- nodedf |>
@@ -40,14 +42,18 @@ node_plot_atts <- function(nodedf) {
     #        rown = cumsum(height*2)-height*2,
     #        y = rown-mid) |>
     # Double columns are a bit better?
-  dplyr::mutate(num = dplyr::n(),
-         mid = num/2,
-         rown = dplyr::row_number(),
-         y = rown-mid) |> # Kinda silly this way instead of mid-rown, but it keeps things from flipping
-    dplyr::mutate(basex = nodeorder*15,
-           devx = width/1.8,
-           plusminus = rlang::rep_along(devx, c(1, -1)) * devx,
-           x = basex + plusminus) |>
+    dplyr::mutate(
+      num = dplyr::n(),
+      mid = num / 2,
+      rown = dplyr::row_number(),
+      y = rown - mid
+    ) |> # Kinda silly this way instead of mid-rown, but it keeps things from flipping
+    dplyr::mutate(
+      basex = nodeorder * 15,
+      devx = width / 1.8,
+      plusminus = rlang::rep_along(devx, c(1, -1)) * devx,
+      x = basex + plusminus
+    ) |>
     dplyr::ungroup() |>
     dplyr::select(-num, -mid, -rown, basex, devx, plusminus)
 

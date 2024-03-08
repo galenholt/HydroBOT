@@ -13,11 +13,9 @@
 #' @examples
 grouped_colors <- function(df, pal_list,
                            pal_direction = rep(1, length(pal_list)),
-                            colorgroups = NULL,
-                            colorset = NULL,
-                            setLimits = NULL) {
-
-
+                           colorgroups = NULL,
+                           colorset = NULL,
+                           setLimits = NULL) {
   # short-circuit if pal_list is just a color name or a named color object-
   # accepts single values, a named object of class color or a vector of length
   # nrow(df)
@@ -25,15 +23,21 @@ grouped_colors <- function(df, pal_list,
   # downstream functions expect a 'colordef' column that allows us to not
   # explicitly track variable names, so add that.
   if (!is.list(pal_list) & is.character(pal_list)) {
-    if (inherits(pal_list, 'colors')) {
+    if (inherits(pal_list, "colors")) {
       coltib <- tibble::tibble(name = names(pal_list), color = pal_list)
       # which column does the pal_list match?
       colnames <- names(pal_list)
-      if (any(colnames %in% df$scenario)) {namematch <- 'scenario'}
+      if (any(colnames %in% df$scenario)) {
+        namematch <- "scenario"
+      }
       if (!is.null(colorgroups) && any(colnames %in%
-              dplyr::pull(df, colorgroups))) {namematch <- colorgroups}
+        dplyr::pull(df, colorgroups))) {
+        namematch <- colorgroups
+      }
       if (!is.null(colorset) && any(colnames %in%
-              dplyr::pull(df, colorset))) {namematch <- colorset}
+        dplyr::pull(df, colorset))) {
+        namematch <- colorset
+      }
       names(coltib)[1] <- namematch
       df <- dplyr::left_join(df, coltib, by = namematch) |>
         dplyr::mutate(colordef = .data[[namematch]])
@@ -50,16 +54,18 @@ grouped_colors <- function(df, pal_list,
 
   # need some name references to know what function to use
   cnames <- paletteer::palettes_c_names |>
-    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) |>
-    dplyr::select(formatted) |> dplyr::pull()
+    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = "::")) |>
+    dplyr::select(formatted) |>
+    dplyr::pull()
 
   dnames <- paletteer::palettes_d_names |>
-    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) |>
-    dplyr::select(formatted) |> dplyr::pull()
+    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = "::")) |>
+    dplyr::select(formatted) |>
+    dplyr::pull()
 
   # For consistency, rename the column to a fixed name `colordef`
   df <- df |>
-    dplyr::mutate(dplyr::across(tidyselect::all_of(colorset), identity, .names = 'colordef'))
+    dplyr::mutate(dplyr::across(tidyselect::all_of(colorset), identity, .names = "colordef"))
 
   # pal_direction needs to be named as pal_list
   if (!is.null(pal_direction) && is.null(names(pal_direction))) {
@@ -71,11 +77,13 @@ grouped_colors <- function(df, pal_list,
     dplyr::group_by(dplyr::across(tidyselect::any_of(colorgroups))) |>
     dplyr::distinct(colordef) |>
     dplyr::mutate(palname = ifelse(is.null(colorgroups),
-                                   unlist(pal_list),
-                                   pal_list[[.data[[colorgroups]][1]]])) |>
+      unlist(pal_list),
+      pal_list[[.data[[colorgroups]][1]]]
+    )) |>
     dplyr::mutate(paldir = ifelse(is.null(colorgroups),
-                                  pal_direction,
-                                  pal_direction[.data[[colorgroups]][1]]))
+      pal_direction,
+      pal_direction[.data[[colorgroups]][1]]
+    ))
 
   # We get the color value by telling the palette how many colors and then
   # grabbing an index. If colordef is a non-numeric, we should choose as many
@@ -83,7 +91,6 @@ grouped_colors <- function(df, pal_list,
   # If colordef is numeric, we want to make a long palette and then grab the
   # color in the right spot.
   if (is.numeric(dfcols$colordef)) {
-
     if (is.null(setLimits)) {
       setLimits <- c(min(dfcols$colordef), max(dfcols$colordef))
     }
@@ -93,42 +100,53 @@ grouped_colors <- function(df, pal_list,
     # simple case with two limits, or complex with 3 (middle is centerpoint for diverging)
     if (length(setLimits) == 2) {
       dfcols <- dfcols |>
-        dplyr::mutate(pallength = 1000,
-                      palindex = round(propor(colordef, minx = setLimits[1], maxx = setLimits[2])*(pallength-1))+1)
+        dplyr::mutate(
+          pallength = 1000,
+          palindex = round(propor(colordef, minx = setLimits[1], maxx = setLimits[2]) * (pallength - 1)) + 1
+        )
     } else if (length(setLimits) == 3) {
       dfcols <- dfcols |>
-        dplyr::mutate(pallength = 1000,
-                      palindex = dplyr::case_when(colordef == setLimits[2] ~ pallength/2,
-                                                  colordef < setLimits[2] ~ round(propor(colordef,
-                                                                                         minx = setLimits[1],
-                                                                                         maxx = setLimits[2]) * ((pallength/2)-1)) + 1,
-                                                  colordef > setLimits[2] ~ round(propor(colordef,
-                                                                                         minx = setLimits[2],
-                                                                                         maxx = setLimits[3]) * ((pallength/2)-1)) + (pallength/2) + 1
-                                                  ))
-
+        dplyr::mutate(
+          pallength = 1000,
+          palindex = dplyr::case_when(
+            colordef == setLimits[2] ~ pallength / 2,
+            colordef < setLimits[2] ~ round(propor(colordef,
+              minx = setLimits[1],
+              maxx = setLimits[2]
+            ) * ((pallength / 2) - 1)) + 1,
+            colordef > setLimits[2] ~ round(propor(colordef,
+              minx = setLimits[2],
+              maxx = setLimits[3]
+            ) * ((pallength / 2) - 1)) + (pallength / 2) + 1
+          )
+        )
     }
-
   } else {
     dfcols <- dfcols |>
-      dplyr::mutate(pallength = dplyr::n(),
-                    palindex = dplyr::row_number())
+      dplyr::mutate(
+        pallength = dplyr::n(),
+        palindex = dplyr::row_number()
+      )
   }
 
 
   # Need to determine `paletteer_c` vs `paletteer_d` dependent on the name. This
   # should be doable with case_when but it won't run in a dplyr::mutate. Loop over
   # rows, getting the correct color index for the correct palette.
-    # this is *very* close to `make_pal`, and could be combined, but the issue
-    # is the rowwise loop. Just need a bit more thinking there
+  # this is *very* close to `make_pal`, and could be combined, but the issue
+  # is the rowwise loop. Just need a bit more thinking there
   colmap <- foreach::foreach(i = 1:nrow(dfcols)) %do% {
     thispal <- dfcols$palname[i]
     if (thispal %in% cnames) {
-      thiscol <- paletteer::paletteer_c(thispal, n = dfcols$pallength[i],
-                                        direction = dfcols$paldir[i])[dfcols$palindex[i]]
+      thiscol <- paletteer::paletteer_c(thispal,
+        n = dfcols$pallength[i],
+        direction = dfcols$paldir[i]
+      )[dfcols$palindex[i]]
     } else if (thispal %in% dnames) {
-      thiscol <- paletteer::paletteer_d(thispal, n = dfcols$pallength[i],
-                                        direction = dfcols$paldir[i])[dfcols$palindex[i]]
+      thiscol <- paletteer::paletteer_d(thispal,
+        n = dfcols$pallength[i],
+        direction = dfcols$paldir[i]
+      )[dfcols$palindex[i]]
     } else {
       # try to inform a bit- I could auto-set palettes this way, but I'd rather
       # make the user do it right

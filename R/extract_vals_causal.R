@@ -37,52 +37,52 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
   agglist <- agglist[names(agglist) %in% targetlevels]
 
   # Could almost certainly be a purrr::map()
-  stackvalues <- foreach::foreach (i = 1:length(agglist),
-                          .combine = dplyr::bind_rows) %do% {
+  stackvalues <- foreach::foreach(
+    i = 1:length(agglist),
+    .combine = dplyr::bind_rows
+  ) %do% {
+    # get the name of the nodelevel- the list is named
+    # by which group is aggregated into
+    thesenodes <- targetlevels[i]
 
-                            # get the name of the nodelevel- the list is named
-                            # by which group is aggregated into
-                            thesenodes <- targetlevels[i]
-
-                            if (length(thesenodes) > 1) {
-                              rlang::abort(glue::glue("Expect each node level to have one value,
+    if (length(thesenodes) > 1) {
+      rlang::abort(glue::glue("Expect each node level to have one value,
                                                       this one {agglist[i]} is {thesenodes}"))
-                            }
+    }
 
-                            # Filter to the right sort of aggregation- noting
-                            # that agglist[1] is the raw data and so not
-                            # aggregated
+    # Filter to the right sort of aggregation- noting
+    # that agglist[1] is the raw data and so not
+    # aggregated
 
-                            simpledf <- agglist[[i]]
+    simpledf <- agglist[[i]]
 
-                            if (i > 1) {
-                              # This bit needs to do ALL the n-1 aggs. Not a fan
-                              # of the loop, but getting fancy with purr or
-                              # pivots was losing history- ie it would get all
-                              # ArithmeticMeans in stage 3 no matter what the
-                              # previous stages were.
+    if (i > 1) {
+      # This bit needs to do ALL the n-1 aggs. Not a fan
+      # of the loop, but getting fancy with purr or
+      # pivots was losing history- ie it would get all
+      # ArithmeticMeans in stage 3 no matter what the
+      # previous stages were.
 
-                              for (j in 1:(i-1)) {
-                                aggcol <- paste0("aggfun_", as.character(j))
-                                colind <- which(names(simpledf) == aggcol)
-                                simpledf <- simpledf |>
-                                  dplyr::filter(.data[[aggcol]] == whichaggs[[j]])
-                              }
+      for (j in 1:(i - 1)) {
+        aggcol <- paste0("aggfun_", as.character(j))
+        colind <- which(names(simpledf) == aggcol)
+        simpledf <- simpledf |>
+          dplyr::filter(.data[[aggcol]] == whichaggs[[j]])
+      }
+    }
 
-                            }
+    # Get just the relevant columns- scenario, gauge, the aggregation units, and the values
+    # Don't assume scenario and gauge exist though
+    simpledf <- simpledf |>
+      dplyr::select(
+        tidyselect::any_of(c("scenario", "gauge")),
+        tidyselect::all_of(c(thesenodes, valcol))
+      ) |>
+      dplyr::rename(Name = tidyselect::all_of(thesenodes)) |>
+      dplyr::mutate(NodeType = thesenodes)
 
-                            # Get just the relevant columns- scenario, gauge, the aggregation units, and the values
-                            # Don't assume scenario and gauge exist though
-                            simpledf <- simpledf |>
-                              dplyr::select(tidyselect::any_of(c('scenario', 'gauge')),
-                                            tidyselect::all_of(c(thesenodes, valcol))) |>
-                              dplyr::rename(Name = tidyselect::all_of(thesenodes)) |>
-                              dplyr::mutate(NodeType = thesenodes)
-
-                            simpledf
-
-                          }
+    simpledf
+  }
 
   return(stackvalues)
 }
-

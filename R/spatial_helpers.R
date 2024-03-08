@@ -25,7 +25,7 @@ add_polyID <- function(geosf, failduplicate = TRUE) {
   # Could also probably do something with st_equals to check that, I guess. But
   # I don't have a good test case handy
   if (failduplicate & any(duplicated(geosf$polyID))) {
-    stop('polygons not unique at a precision of 11')
+    stop("polygons not unique at a precision of 11")
   }
 
   return(geosf)
@@ -44,5 +44,3 @@ crs_clean <- function(geo, whichcrs) {
 
   return(geo)
 }
-
-

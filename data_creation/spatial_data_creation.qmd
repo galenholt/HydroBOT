@@ -17,7 +17,6 @@ Set the directory. This got convoluted with the Rproject nested inside quarto, b
 #| warning: false
 #| message: false
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
-
 ```
 
 ```{r}
@@ -40,19 +39,24 @@ if ("params" %in% ls()) {
 } else {
   REBUILD_DATA <- FALSE
 }
-
 ```
 
 Trying to be as intentional as possible with the data dirs. `data-raw` is for raw data that is used to create package data, and is hidden when building. I'm differentiating downloaded from not to hopefully avoid deletion issues and make it clearer what `data` is a typical R package data dir, following the conventions of `.rda` files with single objects. And `inst/extdata` is for data that *isn't* in R format (here, shapefiles that we want to share around).
 
 ```{r}
-datarawdir <- 'data-raw'
-dataoutdir <- 'data'
-dataextdir <- 'inst/extdata'
+datarawdir <- "data-raw"
+dataoutdir <- "data"
+dataextdir <- "inst/extdata"
 
-if (!dir.exists(datarawdir)) {dir.create(datarawdir, recursive = TRUE)} 
-if (!dir.exists(dataoutdir)) {dir.create(dataoutdir, recursive = TRUE)} 
-if (!dir.exists(dataextdir)) {dir.create(dataextdir, recursive = TRUE)} 
+if (!dir.exists(datarawdir)) {
+  dir.create(datarawdir, recursive = TRUE)
+}
+if (!dir.exists(dataoutdir)) {
+  dir.create(dataoutdir, recursive = TRUE)
+}
+if (!dir.exists(dataextdir)) {
+  dir.create(dataextdir, recursive = TRUE)
+}
 ```
 
 ## File purpose
@@ -62,9 +66,8 @@ Create some clean(er) spatial data for aggregation testing demonstrations. I'm g
 Define a dataload function for download and unzip of shapefiles- doing this here rather than in R/ because this is not really part of the package, but the initial dev building. And it can know about existing dirs
 
 ```{r}
-data_load <- function(dirname, datadir, sourceurl,  
+data_load <- function(dirname, datadir, sourceurl,
                       existing_dirs = list.files(datadir)) {
-
   if (!(dirname %in% existing_dirs)) {
       if (!dir.exists(file.path(datadir, dirname))) {
         dir.create(file.path(datadir, dirname), recursive = TRUE)
@@ -76,9 +79,9 @@ data_load <- function(dirname, datadir, sourceurl,
       curl::curl_download(sourceurl, destfile = zippath)
     }
     download.file(sourceurl, destfile = zippath)
-    
+
     unzip(zippath, exdir = file.path(datadir, dirname))
-    
+
     file.remove(zippath)
   }
 }
@@ -91,15 +94,15 @@ First, read in the basin. This file straight from MDBA. Currently a download lin
 File from
 
 ```{r}
-
-data_load('downloaded/mdb_boundary', datarawdir, "https://data.gov.au/data/dataset/4ede9aed-5620-47db-a72b-0b3aa0a3ced0/resource/8a6d889d-723b-492d-8c12-b8b0d1ba4b5a/download/sworkingadhocjobsj4430dataoutputsmdb_boundarymdb_boundary.zip")
-
+data_load("downloaded/mdb_boundary", datarawdir, "https://data.gov.au/data/dataset/4ede9aed-5620-47db-a72b-0b3aa0a3ced0/resource/8a6d889d-723b-492d-8c12-b8b0d1ba4b5a/download/sworkingadhocjobsj4430dataoutputsmdb_boundarymdb_boundary.zip")
 ```
 
 ```{r}
-basin <- read_sf(file.path(datarawdir,  'downloaded', 
-                           'mdb_boundary',
-                           'mdb_boundary.shp'))
+basin <- read_sf(file.path(
+  datarawdir, "downloaded",
+  "mdb_boundary",
+  "mdb_boundary.shp"
+))
 ```
 
 ## Resource planning areas
@@ -107,14 +110,15 @@ basin <- read_sf(file.path(datarawdir,  'downloaded',
 Also from MDBA- do this with a link too
 
 ```{r}
-data_load('downloaded/sw_rpa', datarawdir, "https://data.gov.au/data/dataset/7b0c274f-7f12-4062-9e54-5b8227ca20c4/resource/8369c483-975c-4f54-8eda-a6fbd0ea89ad/download/sworkingadhocjobsp3827dataoutputsupdate-april-2019sw-wrpasurface-water-water-resource-plan-areas.zip")
-
+data_load("downloaded/sw_rpa", datarawdir, "https://data.gov.au/data/dataset/7b0c274f-7f12-4062-9e54-5b8227ca20c4/resource/8369c483-975c-4f54-8eda-a6fbd0ea89ad/download/sworkingadhocjobsp3827dataoutputsupdate-april-2019sw-wrpasurface-water-water-resource-plan-areas.zip")
 ```
 
 ```{r}
-rpa <- read_sf(file.path(datarawdir, 'downloaded',
-                         'sw_rpa', 
-                         'Surface Water Water Resource Plan Areas.shp')) |> 
+rpa <- read_sf(file.path(
+  datarawdir, "downloaded",
+  "sw_rpa",
+  "Surface Water Water Resource Plan Areas.shp"
+)) |>
   st_make_valid()
 ```
 
@@ -127,7 +131,7 @@ print(vertcount(rpa))
 Simplify it. The obvious route `sf::st_simplify` is easiest, but doesn't preserve touchingness of adjoining polygons. That may not actually matter if we then scale up more, but it will if this is the final level. So use `rmapshaper::ms_simplify()` (https://github.com/r-spatial/sf/issues/1011) to set up a default polygon set and keep adjoining topology. For now, just pick a level crudely. `sf::st_simplify` does the simplification in meters, but `ms_simplify` is in proportion. A bit harder to judge. Maybe 0.01? The default of 0.05?
 
 ```{r}
-resource_plan_areas <- rpa |> 
+resource_plan_areas <- rpa |>
   rmapshaper::ms_simplify(keep = 0.01)
 
 print(vertcount(resource_plan_areas))
@@ -138,8 +142,8 @@ That's not obviously oversmoothed, so should be fine for testing. If this become
 ```{r}
 ggplot(resource_plan_areas) +
   geom_sf(aes(fill = SWWRPANAME), show.legend = FALSE) +
-  geom_sf_label(aes(label = SWWRPANAME), size = 3, label.padding = unit(0.1, 'lines')) + 
-  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+  geom_sf_label(aes(label = SWWRPANAME), size = 3, label.padding = unit(0.1, "lines")) +
+  colorspace::scale_fill_discrete_qualitative(palette = "Set2")
 ```
 
 ## SDL units
@@ -147,14 +151,15 @@ ggplot(resource_plan_areas) +
 Also from MDBA- do this with a link too
 
 ```{r}
-data_load('downloaded/sw_sdl', datarawdir, "https://data.gov.au/data/dataset/4afa3227-8557-4bb6-944a-6494b28ae160/resource/988ae947-f4dc-4f75-9773-536df71b03ad/download/sworkingadhocjobsp3827dataoutputsupdate-january-2019surface-water-sdl-resource-units.zip")
-
+data_load("downloaded/sw_sdl", datarawdir, "https://data.gov.au/data/dataset/4afa3227-8557-4bb6-944a-6494b28ae160/resource/988ae947-f4dc-4f75-9773-536df71b03ad/download/sworkingadhocjobsp3827dataoutputsupdate-january-2019surface-water-sdl-resource-units.zip")
 ```
 
 ```{r}
-sdls <- read_sf(file.path(datarawdir, 'downloaded',
-                         'sw_sdl', 
-                         'Surface Water SDL Resource Units.shp')) |> 
+sdls <- read_sf(file.path(
+  datarawdir, "downloaded",
+  "sw_sdl",
+  "Surface Water SDL Resource Units.shp"
+)) |>
   st_make_valid()
 ```
 
@@ -167,7 +172,7 @@ print(vertcount(sdls))
 again, too many vertices
 
 ```{r}
-sdl_units <- sdls |> 
+sdl_units <- sdls |>
   rmapshaper::ms_simplify(keep = 0.01)
 
 print(vertcount(sdl_units))
@@ -178,8 +183,8 @@ And a plot. Too many units to name so kill the legend
 ```{r}
 ggplot(sdl_units) +
   geom_sf(aes(fill = SWSDLName), show.legend = FALSE) +
-  geom_sf_label(aes(label = SWSDLName), size = 3, label.padding = unit(0.1, 'lines')) + 
-  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+  geom_sf_label(aes(label = SWSDLName), size = 3, label.padding = unit(0.1, "lines")) +
+  colorspace::scale_fill_discrete_qualitative(palette = "Set2")
 ```
 
 The 'Macquarie' file I got from David R. is the Macquarie-Castlereagh there, so just use this to avoid having even more files to lug around.
@@ -361,28 +366,31 @@ ggplot(planning_units) +
 There are gauge locations from the MDBA gis zip (HydrologicIndicatorSites) and BOM (included in EWR tool- bom_gauge_data). I can get the hydrologic indicator sites online, but the only source I can find for the BOM locations is a manual link at <http://www.bom.gov.au/waterdata/>. It's a csv (I got from old version of EWR), so I'm just going to include it for now.
 
 ```{r}
-data_load('downloaded/hyd_ind_sites', datarawdir, "https://data.gov.au/data/dataset/2fbf1d73-712d-4ddb-9d2a-8b4119697525/resource/e507d6a8-bcf1-496a-bfb4-79769c02eced/download/sworkingadhocjobsj4068dataoutputshydrologicindicatorsites_point.zip")
-
+data_load("downloaded/hyd_ind_sites", datarawdir, "https://data.gov.au/data/dataset/2fbf1d73-712d-4ddb-9d2a-8b4119697525/resource/e507d6a8-bcf1-496a-bfb4-79769c02eced/download/sworkingadhocjobsj4068dataoutputshydrologicindicatorsites_point.zip")
 ```
 
 ```{r}
-hydind <- read_sf(file.path(datarawdir, 'downloaded',
-                            "hyd_ind_sites",
-                            "HydrologicIndicatorSites_Point.shp"))
+hydind <- read_sf(file.path(
+  datarawdir, "downloaded",
+  "hyd_ind_sites",
+  "HydrologicIndicatorSites_Point.shp"
+))
 
-bomg <- readr::read_csv(file.path(datarawdir, 'bom_gauge_locations', 'bom_gauge_data.csv'))
+bomg <- readr::read_csv(file.path(datarawdir, "bom_gauge_locations", "bom_gauge_data.csv"))
 ```
 
 Make BOM geographic
 
 ```{r}
-bomg <- bomg |> 
-    dplyr::rename(site = 'site name', gauge = 'gauge number') |>
-    # lat an long come in as chr because there is a line for 'undefined'
-    dplyr::filter(site != 'undefined') |>
-    dplyr::mutate(lat = as.numeric(lat),
-           lon = as.numeric(lon)) |> 
-  st_as_sf(coords = c('lon', 'lat'), crs = 4326) |> 
+bomg <- bomg |>
+  dplyr::rename(site = "site name", gauge = "gauge number") |>
+  # lat an long come in as chr because there is a line for 'undefined'
+  dplyr::filter(site != "undefined") |>
+  dplyr::mutate(
+    lat = as.numeric(lat),
+    lon = as.numeric(lon)
+  ) |>
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) |>
   st_transform(crs = st_crs(basin))
 ```
 
@@ -391,7 +399,7 @@ How do they compare?
 MDBA locations
 
 ```{r}
-ggplot() + 
+ggplot() +
   geom_sf(data = basin) +
   geom_sf(data = hydind)
 ```
@@ -399,8 +407,7 @@ ggplot() +
 BOM are all of Australia
 
 ```{r}
-
-ggplot() + 
+ggplot() +
   geom_sf(data = basin) +
   geom_sf(data = bomg)
 ```
@@ -420,8 +427,8 @@ Quite clearly more in bom, but plot
 ```{r}
 ggplot() +
   geom_sf(data = basin) +
-  geom_sf(data = bom_basin_gauges, color = 'dodgerblue') + 
-  geom_sf(data = hydind, color = 'firebrick', alpha = 0.5)
+  geom_sf(data = bom_basin_gauges, color = "dodgerblue") +
+  geom_sf(data = hydind, color = "firebrick", alpha = 0.5)
 ```
 
 Worth thinking about which to use by default, but let's allow feeding it a path to whatever and using it. I'm going to move that bom dataset into `data` too, and probably use it by default since it seems to be what the EWR is using. Easy to change later.
@@ -431,20 +438,21 @@ Worth thinking about which to use by default, but let's allow feeding it a path 
 Get these from CEWO, there are other sources but I've used a version of this before.
 
 ```{r}
-data_load('downloaded/cewo_valleys', datarawdir, "https://data.gov.au/data/dataset/75910bc5-6c3e-40e8-9c8a-1e895274badb/resource/a7053ee7-8e20-4f2c-b594-cb88c6ed9406/download/cewo_mdb_valleys.shp.zip")
+data_load("downloaded/cewo_valleys", datarawdir, "https://data.gov.au/data/dataset/75910bc5-6c3e-40e8-9c8a-1e895274badb/resource/a7053ee7-8e20-4f2c-b594-cb88c6ed9406/download/cewo_mdb_valleys.shp.zip")
 ```
 
 A bit of cleanup to match crs to the MDBA data, and discard unused cols.
 
 ```{r}
-cewo_valleys <- read_sf(dsn = file.path(datarawdir, 'downloaded',
-                                        'cewo_valleys',
-                                        'CEWO_MDB_Valleys.shp')) |>
+cewo_valleys <- read_sf(dsn = file.path(
+  datarawdir, "downloaded",
+  "cewo_valleys",
+  "CEWO_MDB_Valleys.shp"
+)) |>
   st_transform(st_crs(rpa)) |>
   st_make_valid() |>
   dplyr::select(ValleyName, ValleyID, ValleyCode) |>
-  dplyr::filter(ValleyName != 'Northern Unregulated')
-
+  dplyr::filter(ValleyName != "Northern Unregulated")
 ```
 
 Plot that, make sure it worked
@@ -530,7 +538,6 @@ I *could* save these objects as the sf objects in `.rda` files, as would be typi
 *Only do this if we want to rebuild*- the `data/` directory is tracked, so don't do this willy-nilly.
 
 ```{r}
-
 if (REBUILD_DATA) {
   # The shapefiles to /inst/extdata/
   st_write(basin, 
@@ -567,5 +574,4 @@ if (REBUILD_DATA) {
   usethis::use_data(basin_rivers, overwrite = TRUE)
 
 }
-
 ```

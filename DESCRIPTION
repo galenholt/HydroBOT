@@ -4,7 +4,23 @@ Version: 0.1.3
 Authors@R: 
     person("Galen", "Holt", , "g.holt@deakin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7455-9275"))
-Description: What the package does (one paragraph).
+Description: The werptoolkitr package provides an integrated modelling toolkit tailored for
+    water management in large river systems, exemplified by the Murray-Darling Basin
+    in Australia. Water management in river basins like the Murray-Darling Basin aim
+    to balance multiple values, including supporting water-dependent industries, maintaining
+    healthy ecosystems, and ensuring sufficient water supplies for communities. However, 
+    the dependencies between water and these values are often not well-defined, leading
+    to simplified assumptions in management practices. The werptoolkitr package facilitates
+    the assessment of these values by integrating quantitative and computational models to
+    hydrologic conditions and management actions. It provides a standardized interface
+    for running and synthesizing outputs from these models, simplifying the process of
+    assessing outcomes across a range of values. Key features of the werptoolkitr package
+    include a modular design for easy integration of new response models, standardized     synthesis approaches for management-relevant analysis, scenario-comparison capabilities
+    for assessing outcomes under different conditions, and an emphasis on transparency and
+    reproducibility through public code and self-documentation. By providing a comprehensive
+    toolkit for integrated modelling, werptoolkitr enhances the capacity of water managers
+    to make informed decisions, adapt to changing conditions, and prioritize management
+    actions to achieve desired outcomes in river basin management.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
