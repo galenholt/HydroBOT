@@ -18,10 +18,8 @@ a ggplot theme
 A standard ggplot theme for the toolkit
 }
 \examples{
-ggplot2::ggplot(
-  iris,
-  ggplot2::aes(x = Sepal.Length, y = Sepal.Width, color = Species)
-) +
+ggplot2::ggplot(iris,
+  ggplot2::aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
   ggplot2::geom_point() +
   theme_werp_toolkit()
 }

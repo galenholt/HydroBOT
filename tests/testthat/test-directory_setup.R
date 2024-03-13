@@ -1,17 +1,17 @@
 # Set up some base directory structures
-hydro_dir <- system.file("extdata/testsmall/hydrographs", package = "werptoolkitr")
+hydro_dir <- system.file("extdata/testsmall/hydrographs", package = 'werptoolkitr')
 
 
 # Tests -------------------------------------------------------------------
 
 test_that("get scenario names and nothing else", {
   scenarios <- scenario_names_from_hydro(hydro_dir)
-  expect_equal(scenarios, c("base", "down4", "up4"))
+  expect_equal(scenarios, c('base', 'down4', 'up4'))
 })
 
 test_that("no scenario names if inside scenario", {
-  scenarios <- scenario_names_from_hydro(file.path(hydro_dir, "base"))
-  expect_equal(scenarios, "base")
+  scenarios <- scenario_names_from_hydro(file.path(hydro_dir, 'base'))
+  expect_equal(scenarios, 'base')
 })
 
 test_that("scenario paths works for single csvs in each", {
@@ -22,12 +22,11 @@ test_that("scenario paths works for single csvs in each", {
 })
 
 test_that("scenario paths and the name fixer works for multiple csvs in each", {
-  temp_hydro_multi <- "_test_data/hydrographs"
+
+  temp_hydro_multi <- '_test_data/hydrographs'
   # If needed, build the dir. This takes a while so don't tear it down, typically
-  make_temp_multifile(
-    testdir = "_test_data",
-    temp_hydro = "hydrographs"
-  )
+  make_temp_multifile(testdir = '_test_data',
+                      temp_hydro = 'hydrographs')
 
   scenario_paths <- find_scenario_paths(temp_hydro_multi)
 
@@ -36,7 +35,7 @@ test_that("scenario paths and the name fixer works for multiple csvs in each", {
 
   # Now find the scenario names, fix non-unique naming, and check
   scenenames <- scenario_names_from_hydro(temp_hydro_multi)
-  expect_equal(scenenames, c("base", "down4", "up4"))
+  expect_equal(scenenames, c('base', 'down4', 'up4'))
 
   # This should fix
   newpaths <- fix_file_scenarios(scenario_paths, scenarios = scenenames)
@@ -45,15 +44,16 @@ test_that("scenario paths and the name fixer works for multiple csvs in each", {
   scenario_paths <- find_scenario_paths(temp_hydro_multi)
 
   expect_snapshot(scenario_paths)
+
 })
 
-test_that("creating output dirs works with hydro_dir having all scenarios", {
+test_that('creating output dirs works with hydro_dir having all scenarios', {
   # In this situation, the hydrograph folder and the outputs end up at the same level, underneath a 'project_dir'
-  project_dir <- "_test_data"
+  project_dir <- '_test_data'
 
   make_temp_hydro()
 
-  scenarios <- scenario_names_from_hydro(file.path(project_dir, "hydrographs"))
+  scenarios <- scenario_names_from_hydro(file.path(project_dir, 'hydrographs'))
 
   outpath <- make_output_dir(parent_dir = project_dir, scenarios = scenarios)
 
@@ -62,10 +62,11 @@ test_that("creating output dirs works with hydro_dir having all scenarios", {
 
 })
 
-test_that("creating output dirs works with hydro_dir as a single scenario", {
+test_that('creating output dirs works with hydro_dir as a single scenario', {
+
   # Here, the outputs end up within the same folder as the hydrographs
 
-  single_hydro_scenario <- "_test_data/hydrographs/base"
+  single_hydro_scenario <- '_test_data/hydrographs/base'
   make_temp_hydro()
 
   scenarios <- scenario_names_from_hydro(single_hydro_scenario)

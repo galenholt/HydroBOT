@@ -23,5 +23,3 @@ developer.md
 ^Meta$
 
 python_test_script.py
-
-^\\.pre-commit-config\\.yaml$

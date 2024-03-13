@@ -86,9 +86,9 @@ spatial_aggregate <- function(dat, to_geo, groupers,
   }
 
   if (joinby == 'spatial') {
-    fromto_pair <- spatial_joiner(dat, to_geo, whichcrs = whichcrs)
+    fromto_pair <- spatial_joiner(from_geo = dat, to_geo = to_geo, whichcrs = whichcrs)
   } else if (joinby == 'nonspatial') {
-    fromto_pair <- pseudo_spatial_joiner(dat, to_geo, prefix)
+    fromto_pair <- pseudo_spatial_joiner(from_geo = dat, to_geo = to_geo, prefix = prefix)
     } else {
       rlang::abort("code set up to pass column names with joinby, but not fully. If needed, write the last bits to make it work generally.")
       # fromto_pair <- dplyr::left_join(sf::st_drop_geometry(dat),
@@ -110,14 +110,15 @@ spatial_aggregate <- function(dat, to_geo, groupers,
 
     if (nrow(unusedPolys) > 0) {
       # need to save for each combo of grouping variable
-      allgroups <- fromto_pair |> dplyr::distinct(dplyr::across({{ groupers }}))
+      allgroups <- fromto_pair |> dplyr::distinct(dplyr::across({{groupers}}))
       # combine
       unusedPolys <- dplyr::cross_join(unusedPolys, allgroups)
     }
+
   }
 
   # add the polygon id being grouped into to the grouping variables
-  groupers <- c(groupers, "polyID")
+  groupers <- c(groupers, 'polyID')
 
   # aggCols and funlist might change (see theme_agg_multi) if we have a multi-style wrapper. same with prefix
   # could just use bare aggCols, but it throws warnings. Could use tidyselect::ends_with too, as in theme.
@@ -126,22 +127,19 @@ spatial_aggregate <- function(dat, to_geo, groupers,
   # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
   # Have to specifically exclude quosures to avoid rlang warning, but this conditional is a mess.
   if (!rlang::is_quosure(funlist) &&
-    (is.function(funlist) ||
-      (is.list(funlist) &
+      (is.function(funlist) ||
+       (is.list(funlist) &
         is.function(funlist[[1]])))) {
     funlist <- as.character(substitute(funlist))
-    if (funlist[1] == "c") {
-      funlist <- funlist[2:length(funlist)]
-    }
+    if(funlist[1] == "c") {funlist <- funlist[2:length(funlist)]}
   }
 
   agged <- general_aggregate(fromto_pair,
-    groupers = groupers,
-    aggCols = tidyselect::ends_with(!!aggCols),
-    funlist = funlist,
-    failmissing = failmissing,
-    prefix = prefix
-  )
+                              groupers = groupers,
+                              aggCols = tidyselect::ends_with(!!aggCols),
+                              funlist = funlist,
+                              failmissing = failmissing,
+                              prefix = prefix)
 
 
   # glue back onto the polygons. sf is lost because the x doesn't have the
@@ -149,7 +147,7 @@ spatial_aggregate <- function(dat, to_geo, groupers,
   # The original polys get added with a join using polyID so it doesn't matter if
   # the dataframe gets shuffled or if there were lost areas in the intersection
   # step.
-  aggPoly <- dplyr::left_join(agged, to_geo, by = "polyID") |>
+  aggPoly <- dplyr::left_join(agged, to_geo, by = 'polyID') |>
     sf::st_as_sf()
 
   # add the NAs on if we want
@@ -159,4 +157,9 @@ spatial_aggregate <- function(dat, to_geo, groupers,
 
 
   return(aggPoly)
+
 }
+
+
+
+

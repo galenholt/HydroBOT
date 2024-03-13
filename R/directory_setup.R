@@ -8,18 +8,20 @@
 #' @return a list of filepaths to the hydrographs
 #'
 #' @examples
-find_scenario_paths <- function(hydro_dir, type = "csv") {
+find_scenario_paths <- function(hydro_dir, type = 'csv') {
+
+
   # get the paths relative to hydro_dir
-  if (grepl(".zip", hydro_dir)) {
+  if (grepl('.zip', hydro_dir)) {
     rlang::inform("data in zip is assumed to be 'Straight Node (Gauge).nc'. If that is not the case, will need to allow an argument to specify.")
     hydro_paths <- unzip(hydro_dir, list = TRUE)$Name
-    hydro_paths <- hydro_paths[grepl("Straight Node \\(Gauge\\)\\.nc", hydro_paths)]
+    hydro_paths <- hydro_paths[grepl('Straight Node \\(Gauge\\)\\.nc', hydro_paths)]
   } else {
     hydro_paths <- list.files(hydro_dir, pattern = paste0('.', type, '$'), recursive = TRUE)
   }
 
   unique_names <- hydro_paths |>
-    stringr::str_remove_all(paste0("\\.", type)) |>
+    stringr::str_remove_all(paste0('\\.', type)) |>
     stringr::str_replace_all("/", "_")
 
   # add the path to hydro_dir back on. This keeps things relative to whatever hydro_dir is relative to
@@ -57,15 +59,13 @@ make_output_dir <- function(parent_dir, scenarios, module_name = 'EWR',
 
   # make the scenario directory if needed
   for (i in sceneout) {
-    if (!dir.exists(i)) {
-      dir.create(i, recursive = TRUE)
-    }
+    if (!dir.exists(i)) {dir.create(i, recursive = TRUE)}
   }
 
   # make the internal directories if the module returns different sorts of output
   # This will have to be built for each module, since they will return different things.
   # We could do this in the loop above, but that will just get hard to read.
-  if (module_name == "EWR") {
+  if (module_name == 'EWR') {
     for (i in sceneout) {
       if (!dir.exists(file.path(i))) {dir.create(file.path(i), recursive = TRUE)}
       # for (j in ewr_outtypes) {
@@ -89,11 +89,12 @@ make_output_dir <- function(parent_dir, scenarios, module_name = 'EWR',
 #'
 #' @examples
 scenario_names_from_hydro <- function(hydro_dir) {
+
   # Remove files with extensions- we only want directories
   scenarios <- list.files(hydro_dir)
-  only_dirs <- stringr::str_which(scenarios, "\\.", negate = TRUE)
+  only_dirs <- stringr::str_which(scenarios, '\\.', negate = TRUE)
   # If there's already module_output, ignore it
-  no_modules <- stringr::str_which(scenarios, "module_output", negate = TRUE)
+  no_modules <- stringr::str_which(scenarios, 'module_output', negate = TRUE)
 
   # This really seems unnecessarily complicated
   scenarios <- scenarios[only_dirs[which(only_dirs %in% no_modules)]]
@@ -126,14 +127,14 @@ scenario_names_from_hydro <- function(hydro_dir) {
 #' @examples
 fix_file_scenarios <- function(hydro_paths, scenarios) {
   # Do the split exactly like the ewr tool to make sure the scenarios will work
-  split_path <- sapply(hydro_paths, strsplit, "/")
-  ewr_scenario_name <- sapply(split_path, \(x) stringr::str_remove(x[length(x)], "\\.[A-z]+"))
+  split_path <- sapply(hydro_paths, strsplit, '/')
+  ewr_scenario_name <- sapply(split_path, \(x) stringr::str_remove(x[length(x)], '\\.[A-z]+'))
   if (any(duplicated(ewr_scenario_name))) {
-    path_scenarios <- sapply(split_path, \(x) x[length(x) - 1]) |> unique()
+    path_scenarios <- sapply(split_path, \(x) x[length(x)-1]) |> unique()
 
     if (all(path_scenarios %in% scenarios)) {
-      rename_path <- lapply(split_path, \(x) end_paster(x, npastes = 2))
-      rlang::inform("files not uniquely named and so EWR tool would return
+     rename_path <- lapply(split_path, \(x) end_paster(x, npastes = 2))
+     rlang::inform("files not uniquely named and so EWR tool would return
                    duplicate scenario names for different scenarios.
                    Since file structure appears to be structured around scenarios,
                    scenario names are being appended.
@@ -146,7 +147,7 @@ fix_file_scenarios <- function(hydro_paths, scenarios) {
                   so the scenario name is being given the full path.
                   A better solution would be unique scenario names to start with")
     }
-    new_paths <- lapply(rename_path, \(x) paste0(x, collapse = "/"))
+    new_paths <- lapply(rename_path, \(x) paste0(x, collapse = '/'))
     file.rename(from = unlist(hydro_paths), to = unlist(new_paths))
 
     rlang::inform("Due to duplicate input files across scenario directories,
@@ -163,6 +164,6 @@ fix_file_scenarios <- function(hydro_paths, scenarios) {
 
 # silly helper
 end_paster <- function(x, npastes) {
-  x[length(x)] <- paste0(x[(length(x) - (npastes - 1)):length(x)], collapse = "_DIRECTORYAPPEND_")
+  x[length(x)] <- paste0(x[(length(x)-(npastes-1)):length(x)], collapse = '_DIRECTORYAPPEND_')
   return(x)
 }

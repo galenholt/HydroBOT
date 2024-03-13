@@ -25,15 +25,17 @@
 #' @export
 #'
 #' @examples
-prep_ewr_agg <- function(ewrpath, type = "achievement", geopath, whichcrs = 4283, ...) {
+prep_ewr_agg <- function(ewrpath, type = 'achievement', geopath, whichcrs = 4283, ...) {
   # Dots pass gaugefilter and scenariofilter
-  dat <- get_ewr_output(ewrpath, type, ...)
+    dat <- get_ewr_output(ewrpath, type, ...)
 
   # deal with a single dataframe vs list of dfs
   if (is.data.frame(dat)) {
     dat <- gauge2geo(dat, geopath, whichcrs)
   } else {
     dat <- dat |>
-      purrr::map(~ gauge2geo(.x, geopath, whichcrs))
+      purrr::map(~gauge2geo(.x, geopath, whichcrs))
   }
+
+
 }

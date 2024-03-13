@@ -25,11 +25,10 @@ Uses \code{\link[purrr:safely]{purrr::safely()}} and unpacks the results and err
 }
 \examples{
 safe_imap(as.list(1:10) |> setNames(letters[1:10]),
-  \(x, y) ifelse(sample(c(1, 2), 1) == 1,
-    stop(), paste(x, y)
-  ),
-  retries = 10
-) |>
-  unlist()
+                  \(x, y) ifelse(sample(c(1,2), 1) == 1,
+                              stop(), paste(x, y)),
+                  retries = 10) |>
+ unlist()
+
 
 }

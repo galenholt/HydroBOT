@@ -13,6 +13,7 @@ params:
 #| warning: false
 #| message: false
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
 ```
 
 ```{r}
@@ -73,9 +74,9 @@ if ("params" %in% ls()) {
 Set the data dir to make that easy to change.
 
 ```{r}
-datarawdir <- "data-raw"
-dataoutdir <- "data"
-dataextdir <- "inst/extdata"
+datarawdir <- 'data-raw'
+dataoutdir <- 'data'
+dataextdir <- 'inst/extdata'
 ```
 
 ## Read in gauges
@@ -83,7 +84,7 @@ dataextdir <- "inst/extdata"
 Use the bom gauges, since this is what were contained in the EWR tool.
 
 ```{r}
-gaugegeo <- read_sf(file.path(dataextdir, "bom_gauges.shp"))
+gaugegeo = read_sf(file.path(dataextdir, 'bom_gauges.shp'))
 ```
 
 ## Read in polygons
@@ -91,10 +92,10 @@ gaugegeo <- read_sf(file.path(dataextdir, "bom_gauges.shp"))
 I'll read in a few options, and then choose- basin, resource plan areas, sdl areas (which is where David got the Macquarie polygon), and catchments. I have cut out the testing of David's single polygon- it is the Macquarie-Castlereagh in the sdls.
 
 ```{r}
-basin <- read_sf(file.path(dataextdir, "basin.shp"))
-rps <- read_sf(file.path(dataextdir, "resource_plan.shp"))
-sdl <- read_sf(file.path(dataextdir, "sdl_units.shp"))
-ltv <- read_sf(file.path(dataextdir, "cewo_valleys.shp"))
+basin = read_sf(file.path(dataextdir, 'basin.shp'))
+rps = read_sf(file.path(dataextdir, 'resource_plan.shp'))
+sdl = read_sf(file.path(dataextdir, 'sdl_units.shp'))
+ltv = read_sf(file.path(dataextdir, 'cewo_valleys.shp'))
 ```
 
 crs all match from the creation.
@@ -104,17 +105,15 @@ crs all match from the creation.
 Basin
 
 ```{r}
-ggplot(basin) +
-  geom_sf(fill = "powderblue")
+ggplot(basin) + geom_sf(fill = 'powderblue')
 ```
 
 Resource plan areas
 
 ```{r}
-ggplot(rps) +
-  geom_sf(aes(fill = SWWRPANAME), show.legend = FALSE) +
-  geom_sf_label(aes(label = SWWRPANAME), size = 3, label.padding = unit(0.1, "lines")) +
-  colorspace::scale_fill_discrete_qualitative(palette = "Set2")
+ggplot(rps) + geom_sf(aes(fill = SWWRPANAME), show.legend = FALSE) +
+  geom_sf_label(aes(label = SWWRPANAME), size = 3, label.padding = unit(0.1, 'lines')) + 
+  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
 ```
 
 These have 'SW' codes
@@ -126,10 +125,9 @@ rps
 SDL plan areas
 
 ```{r}
-ggplot(sdl) +
-  geom_sf(aes(fill = SWSDLName), show.legend = FALSE) +
-  geom_sf_label(aes(label = SWSDLName), size = 3, label.padding = unit(0.1, "lines")) +
-  colorspace::scale_fill_discrete_qualitative(palette = "Set2")
+ggplot(sdl) + geom_sf(aes(fill = SWSDLName), show.legend = FALSE) +
+  geom_sf_label(aes(label = SWSDLName), size = 3, label.padding = unit(0.1, 'lines')) + 
+  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
 ```
 
 These have 'SS' codes.
@@ -141,10 +139,9 @@ sdl
 Catchments
 
 ```{r}
-ggplot(ltv) +
-  geom_sf(aes(fill = ValleyName), show.legend = FALSE) +
-  geom_sf_label(aes(label = ValleyName), size = 3, label.padding = unit(0.1, "lines")) +
-  colorspace::scale_fill_discrete_qualitative(palette = "Set2")
+ggplot(ltv) + geom_sf(aes(fill = ValleyName), show.legend = FALSE) +
+  geom_sf_label(aes(label = ValleyName), size = 3, label.padding = unit(0.1, 'lines')) + 
+  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
 ```
 
 ```{r}
@@ -156,14 +153,13 @@ ltv
 The Macquarie shapefile from David is the Macquarie-Castlereagh from `rps`. I want a few catchments to play with for demos, so let's use the Macquarie, Castlereagh, Namoi, Lachlan. That might be a LOT of gauges, though.
 
 ```{r}
-catch_demo <- rps |>
-  dplyr::filter(SWWRPANAME %in% c("Macquarie-Castlereagh", "Lachlan", "Namoi"))
+catch_demo = rps |> 
+  dplyr::filter(SWWRPANAME %in% c('Macquarie-Castlereagh', 'Lachlan', 'Namoi'))
 ```
 
 ```{r}
-(ggplot(catch_demo) +
-  geom_sf(aes(fill = SWWRPANAME)) +
-  scale_fill_brewer(type = "qual", palette = 8))
+(ggplot(catch_demo) + geom_sf(aes(fill = SWWRPANAME)) +
+scale_fill_brewer(type = 'qual', palette = 8))
 ```
 
 ## Get relevant gauges
@@ -173,7 +169,7 @@ catch_demo <- rps |>
 Cut the gaugegeo from the whole country to just those four catchments
 
 ```{r}
-demo_gauges <- st_intersection(gaugegeo, catch_demo)
+demo_gauges = st_intersection(gaugegeo, catch_demo)
 ```
 
 How many are we talking?
@@ -189,7 +185,7 @@ demo_gauges |> nrow()
 To feed to the gauge extractor, we need their gauge numbers.
 
 ```{r}
-gaugenums <- demo_gauges$gauge
+gaugenums = demo_gauges$gauge
 ```
 
 ## Get the values
@@ -199,8 +195,8 @@ We can feed lists to `gg.gauge_pull`, so can feed it that way. We might *want* t
 What time span do we want? 10 years to start
 
 ```{r}
-starttime <- lubridate::ymd(20100101)
-endtime <- lubridate::ymd(20191231)
+starttime = lubridate::ymd(20100101)
+endtime = lubridate::ymd(20191231)
 ```
 
 How many are actually in the EWR tool? I could go get the table myself, but the EWR tool has a function, so use that. *This is where we have to use python to access the EWR table*.
@@ -226,8 +222,8 @@ ewrs, badewrs = get_EWR_table()
 What are those gauges, and which are in both the ewr and the desired catchments?
 
 ```{r}
-ewrgauges <- py$ewrs$Gauge
-ewr_demo_gauges <- gaugenums[gaugenums %in% ewrgauges]
+ewrgauges = py$ewrs$Gauge
+ewr_demo_gauges = gaugenums[gaugenums %in% ewrgauges]
 length(ewr_demo_gauges)
 ```
 
@@ -263,37 +259,37 @@ Transforming the python dates to R dates is horribly slow. MUCH faster to change
 ```{r datatransfer}
 demo_levs <- py$demo_levs
 
-demo_levs$VALUE <- as.numeric(demo_levs$VALUE)
+demo_levs$VALUE = as.numeric(demo_levs$VALUE)
 
 # # In python, we just need to change the name of the date column. Here, we need to change the python datetime.date objects to R dates
-#
+# 
 # # Really slow. furrr is actually slower.
 # # MUCH faster to just make the dates characters in python, and back to dates here.
-# rdates <- purrr::map(demodates, py_to_r) |>
-#   tibble(.name_repair = ~'Date') |>
+# rdates <- purrr::map(demodates, py_to_r) |> 
+#   tibble(.name_repair = ~'Date') |>  
 #   unnest(cols = Date)
-#
+# 
 # demo_levs <- bind_cols(rdates, demo_levs)
-demo_levs <- dplyr::select(demo_levs, -DATETIME) |>
+demo_levs <- dplyr::select(demo_levs, -DATETIME) |> 
   dplyr::mutate(Date = lubridate::ymd(Date))
 ```
 
 ### Map the gauges
 
 ```{r}
-# gaugegeo <- gaugegeo |>
+# gaugegeo <- gaugegeo |> 
 #   dplyr::rename(gauge = `gauge number`)
-demo_geo <- gaugegeo |> dplyr::filter(gauge %in% py$demo_ids)
+demo_geo = gaugegeo |> dplyr::filter(gauge %in% py$demo_ids)
 ```
 
 Looks reasonable. Probably overkill for testing, but can do a cut down version too.
 
 ```{r}
-(ggplot() +
-  geom_sf(data = basin, fill = "lightsteelblue") +
-  geom_sf(data = catch_demo, mapping = aes(fill = SWWRPANAME)) +
-  geom_sf(data = demo_geo, color = "black") +
-  scale_fill_brewer(type = "qual", palette = 8))
+(ggplot() + 
+geom_sf(data = basin, fill = 'lightsteelblue') +
+geom_sf(data = catch_demo, mapping = aes(fill = SWWRPANAME)) +
+geom_sf(data = demo_geo, color = 'black') +
+scale_fill_brewer(type = 'qual', palette = 8))
 ```
 
 ## Make test scenarios
@@ -303,11 +299,11 @@ Looks reasonable. Probably overkill for testing, but can do a cut down version t
 For now, the test scenarios are just multiplying by 4 or 0.25 to give something to work with. This section could easily be modified for other simple scenarios.
 
 ```{r}
-down4 <- demo_levs
-up4 <- demo_levs
+down4 = demo_levs
+up4 = demo_levs
 
-down4$VALUE <- down4$VALUE * 0.25
-up4$VALUE <- up4$VALUE * 4
+down4$VALUE = down4$VALUE * 0.25
+up4$VALUE = up4$VALUE * 4
 ```
 
 ### Make the data look like IQQM
@@ -325,7 +321,7 @@ I will still do the dir/file structure even with one file as it allows easier ch
 *I had saved the full suite, but I think since this is now turning into a package, we want to keep things minimal. Move the full set of gauges to the demo project*
 
 ```{r}
-scenenames <- c("base", "up4", "down4")
+scenenames = c('base', 'up4', 'down4')
 
 # # the full scenarios
 # for (x in scenenames) {
@@ -333,33 +329,34 @@ scenenames <- c("base", "up4", "down4")
 #     if (!dir.exists(scenedir)) {
 #       dir.create(scenedir, recursive = TRUE)
 #     }
-#
+#         
 # }
 
 
 # a minimal set
 for (x in scenenames) {
-  scenedirS <- file.path(dataextdir, "testsmall", "hydrographs", x)
-  if (!dir.exists(scenedirS)) {
-    dir.create(scenedirS, recursive = TRUE)
-  }
+      scenedirS = file.path(dataextdir, 'testsmall', 'hydrographs', x)
+    if (!dir.exists(scenedirS)) {
+      dir.create(scenedirS, recursive = TRUE)
+    }
 }
+
 ```
 
 Create clean dataframes to save.
 
 ```{r}
-base <- demo_levs |>
-  dplyr::select(Date, VALUE, SITEID) |>
+base <- demo_levs |> 
+  dplyr::select(Date, VALUE, SITEID) |> 
   tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE)
 
-up4 <- up4 |>
-  dplyr::select(Date, VALUE, SITEID) |>
+up4 <- up4 |> 
+  dplyr::select(Date, VALUE, SITEID) |> 
   tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE)
 
-down4 <- down4 |>
-  dplyr::select(Date, VALUE, SITEID) |>
-  tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE)
+down4 <- down4 |> 
+  dplyr::select(Date, VALUE, SITEID) |> 
+  tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE) 
 ```
 
 Save. could do this above easily enough, but getting lots of dots and hard to read.
@@ -370,6 +367,7 @@ Save. could do this above easily enough, but getting lots of dots and hard to re
 #       readr::write_csv(up4, file.path(dataextdir, 'testscenarios', 'up4', 'up4.csv'))
 #       readr::write_csv(down4, file.path(dataextdir, 'testscenarios', 'down4', 'down4.csv'))
 # }
+
 ```
 
 ### Smaller set
@@ -379,107 +377,87 @@ I also want a very limited set of test data that runs faster through the EWR too
 Which gauges?
 
 ```{r}
-mac <- rps |>
-  dplyr::filter(SWWRPANAME %in% c("Macquarie-Castlereagh"))
-lach <- rps |>
-  dplyr::filter(SWWRPANAME %in% "Lachlan")
+mac = rps |> 
+  dplyr::filter(SWWRPANAME %in% c('Macquarie-Castlereagh'))
+lach = rps |> 
+  dplyr::filter(SWWRPANAME %in% 'Lachlan')
 
-macgauge <- st_intersection(demo_geo, mac)
-lachgauge <- st_intersection(demo_geo, lach)
+macgauge = st_intersection(demo_geo, mac)
+lachgauge = st_intersection(demo_geo, lach)
 ```
 
 I'll just choose three of each
 
 ```{r}
-macsub <- macgauge |>
-  dplyr::filter(gauge %in% c("421004", "421001", "421011"))
-lachsub <- lachgauge |>
-  dplyr::filter(gauge %in% c("412005", "412002", "412038"))
+macsub = macgauge |> 
+  dplyr::filter(gauge %in% c('421004', '421001', '421011'))
+lachsub = lachgauge |> 
+  dplyr::filter(gauge %in% c('412005', '412002', '412038'))
 
-minigauge <- dplyr::bind_rows(macsub, lachsub)
+minigauge = dplyr::bind_rows(macsub, lachsub)
 
-minigauges <- unique(minigauge$gauge)
+minigauges = unique(minigauge$gauge)
 ```
 
 ```{r}
-(ggplot() +
-  geom_sf(data = basin, fill = "lightsteelblue") +
-  geom_sf(data = catch_demo, mapping = aes(fill = SWWRPANAME)) +
-  geom_sf(data = minigauge, color = "black") +
-  scale_fill_brewer(type = "qual", palette = 8))
+(ggplot() + 
+geom_sf(data = basin, fill = 'lightsteelblue') +
+geom_sf(data = catch_demo, mapping = aes(fill = SWWRPANAME)) +
+geom_sf(data = minigauge, color = 'black') +
+scale_fill_brewer(type = 'qual', palette = 8))
 ```
 
 Write out the scenarios, including metadata to check that that is working (and that we're not picking up extra files in some of the crawling functions).
 
 ```{r}
 if (REBUILD_DATA) {
-  start15 <- lubridate::ymd(20150101)
+  start15 = lubridate::ymd(20150101)
 
-  base |>
-    dplyr::filter(Date > start15) |>
-    dplyr::select(Date, tidyselect::all_of(minigauges)) |>
-    readr::write_csv(file.path(dataextdir, "testsmall", "hydrographs", "base", "base.csv"))
-
-  down4 |>
-    dplyr::filter(Date > start15) |>
-    dplyr::select(Date, tidyselect::all_of(minigauges)) |>
-    readr::write_csv(file.path(dataextdir, "testsmall", "hydrographs", "down4", "down4.csv"))
-
-  up4 |>
-    dplyr::filter(Date > start15) |>
-    dplyr::select(Date, tidyselect::all_of(minigauges)) |>
-    readr::write_csv(file.path(dataextdir, "testsmall", "hydrographs", "up4", "up4.csv"))
-
-  # make JSON metadata
-  jsonlite::write_json(
-    list(
-      scenario_name = "base",
-      flow_multiplier = 1
-    ),
-    path = file.path(
-      dataextdir, "testsmall",
-      "hydrographs", "base", "base.json"
-    )
-  )
-
-  jsonlite::write_json(
-    list(
-      scenario_name = "down4",
-      flow_multiplier = 0.25
-    ),
-    path = file.path(
-      dataextdir, "testsmall",
-      "hydrographs", "down4", "down4.json"
-    )
-  )
-
-  jsonlite::write_json(
-    list(
-      scenario_name = "up4",
-      flow_multiplier = 4
-    ),
-    path = file.path(
-      dataextdir, "testsmall",
-      "hydrographs", "up4", "up4.json"
-    )
-  )
+    base |> 
+      dplyr::filter(Date > start15) |> 
+      dplyr::select(Date, tidyselect::all_of(minigauges)) |> 
+      readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'base', 'base.csv'))
+    
+    down4 |> 
+      dplyr::filter(Date > start15) |> 
+      dplyr::select(Date, tidyselect::all_of(minigauges)) |>  
+      readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'down4', 'down4.csv'))
+    
+    up4 |> 
+      dplyr::filter(Date > start15) |> 
+      dplyr::select(Date, tidyselect::all_of(minigauges)) |>  
+      readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'up4', 'up4.csv'))
+    
+    # make JSON metadata
+    jsonlite::write_json(list(scenario_name = 'base', 
+                            flow_multiplier = 1), 
+                       path = file.path(dataextdir, 'testsmall', 
+                                        'hydrographs', 'base', 'base.json'))
+    
+    jsonlite::write_json(list(scenario_name = 'down4', 
+                            flow_multiplier = 0.25), 
+                       path = file.path(dataextdir, 'testsmall', 
+                                        'hydrographs', 'down4', 'down4.json'))
+    
+    jsonlite::write_json(list(scenario_name = 'up4', 
+                            flow_multiplier = 4), 
+                       path = file.path(dataextdir, 'testsmall', 
+                                        'hydrographs', 'up4', 'up4.json'))
 }
+    
+
 ```
 
 And all the scenario metadata- it might come in like this and we need to be robust
 
 ```{r}
-scenario_meta <- list(
-  scenario_name = c("down4", "base", "up4"),
-  flow_multiplier = c(0.25, 1, 4)
-)
+scenario_meta <- list(scenario_name = c('down4', 'base', 'up4'),
+                      flow_multiplier = c(0.25, 1, 4))
 # I don't know the format we'll be using, but this works to create yaml metadata
-hydro_dir <- file.path(dataextdir, "testsmall", "hydrographs")
-yaml::write_yaml(scenario_meta,
-  file = file.path(hydro_dir, "scenario_metadata.yml")
-)
+hydro_dir <- file.path(dataextdir, 'testsmall', 'hydrographs')
+yaml::write_yaml(scenario_meta, 
+                 file = file.path(hydro_dir, 'scenario_metadata.yml'))
 # and this does the same with JSON
-jsonlite::write_json(scenario_meta,
-  path = file.path(hydro_dir, "scenario_metadata.json")
-)
+jsonlite::write_json(scenario_meta, 
+                     path = file.path(hydro_dir, 'scenario_metadata.json'))
 ```
