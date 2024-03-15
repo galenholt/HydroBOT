@@ -861,23 +861,23 @@
 <polyline points='107.03,320.64 109.77,320.64 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='107.03,294.01 109.77,294.01 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <rect x='192.40' y='528.92' width='359.10' height='41.60' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='197.88' y='553.50' style='font-size: 11.00px; font-family: sans;' textLength='256.26px' lengthAdjust='spacingAndGlyphs'>cewo_valleys_mean_sdl_units_mean_ewr_achieved</text>
 <image width='86.40' height='17.28' x='459.62' y='534.40' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAABCAYAAABkOJMpAAAAiUlEQVQ4jaWT3Q2AIAyEezM4hmO4/0z6QNFif64JiVEpXL8rFBzndYtAn/HVlwigQx3bdTYOJLFPE2s7XM2CX36B/lptEHuZlY+Zf/WxMonOxWr/ua7er07N9V51Pe6wWF2+N6gmiDn27MMtDasx6jFbT8Zd5x03uGs5l/Rni8HOvJkjZG54IusfaBgC//v2D/sAAAAASUVORK5CYII='/>
+<polyline points='460.36,548.22 460.36,551.68 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='481.74,548.22 481.74,551.68 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='503.12,548.22 503.12,551.68 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='524.50,548.22 524.50,551.68 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='545.88,548.22 545.88,551.68 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='460.36,537.85 460.36,534.40 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='481.74,537.85 481.74,534.40 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='503.12,537.85 503.12,534.40 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='524.50,537.85 524.50,534.40 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='545.88,537.85 545.88,534.40 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='460.36' y='563.21' text-anchor='middle' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.2</text>
 <text x='481.74' y='563.21' text-anchor='middle' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.4</text>
 <text x='503.12' y='563.21' text-anchor='middle' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.6</text>
 <text x='524.50' y='563.21' text-anchor='middle' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.8</text>
 <text x='545.88' y='563.21' text-anchor='middle' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>1.0</text>
-<text x='197.88' y='553.50' style='font-size: 11.00px; font-family: sans;' textLength='256.26px' lengthAdjust='spacingAndGlyphs'>cewo_valleys_mean_sdl_units_mean_ewr_achieved</text>
-<line x1='460.36' y1='551.68' x2='460.36' y2='548.22' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='481.74' y1='551.68' x2='481.74' y2='548.22' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='503.12' y1='551.68' x2='503.12' y2='548.22' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='524.50' y1='551.68' x2='524.50' y2='548.22' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='545.88' y1='551.68' x2='545.88' y2='548.22' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='460.36' y1='537.85' x2='460.36' y2='534.40' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='481.74' y1='537.85' x2='481.74' y2='534.40' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='503.12' y1='537.85' x2='503.12' y2='534.40' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='524.50' y1='537.85' x2='524.50' y2='534.40' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='545.88' y1='537.85' x2='545.88' y2='534.40' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='109.77' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='101.27px' lengthAdjust='spacingAndGlyphs'>g2sdl2cewo multi</text>
 </g>
 </svg>
