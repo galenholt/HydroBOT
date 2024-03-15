@@ -1003,7 +1003,18 @@ for (i in unique(gauge412005$planning_unit_name)) {
 
   expect_equal(unique(spataggc$sdl_units$SWSDLName), c('Lachlan', 'Murrumbidgee', 'Macquarie–Castlereagh'))
 
-
+  # check it works for group_until explicitly
+  spatagg_g <- multi_aggregate(ewr_to_agg,
+                              aggsequence = aggseqc,
+                              groupers = "scenario",
+                              aggCols = "ewr_achieved",
+                              group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint),
+                              funsequence = funseq,
+                              causal_edges = causal_ewr,
+                              saveintermediate = TRUE,
+                              namehistory = FALSE,
+                              pseudo_spatial = "planning_units"
+  )
 
   # Plots are useful for checking spatial outcomes
   skip_on_os('linux')

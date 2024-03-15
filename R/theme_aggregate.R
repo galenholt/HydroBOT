@@ -153,7 +153,9 @@ theme_aggregate <- function(dat,
   )
 
   if (spatialflag) {
-    dat <- dplyr::left_join(agged, geodat, by = "polyID") |>
+    # if data comes in with group_until, it sometimes has groupers that need to persist.
+    commonnames <- groupers[groupers %in% names(geodat)]
+    dat <- dplyr::left_join(agged, geodat, by = commonnames) |>
       sf::st_as_sf()
   } else {
     dat <- agged
