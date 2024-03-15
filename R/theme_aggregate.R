@@ -101,11 +101,6 @@ theme_aggregate <- function(dat,
     names(causal_edges)[names(causal_edges) == "from"] <- causal_edges$fromtype[1]
   }
 
-
-  # join to causal_edges
-  pairdat <- dat |>
-    dplyr::left_join(causal_edges, relationship = "many-to-many")
-
   # the theme-level outcomes are defined at gauges and planning units (often
   # many-to-many, e.g. gauges might contribute to EWRs in multiple PUs, and PUs
   # might include several gauges). we want to map back to that until we've done
@@ -128,16 +123,33 @@ theme_aggregate <- function(dat,
                       "i" = "Lower-level processing should include as `grouper` in `theme_aggregate()`"))
       } else {
         rlang::inform(c("EWR outputs auto-grouped!",
-        "i" = "EWRs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
-        "*" = "gauge is less important, since it has the geometry, but the gauge column will be lost otherwise.",
-        "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
-        "i" = "Lower-level processing handles by including as `grouper` in `theme_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."))
-        groupers <- c(groupers, 'planning_unit_name', 'gauge')
+                        "i" = "EWRs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
+                        "*" = "gauge is less important, since it has the geometry, but the gauge column will be lost otherwise.",
+                        "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
+                        "i" = "Lower-level processing handles by including as `grouper` in `theme_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."))
+        # add gauge and plannng unit name if available.
+        groupers <- unique(c(groupers, intersect(c('gauge', 'planning_unit_name'), names(causal_edges))))
       }
 
 
     }
   }
+
+  # join to causal_edges
+
+  # A bit of a hacky check
+  extragroups <- groupers[!groupers %in% c('scenario', 'polyID')]
+  if (any(!(extragroups %in% names(causal_edges)))) {
+    rlang::warn(c("Causal network does not have all groupers.",
+                  glue::glue("Joining {from_theme} to {to_theme}"),
+                  glue::glue("Groupers are {paste0(groupers, collapse = ', ')}."),
+                             glue::glue("expect causal network to have {paste0(extragroups, collapse = ', ')}; it has {paste0(names(causal_edges), collapse = ', ')}."),
+                  "Do you need to use `group_until`? Or is your network missing columns?"))
+  }
+  pairdat <- dat |>
+    dplyr::left_join(causal_edges, relationship = "many-to-many")
+
+
 
 
   # The core aggregation function. the !! needs to happen here
