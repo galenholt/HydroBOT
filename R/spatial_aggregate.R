@@ -147,7 +147,10 @@ spatial_aggregate <- function(dat, to_geo, groupers,
   # The original polys get added with a join using polyID so it doesn't matter if
   # the dataframe gets shuffled or if there were lost areas in the intersection
   # step.
-  aggPoly <- dplyr::left_join(agged, to_geo, by = 'polyID') |>
+
+  # if data comes in with group_until, it sometimes has groupers that need to persist.
+  commonnames <- groupers[groupers %in% names(to_geo)]
+  aggPoly <- dplyr::left_join(agged, to_geo, by = commonnames) |>
     sf::st_as_sf()
 
   # add the NAs on if we want

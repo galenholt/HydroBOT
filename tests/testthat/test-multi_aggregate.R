@@ -11,7 +11,7 @@ test_that("ewr-obj works, nongeom", {
   # no need to load the demo/test data since it's in /data
   agged <- multi_aggregate(non_spatial_ewrout,
     aggsequence = list(c("ewr_code_timing", "ewr_code")),
-    groupers = c("scenario", "gauge"),
+    groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list("mean"),
     causal_edges = make_edges(causal_ewr, list(c("ewr_code_timing", "ewr_code"))),
@@ -24,7 +24,7 @@ test_that("ewr-obj works, nongeom", {
 test_that("auto-generating causal_edges works", {
   agged <- multi_aggregate(non_spatial_ewrout,
     aggsequence = list(c("ewr_code_timing", "ewr_code")),
-    groupers = c("scenario", "gauge"),
+    groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list("mean"),
     causal_edges = causal_ewr,
@@ -37,17 +37,13 @@ test_that("auto-generating causal_edges works", {
 test_that("spatial input data works", {
   agged <- multi_aggregate(ewr_to_agg,
     aggsequence = list(c("ewr_code_timing", "ewr_code")),
-    groupers = c("scenario", "gauge"),
+    groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list("mean"),
     causal_edges = causal_ewr,
     auto_ewr_PU = TRUE
   )
-  expect_equal(names(agged), c(
-    "scenario", "gauge", "polyID", "planning_unit_name",
-    "ewr_code", "ewr_code_mean_ewr_achieved",
-    "geometry"
-  ))
+  expect_snapshot(names(agged))
   expect_s3_class(agged, "data.frame")
   expect_s3_class(agged, "sf")
 
@@ -57,7 +53,7 @@ test_that("spatial input data works", {
 test_that("bare functions", {
   agged <- multi_aggregate(non_spatial_ewrout,
     aggsequence = list(c("ewr_code_timing", "ewr_code")),
-    groupers = c("scenario", "gauge"),
+    groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list(mean),
     causal_edges = causal_ewr,
@@ -70,7 +66,7 @@ test_that("bare functions", {
 test_that("list functions", {
   agged <- multi_aggregate(non_spatial_ewrout,
     aggsequence = list(c("ewr_code_timing", "ewr_code")),
-    groupers = c("scenario", "gauge"),
+    groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list(list(mean = ~ mean(., na.rm = TRUE))),
     causal_edges = causal_ewr,
@@ -84,7 +80,7 @@ test_that("multiple functions", {
   # Character
   agged_c <- multi_aggregate(non_spatial_ewrout,
     aggsequence = list(c("ewr_code_timing", "ewr_code")),
-    groupers = c("scenario", "gauge"),
+    groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list(c("mean", "sd")),
     causal_edges = causal_ewr,
@@ -99,7 +95,7 @@ test_that("multiple functions", {
   # bare
   agged_b <- multi_aggregate(non_spatial_ewrout,
     aggsequence = list(c("ewr_code_timing", "ewr_code")),
-    groupers = c("scenario", "gauge"),
+    groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list(c(mean, sd)),
     causal_edges = causal_ewr,
@@ -114,7 +110,7 @@ test_that("multiple functions", {
   # List
   agged_l <- multi_aggregate(non_spatial_ewrout,
     aggsequence = list(c("ewr_code_timing", "ewr_code")),
-    groupers = c("scenario", "gauge"),
+    groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list(list(
       mean = ~ mean(., na.rm = TRUE),
@@ -343,7 +339,7 @@ test_that("multi-step theme agg works, nongeom", {
 
   agged <- multi_aggregate(non_spatial_ewrout,
     aggsequence = aggseq,
-    groupers = c("scenario", "gauge"),
+    groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = funseq,
     causal_edges = make_edges(causal_ewr, aggseq),
@@ -351,13 +347,7 @@ test_that("multi-step theme agg works, nongeom", {
   )
 
   # stringr::str_flatten(names(agged), "', '")
-  expect_equal(
-    names(agged),
-    c(
-      "scenario", "gauge", "planning_unit_name", "target_5_year_2024",
-      "target_5_year_2024_ArithmeticMean_Objective_ArithmeticMean_Specific_goal_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved"
-    )
-  )
+  expect_snapshot(names(agged))
   expect_s3_class(agged, "data.frame")
 })
 
@@ -381,7 +371,7 @@ test_that("multi-step theme agg works, auto-edges", {
 
   agged <- multi_aggregate(non_spatial_ewrout,
     aggsequence = aggseq,
-    groupers = c("scenario", "gauge"),
+    groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = funseq,
     causal_edges = causal_ewr,
@@ -389,13 +379,7 @@ test_that("multi-step theme agg works, auto-edges", {
   )
 
   # stringr::str_flatten(names(agged), "', '")
-  expect_equal(
-    names(agged),
-    c(
-      "scenario", "gauge", "planning_unit_name", "target_5_year_2024",
-      "target_5_year_2024_ArithmeticMean_Objective_ArithmeticMean_Specific_goal_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved"
-    )
-  )
+  expect_snapshot(names(agged))
   expect_s3_class(agged, "data.frame")
 })
 
@@ -1002,6 +986,30 @@ for (i in unique(gauge412005$planning_unit_name)) {
   )
 
   expect_equal(unique(spataggc$sdl_units$SWSDLName), c('Lachlan', 'Murrumbidgee', 'Macquarie–Castlereagh'))
+
+  # check it works for group_until explicitly
+  spatagg_g <- multi_aggregate(ewr_to_agg,
+                              aggsequence = aggseqc,
+                              groupers = "scenario",
+                              aggCols = "ewr_achieved",
+                              group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint),
+                              funsequence = funseq,
+                              causal_edges = causal_ewr,
+                              saveintermediate = TRUE,
+                              namehistory = FALSE,
+                              pseudo_spatial = "planning_units"
+  )
+
+  # those should match
+  sortc <- spataggc$mdb |>
+    sf::st_drop_geometry() |>
+    dplyr::arrange(scenario, Objective, polyID, ewr_achieved)
+
+  sortg <- spatagg_g$mdb |>
+    sf::st_drop_geometry() |>
+    dplyr::arrange(scenario, Objective, polyID, ewr_achieved)
+
+  expect_equal(sortc$ewr_achieved, sortg$ewr_achieved)
 
 
 
