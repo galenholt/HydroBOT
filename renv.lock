@@ -48,6 +48,21 @@
       ],
       "Hash": "f3de4a4878163a4629a528bbcc6e655d"
     },
+    "DiagrammeRsvg": {
+      "Package": "DiagrammeRsvg",
+      "Version": "0.1",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "DiagrammeRsvg",
+      "RemoteUsername": "rich-iannone",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "5057edac4947e38a41e9d76ab439b537b2e9d35f",
+      "Requirements": [
+        "V8"
+      ],
+      "Hash": "42d60ccca96b06a8be40250645b2c625"
+    },
     "Formula": {
       "Package": "Formula",
       "Version": "1.2-5",
