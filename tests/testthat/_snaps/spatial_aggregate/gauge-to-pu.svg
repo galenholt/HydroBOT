@@ -821,23 +821,23 @@
 <polyline points='124.25,379.29 126.99,379.29 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='124.25,329.81 126.99,329.81 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <rect x='250.81' y='528.92' width='242.28' height='41.60' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='256.29' y='553.50' style='font-size: 11.00px; font-family: sans;' textLength='139.44px' lengthAdjust='spacingAndGlyphs'>spatial_mean_ewr_achieved</text>
 <image width='86.40' height='17.28' x='401.21' y='534.40' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAABCAYAAABkOJMpAAAAiUlEQVQ4jaWT3Q2AIAyEezM4hmO4/0z6QNFif64JiVEpXL8rFBzndYtAn/HVlwigQx3bdTYOJLFPE2s7XM2CX36B/lptEHuZlY+Zf/WxMonOxWr/ua7er07N9V51Pe6wWF2+N6gmiDn27MMtDasx6jFbT8Zd5x03uGs5l/Rni8HOvJkjZG54IusfaBgC//v2D/sAAAAASUVORK5CYII='/>
+<polyline points='401.36,548.22 401.36,551.68 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='422.89,548.22 422.89,551.68 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='444.41,548.22 444.41,551.68 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='465.94,548.22 465.94,551.68 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='487.47,548.22 487.47,551.68 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='401.36,537.85 401.36,534.40 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='422.89,537.85 422.89,534.40 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='444.41,537.85 444.41,534.40 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='465.94,537.85 465.94,534.40 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='487.47,537.85 487.47,534.40 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='401.36' y='563.21' text-anchor='middle' style='font-size: 8.80px; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.00</text>
 <text x='422.89' y='563.21' text-anchor='middle' style='font-size: 8.80px; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.25</text>
 <text x='444.41' y='563.21' text-anchor='middle' style='font-size: 8.80px; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.50</text>
 <text x='465.94' y='563.21' text-anchor='middle' style='font-size: 8.80px; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.75</text>
 <text x='487.47' y='563.21' text-anchor='middle' style='font-size: 8.80px; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>1.00</text>
-<text x='256.29' y='553.50' style='font-size: 11.00px; font-family: sans;' textLength='139.44px' lengthAdjust='spacingAndGlyphs'>spatial_mean_ewr_achieved</text>
-<line x1='401.36' y1='551.68' x2='401.36' y2='548.22' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='422.89' y1='551.68' x2='422.89' y2='548.22' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='444.41' y1='551.68' x2='444.41' y2='548.22' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='465.94' y1='551.68' x2='465.94' y2='548.22' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='487.47' y1='551.68' x2='487.47' y2='548.22' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='401.36' y1='537.85' x2='401.36' y2='534.40' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='422.89' y1='537.85' x2='422.89' y2='534.40' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='444.41' y1='537.85' x2='444.41' y2='534.40' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='465.94' y1='537.85' x2='465.94' y2='534.40' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='487.47' y1='537.85' x2='487.47' y2='534.40' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='126.99' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='73.39px' lengthAdjust='spacingAndGlyphs'>gauge to PU</text>
 </g>
 </svg>

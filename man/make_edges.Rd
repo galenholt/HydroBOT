@@ -47,7 +47,7 @@ other when only one is passed}
 might be desired attributes later. Default \code{NULL} retains none.}
 }
 \value{
-a tibble with columns for \code{gauge} and \code{PlanningUnitID} (where
+a tibble with columns for \code{gauge} and \code{planning_unit_name} (where
 included), \code{from} and \code{to} columns indicating the directionality of
 pairings, \code{fromtype} and \code{totype} for the type of node being connected, and
 an \code{edgeorder} column for the order in which the edges were passed
