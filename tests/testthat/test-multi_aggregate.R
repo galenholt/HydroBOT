@@ -886,6 +886,10 @@ test_that("nonspatial joins of spatial data", {
                              pseudo_spatial = "planning_units"
   )
 
+  # Find some NA- delete
+  naexample <- spatagg$ewr_code |> dplyr::filter(scenario == 'base_base' & planning_unit_name == 'Muggabah Creek')
+  relevantewrs <- causal_ewr$ewr2obj |> dplyr::filter(ewr_code %in% naexample$ewr_code & planning_unit_name %in% naexample$planning_unit_name)
+
   # stringr::str_flatten(names(spatagg), "', '")
   expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
   expect_s3_class(spatagg$planning_units, "sf")
