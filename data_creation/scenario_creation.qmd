@@ -225,8 +225,6 @@ demo_levs <- hydrogauge::get_ts_traces(portal = 'NSW',
                                       end_time = endtime)
 ```
 
-This was 168k rows wtih the old code using py\$mdba_gauge_getter and was considered fine in general, but likely overkill for testing. Now it's double using hydrgauage::get_ts_traces() (including both flow and level after changes to ewr standard formatting). It could be cut it to fewer gauges and less time, probably, but it will be good to have reasonable time periods for testing time windowing if this doesn't eat too much time elsewhere.
-
 ### Map the gauges
 
 ```{r}
@@ -317,14 +315,14 @@ up4_smaller$value = up4_smaller$value * 4
 make_ewrformat <- function(x) {
   x <- x |> 
     dplyr::mutate(gauge = dplyr::case_when(
-      grepl('ml/d', units, ignore.case = TRUE) ~ paste0(site, '_flow'),
+      units %in% c('Megalitres/Day') ~ paste0(site, '_flow'),
       units %in% c('m', 'Res. Level AHD', 'Metres') ~ paste0(site, '_level'),
       .default = paste0(site, '_FAIL'))
       ) |> 
     dplyr::select(Date = time, gauge, value) |> 
     tidyr::pivot_wider(id_cols = Date, names_from = gauge, values_from = value) |> 
     dplyr::mutate(Date = as.Date(Date))
-  #unnest columns converted to list columns 
+  # unnest columns converted to list columns
   cols <- colnames(x[,-1])
   x <- tidyr::unnest(x,cols=cols)
   return(x)
@@ -348,18 +346,41 @@ base_smaller <- make_ewrformat(base_smaller)
 down4_smaller <- make_ewrformat(down4_smaller)
 up4_smaller <- make_ewrformat(up4_smaller) 
 
+```
 
+### **Remove duplicates**
+
+For a specific gauage causing duplicate rows with zero level reading and non-zero level reading on same date. Take the non-zero level reading.
+
+```{r}
+remove_doubles <- function(x){
+    x %>%
+    group_by(Date) %>%
+    filter(!(duplicated(Date) & `412038_level` == 0))
+}
+
+df_list <- list(base,
+                down4,
+                up4,
+                base_smaller,
+                down4_smaller,
+                up4_smaller)
+
+filtered_df_list <- lapply(df_list,remove_doubles)
+
+base <- filtered_df_list[[1]]
+down4 <- filtered_df_list[[2]]
+up4 <- filtered_df_list[[3]]
+base_smaller <- filtered_df_list[[4]]
+down4_smaller <- filtered_df_list[[5]]
+up4_smaller <- filtered_df_list[[6]]
 ```
 
 ### Save the output
 
-Not being too fussed about structure, since the structure is going to change once we have actual scenarios.
-
-I will still do the dir/file structure even with one file as it allows easier changes and more flexibility.
-
-*I had saved the full suite, but I think since this is now turning into a package, we want to keep things minimal. Move the full set of gauges to the demo project*
-
 ```{r}
+# Create directories
+
 scenenames = c('base', 'up4', 'down4')
 
 # # the full scenarios
