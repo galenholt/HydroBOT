@@ -8,7 +8,8 @@
 #' @return a list of filepaths to the hydrographs
 #'
 #' @examples
-find_scenario_paths <- function(hydro_dir, type = 'csv') {
+find_scenario_paths <- function(hydro_dir, type = 'csv',
+                                scenarios_from = 'directory') {
 
 
   # get the paths relative to hydro_dir
@@ -23,6 +24,12 @@ find_scenario_paths <- function(hydro_dir, type = 'csv') {
   unique_names <- hydro_paths |>
     stringr::str_remove_all(paste0('\\.', type)) |>
     stringr::str_replace_all("/", "_")
+
+  # If the scenario names come from the directory name, cut off the filename.
+  if (scenarios_from == 'directory') {
+    unique_names <- sub("^(.*)_.*$", "\\1", unique_names)
+  }
+  # no need for a scenarios_from == 'file', since that's what unique_names is originally.
 
   # add the path to hydro_dir back on. This keeps things relative to whatever hydro_dir is relative to
   hydro_paths <- file.path(hydro_dir, hydro_paths)

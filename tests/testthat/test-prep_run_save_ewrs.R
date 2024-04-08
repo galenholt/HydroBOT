@@ -26,7 +26,7 @@ test_that("returns one result, no saving", {
   expect_equal(names(ewr_out), "summary")
   expect_equal(
     unique(ewr_out$summary$scenario),
-    c("base_base", "down4_down4", "up4_up4")
+    c("base", "down4_down4", "up4_up4")
   )
   # Test it didn't create anything since outputType = 'none'
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
@@ -50,7 +50,7 @@ test_that("returns list", {
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_equal(
     unique(ewr_out$summary$scenario),
-    c("base_base", "down4_down4", "up4_up4")
+    c("base", "down4_down4", "up4_up4")
   )
 })
 
@@ -76,7 +76,7 @@ test_that("complex dir structure", {
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_true(all(unique(ewr_out$summary$scenario) %in%
-    c("base_base", "down4_down4", "S1_base_base", "S2_up4_up4", "up4_up4")))
+    c("base", "down4_down4", "S1_base", "S2_up4_up4", "up4_up4")))
 
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
   expect_snapshot(realised_structure)
@@ -128,14 +128,44 @@ test_that("csv per gauge works", {
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
 
-  # These come in with directory_gauge. Split gauge off and should be left with scenarios.
-  ewr_out$summary <- ewr_out$summary |>
-    dplyr::mutate(scenario = purrr::map_chr(scenario, \(x) stringr::str_split_1(x, "_")[1]))
+  # These no longer come in with directory_gauge. Split gauge off and should be left with scenarios.
+  # ewr_out$summary <- ewr_out$summary |>
+  #   dplyr::mutate(scenario = purrr::map_chr(scenario, \(x) stringr::str_split_1(x, "_")[1]))
   expect_equal(unique(ewr_out$summary$scenario), c(
     "base",
     "down4",
     "up4"
   ))
+
+  # I'm now controlling the scenario names in the toolkit, so this should work.
+
+  # Test it created the expected structure
+  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  expect_snapshot(realised_structure)
+})
+
+
+test_that("csv per gauge works for filenames", {
+  # First, generate temporary hydrograph files
+
+  make_temp_multifile()
+
+  ewr_out <- prep_run_save_ewrs(
+    hydro_dir = temp_hydro_multi,
+    scenarios_from = 'file',
+    output_parent_dir = temp_parent_dir,
+    outputType = list("summary", "yearly"),
+    datesuffix = FALSE,
+    returnType = list("summary", "all")
+  )
+
+  expect_equal(length(ewr_out), 2)
+  expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
+
+  # These no longer come in with directory_gauge. Split gauge off and should be left with scenarios.
+  # ewr_out$summary <- ewr_out$summary |>
+  #   dplyr::mutate(scenario = purrr::map_chr(scenario, \(x) stringr::str_split_1(x, "_")[1]))
+  expect_snapshot(unique(ewr_out$summary$scenario))
 
   # I'm now controlling the scenario names in the toolkit, so this should work.
 
@@ -537,6 +567,6 @@ test_that("safety works", {
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_equal(
     unique(ewr_out$summary$scenario),
-    c("base_base", "down4_down4", "up4_up4")
+    c("base", "down4_down4", "up4_up4")
   )
 })

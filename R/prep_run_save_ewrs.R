@@ -43,6 +43,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'  * 'all_successful_interEvents'
 #' @param returnType list of strings or character vector defining what to return
 #'   to the active R session. Same options as `outputType`
+#' @param scenarios_from character, default 'directory' gets scenario names from directory names. If anything else, gets them from filenames (safest). Expect additional options in future, e.g from metadata.
 #' @param datesuffix logical. whether to add a suffix to saved filenames to
 #'   provide a datestamp. Should be deprecated in favour of metadata files.
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
@@ -53,7 +54,6 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @param MAXT deprecated, included to let old calls pass
 #' @param DUR deprecated, included to let old calls pass
 #' @param DRAW deprecated, included to let old calls pass
-
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
@@ -62,6 +62,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
                                model_format = "IQQM - NSW 10,000 years",
                                outputType = "none", returnType = "none",
+                               scenarios_from = 'directory',
                                extrameta = NULL,
                                rparallel = FALSE,
                                retries = 2,
@@ -120,7 +121,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
     if (grepl("netcdf", model_format)) {
       filetype <- "nc"
     }
-    hydro_paths <- find_scenario_paths(hydro_dir, type = filetype)
+    hydro_paths <- find_scenario_paths(hydro_dir, type = filetype, scenarios_from = scenarios_from)
   } else {
     hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
   }
