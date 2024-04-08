@@ -41,11 +41,12 @@ find_scenario_paths <- function(hydro_dir, type = 'csv',
 }
 
 
-#' Set up the output directory structure based on parent directory and module
+#' Set up the output directory structure based on parent directory and module at `parent_dir/module_output/MODULE_NAME/subdir`
 #'
 #' @param parent_dir parent directory- typically for a project, but could be a single scenario
 #' @param scenarios names of the scenarios (character vector)
 #' @param module_name default 'EWR', sets up different directories for different modules
+#' @param subdir character, default "" for none, but if included, makes a sub-directory in parent_dir/module_output/MODULE_NAME
 #' @param ewr_outtypes character vector, names of EWR outputs to return. Options include
 #'  * 'summary': outputs summarised to the period
 #'  * 'yearly': outputs summarised to year
@@ -57,9 +58,13 @@ find_scenario_paths <- function(hydro_dir, type = 'csv',
 #' @return path to output directory
 #'
 #' @examples
-make_output_dir <- function(parent_dir, scenarios, module_name = 'EWR',
+make_output_dir <- function(parent_dir,
+                            scenarios,
+                            module_name = 'EWR',
+                            subdir = "",
                             ewr_outtypes = c('summary', 'yearly')) {
-  output_path <- file.path(parent_dir, 'module_output', module_name)
+
+  output_path <- file.path(parent_dir, 'module_output', module_name, subdir)
 
   # if parent_dir is the scenario dir (we're in a single run), use `scenarios = ''` to not make a subdir
   sceneout <- file.path(output_path, scenarios)

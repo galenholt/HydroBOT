@@ -24,6 +24,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'   but two typical cases:
 #'  * The directory containing `hydro_dir`, which puts the `module_outputs` at the same level as the hydrographs
 #'  * If running in batches for single scenarios, may be `hydro_dir`, which just puts the `module_outputs` in `hydro_dir`
+#' @param output_subdir a sub-directory for the outputs, if for example we want `module_output/EWR/V1` and `module_output/EWR/V2`
 #' @param scenarios `NULL` (default) or named list.
 #'  * `NULL`- finds scenario names by parsing directory names in `hydro_dir`. If no internal directories, just stays in `hydro_dir`. This captures the two typical situations discussed for `output_parent_dir`. If there are other directories in `hydro_dir` that do not contain hydrological scenarios, should use a character vector.
 #'  * named list of paths to files. names become scenario names, paths should be relative to `hydro_dir`. This allows unusual directory structures.
@@ -59,9 +60,12 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @export
 #'
 #' @examples
-prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
+prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
+                               output_subdir = '',
+                               scenarios = NULL,
                                model_format = "IQQM - NSW 10,000 years",
-                               outputType = "none", returnType = "none",
+                               outputType = "none",
+                               returnType = "none",
                                scenarios_from = 'directory',
                                extrameta = NULL,
                                rparallel = FALSE,
@@ -144,7 +148,9 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   } else {
     output_path <- make_output_dir(output_parent_dir,
       scenarios = names(hydro_paths),
-      module_name = "EWR", ewr_outtypes = unlist(outputType)
+      module_name = "EWR",
+      subdir = output_subdir,
+      ewr_outtypes = unlist(outputType)
     )
     # set up flags for the metadata in case the ewr fails partway
     init_params <- list(
