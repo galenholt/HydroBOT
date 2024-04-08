@@ -378,7 +378,8 @@ assess_ewr_achievement <- function(annualdf, summarydf, year_roll = ifelse(nrow(
 #' @examples
 bind_max <- function(outdf) {
   MAX_scenario <- outdf |>
-    dplyr::filter(scenario == unique(outdf$scenario)[1])|>
+    dplyr::select(gauge, planning_unit_name, ewr_code, ewr_code_timing) |>
+    dplyr::distinct() |>
     dplyr::mutate(scenario = "MAX",
            ewr_achieved = 1)|>
     dplyr::select(scenario, gauge, planning_unit_name, ewr_achieved, ewr_code, ewr_code_timing)
