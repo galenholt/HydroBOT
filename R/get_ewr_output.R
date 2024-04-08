@@ -125,7 +125,8 @@ get_any_ewr_output <- function(dir, type,
   # numeric. We can't pre-set them with readr because they may be in different
   # places for different gauges
   ewrdata <- ewrdata |>
-    dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric))
+    dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric))|>
+    dplyr::mutate(gauge = as.character(gauge))
 
   ewrdata <- suppressWarnings(cleanewrs(ewrdata))
 
