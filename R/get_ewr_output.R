@@ -107,7 +107,7 @@ get_any_ewr_output <- function(dir, type,
       i = relevantfiles,
       .combine = dplyr::bind_rows
     ) %do% {
-      temp <- readr::read_csv(i, col_types = readr::cols())
+      temp <- readr::read_csv(i, col_types = readr::cols(gauge = readr::col_character()))
     }
   } else if (is.list(dir)) {
     ewrdata <- dir[[type]]
