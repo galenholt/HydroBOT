@@ -2,6 +2,7 @@ import os
 import copy
 import zipfile
 import shutil
+import re
 
 from py_ewr.scenario_handling import ScenarioHandler
 
@@ -26,17 +27,22 @@ def clean_ewrs(ewr_results, scenario_name):
     return(ewr_results)
 
 # save the new cleaner ewr structure
-def save_ewrs(ewr_results, ewr_type, output_path, datesuffix = True):
+def save_ewrs(ewr_results, ewr_type, output_path, scenarios_from = 'directory', datesuffix = True):
     # The data comes in with different scenarios in one df, but typically the
     # scenarios will be in different directories. This sorts that out
 
+    ewrresults = copy.deepcopy(ewr_results)
     # If we want a date suffix
     suff = ''
     if datesuffix:
         suff = "_" + time.strftime("%Y%m%d-%H%M%S")
         
     # Get scenario names
-    ewr_scenarionames = ewr_results['scenario'].unique()
+    ewr_scenarionames = ewrresults['scenario'].unique()
+
+    # Now, we can toss the file names if we are getting scenario names from the directory. I was doing this in R, but we need the gauge names all the way in here.
+    if scenarios_from == 'directory':
+        ewrresults['scenario'] = ewrresults['scenario'].str.replace(r'^(.*)_.*$', r'\1', regex=True)
 
     for i in ewr_scenarionames:
         scene_outpath = os.path.join(output_path, i)
@@ -53,10 +59,13 @@ def save_ewrs(ewr_results, ewr_type, output_path, datesuffix = True):
         if (len(outfile) > 250) & (os.name == 'nt'):
             print(f'''path length {len(outfile)} longer than 250, may not save output. 260 is typical cutoff, +-. If saving is failing, shorten paths or disable the path length limit for your system.''')
 
-        # Tried chaining the methods but didn't work well- some want to save, and others operate in place  
+        # If we're collapsing off gauge files, do that here for the search  
+        if scenarios_from == 'directory':
+            i = re.sub(r'^(.*)_.*$', r'\1', i)
 
-        sceneresults = ewr_results.query('scenario == @i')
+        sceneresults = ewrresults.query('scenario == @i')
         sceneresults.to_csv(outfile, index = False)
+        # we could use `, mode='a'` in to_csv to append, but that's dangerous
 
 # an unzipper and change pathlist to the new directory
 def unzip_and_pathparse(pathlist, output_path):
@@ -76,7 +85,7 @@ def unzip_and_pathparse(pathlist, output_path):
         return(pathlist)
 
 # Main function to run and save the EWRs
-def run_save_ewrs(pathlist, output_path, model_format, outputType = 'none', returnType = 'none', scenario_name = '_UNNAMEDSCENARIO_', datesuffix = False):
+def run_save_ewrs(pathlist, output_path, model_format, outputType = 'none', returnType = 'none', scenario_name = '_UNNAMEDSCENARIO_', scenarios_from = 'directory', datesuffix = False):
       
     # I'm not convinced we want to support in-function unzipping, but it would work, I guess.
     # The goal here is to unzip only the needed file, and so paralleling does that once per process
@@ -119,17 +128,17 @@ def run_save_ewrs(pathlist, output_path, model_format, outputType = 'none', retu
 
     # only save the parts we want
     if ('summary' in outputType) | ('everything' in outputType):
-        save_ewrs(ewr_sum, 'summary', output_path, datesuffix = datesuffix)
+        save_ewrs(ewr_sum, 'summary', output_path, scenarios_from = scenarios_from, datesuffix = datesuffix)
     if (('annual' in outputType) | ('everything' in outputType) | ('yearly' in outputType)):
-        save_ewrs(ewr_yr, 'yearly', output_path, datesuffix = datesuffix)
+        save_ewrs(ewr_yr, 'yearly', output_path, scenarios_from = scenarios_from, datesuffix = datesuffix)
     if ('all' in outputType) | ('everything' in outputType) | ('all_events' in outputType):
-        save_ewrs(ewr_all, 'all_events', output_path, datesuffix = datesuffix)
+        save_ewrs(ewr_all, 'all_events', output_path, scenarios_from = scenarios_from, datesuffix = datesuffix)
     if (('all_successful_events' in outputType) | ('everything' in outputType) | ('successful' in outputType)):
-        save_ewrs(ewr_success, 'all_successful_events', output_path, datesuffix = datesuffix)
+        save_ewrs(ewr_success, 'all_successful_events', output_path, scenarios_from = scenarios_from, datesuffix = datesuffix)
     if (('all_interEvents' in outputType) | ('everything' in outputType)):
-        save_ewrs(ewr_inter, 'all_interEvents', output_path, datesuffix = datesuffix)
+        save_ewrs(ewr_inter, 'all_interEvents', output_path, scenarios_from = scenarios_from, datesuffix = datesuffix)
     if (('all_successful_interEvents' in outputType) | ('everything' in outputType)):
-        save_ewrs(ewr_successInter, 'all_successful_interEvents', output_path, datesuffix = datesuffix)
+        save_ewrs(ewr_successInter, 'all_successful_interEvents', output_path, scenarios_from = scenarios_from, datesuffix = datesuffix)
     
 
     # Only return the parts we want. also should be list comprehension or at
@@ -151,6 +160,12 @@ def run_save_ewrs(pathlist, output_path, model_format, outputType = 'none', retu
     if (('all_successful_interEvents' in returnType) | ('everything' in returnType)):
         returndict.update({ "all_successful_interEvents" : ewr_successInter})
     
+    # Deal with directory-named. Could probably replace this with a comprehension or map
+    # Have to wait until here and not do it in clean_ewrs because we need the gauges for saving unique files.
+    if scenarios_from == 'directory':
+        for i in returndict.keys():
+            returndict[i]['scenario'] = returndict[i]['scenario'].str.replace(r'^(.*)_.*$', r'\1', regex=True)
+
     return(returndict)
   
   
@@ -220,5 +235,7 @@ def run_save_ewrs_old(pathlist, output_path, model_format, allowance, climate, o
     if (('all_successful_interEvents' in returnType) | ('everything' in returnType)):
         returndict.update({ "all_successful_interEvents" : ewr_successInter})
     
+
+
     return(returndict)
 

@@ -237,10 +237,16 @@ test_that("csv per gauge works", {
     "down4",
     "up4"
   ))
+  expect_equal(unique(ewr_out$all_events$scenario), c(
+    "base",
+    "down4",
+    "up4"
+  ))
 
   # I'm now controlling the scenario names in the toolkit, so this should work.
 
-  # Test it created the expected structure
+  # Test it created the expected structure.
+  # These still need to create a single output per input, or they overwrite
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
   expect_snapshot(realised_structure)
 })
@@ -286,6 +292,7 @@ test_that("saving works for one", {
     datesuffix = FALSE,
     returnType = list("summary")
   )
+
   expect_equal(length(ewr_out), 1)
   expect_equal(names(ewr_out), "summary")
 
@@ -404,6 +411,7 @@ test_that("zipped NETCDF saving and returning works for all (or nearly all) ewr 
     hydro_dir = "_test_data/hydrographs/zipcdf.zip",
     output_parent_dir = temp_parent_dir,
     model_format = "IQQM - netcdf",
+    scenarios_from = 'file',
     outputType = ewroutlist,
     datesuffix = FALSE,
     returnType = ewroutlist
