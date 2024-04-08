@@ -26,7 +26,7 @@ test_that("returns one result, no saving", {
   expect_equal(names(ewr_out), "summary")
   expect_equal(
     unique(ewr_out$summary$scenario),
-    c("base", "down4_down4", "up4_up4")
+    c("base", "down4", "up4")
   )
   # Test it didn't create anything since outputType = 'none'
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
@@ -50,7 +50,7 @@ test_that("returns list", {
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_equal(
     unique(ewr_out$summary$scenario),
-    c("base", "down4_down4", "up4_up4")
+    c("base", "down4", "up4")
   )
 })
 
@@ -76,7 +76,7 @@ test_that("complex dir structure", {
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_true(all(unique(ewr_out$summary$scenario) %in%
-    c("base", "down4_down4", "S1_base", "S2_up4_up4", "up4_up4")))
+    c("base", "down4", "S1_base", "S2_up4", "up4")))
 
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
   expect_snapshot(realised_structure)
@@ -567,6 +567,6 @@ test_that("safety works", {
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_equal(
     unique(ewr_out$summary$scenario),
-    c("base", "down4_down4", "up4_up4")
+    c("base", "down4", "up4")
   )
 })
