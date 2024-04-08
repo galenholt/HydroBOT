@@ -95,7 +95,6 @@ test_that("all_successful_interEvents works", {
   expect_true(is.character(ewrdat$gauge))
 })
 
-
 test_that("assessment works", {
   yeardat <- get_any_ewr_output(ewrpath, type = 'yearly')
   sumdat <- get_any_ewr_output(ewrpath, type = 'summary')

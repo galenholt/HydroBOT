@@ -107,7 +107,8 @@ get_any_ewr_output <- function(dir, type,
       i = relevantfiles,
       .combine = dplyr::bind_rows
     ) %do% {
-      temp <- readr::read_csv(i, col_types = readr::cols())
+      # gauge needs to be character, but often looks numeric
+      temp <- readr::read_csv(i, col_types = readr::cols(gauge = readr::col_character()))
     }
   } else if (is.list(dir)) {
     ewrdata <- dir[[type]]
@@ -125,7 +126,8 @@ get_any_ewr_output <- function(dir, type,
   # numeric. We can't pre-set them with readr because they may be in different
   # places for different gauges
   ewrdata <- ewrdata |>
-    dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric))
+    dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric)) |>
+    dplyr::mutate(gauge = as.character(gauge)) # belt and braces- this should never be anything else at this point
 
   ewrdata <- suppressWarnings(cleanewrs(ewrdata))
 
