@@ -419,11 +419,11 @@ Save. could do this above easily enough, but getting lots of dots and hard to re
 ```{r}
 # export larger scenarios 
 
-if (REBUILD_DATA) {
-  readr::write_csv(base, file.path(dataextdir, 'testscenarios', 'base', 'base.csv'))
-  readr::write_csv(up4, file.path(dataextdir, 'testscenarios', 'up4', 'up4.csv'))
-  readr::write_csv(down4, file.path(dataextdir, 'testscenarios', 'down4', 'down4.csv'))
-  } 
+# if (REBUILD_DATA) {
+#   readr::write_csv(base, file.path(dataextdir, 'testscenarios', 'base', 'base.csv'))
+#   readr::write_csv(up4, file.path(dataextdir, 'testscenarios', 'up4', 'up4.csv'))
+#   readr::write_csv(down4, file.path(dataextdir, 'testscenarios', 'down4', 'down4.csv'))
+#   } 
 ```
 
 Write out the scenarios, including metadata to check that that is working (and that we're not picking up extra files in some of the crawling functions).
