@@ -114,27 +114,6 @@ test_that("making assessment tibble works", {
   expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
 })
 
-test_that("SRA state drop", {
-  assessed <- get_ewr_output("C:/Users/galen/Deakin University/QAEL - SRA - SRA/data_out/werpstyle/module_output/EWR_numeric_gauges")
-  ewrgauges <- get_ewr_gauges()
-
-  ewr2g <- ewrgauges |> sf::st_drop_geometry() |>
-    dplyr::left_join(assessed)
-
-  ewr2g$owner |> table()
-
-  # macquarie
-  assessed <- get_ewr_output("C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/macq-data-no_climate_change/module_output/EWR")
-
-
-  # nope
-  ewr2state <- ewr2g |> dplyr::left_join(planning_units)
-  ewr2state$STATE |> table()
-
-  expect_equal(names(assessed), c('ewr_code', 'ewr_code_timing', 'gauge',
-                                  'scenario', 'planning_unit_name', 'ewr_achieved', 'ewr_achieved_timeframe'))
-  expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
-})
 
 test_that("passing in a list from memory works", {
   # ewr_out <- make_test_ewr_output(build_dirs = FALSE)
