@@ -82,7 +82,7 @@ svgnetwriter <- function(plot, file, title = "") {
 
 test_that("networks work", {
   aggNetworkdown <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals,
-                                                           scenario == 'down4_down4'),
+                                                           scenario == 'down4'),
                                      edges = dplyr::filter(ewr_edges, gauge %in% unique(nodes_with_vals$gauge)),
                                      edge_pal = 'black',
                                      node_pal = list(value = 'scico::tokyo'),

@@ -253,10 +253,13 @@ plot_outcomes <- function(outdf,
     # Numeric x
     if (xtype %in% c("numeric", "date")) {
       outcome_plot <- plot_numeric(
-        prepped = prepped, x_col = x_col,
-        x_lab = x_lab, outcome_lab = outcome_lab,
+        prepped = prepped,
+        x_col = x_col,
+        x_lab = x_lab,
+        outcome_lab = outcome_lab,
         position = position,
-        transoutcome = transoutcome, transx = transx,
+        transoutcome = transoutcome,
+        transx = transx,
         smooth_arglist = smooth_arglist,
         xtype = xtype
       )

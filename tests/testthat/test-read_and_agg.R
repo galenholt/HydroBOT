@@ -166,7 +166,7 @@ test_that("nonspatial joins of spatial data (as in multi_agg)", {
   # This is *very* specific to test data, so if that ever changes, this might too
   gauge412005 <- spatagg$ewr_code |>
     sf::st_drop_geometry() |>
-    dplyr::filter(scenario == 'base_base' & gauge == 412005) |>
+    dplyr::filter(scenario == 'base' & gauge == 412005) |>
     dplyr::select(scenario, planning_unit_name, ewr_code, ewr_achieved) |>
     dplyr::arrange(planning_unit_name, ewr_code, ewr_achieved)
 
@@ -174,7 +174,7 @@ test_that("nonspatial joins of spatial data (as in multi_agg)", {
   for (i in unique(gauge412005$planning_unit_name)) {
     pudf <- spatagg$planning_units |>
       sf::st_drop_geometry() |>
-      dplyr::filter(scenario == 'base_base' & planning_unit_name == i) |>
+      dplyr::filter(scenario == 'base' & planning_unit_name == i) |>
       dplyr::select(scenario, planning_unit_name, ewr_code, ewr_achieved) |>
       dplyr::arrange(planning_unit_name, ewr_code, ewr_achieved)
     expect_equal(gauge412005 |> dplyr::filter(planning_unit_name == i), pudf)

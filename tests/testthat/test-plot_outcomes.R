@@ -10,7 +10,7 @@ ewr_to_agg <- make_test_ewr_prepped()
 agg_theme_space <- make_test_agg(namehistory = FALSE, style = 'noPU')
 
 # create a quant description of scenarios
-scenarios <- tibble::tibble(scenario = c("base_base", "down4_down4", "up4_up4", 'MAX'), delta = c(1, 0.25, 4, Inf))
+scenarios <- tibble::tibble(scenario = c("base", "down4", "up4", 'MAX'), delta = c(1, 0.25, 4, Inf))
 
 obj_sdl_to_plot <- agg_theme_space$sdl_units |>
   dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
@@ -52,7 +52,7 @@ test_that("basin works with single color palette", {
     outcome_col = "ewr_achieved",
     colorset = "Objective",
     pal_list = list("scico::oslo"),
-    sceneorder = c("down4_down4", "base_base", "up4_up4")
+    sceneorder = c("down4", "base", "up4")
   ) +
     ggplot2::theme(legend.position = "none")
 
@@ -64,7 +64,7 @@ test_that("basin works with single color palette", {
                               colorset = "Objective",
                               pal_list = list("scico::oslo"),
                               pal_direction = -1,
-                              sceneorder = c("down4_down4", "base_base", "up4_up4")
+                              sceneorder = c("down4", "base", "up4")
   ) +
     ggplot2::theme(legend.position = "none")
 
@@ -77,7 +77,7 @@ test_that("a fixed color works (contrived)", {
     outcome_col = "ewr_achieved",
     colorset = "Objective",
     pal_list = "firebrick",
-    sceneorder = c("down4_down4", "base_base", "up4_up4")
+    sceneorder = c("down4", "base", "up4")
   ) +
     ggplot2::theme(legend.position = "none")
 
@@ -103,7 +103,7 @@ test_that("multi-palette and facetting", {
       colorset = "env_obj",
       pal_list = grouplist,
       facet_wrapper = "SWSDLName",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   vdiffr::expect_doppelganger("bar_basin_group_sdl", sdl_plot)
@@ -117,7 +117,7 @@ test_that("multi-palette and facetting", {
       pal_list = grouplist,
       pal_direction = c(1,-1,1,-1,1,-1),
       facet_wrapper = "SWSDLName",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   vdiffr::expect_doppelganger("bar_basin_group_sdl_pd", sdl_plot_pd)
@@ -132,7 +132,7 @@ test_that("multi-palette and facetting", {
       pal_list = grouplist,
       facet_col = "SWSDLName",
       facet_row = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   vdiffr::expect_doppelganger("bar_basin_group_sdlrow", sdl_plot_facrow)
@@ -145,7 +145,7 @@ test_that("multi-palette and facetting", {
       pal_list = grouplist,
       facet_row = "env_group",
       facet_col = "SWSDLName",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   vdiffr::expect_doppelganger("bar_basin_groupfacet_sdl", sdl_plot_factgroup)
@@ -166,7 +166,7 @@ test_that("flipped", {
       pal_list = scene_pal,
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   vdiffr::expect_doppelganger("scenario stack", sdl_plot)
@@ -182,7 +182,7 @@ test_that("flipped", {
       pal_list = scene_pal,
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   vdiffr::expect_doppelganger("scenario stack group", sdl_plot_g)
@@ -196,7 +196,7 @@ test_that("flipped", {
       pal_list = obj_pal,
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   vdiffr::expect_doppelganger("stacked_objgroups", sdl_plot_groupblock)
@@ -212,7 +212,7 @@ test_that("flipped", {
       pal_list = obj_pal,
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
   vdiffr::expect_doppelganger("legend_name", sdl_plot_groupblock_l)
 
@@ -226,7 +226,7 @@ test_that("flipped", {
       pal_list = obj_pal,
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   vdiffr::expect_doppelganger("no legend title", sdl_plot_groupblock_n)
@@ -240,7 +240,7 @@ test_that("quant x", {
   # a line. Can I do that easily?
 
   # create a quant description of scenarios
-  scenarios <- tibble::tibble(scenario = c("base_base", "down4_down4", "up4_up4"), delta = c(1, 0.25, 4))
+  scenarios <- tibble::tibble(scenario = c("base", "down4", "up4"), delta = c(1, 0.25, 4))
 
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_line <- obj_sdl_to_plot |>
@@ -270,7 +270,7 @@ test_that("quant x", {
       facet_row = "SWSDLName",
       facet_col = ".",
       base_list = list(
-        base_lev = "base_base", comp_fun = "difference",
+        base_lev = "base", comp_fun = "difference",
         group_cols = c("env_obj", "polyID")
       )
     )
@@ -293,7 +293,7 @@ test_that("quant x", {
       facet_row = "env_group",
       facet_col = ".",
       base_list = list(
-        base_lev = "base_base", comp_fun = "difference",
+        base_lev = "base", comp_fun = "difference",
         group_cols = c("env_obj", "polyID")
       )
     )
@@ -315,7 +315,7 @@ test_that("quant x", {
       facet_row = "SWSDLName",
       facet_col = ".",
       base_list = list(
-        base_lev = "base_base",
+        base_lev = "base",
         comp_fun = "difference",
         group_cols = c("polyID")
       ),
@@ -341,7 +341,7 @@ test_that("quant x", {
       facet_row = "SWSDLName",
       facet_col = ".",
       base_list = list(
-        base_lev = "base_base",
+        base_lev = "base",
         comp_fun = "difference",
         group_cols = c("polyID")
       ),
@@ -367,9 +367,9 @@ test_that("quant x", {
       pal_list = list("RColorBrewer::Dark2"),
       facet_row = "env_group",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       base_list = list(
-        base_lev = "base_base", comp_fun = "difference",
+        base_lev = "base", comp_fun = "difference",
         group_cols = c("env_obj", "polyID")
       ),
       smooth = TRUE
@@ -396,7 +396,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   vdiffr::expect_doppelganger("sdl_map_simple", sdl_map)
@@ -428,7 +428,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   vdiffr::expect_doppelganger("sdl_map_colorlabel", sdl_map)
@@ -445,7 +445,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = list(underlay = basin, underlay_pal = "azure")
     )
 
@@ -463,7 +463,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = list(
         underlay = cewo_valleys,
         underlay_ycol = "ValleyName",
@@ -484,7 +484,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
       facet_row = "env_obj",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = list(
         underlay = "basin",
         underlay_pal = "azure"
@@ -506,7 +506,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
       facet_row = "env_obj",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = list(
         underlay = sdl_units,
         underlay_ycol = "SWSDLName",
@@ -531,7 +531,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
       facet_row = "env_obj",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = list(
         underlay = dplyr::filter(obj_sdl_to_plot, env_obj == "NF1"),
         underlay_ycol = "ewr_achieved",
@@ -553,7 +553,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
       facet_row = "env_obj",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = list(
         list(
           underlay = "basin",
@@ -581,7 +581,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
       facet_row = "env_obj",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = "basin",
       overlay_list = list(overlay = "bom_basin_gauges", overlay_pal = "purple")
     ) +
@@ -600,7 +600,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
       facet_row = "env_obj",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = "basin",
       overlay_list = list(
         overlay = "bom_basin_gauges",
@@ -623,7 +623,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
       facet_row = "env_obj",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = "basin",
       overlay_list = list(
         overlay = dplyr::filter(env_obj_to_plot, env_obj == "NF1"),
@@ -647,7 +647,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
       facet_row = "env_obj",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = "basin",
       overlay_list = list(
         overlay = dplyr::filter(env_obj_to_plot, env_obj == "NF1"),
@@ -676,7 +676,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
       facet_row = "Objective",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       overlay_list = "bom_basin_gauges"
     ) +
     ggplot2::theme(legend.position = "bottom")
@@ -698,7 +698,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
       facet_row = "Objective",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       overlay_list = list(
         list(overlay = "sdl_units", overlay_pal = NA),
         list(
@@ -724,7 +724,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
       facet_row = "env_obj",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = list(underlay = "basin", underlay_pal = "azure"),
       overlay_list = list(
         overlay = dplyr::filter(env_obj_to_plot, env_obj == "NF1"),
@@ -754,7 +754,7 @@ test_that("maps", {
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
       facet_row = "env_obj",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = list(
         list(
           underover = "basin",
@@ -788,9 +788,9 @@ test_that("maps", {
       pal_list = list("ggthemes::Orange-Blue-White Diverging"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       base_list = list(
-        base_lev = "base_base", comp_fun = "difference",
+        base_lev = "base", comp_fun = "difference",
         group_cols = c("env_obj", "polyID")
       ), # Do I need to group_by polyID for the maps? Yes. should probably automate that.
       underlay_list = list(underlay = basin, underlay_pal = "azure")
@@ -809,9 +809,9 @@ test_that("maps", {
       pal_list = list("ggthemes::Orange-Blue-White Diverging"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       base_list = list(
-        base_lev = "base_base", comp_fun = "relative",
+        base_lev = "base", comp_fun = "relative",
         group_cols = c("env_obj", "polyID")
       ),
       zero_adjust = "auto",
@@ -849,7 +849,7 @@ test_that("adding color to filled maps", {
       map_outlinecolor = 'red',
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   vdiffr::expect_doppelganger("sdl_map_outline", sdl_map_outline)
@@ -867,7 +867,7 @@ test_that("adding color to filled maps", {
       map_outlinecolor = NA,
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       underlay_list = list(underlay = basin, pal_list = 'azure', map_outlinecolor = 'red')
     )
 
@@ -883,7 +883,7 @@ test_that("setLimits works", {
     outcome_col = "ewr_achieved",
     colorset = "Objective",
     pal_list = list("scico::oslo"),
-    sceneorder = c("down4_down4", "base_base", "up4_up4"),
+    sceneorder = c("down4", "base", "up4"),
     setLimits = c(0, 20)
   ) +
     ggplot2::theme(legend.position = "none")
@@ -894,7 +894,7 @@ test_that("setLimits works", {
     outcome_col = "ewr_achieved",
     colorset = "Objective",
     pal_list = list("scico::oslo"),
-    sceneorder = c("down4_down4", "base_base", "up4_up4"),
+    sceneorder = c("down4", "base", "up4"),
     setLimits = c(0, 10)
   ) +
     ggplot2::theme(legend.position = "none")
@@ -913,7 +913,7 @@ test_that("setLimits works", {
       point_group = "env_obj",
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       setLimits = c(0, 0.75)
     )
 
@@ -930,7 +930,7 @@ test_that("setLimits works", {
       point_group = "env_obj",
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       setLimits = c(0.25)
     )
 
@@ -947,7 +947,7 @@ test_that("setLimits works", {
       point_group = "env_obj",
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       setLimits = c(-1, 0.25, 1)
     )
 
@@ -964,9 +964,9 @@ test_that("setLimits works", {
       point_group = "env_obj",
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       base_list = list(
-        base_lev = "base_base",
+        base_lev = "base",
         comp_fun = "difference",
         group_cols = c("env_obj", 'polyID')
       )
@@ -985,9 +985,9 @@ test_that("setLimits works", {
       point_group = "env_obj",
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       base_list = list(
-        base_lev = "base_base",
+        base_lev = "base",
         comp_fun = "relative",
         group_cols = c("env_obj", 'polyID')
       ),
@@ -1010,7 +1010,7 @@ test_that("setLimits works", {
       pal_list = list("scico::berlin"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   # Make a minimal map
@@ -1024,7 +1024,7 @@ test_that("setLimits works", {
       pal_list = list("scico::berlin"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       setLimits = c(0, 1)
     )
 
@@ -1041,7 +1041,7 @@ test_that("setLimits works", {
       pal_list = list("scico::berlin"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       setLimits = 0.25
     )
 
@@ -1059,7 +1059,7 @@ test_that("setLimits works", {
       pal_list = list("scico::berlin"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       setLimits = c(-1, 0, 1)
     )
 
@@ -1076,9 +1076,9 @@ test_that("setLimits works", {
       pal_list = list("scico::berlin"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       base_list = list(
-        base_lev = "base_base",
+        base_lev = "base",
         comp_fun = "difference",
         group_cols = c("env_obj", 'polyID')
       )
@@ -1096,9 +1096,9 @@ test_that("setLimits works", {
       pal_list = list("scico::berlin"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       base_list = list(
-        base_lev = "base_base",
+        base_lev = "base",
         comp_fun = "relative",
         group_cols = c("env_obj", 'polyID')
       ),
@@ -1119,9 +1119,9 @@ test_that("setLimits works", {
       pal_list = list("scico::berlin"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       base_list = list(
-        base_lev = "base_base",
+        base_lev = "base",
         comp_fun = "relative",
         group_cols = c("env_obj", 'polyID')
       ),
@@ -1154,7 +1154,7 @@ test_that("ewr works as in `plot_outcomes_bar`", {
     facet_col = "ewr_code",
     colorset = "scenario",
     pal_list = scene_pal,
-    sceneorder = c("down4_down4", "base_base", "up4_up4")
+    sceneorder = c("down4", "base", "up4")
   )
 
   vdiffr::expect_doppelganger("bar_ewr", ewr_plot)
@@ -1167,7 +1167,7 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
     colorset = "scenario",
     pal_list = scene_pal,
     facet_wrapper = "Objective",
-    sceneorder = c("down4_down4", "base_base", "up4_up4")
+    sceneorder = c("down4", "base", "up4")
   )
 
   vdiffr::expect_doppelganger("bar_basin", basin_plot)
@@ -1178,7 +1178,7 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
     facet_wrapper = "Objective",
     colorset = "scenario",
     pal_list = scene_pal,
-    sceneorder = c("down4_down4", "base_base", "up4_up4")
+    sceneorder = c("down4", "base", "up4")
   )
 
   vdiffr::expect_doppelganger("bar_basin_lab", basin_plot_L)
@@ -1220,13 +1220,17 @@ test_that("facet addition works", {
 test_that("hydrographs", {
   hydro_to_plot <- read_hydro(hydropath = system.file("extdata/testsmall/hydrographs", package = "werptoolkitr"))
 
-  # This one sums the flwos
+  hydro_to_plot <- hydro_to_plot |>
+    dplyr::mutate(scenario = dplyr::case_when(grepl('down', scenario) ~ 'down4',
+                                       grepl('base', scenario) ~ 'base',
+                                       grepl('up4', scenario) ~ 'up4'))
+  # This one sums the flows
   hydplot_bar <- plot_outcomes(hydro_to_plot,
     outcome_col = "flow",
     colorset = "scenario",
     pal_list = scene_pal,
     facet_wrapper = "gauge",
-    sceneorder = c("down4_down4", "base_base", "up4_up4")
+    sceneorder = c("down4", "base", "up4")
   ) +
     ggplot2::theme(legend.position = "none")
 
@@ -1239,7 +1243,7 @@ test_that("hydrographs", {
     colorset = "scenario",
     pal_list = scene_pal,
     facet_wrapper = "gauge",
-    sceneorder = c("down4_down4", "base_base", "up4_up4")
+    sceneorder = c("down4", "base", "up4")
   ) +
     ggplot2::theme(legend.position = "none")
 
@@ -1267,7 +1271,7 @@ test_that("hydrographs", {
     facet_wrapper = "gauge",
     scales = "free_y",
     transoutcome = "log10",
-    sceneorder = c("down4_down4", "base_base", "up4_up4")
+    sceneorder = c("down4", "base", "up4")
   ) +
     ggplot2::theme(legend.position = "none")
 
@@ -1280,9 +1284,9 @@ test_that("hydrographs", {
     colorset = "scenario",
     pal_list = scene_pal,
     facet_wrapper = "gauge",
-    sceneorder = c("down4_down4", "base_base", "up4_up4"),
+    sceneorder = c("down4", "base", "up4"),
     base_list = list(
-      base_lev = "base_base",
+      base_lev = "base",
       comp_fun = "difference",
       group_cols = c("Date", "gauge")
     )
@@ -1298,11 +1302,11 @@ test_that("hydrographs", {
     colorset = "scenario",
     pal_list = scene_pal,
     facet_wrapper = "gauge",
-    sceneorder = c("down4_down4", "base_base", "up4_up4"),
+    sceneorder = c("down4", "base", "up4"),
     zero_adjust = "auto",
     transoutcome = "log10",
     base_list = list(
-      base_lev = "base_base",
+      base_lev = "base",
       comp_fun = "relative",
       group_cols = c("Date", "gauge")
     )
@@ -1338,7 +1342,7 @@ test_that("scenarios aren't special", {
 
 test_that("heatmaps", {
   # create a quant description of scenarios
-  # scenarios <- tibble::tibble(scenario = c('base_base', 'down4_down4', 'up4_up4'), delta = c(1, 0.25, 4))
+  # scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
 
   # Mock data to have two dimensions. This is silly, but doesn't matter.
   ostp05 <- obj_sdl_to_plot |>
@@ -1440,7 +1444,7 @@ test_that("heatmaps", {
       contour_arglist = list(breaks = c(-300, -200, -100, 0, 100, 200, 300)),
       zero_adjust = "auto",
       base_list = list(
-        base_lev = "base_basezero", comp_fun = "relative",
+        base_lev = "basezero", comp_fun = "relative",
         group_cols = c("env_group", "SWSDLName")
       )
     )
@@ -1469,7 +1473,7 @@ test_that("heatmaps", {
       transx = "log10",
       transoutcome = "sqrt",
       base_list = list(
-        base_lev = "down4_down4minus1", comp_fun = "difference",
+        base_lev = "down4minus1", comp_fun = "difference",
         group_cols = c("env_group", "SWSDLName")
       )
     )
@@ -1511,9 +1515,9 @@ test_that("heatmaps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::turku"),
       sceneorder = c(
-        "down4_down4minus1", "down4_down4zero", "down4_down4plus1",
-        "base_baseminus1", "base_basezero", "base_baseplus1",
-        "up4_up4minus1", "up4_up4zero", "up4_up4plus1"
+        "down4minus1", "down4zero", "down4plus1",
+        "baseminus1", "basezero", "baseplus1",
+        "up4minus1", "up4zero", "up4plus1"
       ),
       facet_row = "scenario",
       facet_col = "env_group"
@@ -1600,7 +1604,7 @@ test_that("post-hoc label changes work", {
       pal_list = list("scico::berlin"),
       facet_col = "env_obj",
       facet_row = "scenario",
-      sceneorder = c("down4_down4", "base_base", "up4_up4"),
+      sceneorder = c("down4", "base", "up4"),
       setLimits = c(0, 2),
       overlay_list = list(
         overlay = dplyr::filter(env_obj_to_plot, grepl("^EF", env_obj)),
@@ -1626,7 +1630,7 @@ test_that("discrete but non-named colors", {
       pal_list = "ggsci::default_jama",
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   vdiffr::expect_doppelganger("sdl_plot_groupblock_dc", sdl_plot_groupblock_dc)
@@ -1646,7 +1650,7 @@ test_that("discrete but non-named colors", {
       pal_list = "scico::turku",
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   # throw another lab-change test in too.

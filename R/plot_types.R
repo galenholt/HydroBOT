@@ -125,11 +125,16 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
     color_type = prepped$color_type,
     pal_direction = prepped$direction)
 
-  outcome_plot <- handle_palettes(outcome_plot,
-    aes_type = "fill",
-    pal_list = prepped$pal_list,
-    color_type = prepped$color_type,
-    pal_direction = prepped$direction)
+  if (!is.null(smooth_arglist)) {
+    outcome_plot <- handle_palettes(outcome_plot,
+      aes_type = "fill",
+      pal_list = prepped$pal_list,
+      color_type = prepped$color_type,
+      pal_direction = prepped$direction)
+  }
+
+  return(outcome_plot)
+
 
 }
 
