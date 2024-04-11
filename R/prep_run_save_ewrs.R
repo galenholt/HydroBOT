@@ -24,6 +24,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'   but two typical cases:
 #'  * The directory containing `hydro_dir`, which puts the `module_outputs` at the same level as the hydrographs
 #'  * If running in batches for single scenarios, may be `hydro_dir`, which just puts the `module_outputs` in `hydro_dir`
+#' @param output_subdir a sub-directory for the outputs, if for example we want `module_output/EWR/V1` and `module_output/EWR/V2`
 #' @param scenarios `NULL` (default) or named list.
 #'  * `NULL`- finds scenario names by parsing directory names in `hydro_dir`. If no internal directories, just stays in `hydro_dir`. This captures the two typical situations discussed for `output_parent_dir`. If there are other directories in `hydro_dir` that do not contain hydrological scenarios, should use a character vector.
 #'  * named list of paths to files. names become scenario names, paths should be relative to `hydro_dir`. This allows unusual directory structures.
@@ -43,6 +44,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'  * 'all_successful_interEvents'
 #' @param returnType list of strings or character vector defining what to return
 #'   to the active R session. Same options as `outputType`
+#' @param scenarios_from character, default 'directory' gets scenario names from directory names. If anything else, gets them from filenames (safest). Expect additional options in future, e.g from metadata.
 #' @param datesuffix logical. whether to add a suffix to saved filenames to
 #'   provide a datestamp. Should be deprecated in favour of metadata files.
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
@@ -53,15 +55,18 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @param MAXT deprecated, included to let old calls pass
 #' @param DUR deprecated, included to let old calls pass
 #' @param DRAW deprecated, included to let old calls pass
-
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
 #'
 #' @examples
-prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
+prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
+                               output_subdir = '',
+                               scenarios = NULL,
                                model_format = "IQQM - NSW 10,000 years",
-                               outputType = "none", returnType = "none",
+                               outputType = "none",
+                               returnType = "none",
+                               scenarios_from = 'directory',
                                extrameta = NULL,
                                rparallel = FALSE,
                                retries = 2,
@@ -129,6 +134,20 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   names(hydro_paths) <- gsub(' |\\(|\\)', '', names(hydro_paths))
   names(hydro_paths) <- gsub('_StraightNodeGauge', '', names(hydro_paths))
 
+  # If the scenario names are just duplicated, as happens with scenario/scenario.csv, cut.
+  splitnames <- stringr::str_split(names(hydro_paths), '_')
+  check_double_names <- function(x) {
+    if (length(x) == 2 && x[1] == x[2]) {
+      doubled <- TRUE
+    } else {
+      doubled <- FALSE
+    }
+  }
+
+  if (all(purrr::map_lgl(splitnames, check_double_names))) {
+    names(hydro_paths) <- stringr::str_split_i(names(hydro_paths), '_', 1)
+  }
+
   # We need to check the files have unique names (and fix if not), since the EWR
   # tool makes them the 'scenario' column.
   # hydro_paths <- fix_file_scenarios(hydro_paths, scenarios)
@@ -143,7 +162,9 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
   } else {
     output_path <- make_output_dir(output_parent_dir,
       scenarios = names(hydro_paths),
-      module_name = "EWR", ewr_outtypes = unlist(outputType)
+      module_name = "EWR",
+      subdir = output_subdir,
+      ewr_outtypes = unlist(outputType)
     )
     # set up flags for the metadata in case the ewr fails partway
     init_params <- list(
@@ -180,6 +201,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir, scenarios = NULL,
       outputType = outputType,
       returnType = returnType,
       scenario_name = y,
+      scenarios_from = scenarios_from,
       datesuffix = datesuffix
     )
   }

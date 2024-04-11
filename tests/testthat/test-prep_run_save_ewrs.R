@@ -26,7 +26,7 @@ test_that("returns one result, no saving", {
   expect_equal(names(ewr_out), "summary")
   expect_equal(
     unique(ewr_out$summary$scenario),
-    c("base_base", "down4_down4", "up4_up4")
+    c("base", "down4", "up4")
   )
   # Test it didn't create anything since outputType = 'none'
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
@@ -50,7 +50,7 @@ test_that("returns list", {
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_equal(
     unique(ewr_out$summary$scenario),
-    c("base_base", "down4_down4", "up4_up4")
+    c("base", "down4", "up4")
   )
 })
 
@@ -76,7 +76,7 @@ test_that("complex dir structure", {
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_true(all(unique(ewr_out$summary$scenario) %in%
-    c("base_base", "down4_down4", "S1_base_base", "S2_up4_up4", "up4_up4")))
+    c("base", "down4", "S1_base", "S2_up4", "up4")))
 
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
   expect_snapshot(realised_structure)
@@ -111,6 +111,107 @@ test_that("manual scenario naming", {
   expect_snapshot(realised_structure)
 })
 
+
+# Does the read-in and run work for singe gauges per csv?
+test_that("do different length gauge records break EWR", {
+  # First, generate temporary hydrograph files
+
+  make_temp_multifile()
+
+  # For each of those, delete some section(s)
+  # super manual and annoying
+  alldates <- tibble::tibble(Date = lubridate::ymd('20150205'), .rows = 0)
+  base <- alldates
+  up4 <- alldates
+  down4 <- alldates
+  allfiles <- list.files(temp_hydro_multi, recursive = TRUE)
+  for (i in 1:length(allfiles)) {
+    tc <- readr::read_csv(file.path(temp_hydro_multi, allfiles[i]))
+    if ("412002" %in% names(tc)) {
+      tc[lubridate::year(tc$Date) %in% c('2017'), 2] <- NA
+    }
+    if ("412005" %in% names(tc)) {
+      tc[lubridate::year(tc$Date) %in% c('2015'), 2] <- NA
+    }
+    if ("412038" %in% names(tc)) {
+      tc[lubridate::year(tc$Date) %in% c('2019'), 2] <- NA
+    }
+    if ("421001" %in% names(tc)) {
+      tc[lubridate::year(tc$Date) %in% c('2015', '2018', '2019'), 2] <- NA
+
+    }
+    if ("421004" %in% names(tc)) {
+      tc[lubridate::year(tc$Date) %in% c('2015', '2016'), 2] <- NA
+
+    }
+    if ("421011" %in% names(tc)) {
+      tc[lubridate::year(tc$Date) %in% c('2016', '2018'), 2] <- NA
+
+    }
+
+    # Glue together
+    alldates <- tibble::tibble(Date = unique(c(alldates$Date, tc$Date)))
+
+    if (grepl('base', allfiles[i])) {
+      base <- alldates |>
+        dplyr::left_join(base) |>
+        dplyr::left_join(tc)
+    }
+    if (grepl('down4', allfiles[i])) {
+      down4 <- alldates |>
+        dplyr::left_join(down4) |>
+        dplyr::left_join(tc)
+    }
+    if (grepl('up4', allfiles[i])) {
+      up4 <- alldates |>
+        dplyr::left_join(up4) |>
+        dplyr::left_join(tc)
+    }
+
+    # Save singles
+    write.csv(tc, file.path(temp_hydro_multi, allfiles[i]))
+  }
+
+  # save the combos
+  dir.create(file.path(temp_parent_dir, 'hydrosmoosh'))
+  dir.create(file.path(temp_parent_dir, 'hydrosmoosh', 'base'))
+  dir.create(file.path(temp_parent_dir, 'hydrosmoosh', 'down4'))
+  dir.create(file.path(temp_parent_dir, 'hydrosmoosh', 'up4'))
+
+  write.csv(base, file.path(temp_parent_dir, 'hydrosmoosh', 'base', 'base.csv'))
+  write.csv(down4, file.path(temp_parent_dir, 'hydrosmoosh', 'down4', 'down4.csv'))
+  write.csv(up4, file.path(temp_parent_dir, 'hydrosmoosh', 'up4', 'up4.csv'))
+
+
+  ewr_out <- prep_run_save_ewrs(
+    hydro_dir = temp_hydro_multi,
+    output_parent_dir = temp_parent_dir,
+    outputType = list("none"),
+    datesuffix = FALSE,
+    returnType = list("summary", "all")
+  )
+
+  smoosh_out <- prep_run_save_ewrs(
+    hydro_dir = file.path(temp_parent_dir, 'hydrosmoosh'),
+    output_parent_dir = temp_parent_dir,
+    outputType = list("none"),
+    datesuffix = FALSE,
+    returnType = list("summary", "all")
+  )
+
+
+  expect_equal(ewr_out$summary, smoosh_out$summary)
+
+  # all_events gets sorted, but if we sort, should match
+  ewa <- ewr_out$all_events |>
+    dplyr::arrange(scenario, gauge, pu, ewr)
+  swa <- smoosh_out$all_events |>
+    dplyr::arrange(scenario, gauge, pu, ewr)
+
+  expect_equal(ewa, swa)
+
+})
+
 # Does the read-in and run work for singe gauges per csv?
 test_that("csv per gauge works", {
   # First, generate temporary hydrograph files
@@ -128,14 +229,50 @@ test_that("csv per gauge works", {
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
 
-  # These come in with directory_gauge. Split gauge off and should be left with scenarios.
-  ewr_out$summary <- ewr_out$summary |>
-    dplyr::mutate(scenario = purrr::map_chr(scenario, \(x) stringr::str_split_1(x, "_")[1]))
+  # These no longer come in with directory_gauge. Split gauge off and should be left with scenarios.
+  # ewr_out$summary <- ewr_out$summary |>
+  #   dplyr::mutate(scenario = purrr::map_chr(scenario, \(x) stringr::str_split_1(x, "_")[1]))
   expect_equal(unique(ewr_out$summary$scenario), c(
     "base",
     "down4",
     "up4"
   ))
+  expect_equal(unique(ewr_out$all_events$scenario), c(
+    "base",
+    "down4",
+    "up4"
+  ))
+
+  # I'm now controlling the scenario names in the toolkit, so this should work.
+
+  # Test it created the expected structure.
+  # These still need to create a single output per input, or they overwrite
+  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  expect_snapshot(realised_structure)
+})
+
+
+test_that("csv per gauge works for filenames", {
+  # First, generate temporary hydrograph files
+
+  make_temp_multifile()
+
+  ewr_out <- prep_run_save_ewrs(
+    hydro_dir = temp_hydro_multi,
+    scenarios_from = 'file',
+    output_parent_dir = temp_parent_dir,
+    outputType = list("summary", "yearly"),
+    datesuffix = FALSE,
+    returnType = list("summary", "all")
+  )
+
+  expect_equal(length(ewr_out), 2)
+  expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
+
+  # These no longer come in with directory_gauge. Split gauge off and should be left with scenarios.
+  # ewr_out$summary <- ewr_out$summary |>
+  #   dplyr::mutate(scenario = purrr::map_chr(scenario, \(x) stringr::str_split_1(x, "_")[1]))
+  expect_snapshot(unique(ewr_out$summary$scenario))
 
   # I'm now controlling the scenario names in the toolkit, so this should work.
 
@@ -151,6 +288,27 @@ test_that("saving works for one", {
   ewr_out <- prep_run_save_ewrs(
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
+    outputType = list("summary"),
+    datesuffix = FALSE,
+    returnType = list("summary")
+  )
+
+  expect_equal(length(ewr_out), 1)
+  expect_equal(names(ewr_out), "summary")
+
+  # Test it created the expected structure
+  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  expect_snapshot(realised_structure)
+})
+
+test_that("saving works with subdir", {
+  # create dir so building makes sense
+  make_temp_hydro()
+
+  ewr_out <- prep_run_save_ewrs(
+    hydro_dir = temp_hydro_dir,
+    output_parent_dir = temp_parent_dir,
+    output_subdir = 'testsub',
     outputType = list("summary"),
     datesuffix = FALSE,
     returnType = list("summary")
@@ -253,6 +411,7 @@ test_that("zipped NETCDF saving and returning works for all (or nearly all) ewr 
     hydro_dir = "_test_data/hydrographs/zipcdf.zip",
     output_parent_dir = temp_parent_dir,
     model_format = "IQQM - netcdf",
+    scenarios_from = 'file',
     outputType = ewroutlist,
     datesuffix = FALSE,
     returnType = ewroutlist
@@ -537,6 +696,6 @@ test_that("safety works", {
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_equal(
     unique(ewr_out$summary$scenario),
-    c("base_base", "down4_down4", "up4_up4")
+    c("base", "down4", "up4")
   )
 })

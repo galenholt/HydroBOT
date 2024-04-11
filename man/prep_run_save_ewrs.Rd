@@ -7,10 +7,12 @@
 prep_run_save_ewrs(
   hydro_dir,
   output_parent_dir,
+  output_subdir = "",
   scenarios = NULL,
   model_format = "IQQM - NSW 10,000 years",
   outputType = "none",
   returnType = "none",
+  scenarios_from = "directory",
   extrameta = NULL,
   rparallel = FALSE,
   retries = 2,
@@ -33,6 +35,8 @@ but two typical cases:
 \item The directory containing \code{hydro_dir}, which puts the \code{module_outputs} at the same level as the hydrographs
 \item If running in batches for single scenarios, may be \code{hydro_dir}, which just puts the \code{module_outputs} in \code{hydro_dir}
 }}
+
+\item{output_subdir}{a sub-directory for the outputs, if for example we want \code{module_output/EWR/V1} and \code{module_output/EWR/V2}}
 
 \item{scenarios}{\code{NULL} (default) or named list.
 \itemize{
@@ -62,6 +66,8 @@ to disk. One or more of:
 
 \item{returnType}{list of strings or character vector defining what to return
 to the active R session. Same options as \code{outputType}}
+
+\item{scenarios_from}{character, default 'directory' gets scenario names from directory names. If anything else, gets them from filenames (safest). Expect additional options in future, e.g from metadata.}
 
 \item{extrameta}{list, extra information to include in saved metadata documentation for the run. Default NULL.}
 

@@ -1,6 +1,6 @@
 agg_theme_space <- make_test_agg(namehistory = FALSE)
 # create a quant description of scenarios
-scenarios <- tibble::tibble(scenario = c("base_base", "down4_down4", "up4_up4", 'MAX'), delta = c(1, 0.25, 4, Inf))
+scenarios <- tibble::tibble(scenario = c("base", "down4", "up4", 'MAX'), delta = c(1, 0.25, 4, Inf))
 
 obj_sdl_to_plot <- agg_theme_space$sdl_units |>
   dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
@@ -23,7 +23,7 @@ test_that("werp plots work", {
                               outcome_col = "ewr_achieved",
                               colorset = "Objective",
                               pal_list = list("scico::oslo"),
-                              sceneorder = c("down4_down4", "base_base", "up4_up4")
+                              sceneorder = c("down4", "base", "up4")
   ) +
     ggplot2::theme(legend.position = "none")
 
@@ -40,7 +40,7 @@ test_that("werp plots work", {
       pal_list = scene_pal,
       facet_row = "SWSDLName",
       facet_col = ".",
-      sceneorder = c("down4_down4", "base_base", "up4_up4")
+      sceneorder = c("down4", "base", "up4")
     )
 
   sdl_table <- make_plot_table(sdl_plot)

@@ -75,6 +75,8 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
                    list(wm = ~weighted.mean(., w = area,
                                             na.rm = TRUE)),
                    'ArithmeticMean')
+
+    ps <- "planning_units"
   }
 
   # This ignores planning units, which yields much better data for testing plots, even if it's not what we would do in an analysis.
@@ -99,6 +101,8 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
                    list(wm = ~weighted.mean(., w = area,
                                             na.rm = TRUE)),
                    'ArithmeticMean')
+    # no pseudo_spatial argument herea
+    ps <- NULL
   }
 
 
@@ -110,7 +114,7 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
                                      funsequence = funseq,
                                      causal_edges = causal_ewr,
                                      namehistory = namehistory,
-                                     pseudo_spatial = 'planning_units',
+                                     pseudo_spatial = ps,
                                      saveintermediate = TRUE)
 
   return(agg_theme_space)

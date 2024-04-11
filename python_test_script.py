@@ -70,10 +70,10 @@
 
 # csvs
 # Run make_temp_hydro() first
-scenarios = 'C:/Users/galen/Documents/code/WERP/WERP_toolkit/_test_data/hydrographs/base/base.csv'
+scenarios = 'C:/Users/galen/Documents/code/WERP/WERP_toolkit/_test_data/hydrographs/base/412005.csv'
 op = 'C:/Users/galen/Documents/code/WERP/WERP_toolkit/_test_data/module_output/EWR'
-sn = 'base'
+sn = 'base_412005'
 # model_format = 'IQQM - netcdf'
 # Testing the controller
 from inst.python import controller_functions
-ewr_sh = controller_functions.run_save_ewrs(scenarios, output_path = op, model_format = 'IQQM - NSW 10,000 years', outputType = ['summary', 'yearly'], returnType = ['none'], scenario_name = sn)
+ewr_sh = controller_functions.run_save_ewrs(scenarios, output_path = op, model_format = 'IQQM - NSW 10,000 years', outputType = ['summary', 'yearly'], returnType = ['summary', 'yearly', 'all_events'], scenario_name = sn)

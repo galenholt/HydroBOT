@@ -402,7 +402,7 @@
 <polyline points='49.24,314.99 51.73,314.99 ' style='stroke-width: 0.97; stroke: #333333; stroke-linecap: butt;' />
 <text x='321.52' y='568.94' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='21.68px' lengthAdjust='spacingAndGlyphs'>delta</text>
 <text transform='translate(11.86,284.32) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='61.72px' lengthAdjust='spacingAndGlyphs'>ewr_achieved</text>
-<text transform='translate(22.66,284.32) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='95.08px' lengthAdjust='spacingAndGlyphs'>relative to base_base</text>
+<text transform='translate(22.66,284.32) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='67.82px' lengthAdjust='spacingAndGlyphs'>relative to base</text>
 <rect x='616.41' y='125.49' width='98.61' height='317.66' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
 <text x='621.39' y='138.39' style='font-size: 10.00px; font-family: sans;' textLength='35.03px' lengthAdjust='spacingAndGlyphs'>env_obj</text>
 <rect x='621.39' y='144.41' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />

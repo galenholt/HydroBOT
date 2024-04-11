@@ -6,7 +6,7 @@ test_that("long data referencing works", {
   # names are right
   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
   # all the bases are 0
-  expect_equal(sum(baselong$difference_flow[which(baselong$scenario == 'base')]), 0)
+  expect_equal(sum(baselong$difference_flow[which(baselong$scenario == 'base_base')]), 0)
 })
 
 test_that("auto-grouper works", {
@@ -17,7 +17,7 @@ test_that("auto-grouper works", {
   # names are right
   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
   # all the bases are 0
-  expect_equal(sum(baselong$difference_flow[which(baselong$scenario == 'base')]), 0)
+  expect_equal(sum(baselong$difference_flow[which(baselong$scenario == 'base_base')]), 0)
 })
 
 test_that("multiple values columns works", {
@@ -30,7 +30,7 @@ test_that("multiple values columns works", {
   # names are right
   expect_equal(names(basewide), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
   # all the bases are 0
-  expect_equal(sum(basewide$difference_flow[which(basewide$scenario == 'base')]), 0)
+  expect_equal(sum(basewide$difference_flow[which(basewide$scenario == 'base_base')]), 0)
 })
 
 test_that("scalar refs works", {
@@ -65,7 +65,7 @@ test_that("relative comparison works", {
   # names are right
   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'relative_flow'))
   # all the bases should be 1 or div/0
-  expect_true(all(baselong$relative_flow[which(baselong$scenario == 'base' & baselong$flow != 0)] == 1))
+  expect_true(all(baselong$relative_flow[which(baselong$scenario == 'base_base' & baselong$flow != 0)] == 1))
 })
 
 test_that("relative comparison works with add_eps", {
@@ -88,7 +88,7 @@ test_that("character functions work", {
   # names are right
   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
   # all the bases are 0
-  expect_equal(sum(baselong$difference_flow[which(baselong$scenario == 'base')]), 0)
+  expect_equal(sum(baselong$difference_flow[which(baselong$scenario == 'base_base')]), 0)
 })
 
 test_that("list functions work", {
@@ -101,7 +101,7 @@ test_that("list functions work", {
   # names are right
   expect_equal(names(baselong), c('scenario', 'Date', 'gauge', 'flow', 'ref_flow', 'difference_flow'))
   # all the bases are 0
-  expect_equal(sum(baselong$difference_flow[which(baselong$scenario == 'base')]), 0)
+  expect_equal(sum(baselong$difference_flow[which(baselong$scenario == 'base_base')]), 0)
 })
 
 test_that("no grouping works", {

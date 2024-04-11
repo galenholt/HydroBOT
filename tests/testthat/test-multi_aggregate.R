@@ -887,7 +887,7 @@ test_that("nonspatial joins of spatial data", {
   )
 
   # Find some NA- delete
-  naexample <- spatagg$ewr_code |> dplyr::filter(scenario == 'base_base' & planning_unit_name == 'Muggabah Creek')
+  naexample <- spatagg$ewr_code |> dplyr::filter(scenario == 'base' & planning_unit_name == 'Muggabah Creek')
   relevantewrs <- causal_ewr$ewr2obj |> dplyr::filter(ewr_code %in% naexample$ewr_code & planning_unit_name %in% naexample$planning_unit_name)
 
   # stringr::str_flatten(names(spatagg), "', '")
@@ -920,7 +920,7 @@ test_that("nonspatial joins of spatial data", {
   # This is *very* specific to test data, so if that ever changes, this might too
   gauge412005 <- spatagg$ewr_code |>
     sf::st_drop_geometry() |>
-    dplyr::filter(scenario == 'base_base' & gauge == 412005) |>
+    dplyr::filter(scenario == 'base' & gauge == 412005) |>
     dplyr::select(scenario, planning_unit_name, ewr_code, ewr_achieved) |>
     dplyr::arrange(planning_unit_name, ewr_code, ewr_achieved)
 
@@ -928,7 +928,7 @@ test_that("nonspatial joins of spatial data", {
 for (i in unique(gauge412005$planning_unit_name)) {
  pudf <- spatagg$planning_units |>
     sf::st_drop_geometry() |>
-    dplyr::filter(scenario == 'base_base' & planning_unit_name == i) |>
+    dplyr::filter(scenario == 'base' & planning_unit_name == i) |>
     dplyr::select(scenario, planning_unit_name, ewr_code, ewr_achieved) |>
     dplyr::arrange(planning_unit_name, ewr_code, ewr_achieved)
   expect_equal(gauge412005 |> dplyr::filter(planning_unit_name == i), pudf)

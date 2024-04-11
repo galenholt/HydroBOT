@@ -195,7 +195,7 @@
 <polyline points='40.34,336.33 42.83,336.33 ' style='stroke-width: 0.97; stroke: #333333; stroke-linecap: butt;' />
 <text x='378.93' y='568.94' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='21.13px' lengthAdjust='spacingAndGlyphs'>Date</text>
 <text transform='translate(11.86,291.88) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='17.78px' lengthAdjust='spacingAndGlyphs'>flow</text>
-<text transform='translate(22.66,291.88) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='95.08px' lengthAdjust='spacingAndGlyphs'>relative to base_base</text>
+<text transform='translate(22.66,291.88) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='67.82px' lengthAdjust='spacingAndGlyphs'>relative to base</text>
 <text x='42.83' y='13.24' style='font-size: 12.00px; font-family: sans;' textLength='80.07px' lengthAdjust='spacingAndGlyphs'>hydplot_baseR</text>
 </g>
 </svg>

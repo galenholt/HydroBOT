@@ -95,7 +95,6 @@ test_that("all_successful_interEvents works", {
   expect_true(is.character(ewrdat$gauge))
 })
 
-
 test_that("assessment works", {
   yeardat <- get_any_ewr_output(ewrpath, type = 'yearly')
   sumdat <- get_any_ewr_output(ewrpath, type = 'summary')
@@ -107,7 +106,6 @@ test_that("assessment works", {
 })
 
 
-
 test_that("making assessment tibble works", {
   assessed <- get_ewr_output(ewrpath)
 
@@ -115,6 +113,7 @@ test_that("making assessment tibble works", {
                                   'scenario', 'planning_unit_name', 'ewr_achieved', 'ewr_achieved_timeframe'))
   expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
 })
+
 
 test_that("passing in a list from memory works", {
   # ewr_out <- make_test_ewr_output(build_dirs = FALSE)

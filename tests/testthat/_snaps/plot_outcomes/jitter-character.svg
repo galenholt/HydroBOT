@@ -6084,7 +6084,7 @@
 <polyline points='43.01,298.68 45.50,298.68 ' style='stroke-width: 0.97; stroke: #333333; stroke-linecap: butt;' />
 <text x='330.76' y='568.94' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='66.16px' lengthAdjust='spacingAndGlyphs'>Change in flow</text>
 <text transform='translate(11.86,284.32) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='65.59px' lengthAdjust='spacingAndGlyphs'>Proportion met</text>
-<text transform='translate(22.66,284.32) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='106.76px' lengthAdjust='spacingAndGlyphs'>difference to base_base</text>
+<text transform='translate(22.66,284.32) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='79.51px' lengthAdjust='spacingAndGlyphs'>difference to base</text>
 <rect x='641.13' y='215.13' width='73.89' height='138.38' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
 <text x='646.11' y='228.03' style='font-size: 10.00px; font-family: sans;' textLength='63.93px' lengthAdjust='spacingAndGlyphs'>Environmental</text>
 <text x='646.11' y='238.83' style='font-size: 10.00px; font-family: sans;' textLength='25.58px' lengthAdjust='spacingAndGlyphs'>group</text>

@@ -317,9 +317,9 @@
 <polyline points='264.10,550.41 264.10,547.92 ' style='stroke-width: 0.97; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='410.52,550.41 410.52,547.92 ' style='stroke-width: 0.97; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='556.95,550.41 556.95,547.92 ' style='stroke-width: 0.97; stroke: #333333; stroke-linecap: butt;' />
-<text x='117.67' y='557.91' text-anchor='middle' style='font-size: 8.00px; fill: #4D4D4D; font-family: sans;' textLength='51.60px' lengthAdjust='spacingAndGlyphs'>down4_down4</text>
-<text x='264.10' y='557.91' text-anchor='middle' style='font-size: 8.00px; fill: #4D4D4D; font-family: sans;' textLength='39.15px' lengthAdjust='spacingAndGlyphs'>base_base</text>
-<text x='410.52' y='557.91' text-anchor='middle' style='font-size: 8.00px; fill: #4D4D4D; font-family: sans;' textLength='31.15px' lengthAdjust='spacingAndGlyphs'>up4_up4</text>
+<text x='117.67' y='557.91' text-anchor='middle' style='font-size: 8.00px; fill: #4D4D4D; font-family: sans;' textLength='23.58px' lengthAdjust='spacingAndGlyphs'>down4</text>
+<text x='264.10' y='557.91' text-anchor='middle' style='font-size: 8.00px; fill: #4D4D4D; font-family: sans;' textLength='17.35px' lengthAdjust='spacingAndGlyphs'>base</text>
+<text x='410.52' y='557.91' text-anchor='middle' style='font-size: 8.00px; fill: #4D4D4D; font-family: sans;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>up4</text>
 <text x='556.95' y='557.91' text-anchor='middle' style='font-size: 8.00px; fill: #4D4D4D; font-family: sans;' textLength='17.34px' lengthAdjust='spacingAndGlyphs'>MAX</text>
 <text x='25.33' y='272.71' text-anchor='end' style='font-size: 8.00px; fill: #4D4D4D; font-family: sans;' textLength='4.45px' lengthAdjust='spacingAndGlyphs'>0</text>
 <text x='25.33' y='198.53' text-anchor='end' style='font-size: 8.00px; fill: #4D4D4D; font-family: sans;' textLength='8.90px' lengthAdjust='spacingAndGlyphs'>10</text>

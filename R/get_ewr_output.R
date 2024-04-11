@@ -107,7 +107,9 @@ get_any_ewr_output <- function(dir, type,
       i = relevantfiles,
       .combine = dplyr::bind_rows
     ) %do% {
-      temp <- readr::read_csv(i, col_types = readr::cols())
+      # gauge needs to be character, but often looks numeric
+      temp <- readr::read_csv(i, col_types = readr::cols(scenario = readr::col_character(),
+                                                         gauge = readr::col_character()))
     }
   } else if (is.list(dir)) {
     ewrdata <- dir[[type]]
@@ -125,7 +127,9 @@ get_any_ewr_output <- function(dir, type,
   # numeric. We can't pre-set them with readr because they may be in different
   # places for different gauges
   ewrdata <- ewrdata |>
-    dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric))
+    dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric)) |>
+    dplyr::mutate(gauge = as.character(gauge),
+                  scenario = as.character(scenario)) # belt and braces- this should never be anything else at this point
 
   ewrdata <- suppressWarnings(cleanewrs(ewrdata))
 
@@ -378,7 +382,8 @@ assess_ewr_achievement <- function(annualdf, summarydf, year_roll = ifelse(nrow(
 #' @examples
 bind_max <- function(outdf) {
   MAX_scenario <- outdf |>
-    dplyr::filter(scenario == unique(outdf$scenario)[1])|>
+    dplyr::select(gauge, planning_unit_name, ewr_code, ewr_code_timing) |>
+    dplyr::distinct() |>
     dplyr::mutate(scenario = "MAX",
            ewr_achieved = 1)|>
     dplyr::select(scenario, gauge, planning_unit_name, ewr_achieved, ewr_code, ewr_code_timing)

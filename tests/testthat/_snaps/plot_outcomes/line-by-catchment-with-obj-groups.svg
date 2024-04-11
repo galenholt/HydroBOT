@@ -528,7 +528,7 @@
 <polyline points='44.79,468.01 47.28,468.01 ' style='stroke-width: 0.97; stroke: #333333; stroke-linecap: butt;' />
 <text x='310.01' y='568.94' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='66.16px' lengthAdjust='spacingAndGlyphs'>Change in flow</text>
 <text transform='translate(11.86,284.32) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='65.59px' lengthAdjust='spacingAndGlyphs'>Proportion met</text>
-<text transform='translate(22.66,284.32) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='106.76px' lengthAdjust='spacingAndGlyphs'>difference to base_base</text>
+<text transform='translate(22.66,284.32) rotate(-90)' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='79.51px' lengthAdjust='spacingAndGlyphs'>difference to base</text>
 <rect x='597.84' y='255.09' width='117.17' height='58.46' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
 <text x='602.83' y='267.99' style='font-size: 10.00px; font-family: sans;' textLength='48.37px' lengthAdjust='spacingAndGlyphs'>Catchment</text>
 <rect x='602.83' y='274.01' width='17.28' height='17.28' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />

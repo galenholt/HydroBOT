@@ -2,12 +2,13 @@
 % Please edit documentation in R/directory_setup.R
 \name{make_output_dir}
 \alias{make_output_dir}
-\title{Set up the output directory structure based on parent directory and module}
+\title{Set up the output directory structure based on parent directory and module at \code{parent_dir/module_output/MODULE_NAME/subdir}}
 \usage{
 make_output_dir(
   parent_dir,
   scenarios,
   module_name = "EWR",
+  subdir = "",
   ewr_outtypes = c("summary", "yearly")
 )
 }
@@ -17,6 +18,8 @@ make_output_dir(
 \item{scenarios}{names of the scenarios (character vector)}
 
 \item{module_name}{default 'EWR', sets up different directories for different modules}
+
+\item{subdir}{character, default "" for none, but if included, makes a sub-directory in parent_dir/module_output/MODULE_NAME}
 
 \item{ewr_outtypes}{character vector, names of EWR outputs to return. Options include
 \itemize{
@@ -32,5 +35,5 @@ make_output_dir(
 path to output directory
 }
 \description{
-Set up the output directory structure based on parent directory and module
+Set up the output directory structure based on parent directory and module at \code{parent_dir/module_output/MODULE_NAME/subdir}
 }
