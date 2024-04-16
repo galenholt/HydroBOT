@@ -63,7 +63,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
                                output_subdir = '',
                                scenarios = NULL,
-                               model_format = "IQQM - NSW 10,000 years",
+                               model_format = "Standard time-series",
                                outputType = "none",
                                returnType = "none",
                                scenarios_from = 'directory',
@@ -418,7 +418,7 @@ make_ewr_consistent <- function(typearg) {
 #'
 #' @examples
 prep_run_save_ewrs_old <- function(hydro_dir, output_parent_dir, scenarios = NULL,
-                                   model_format = "IQQM - NSW 10,000 years",
+                                   model_format = "Standard time-series",
                                    climate = "Standard - 1911 to 2018 climate categorisation",
                                    outputType = "none", returnType = "none",
                                    MINT = (100 - 0) / 100, MAXT = (100 + 0) / 100,

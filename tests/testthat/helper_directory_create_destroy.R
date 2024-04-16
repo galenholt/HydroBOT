@@ -75,9 +75,11 @@ make_temp_multifile <- function(testdir = '_test_data',
 
       multigauges <- readr::read_csv(scenepaths[[s]])
       for (i in 2:ncol(multigauges)) {
+        col_name <- names(multigauges)[i]
+        num <- gsub("[^0-9]", "", col_name)
         readr::write_csv(multigauges[, c(1, i)],
                          file = file.path(full_hydro_path, scenenames[s],
-                                          paste0(names(multigauges)[i], '.csv')))
+                                          paste0(num, '.csv')))
       }
     }
 

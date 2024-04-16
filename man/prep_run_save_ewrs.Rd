@@ -9,7 +9,7 @@ prep_run_save_ewrs(
   output_parent_dir,
   output_subdir = "",
   scenarios = NULL,
-  model_format = "IQQM - NSW 10,000 years",
+  model_format = "Standard time-series",
   outputType = "none",
   returnType = "none",
   scenarios_from = "directory",
