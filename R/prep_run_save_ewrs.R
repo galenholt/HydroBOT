@@ -63,7 +63,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
                                output_subdir = '',
                                scenarios = NULL,
-                               model_format = "IQQM - NSW 10,000 years",
+                               model_format = "Standard time-series",
                                outputType = "none",
                                returnType = "none",
                                scenarios_from = 'directory',
@@ -130,23 +130,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
     hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
   }
 
-  # a specific bit of cleanup
-  names(hydro_paths) <- gsub(' |\\(|\\)', '', names(hydro_paths))
-  names(hydro_paths) <- gsub('_StraightNodeGauge', '', names(hydro_paths))
 
-  # If the scenario names are just duplicated, as happens with scenario/scenario.csv, cut.
-  splitnames <- stringr::str_split(names(hydro_paths), '_')
-  check_double_names <- function(x) {
-    if (length(x) == 2 && x[1] == x[2]) {
-      doubled <- TRUE
-    } else {
-      doubled <- FALSE
-    }
-  }
-
-  if (all(purrr::map_lgl(splitnames, check_double_names))) {
-    names(hydro_paths) <- stringr::str_split_i(names(hydro_paths), '_', 1)
-  }
 
   # We need to check the files have unique names (and fix if not), since the EWR
   # tool makes them the 'scenario' column.
@@ -418,7 +402,7 @@ make_ewr_consistent <- function(typearg) {
 #'
 #' @examples
 prep_run_save_ewrs_old <- function(hydro_dir, output_parent_dir, scenarios = NULL,
-                                   model_format = "IQQM - NSW 10,000 years",
+                                   model_format = "Standard time-series",
                                    climate = "Standard - 1911 to 2018 climate categorisation",
                                    outputType = "none", returnType = "none",
                                    MINT = (100 - 0) / 100, MAXT = (100 + 0) / 100,

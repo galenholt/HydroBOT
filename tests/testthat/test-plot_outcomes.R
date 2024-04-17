@@ -1223,7 +1223,9 @@ test_that("hydrographs", {
   hydro_to_plot <- hydro_to_plot |>
     dplyr::mutate(scenario = dplyr::case_when(grepl('down', scenario) ~ 'down4',
                                        grepl('base', scenario) ~ 'base',
-                                       grepl('up4', scenario) ~ 'up4'))
+                                       grepl('up4', scenario) ~ 'up4')) |>
+    dplyr::filter(!grepl('_level', gauge))
+
   # This one sums the flows
   hydplot_bar <- plot_outcomes(hydro_to_plot,
     outcome_col = "flow",

@@ -24,7 +24,8 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 library(ggplot2)
 library(sf)
 library(reticulate) # Not strictly necessary but allows easier referencing of objects
-
+library(hydrogauge)
+library(dplyr)
 # library(werptoolkitr) works when running interactively, but not when quarto
 # rendering. Just use load_all for now.
 # Also have to turn off caching and delete _cache directories or it gets really
@@ -185,7 +186,7 @@ demo_gauges |> nrow()
 To feed to the gauge extractor, we need their gauge numbers.
 
 ```{r}
-gaugenums = demo_gauges$gauge
+gaugenums <- demo_gauges$gauge
 ```
 
 ## Get the values
@@ -199,31 +200,16 @@ starttime = lubridate::ymd(20100101)
 endtime = lubridate::ymd(20191231)
 ```
 
-How many are actually in the EWR tool? I could go get the table myself, but the EWR tool has a function, so use that. *This is where we have to use python to access the EWR table*.
+How many are actually in the EWR tool?
 
-\*Access the python objects with `py$objname`.
-
-**TODO** THIS FAILS AS OF 1.0.4. Get the table some other way, I guess. I have rolled back to 1.0.1, since the necessary file just doesn't exist in 1.0.4 (and in about half the branches on github). Is it being phased out? Does that mean they're all 'good' now, and I can use all of them and not filter good/bad?
-
-Error messages:
-
-```         
-FileNotFoundError: [Errno 2] No such file or directory: 'py_ewr/parameter_metadata/NSWEWR.csv'
-
-Error in py_get_attr_impl(x, name, silent) : 
-  AttributeError: module '__main__' has no attribute 'ewrs'
-```
-
-```{python}
-from py_ewr.data_inputs import get_EWR_table
-ewrs, badewrs = get_EWR_table()
+```{r, echo = F}
+ewrgauges <- werptoolkitr::get_ewr_gauges()
 ```
 
 What are those gauges, and which are in both the ewr and the desired catchments?
 
 ```{r}
-ewrgauges = py$ewrs$Gauge
-ewr_demo_gauges = gaugenums[gaugenums %in% ewrgauges]
+ewr_demo_gauges <- intersect(ewrgauges$gauge,gaugenums)
 length(ewr_demo_gauges)
 ```
 
@@ -231,47 +217,12 @@ length(ewr_demo_gauges)
 
 ### Get all the gauge data
 
-Now we have a list of gauges, go actually get their hydrographs. Takes a while, be patient.
-
-*Again, need python here.* *Pass R objects to python as* `r.`
-
-*It takes -forever- to do a type translation on the* `DATETIME` *column*. So change it to something simple while still in python, and change it back in R next.
-
-```{python gaugepulling}
-#| message: false
-import mdba_gauge_getter as gg
-demo_levs = gg.gauge_pull(r.ewr_demo_gauges, start_time_user = r.starttime, end_time_user = r.endtime)
-demo_ids = demo_levs.SITEID.unique()
-len(demo_ids)
-
-# I think this will work, the above is running
-demo_levs['Date'] = demo_levs['DATETIME'].astype(str)
-```
-
-I guess that's not terrible. 168k rows is fine in general, but likely overkill for testing. I could cut it to fewer gauges and less time, probably, but it will be good to have reasonable time periods for testing time windowing if this doesn't eat too much time elsewhere.
-
-For some reason `demo_levs['VALUE']` is an object and not numeric. And `'DATETIME'` needs to be named `Date` for the EWR tool to read it.
-
-*I'm copying the py obj to R for further manipulation.* A bit dumb from a memory point of view, but it's not big.
-
-Transforming the python dates to R dates is horribly slow. MUCH faster to change to string and back again.
-
-```{r datatransfer}
-demo_levs <- py$demo_levs
-
-demo_levs$VALUE = as.numeric(demo_levs$VALUE)
-
-# # In python, we just need to change the name of the date column. Here, we need to change the python datetime.date objects to R dates
-# 
-# # Really slow. furrr is actually slower.
-# # MUCH faster to just make the dates characters in python, and back to dates here.
-# rdates <- purrr::map(demodates, py_to_r) |> 
-#   tibble(.name_repair = ~'Date') |>  
-#   unnest(cols = Date)
-# 
-# demo_levs <- bind_cols(rdates, demo_levs)
-demo_levs <- dplyr::select(demo_levs, -DATETIME) |> 
-  dplyr::mutate(Date = lubridate::ymd(Date))
+```{r}
+demo_levs <- hydrogauge::get_ts_traces(portal = 'NSW', 
+                                      site_list = ewr_demo_gauges,
+                                      var_list = c("141","100"), #flow and level
+                                      start_time = starttime,
+                                      end_time = endtime)
 ```
 
 ### Map the gauges
@@ -279,7 +230,7 @@ demo_levs <- dplyr::select(demo_levs, -DATETIME) |>
 ```{r}
 # gaugegeo <- gaugegeo |> 
 #   dplyr::rename(gauge = `gauge number`)
-demo_geo = gaugegeo |> dplyr::filter(gauge %in% py$demo_ids)
+demo_geo <- gaugegeo |> dplyr::filter(gauge %in% demo_levs$site)
 ```
 
 Looks reasonable. Probably overkill for testing, but can do a cut down version too.
@@ -299,28 +250,137 @@ scale_fill_brewer(type = 'qual', palette = 8))
 For now, the test scenarios are just multiplying by 4 or 0.25 to give something to work with. This section could easily be modified for other simple scenarios.
 
 ```{r}
-down4 = demo_levs
-up4 = demo_levs
+# for larger runs in ~/WERP_toolkit/inst/extdata/testscenarios
+base <- demo_levs
+down4 <- demo_levs
+up4 <- demo_levs
 
-down4$VALUE = down4$VALUE * 0.25
-up4$VALUE = up4$VALUE * 4
+down4$value = down4$value * 0.25
+up4$value = up4$value * 4
 ```
 
-### Make the data look like IQQM
+### Smaller set
 
-I read this in with the EWR tool's code, but need to be able to read into the EWR tool through the `scenario_handling`. That's sort of convoluted, and could be fixed by splitting up `process_scenarios` into a read-in bit and a bit that calls `evaluate_EWRs.calc_sorter`. The end of `process_scenarios` starting with `gauge_results = {}` is the same as `process_gauges` and so could be shared.
+I also want a very limited set of test data that runs faster through the EWR tool and the rest of the toolkit. It still needs to have \> 1 gauge in \> 1 catchment though. Let's do three gauges in two catchments, 5 years.
 
-For now though, just tell EWR it's IQQM so I can use `scenario_handling`. As long as I have a date column `Date` and other columns with gauge numbers for names, I can get the EWR tool to work by telling it it's IQQM. It can have multiple gauges, with each having its own column. I had originally set up for single files per scenario-gauge combination, but let's use multi-cols for now. The read-in should work either way.
+Which gauges?
+
+```{r}
+# for smaller runs in ~/WERP_toolkit/inst/extdata/testsmall
+
+# get gauges for smaller set
+
+mac = rps |> 
+  dplyr::filter(SWWRPANAME %in% c('Macquarie-Castlereagh'))
+lach = rps |> 
+  dplyr::filter(SWWRPANAME %in% 'Lachlan')
+
+macgauge = st_intersection(demo_geo, mac)
+lachgauge = st_intersection(demo_geo, lach)
+macsub = macgauge |> 
+  dplyr::filter(gauge %in% c('421004', '421001', '421011'))
+lachsub = lachgauge |> 
+  dplyr::filter(gauge %in% c('412005', '412002', '412038'))
+
+minigauge = dplyr::bind_rows(macsub, lachsub)
+
+minigauges = unique(minigauge$gauge)
+
+```
+
+```{r}
+
+# restrict dates
+start15 = lubridate::ymd(20150101)
+
+# function to subset gauages and date window
+restrict <- function(x){
+  x <- x |> filter(x$time > start15)
+  x <- x |> filter(x$site %in% minigauges)
+}
+
+demo_levs_smaller <- restrict(demo_levs)
+
+base_smaller <- demo_levs_smaller
+down4_smaller <- demo_levs_smaller
+up4_smaller <- demo_levs_smaller
+
+down4_smaller$value = down4_smaller$value * 0.25
+up4_smaller$value = up4_smaller$value * 4
+```
+
+### Format the data to 'Standard Time Series'
+
+```{r}
+make_ewrformat <- function(x) {
+  x <- x |> 
+    dplyr::mutate(gauge = dplyr::case_when(
+      units %in% c('Megalitres/Day') ~ paste0(site, '_flow'),
+      units %in% c('m', 'Res. Level AHD', 'Metres') ~ paste0(site, '_level'),
+      .default = paste0(site, '_FAIL'))
+      ) |> 
+    dplyr::select(Date = time, gauge, value) |> 
+    tidyr::pivot_wider(id_cols = Date, names_from = gauge, values_from = value) |> 
+    dplyr::mutate(Date = as.Date(Date))
+  # unnest columns converted to list columns
+  cols <- colnames(x[,-1])
+  x <- tidyr::unnest(x,cols=cols)
+  return(x)
+}
+
+
+```
+
+Create clean dataframes to save.
+
+```{r}
+#try add in tidyr::unnest() here to unlist columns
+
+#just do lapply here over all long and smaller 
+
+base <- make_ewrformat(base)
+down4 <- make_ewrformat(down4)
+up4 <- make_ewrformat(up4) 
+
+base_smaller <- make_ewrformat(base_smaller)
+down4_smaller <- make_ewrformat(down4_smaller)
+up4_smaller <- make_ewrformat(up4_smaller) 
+
+```
+
+### **Remove duplicates**
+
+For a specific gauage causing duplicate rows with zero level reading and non-zero level reading on same date. Take the non-zero level reading.
+
+```{r}
+remove_doubles <- function(x){
+    x %>%
+    group_by(Date) %>%
+    filter(!(duplicated(Date) & `412038_level` == 0))
+}
+
+df_list <- list(base,
+                down4,
+                up4,
+                base_smaller,
+                down4_smaller,
+                up4_smaller)
+
+filtered_df_list <- lapply(df_list,remove_doubles)
+
+base <- filtered_df_list[[1]]
+down4 <- filtered_df_list[[2]]
+up4 <- filtered_df_list[[3]]
+base_smaller <- filtered_df_list[[4]]
+down4_smaller <- filtered_df_list[[5]]
+up4_smaller <- filtered_df_list[[6]]
+```
 
 ### Save the output
 
-Not being too fussed about structure, since the structure is going to change once we have actual scenarios.
-
-I will still do the dir/file structure even with one file as it allows easier changes and more flexibility.
-
-*I had saved the full suite, but I think since this is now turning into a package, we want to keep things minimal. Move the full set of gauges to the demo project*
-
 ```{r}
+# Create directories
+
 scenenames = c('base', 'up4', 'down4')
 
 # # the full scenarios
@@ -341,62 +401,7 @@ for (x in scenenames) {
     }
 }
 
-```
 
-Create clean dataframes to save.
-
-```{r}
-base <- demo_levs |> 
-  dplyr::select(Date, VALUE, SITEID) |> 
-  tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE)
-
-up4 <- up4 |> 
-  dplyr::select(Date, VALUE, SITEID) |> 
-  tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE)
-
-down4 <- down4 |> 
-  dplyr::select(Date, VALUE, SITEID) |> 
-  tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE) 
-```
-
-Save. could do this above easily enough, but getting lots of dots and hard to read.
-
-```{r}
-# if (REBUILD_DATA) {
-#       readr::write_csv(base, file.path(dataextdir, 'testscenarios', 'base', 'base.csv'))
-#       readr::write_csv(up4, file.path(dataextdir, 'testscenarios', 'up4', 'up4.csv'))
-#       readr::write_csv(down4, file.path(dataextdir, 'testscenarios', 'down4', 'down4.csv'))
-# }
-
-```
-
-### Smaller set
-
-I also want a very limited set of test data that runs faster through the EWR tool and the rest of the toolkit. It still needs to have \> 1 gauge in \> 1 catchment though. Let's do three gauges in two catchments, 5 years.
-
-Which gauges?
-
-```{r}
-mac = rps |> 
-  dplyr::filter(SWWRPANAME %in% c('Macquarie-Castlereagh'))
-lach = rps |> 
-  dplyr::filter(SWWRPANAME %in% 'Lachlan')
-
-macgauge = st_intersection(demo_geo, mac)
-lachgauge = st_intersection(demo_geo, lach)
-```
-
-I'll just choose three of each
-
-```{r}
-macsub = macgauge |> 
-  dplyr::filter(gauge %in% c('421004', '421001', '421011'))
-lachsub = lachgauge |> 
-  dplyr::filter(gauge %in% c('412005', '412002', '412038'))
-
-minigauge = dplyr::bind_rows(macsub, lachsub)
-
-minigauges = unique(minigauge$gauge)
 ```
 
 ```{r}
@@ -407,25 +412,34 @@ geom_sf(data = minigauge, color = 'black') +
 scale_fill_brewer(type = 'qual', palette = 8))
 ```
 
+### **Export data**
+
+Save. could do this above easily enough, but getting lots of dots and hard to read.
+
+```{r}
+# export larger scenarios 
+
+# if (REBUILD_DATA) {
+#   readr::write_csv(base, file.path(dataextdir, 'testscenarios', 'base', 'base.csv'))
+#   readr::write_csv(up4, file.path(dataextdir, 'testscenarios', 'up4', 'up4.csv'))
+#   readr::write_csv(down4, file.path(dataextdir, 'testscenarios', 'down4', 'down4.csv'))
+#   } 
+```
+
 Write out the scenarios, including metadata to check that that is working (and that we're not picking up extra files in some of the crawling functions).
 
 ```{r}
-if (REBUILD_DATA) {
-  start15 = lubridate::ymd(20150101)
+# export smaller scenarios
 
-    base |> 
-      dplyr::filter(Date > start15) |> 
-      dplyr::select(Date, tidyselect::all_of(minigauges)) |> 
+if (REBUILD_DATA) {
+
+    base_smaller |> 
       readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'base', 'base.csv'))
     
-    down4 |> 
-      dplyr::filter(Date > start15) |> 
-      dplyr::select(Date, tidyselect::all_of(minigauges)) |>  
+    down4_smaller |>  
       readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'down4', 'down4.csv'))
     
-    up4 |> 
-      dplyr::filter(Date > start15) |> 
-      dplyr::select(Date, tidyselect::all_of(minigauges)) |>  
+    up4_smaller |>   
       readr::write_csv(file.path(dataextdir, 'testsmall', 'hydrographs', 'up4', 'up4.csv'))
     
     # make JSON metadata
