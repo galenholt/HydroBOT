@@ -353,7 +353,8 @@ assess_ewr_achievement <- function(annualdf, summarydf, year_roll = ifelse(nrow(
       EWR_results <- annualdf |>
         dplyr::group_by(ewr_code, ewr_code_timing, gauge, scenario, planning_unit_name) |>
         dplyr::mutate(
-          frequency_check_10and20_years = ifelse(target_frequency < 10 | target_frequency > 90, frequency_check_20_years, frequency_check_10_years),
+          frequency_check_10and20_years = ifelse(target_frequency < 10 | target_frequency > 90,
+                                                 frequency_check_20_years, frequency_check_10_years),
           ewr_achieved_timeframe = ifelse(target_frequency < 10 | target_frequency > 90, 20, 10)
         ) |>
         dplyr::filter(!is.na(frequency_check_10and20_years)) |>

@@ -14,12 +14,14 @@ test_that("returns one result, no saving", {
   # Test it didn't create anything since outputType = 'none'
   start_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
 
+  system.time(
   ewr_out <- prep_run_save_ewrs(
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("none"),
     datesuffix = FALSE,
     returnType = list("summary")
+  )
   )
 
   expect_equal(length(ewr_out), 1)
