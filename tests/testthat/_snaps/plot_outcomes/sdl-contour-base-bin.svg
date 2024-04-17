@@ -25,16 +25,6 @@
     <rect x='34.70' y='35.85' width='127.70' height='253.55' />
   </clipPath>
 </defs>
-<<<<<<< HEAD
-<g clip-path='url(#cpMzQuNzB8MTUzLjY0fDM1Ljg1fDI4OS4zOQ==)'>
-<rect x='34.70' y='35.85' width='118.94' height='253.55' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<path d='M 105.36 277.87 L 94.17 267.85 L 40.10 241.14 L 40.10 277.87 L 94.17 277.87 Z' style='fill-rule: evenodd; fill: #000000; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<path d='M 105.36 277.87 L 148.23 277.87 L 148.23 266.08 L 94.17 220.76 L 40.10 204.41 L 40.10 241.14 L 94.17 267.85 Z' style='fill-rule: evenodd; fill: #484839; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<path d='M 148.23 202.40 L 94.17 173.68 L 40.10 167.67 L 40.10 204.41 L 94.17 220.76 L 148.23 266.08 Z' style='fill-rule: evenodd; fill: #928B5A; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<path d='M 148.23 162.62 L 148.23 125.36 L 94.17 92.79 L 40.10 85.62 L 40.10 162.62 L 40.10 167.67 L 94.17 173.68 L 148.23 202.40 Z' style='fill-rule: evenodd; fill: #E4A98F; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<path d='M 148.23 47.37 L 94.17 47.37 L 40.10 47.37 L 40.10 85.62 L 94.17 92.79 L 148.23 125.36 Z' style='fill-rule: evenodd; fill: #FFE5E5; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<rect x='34.70' y='35.85' width='118.94' height='253.55' style='stroke-width: 0.97; stroke: #333333;' />
-=======
 <g clip-path='url(#cpMzQuNzB8MTYyLjM5fDM1Ljg1fDI4OS4zOQ==)'>
 <rect x='34.70' y='35.85' width='127.70' height='253.55' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
 <path d='M 110.56 277.87 L 98.55 267.85 L 40.50 241.14 L 40.50 277.87 L 98.55 277.87 Z' style='fill-rule: evenodd; fill: #000000; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
@@ -43,7 +33,6 @@
 <path d='M 156.59 162.62 L 156.59 125.36 L 98.55 92.79 L 40.50 85.62 L 40.50 162.62 L 40.50 167.67 L 98.55 173.68 L 156.59 202.40 Z' style='fill-rule: evenodd; fill: #E4A98F; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
 <path d='M 156.59 47.37 L 98.55 47.37 L 40.50 47.37 L 40.50 85.62 L 98.55 92.79 L 156.59 125.36 Z' style='fill-rule: evenodd; fill: #FFE5E5; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
 <rect x='34.70' y='35.85' width='127.70' height='253.55' style='stroke-width: 0.97; stroke: #333333;' />
->>>>>>> origin/galen_working
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 </g>
@@ -68,16 +57,6 @@
     <rect x='167.38' y='35.85' width='127.70' height='253.55' />
   </clipPath>
 </defs>
-<<<<<<< HEAD
-<g clip-path='url(#cpMTU4LjYyfDI3Ny41NXwzNS44NXwyODkuMzk=)'>
-<rect x='158.62' y='35.85' width='118.94' height='253.55' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<path d='M 267.35 277.87 L 218.09 256.46 L 164.02 241.14 L 164.02 277.87 L 218.09 277.87 Z' style='fill-rule: evenodd; fill: #000000; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<path d='M 267.35 277.87 L 272.15 277.87 L 272.15 229.33 L 218.09 213.37 L 164.02 204.41 L 164.02 241.14 L 218.09 256.46 Z' style='fill-rule: evenodd; fill: #484839; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<path d='M 272.15 178.33 L 218.09 170.28 L 164.02 167.67 L 164.02 204.41 L 218.09 213.37 L 272.15 229.33 Z' style='fill-rule: evenodd; fill: #928B5A; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<path d='M 272.15 162.62 L 272.15 98.45 L 218.09 88.53 L 164.02 85.62 L 164.02 162.62 L 164.02 167.67 L 218.09 170.28 L 272.15 178.33 Z' style='fill-rule: evenodd; fill: #E4A98F; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<path d='M 272.15 47.37 L 218.09 47.37 L 164.02 47.37 L 164.02 85.62 L 218.09 88.53 L 272.15 98.45 Z' style='fill-rule: evenodd; fill: #FFE5E5; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<rect x='158.62' y='35.85' width='118.94' height='253.55' style='stroke-width: 0.97; stroke: #333333;' />
-=======
 <g clip-path='url(#cpMTY3LjM4fDI5NS4wN3wzNS44NXwyODkuMzk=)'>
 <rect x='167.38' y='35.85' width='127.70' height='253.55' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
 <path d='M 284.12 277.87 L 231.22 256.46 L 173.18 241.14 L 173.18 277.87 L 231.22 277.87 Z' style='fill-rule: evenodd; fill: #000000; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
@@ -86,7 +65,6 @@
 <path d='M 289.27 162.62 L 289.27 98.45 L 231.22 88.53 L 173.18 85.62 L 173.18 162.62 L 173.18 167.67 L 231.22 170.28 L 289.27 178.33 Z' style='fill-rule: evenodd; fill: #E4A98F; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
 <path d='M 289.27 47.37 L 231.22 47.37 L 173.18 47.37 L 173.18 85.62 L 231.22 88.53 L 289.27 98.45 Z' style='fill-rule: evenodd; fill: #FFE5E5; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
 <rect x='167.38' y='35.85' width='127.70' height='253.55' style='stroke-width: 0.97; stroke: #333333;' />
->>>>>>> origin/galen_working
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 </g>
@@ -143,16 +121,6 @@
     <rect x='432.73' y='35.85' width='127.70' height='253.55' />
   </clipPath>
 </defs>
-<<<<<<< HEAD
-<g clip-path='url(#cpNDA2LjQ1fDUyNS4zOXwzNS44NXwyODkuMzk=)'>
-<rect x='406.45' y='35.85' width='118.94' height='253.55' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
-<path d='M 482.05 277.87 L 465.92 265.96 L 411.86 241.14 L 411.86 277.87 L 465.92 277.87 Z' style='fill-rule: evenodd; fill: #000000; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<path d='M 482.05 277.87 L 519.98 277.87 L 519.98 254.06 L 465.92 219.50 L 411.86 204.41 L 411.86 241.14 L 465.92 265.96 Z' style='fill-rule: evenodd; fill: #484839; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<path d='M 519.98 194.04 L 465.92 173.05 L 411.86 167.67 L 411.86 204.41 L 465.92 219.50 L 519.98 254.06 Z' style='fill-rule: evenodd; fill: #928B5A; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<path d='M 519.98 162.62 L 519.98 116.32 L 465.92 92.01 L 411.86 85.62 L 411.86 162.62 L 411.86 167.67 L 465.92 173.05 L 519.98 194.04 Z' style='fill-rule: evenodd; fill: #E4A98F; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<path d='M 519.98 47.37 L 465.92 47.37 L 411.86 47.37 L 411.86 85.62 L 465.92 92.01 L 519.98 116.32 Z' style='fill-rule: evenodd; fill: #FFE5E5; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<rect x='406.45' y='35.85' width='118.94' height='253.55' style='stroke-width: 0.97; stroke: #333333;' />
-=======
 <g clip-path='url(#cpNDMyLjczfDU2MC40MnwzNS44NXwyODkuMzk=)'>
 <rect x='432.73' y='35.85' width='127.70' height='253.55' style='stroke-width: 0.97; stroke: none; fill: #FFFFFF;' />
 <path d='M 513.89 277.87 L 496.58 265.96 L 438.53 241.14 L 438.53 277.87 L 496.58 277.87 Z' style='fill-rule: evenodd; fill: #000000; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
@@ -161,7 +129,6 @@
 <path d='M 554.62 162.62 L 554.62 116.32 L 496.58 92.01 L 438.53 85.62 L 438.53 162.62 L 438.53 167.67 L 496.58 173.05 L 554.62 194.04 Z' style='fill-rule: evenodd; fill: #E4A98F; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
 <path d='M 554.62 47.37 L 496.58 47.37 L 438.53 47.37 L 438.53 85.62 L 496.58 92.01 L 554.62 116.32 Z' style='fill-rule: evenodd; fill: #FFE5E5; stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
 <rect x='432.73' y='35.85' width='127.70' height='253.55' style='stroke-width: 0.97; stroke: #333333;' />
->>>>>>> origin/galen_working
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 </g>
