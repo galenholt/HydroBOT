@@ -32,6 +32,24 @@ find_scenario_paths <- function(hydro_dir, type = 'csv') {
   hydro_paths <- as.list(hydro_paths) |>
     setNames(unique_names)
 
+  # a specific bit of cleanup
+  names(hydro_paths) <- gsub(' |\\(|\\)', '', names(hydro_paths))
+  names(hydro_paths) <- gsub('_StraightNodeGauge', '', names(hydro_paths))
+
+  # If the scenario names are just duplicated, as happens with scenario/scenario.csv, cut.
+  splitnames <- stringr::str_split(names(hydro_paths), '_')
+  check_double_names <- function(x) {
+    if (length(x) == 2 && x[1] == x[2]) {
+      doubled <- TRUE
+    } else {
+      doubled <- FALSE
+    }
+  }
+
+  if (all(purrr::map_lgl(splitnames, check_double_names))) {
+    names(hydro_paths) <- stringr::str_split_i(names(hydro_paths), '_', 1)
+  }
+
   return(hydro_paths)
 }
 

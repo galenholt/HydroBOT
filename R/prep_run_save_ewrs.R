@@ -130,23 +130,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
     hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
   }
 
-  # a specific bit of cleanup
-  names(hydro_paths) <- gsub(' |\\(|\\)', '', names(hydro_paths))
-  names(hydro_paths) <- gsub('_StraightNodeGauge', '', names(hydro_paths))
 
-  # If the scenario names are just duplicated, as happens with scenario/scenario.csv, cut.
-  splitnames <- stringr::str_split(names(hydro_paths), '_')
-  check_double_names <- function(x) {
-    if (length(x) == 2 && x[1] == x[2]) {
-      doubled <- TRUE
-    } else {
-      doubled <- FALSE
-    }
-  }
-
-  if (all(purrr::map_lgl(splitnames, check_double_names))) {
-    names(hydro_paths) <- stringr::str_split_i(names(hydro_paths), '_', 1)
-  }
 
   # We need to check the files have unique names (and fix if not), since the EWR
   # tool makes them the 'scenario' column.
