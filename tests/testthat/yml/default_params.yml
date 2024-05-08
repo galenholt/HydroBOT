@@ -24,7 +24,7 @@ agg_input_path: NULL
 agg_results: NULL
 
 # Model type
-model_format: 'IQQM - NSW 10,000 years'
+model_format: 'Standard time-series'
 
 # Climate (deprecated as of py-ewr 2.1)
 climate: 'Standard - 1911 to 2018 climate categorisation'

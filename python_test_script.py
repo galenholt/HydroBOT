@@ -74,6 +74,7 @@ scenarios = 'C:/Users/galen/Documents/code/WERP/WERP_toolkit/_test_data/hydrogra
 op = 'C:/Users/galen/Documents/code/WERP/WERP_toolkit/_test_data/module_output/EWR'
 sn = 'base_412005'
 # model_format = 'IQQM - netcdf'
+# model_format = 'Standard time-series'
 # Testing the controller
 from inst.python import controller_functions
 ewr_sh = controller_functions.run_save_ewrs(scenarios, output_path = op, model_format = 'IQQM - NSW 10,000 years', outputType = ['summary', 'yearly'], returnType = ['summary', 'yearly', 'all_events'], scenario_name = sn)

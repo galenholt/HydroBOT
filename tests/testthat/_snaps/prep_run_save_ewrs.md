@@ -244,6 +244,10 @@
       [79] "module_output/EWR/up4_421011/summary.csv"  
       [80] "module_output/EWR/up4_421011/yearly.csv"   
 
+# subset using file_search works
+
+    c("412002", "412005", "412038")
+
 # saving works for one
 
     Code

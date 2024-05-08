@@ -66,7 +66,7 @@ Tell it the format- typically will be IQQM, at least for a while
 # 'IQQM - NSW 10,000 years'
 # 'Source - NSW (res.csv)'
 
-model_format = 'IQQM - NSW 10,000 years'
+model_format = 'Standard time-series'
 ```
 
 ### Climate info

@@ -95,11 +95,6 @@ test_that("file_search works", {
 
   expect_equal(length(scenario_paths)*2, length(scenario_paths_all))
 
-  # create dir so building makes sense
-  make_temp_zip(
-    temp_hydro_dir = "hydrographs",
-    orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "werptoolkitr")
-  )
 })
 
 test_that("zip works", {
@@ -110,6 +105,8 @@ test_that("zip works", {
     orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "werptoolkitr")
   )
 
-  scenario_paths <- find_scenario_paths(file.path(temp_hydro_multi, 'zipcdf.zip'), type = 'nc', file_search = 'Straight Node')
+  temp_hydro <- '_test_data/hydrographs'
+  scenario_paths <- find_scenario_paths(file.path(temp_hydro, 'zipcdf.zip'), type = 'nc', file_search = 'Straight Node')
 
+  expect_snapshot_value(scenario_paths, style = 'deparse')
 })

@@ -196,3 +196,8 @@
       [1] "_test_data/hydrographs/up4/412038.csv"
       
 
+# zip works
+
+    list(zipcdf_S1 = "_test_data/hydrographs/zipcdf.zip/zipcdf/S1/Straight Node (Gauge).nc", 
+        zipcdf_S2 = "_test_data/hydrographs/zipcdf.zip/zipcdf/S2/Straight Node (Gauge).nc")
+

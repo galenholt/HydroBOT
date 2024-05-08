@@ -48,7 +48,7 @@ hydro_dir = file.path("inst/extdata/testsmall/hydrographs")
 
 project_dir =file.path("inst/extdata/testsmall")
 
-model_format = 'IQQM - NSW 10,000 years'
+model_format = 'Standard time-series'
 
 outputType <- list('summary')
 
