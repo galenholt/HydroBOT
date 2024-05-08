@@ -4,22 +4,29 @@
 #'
 #' @param hydro_dir directory with hydrographs
 #' @param type filetype, default 'csv', likely will also need 'ncdf'
+#' @param file_search character, regex for additional limitations on filenames. Useful if several files have the extension defined by `type`, but only some are hydrographs.
 #'
 #' @return a list of filepaths to the hydrographs
 #'
 #' @examples
-find_scenario_paths <- function(hydro_dir, type = 'csv') {
+find_scenario_paths <- function(hydro_dir, type = 'csv', file_search = NULL) {
 
 
   # get the paths relative to hydro_dir
   if (grepl('.zip', hydro_dir)) {
-    rlang::inform("data in zip is assumed to be 'Straight Node (Gauge).nc'. If that is not the case, will need to allow an argument to specify.")
+    # rlang::inform("data in zip is assumed to be 'Straight Node (Gauge).nc'. If that is not the case, will need to allow an argument to specify.")
     hydro_paths <- unzip(hydro_dir, list = TRUE)$Name
-    hydro_paths <- hydro_paths[grepl('Straight Node \\(Gauge\\)\\.nc', hydro_paths)]
+    # hydro_paths <- hydro_paths[grepl('Straight Node \\(Gauge\\)\\.nc', hydro_paths)]
   } else {
     hydro_paths <- list.files(hydro_dir, pattern = paste0('.', type, '$'), recursive = TRUE)
   }
 
+  # at this point, hydro_paths has *all* files with extension `type`. Allow additional grep
+  if (!is.null(file_search)) {
+    hydro_paths <- hydro_paths[grepl(file_search, hydro_paths)]
+  }
+
+  # This removes the extension and turns / into _, since paths must be unique
   unique_names <- hydro_paths |>
     stringr::str_remove_all(paste0('\\.', type)) |>
     stringr::str_replace_all("/", "_")

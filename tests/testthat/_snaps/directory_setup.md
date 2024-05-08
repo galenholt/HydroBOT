@@ -163,3 +163,36 @@
       [14] "hydrographs/up4/up4.csv"                
       [15] "hydrographs/up4/up4.json"               
 
+# file_search works
+
+    Code
+      scenario_paths
+    Output
+      $base_412002
+      [1] "_test_data/hydrographs/base/412002.csv"
+      
+      $base_412005
+      [1] "_test_data/hydrographs/base/412005.csv"
+      
+      $base_412038
+      [1] "_test_data/hydrographs/base/412038.csv"
+      
+      $down4_412002
+      [1] "_test_data/hydrographs/down4/412002.csv"
+      
+      $down4_412005
+      [1] "_test_data/hydrographs/down4/412005.csv"
+      
+      $down4_412038
+      [1] "_test_data/hydrographs/down4/412038.csv"
+      
+      $up4_412002
+      [1] "_test_data/hydrographs/up4/412002.csv"
+      
+      $up4_412005
+      [1] "_test_data/hydrographs/up4/412005.csv"
+      
+      $up4_412038
+      [1] "_test_data/hydrographs/up4/412038.csv"
+      
+

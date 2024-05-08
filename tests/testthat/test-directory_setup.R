@@ -78,3 +78,38 @@ test_that('creating output dirs works with hydro_dir as a single scenario', {
   expect_snapshot(realised_structure)
 
 })
+
+test_that("file_search works", {
+
+  temp_hydro_multi <- '_test_data/hydrographs'
+  # If needed, build the dir. This takes a while so don't tear it down, typically
+  make_temp_multifile(testdir = '_test_data',
+                      temp_hydro = 'hydrographs')
+
+  scenario_paths <- find_scenario_paths(temp_hydro_multi, type = 'csv', file_search = '412')
+
+  # Should be a list
+  expect_snapshot(scenario_paths)
+
+  scenario_paths_all <- find_scenario_paths(temp_hydro_multi, type = 'csv')
+
+  expect_equal(length(scenario_paths)*2, length(scenario_paths_all))
+
+  # create dir so building makes sense
+  make_temp_zip(
+    temp_hydro_dir = "hydrographs",
+    orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "werptoolkitr")
+  )
+})
+
+test_that("zip works", {
+
+  # create dir so building makes sense
+  make_temp_zip(
+    temp_hydro_dir = "hydrographs",
+    orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "werptoolkitr")
+  )
+
+  scenario_paths <- find_scenario_paths(file.path(temp_hydro_multi, 'zipcdf.zip'), type = 'nc', file_search = 'Straight Node')
+
+})

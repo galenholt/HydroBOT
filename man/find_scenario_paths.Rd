@@ -4,12 +4,14 @@
 \alias{find_scenario_paths}
 \title{get the paths to scenarios}
 \usage{
-find_scenario_paths(hydro_dir, type = "csv")
+find_scenario_paths(hydro_dir, type = "csv", file_search = NULL)
 }
 \arguments{
 \item{hydro_dir}{directory with hydrographs}
 
 \item{type}{filetype, default 'csv', likely will also need 'ncdf'}
+
+\item{file_search}{character, regex for additional limitations on filenames. Useful if several files have the extension defined by \code{type}, but only some are hydrographs.}
 }
 \value{
 a list of filepaths to the hydrographs

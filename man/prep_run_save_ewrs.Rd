@@ -13,15 +13,11 @@ prep_run_save_ewrs(
   outputType = "none",
   returnType = "none",
   scenarios_from = "directory",
+  file_search = NULL,
   extrameta = NULL,
   rparallel = FALSE,
   retries = 2,
-  datesuffix = FALSE,
-  climate = NULL,
-  MINT = NULL,
-  MAXT = NULL,
-  DUR = NULL,
-  DRAW = NULL
+  datesuffix = FALSE
 )
 }
 \arguments{
@@ -46,10 +42,11 @@ but two typical cases:
 
 \item{model_format}{see EWR tool. One of:
 \itemize{
-\item 'IQQM - NSW 10,000 years' (default, among other things accepts a csv with a Date column followed by gauge columns)
+\item 'Standard time-series': (default, among other things accepts a csv with a Date column followed by gauge columns, with _flow or _level appended to the gauge number)
+\item 'IQQM - netcdf': in development, finds all netcdf files in \code{hydro_dir}. Should also work when \code{hydro_dir} is a .zip with netcdfs inside
+\item 'IQQM - NSW 10,000 years': old default, works nearly the same as standard time-series, but no longer supported in EWR tool.
 \item 'Bigmod - MDBA'
 \item 'Source - NSW (res.csv)'
-\item 'IQQM - netcdf': in development, finds all netcdf files in \code{hydro_dir} (and so if there are multiple nc files, you'll need to reorganise or use the .zip approach: Should also work when \code{hydro_dir} is a .zip with netcdfs inside, but ONLY if those netcdfs are named 'Straight Node (Gauge).nc'. This could change.
 }}
 
 \item{outputType}{list of strings or character vector defining what to save
@@ -69,6 +66,8 @@ to the active R session. Same options as \code{outputType}}
 
 \item{scenarios_from}{character, default 'directory' gets scenario names from directory names. If anything else, gets them from filenames (safest). Expect additional options in future, e.g from metadata.}
 
+\item{file_search}{character, regex for additional limitations on filenames. Useful if several files have the extension defined by \code{model_format}, but only some are hydrographs.}
+
 \item{extrameta}{list, extra information to include in saved metadata documentation for the run. Default NULL.}
 
 \item{rparallel}{logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using \code{furrr}. To use, install \code{furrr} and set a \code{\link[future:plan]{future::plan()}} (likely \code{multisession} or \code{multicore})}
@@ -77,16 +76,6 @@ to the active R session. Same options as \code{outputType}}
 
 \item{datesuffix}{logical. whether to add a suffix to saved filenames to
 provide a datestamp. Should be deprecated in favour of metadata files.}
-
-\item{climate}{deprecated, included to let old calls pass}
-
-\item{MINT}{deprecated, included to let old calls pass}
-
-\item{MAXT}{deprecated, included to let old calls pass}
-
-\item{DUR}{deprecated, included to let old calls pass}
-
-\item{DRAW}{deprecated, included to let old calls pass}
 }
 \value{
 a list of dataframe(s) if \code{returnType} is not 'none', otherwise, NULL

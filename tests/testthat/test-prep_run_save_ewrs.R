@@ -283,6 +283,28 @@ test_that("csv per gauge works for filenames", {
   expect_snapshot(realised_structure)
 })
 
+test_that("subset using file_search works", {
+  # First, generate temporary hydrograph files
+
+  make_temp_multifile()
+
+  ewr_out <- prep_run_save_ewrs(
+    hydro_dir = temp_hydro_multi,
+    file_search = '412', # half start with this, the other half with 421
+    output_parent_dir = temp_parent_dir,
+    outputType = list("summary", "yearly"),
+    datesuffix = FALSE,
+    returnType = list("summary", "all")
+  )
+
+  expect_equal(length(ewr_out), 2)
+  expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
+
+  # check we only have the three gauges
+  expect_snapshot_value(unique(ewr_out$summary$gauge), style = 'deparse')
+
+})
+
 test_that("saving works for one", {
   # create dir so building makes sense
   make_temp_hydro()
@@ -413,6 +435,7 @@ test_that("zipped NETCDF saving and returning works for all (or nearly all) ewr 
     hydro_dir = "_test_data/hydrographs/zipcdf.zip",
     output_parent_dir = temp_parent_dir,
     model_format = "IQQM - netcdf",
+    file_search = 'Straight Node',
     scenarios_from = 'file',
     outputType = ewroutlist,
     datesuffix = FALSE,
