@@ -150,7 +150,33 @@ theme_aggregate <- function(dat,
     dplyr::left_join(causal_edges, relationship = "many-to-many")
 
 
+  # Check for NA in the causal network
+  ergroups <- c(from_theme, groupers[groupers != 'scenario'])
+  napairs <- pairdat |>
+    dplyr::filter(is.na(.data[[to_theme]])) |>
+    dplyr::select(tidyselect::any_of(ergroups)) |>
+    dplyr::distinct()
 
+  if (nrow(napairs) > 0) {
+
+    nacount <- napairs |> dplyr::summarise(ntimes = dplyr::n(), .by = from_theme)
+
+    groupout <- if (ncol(napairs) > 1) {
+      groupinform <- glue::glue("Groups with issues: {unique(napairs[2])}")
+    } else {
+      groupinform <- NULL
+    }
+
+    rlang::inform(c("!" = "Unmatched links in causal network",
+                    "*" = glue::glue("From {from_theme} to {to_theme}"),
+                    glue::glue("{from_theme}s {nacount[,from_theme]}"),
+                    glue::glue("{nacount[,'ntimes']} times each."),
+                    groupinform))
+
+    # Now delete the NA
+    pairdat <- pairdat |>
+      dplyr::filter(!is.na(.data[[to_theme]]))
+  }
 
   # The core aggregation function. the !! needs to happen here
   # because aggCols needs to be evaluated to a character vector, not passed in
