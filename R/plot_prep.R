@@ -137,7 +137,7 @@ plot_style_prep <- function(prepped, colorset, colorgroups, pal_list, pal_direct
 
   # if the data is qualitative but the palette is continuous, we need to make a named palette
   if (!is.null(colorset)) {
-    if (is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,colorset])))) {
+    if (is.numeric(dplyr::pull(sf::st_drop_geometry(prepped$data[,colorset, drop = FALSE])))) {
       dataqualquant <- 'quant'
     } else {
       dataqualquant <- 'qual'

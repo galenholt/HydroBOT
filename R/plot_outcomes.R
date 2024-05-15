@@ -227,7 +227,7 @@ plot_outcomes <- function(outdf,
   )
 
   # We often need to know what x is
-  xc <- dplyr::pull(sf::st_drop_geometry(prepped$data[, x_col]))
+  xc <- dplyr::pull(sf::st_drop_geometry(prepped$data[, x_col, drop = FALSE]))
   xtype <- dplyr::case_when(
     is.numeric(xc) ~ "numeric",
     inherits(xc, "POSIXt") |
@@ -236,12 +236,12 @@ plot_outcomes <- function(outdf,
   )
 
   # We need to know what y is for heatmaps
-  yc <- dplyr::pull(sf::st_drop_geometry(prepped$data[, x_col]))
+  yc <- dplyr::pull(sf::st_drop_geometry(prepped$data[, y_col, drop = FALSE]))
   ytype <- dplyr::case_when(
     is.numeric(yc) ~ "numeric",
     inherits(yc, "POSIXt") |
       inherits(yc, "Date") ~ "date",
-    is.factor(yc) | is.character(xc) ~ "qual"
+    is.factor(yc) | is.character(yc) ~ "qual"
   )
 
   ## different plot types

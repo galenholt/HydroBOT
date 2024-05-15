@@ -1661,3 +1661,23 @@ test_that("discrete but non-named colors", {
   vdiffr::expect_doppelganger("sdl_plot_groupblock_dcn", sdl_plot_groupblock_dcn)
 
 })
+
+test_that("non-ewr works", {
+
+  sdl_economic <- data.frame(names_climate_scenario = c('SR1.2_SE1.07', 'SR1.2_SE1.07', 'SR0.8_SE1.07', 'SR0.8_SE1.07', 'SR0.0_SE1.07', 'SR0.8_SE1.07'),
+                                 Economic_outcomes = c(51.9,23.6,-68.2,-42,-15.6,-10.9))
+
+  econ_plot <- plot_outcomes(outdf = sdl_economic,
+                plot_type = "2d",
+                outcome_col = 'Economic_outcomes',
+                outcome_lab = 'Economic_outcomes achieved',
+                x_col = 'names_climate_scenario',
+                x_lab = 'Climate scenario',
+                colorset = 'Economic_outcomes',
+                color_lab = 'Economic_outcomes achieved',
+                pal_list = "grDevices::Viridis",
+                position = 'dodge',
+                setLimits = c(-100,100))
+
+  vdiffr::expect_doppelganger("econ_plot", econ_plot)
+})

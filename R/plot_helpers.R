@@ -150,7 +150,7 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
       matched_vals <- unique(data[,c('colordef', 'color')])
       # make sure everything lines up
       m_ind <- match(breaks, matched_vals$color)
-      return(dplyr::pull(matched_vals[, 'colordef'])[m_ind])
+      return(dplyr::pull(matched_vals[, 'colordef', drop = FALSE])[m_ind])
     }
 
     if (aes_type == 'fill') {
