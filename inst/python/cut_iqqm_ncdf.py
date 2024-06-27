@@ -17,8 +17,11 @@ def cut_iqqm_ncdf(infile, newpath, newname = 'cut_flows', timeclip = slice(None,
     # Get just the nodes that match gauges
     dataset = dataset.sel(node=dataset['node'].isin(ints_list))
     
-    # cut to just flow
-    dataset = dataset.drop_vars(['Orders', 'IDT Result']) 
+    # cut to just flow- this is weirdly roundabout
+    availvars = list(dataset.keys())
+    availvars.remove('Simulated flow')
+    
+    dataset = dataset.drop_vars(availvars) 
 
     # cut the time if timeclip isn't None
     # slice(None, timeclip) # where timeclip = 2000
