@@ -14,7 +14,7 @@ get_ewr_gauges <- function() {
   names(gauges_in_pyewr) <- stringr::str_to_lower(names(gauges_in_pyewr))
 
   gauges_in_pyewr <- gauges_in_pyewr |>
-   dplyr::left_join(bom_basin_gauges) |>
+   dplyr::left_join(werptoolkitr::bom_basin_gauges) |>
     sf::st_as_sf()
 
   return(gauges_in_pyewr)

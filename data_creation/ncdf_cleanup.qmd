@@ -1,0 +1,148 @@
+---
+title: "Netcdf data"
+format: html
+editor: visual
+---
+
+## Creates ncdf data to test
+
+This needs some local files to start with, that we then cut down. I've already done this once ad-hoc and lost it, so I'm just going to put it here, even though I won't link that data.
+
+```{r}
+library(ncdf4)
+library(metR)
+```
+
+```{r}
+ncd_path <- "C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/batchertesterdata"
+singlenc <- file.path(ncd_path, 'licvolfactor_0_7/r0_7_e1_0/9360/Straight Node (Gauge).nc')
+```
+
+## See what we have
+
+```{r}
+nc <- nc_open(singlenc)
+```
+
+If we want to extract metadata, use something like this to get the global attributes
+
+```{r}
+ncatt_get(nc, 0, '_evap_scale')
+```
+
+the metR function to glance doesn't show the global attributes.
+
+```{r}
+GlanceNetCDF(singlenc)
+```
+
+## Cut to something reasonable
+
+The IQQM stations are
+
+```{r}
+gaugemap <- tibble::tibble(node = c(229, 42, 464, 240, 266, 951, 487, 130, 171),
+                             gauge = c("421023", "421001", "421011",
+                                       "421019", "421146", "421090",
+                                       "421022", "421012", "421004"))
+
+# node_gauge <- get_iqqm_gauges() # should work
+```
+
+Now, this is where metR is handy- the cutting.
+
+```{r}
+# The catch is that metR grabs nearests, so we need to ensure it only asks for those that are exact.
+
+# times are in days since 1889-01-01
+
+truenodes <- metR::GlanceNetCDF(nc)$dims$node$vals
+
+flows <- metR::ReadNetCDF(nc, vars = 'Simulated flow', 
+                       subset = list(node = as.list(gaugemap$node[gaugemap$node %in% truenodes]),
+                                     time = 0:5*365))
+
+```
+
+The metR approach works great for plotting, etc since it returns a data.table, but it's a hassle here since we just want to immediately re-export a cut ncdf. Can we do this with bare ncdf4? `start` is a vector of lenght dimensions.
+
+Despite the order of dims, this always puts time last.
+
+We could read all the nodes in and then clip to the ones that match, but it probably makes more sense to read in only the ones we want and glue, since they're such a small proportion.
+
+But it also drops the attributes.
+
+```{r}
+flowsnc <- ncvar_get(nc, 'Simulated flow', start = c(1, 1), count = c(1, 365),
+                     collapse_degen = FALSE)
+```
+
+xarray in python seems to just work better for this. It has isel functionality and retains attributes, and almost seems to do it without reading the full object in and re-writing it (though I'm not positive about that). This is unecessarily complex; I'm just working through some things.
+
+```{python}
+from py_ewr import data_inputs
+import xarray as xr
+
+dataset = xr.open_dataset(r.singlenc, engine='netcdf4')
+iqqm_dict = data_inputs.get_iqqm_codes()
+
+# the nodes are ints, but the above is str
+ints_list = list(map(int, list(iqqm_dict)))
+# add a few extras just to make sure we drop correctly
+ints_list.append(823)
+ints_list.append(90)
+ints_list.append(100)
+dataset = dataset.sel(node=dataset['node'].isin(ints_list))
+# cut the time to about 5 years
+datatotest = dataset.isel(time = slice(None, 2000))
+
+# cut to just flow
+datatotestf = datatotest.drop_vars(['Orders', 'IDT Result']) 
+
+# This loses the attributes: datatotest['Simulated flow']
+# save
+datatotestf.to_netcdf("C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/AshData/cutout/werp_ncdf.nc")
+datatotest.close()
+
+# check
+dcut = xr.open_dataset('C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/AshData/cutout/werp_ncdf.nc', engine='netcdf4')
+dcut.attrs.keys()
+dcut.attrs['_evap_scale']
+dcut.close()
+```
+
+And, we just did this in in python, but back to R to see the attributes are still there.
+
+```{r}
+ncut <- nc_open("C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/AshData/cutout/werp_ncdf.nc")
+
+```
+
+```{r}
+ncut
+```
+
+What's in that other file that Georgia needs?
+
+```{r}
+h2o_table <- nc_open("C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/batchertesterdata/licvolfactor_0_7/r0_7_e1_0/9360/h2o_table.nc")
+```
+
+```{r}
+h2o_table
+```
+
+I've now written the netcdf cutter in python. I think I'll not export it as an R function since it's so specific, and instead just use it here.
+
+```{python}
+# nccut <- reticulate::import_from_path("cut_iqqm_ncdf",
+#   path = "inst/python")
+
+from cut_iqqm_ncdf import cut_all_ncdf
+
+outerpath = "C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/batchertesterdata"
+newpath = 'C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/AshData/cutall'
+
+cut_all_ncdf(outerpath, newpath, timeclip = slice(None, 2000))
+```
+

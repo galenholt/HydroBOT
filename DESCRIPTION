@@ -1,6 +1,6 @@
 Package: werptoolkitr
 Title: Toolkit For Flow-Dependent Outcomes in MDB
-Version: 0.1.4.9006
+Version: 0.1.4.9007
 Authors@R: 
     person("Galen", "Holt", , "g.holt@deakin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7455-9275"))
@@ -60,7 +60,7 @@ LazyData: true
 Config/reticulate:
   list(
     packages = list(
-      list(package = "py-ewr")
+      list(package = "py-ewr", version = '2.1.6')
     )
   )
 VignetteBuilder: knitr
