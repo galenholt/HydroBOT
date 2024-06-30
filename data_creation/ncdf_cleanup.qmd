@@ -146,3 +146,37 @@ newpath = 'C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/
 cut_all_ncdf(outerpath, newpath, timeclip = slice(None, 2000))
 ```
 
+What do we have in the pulled data?
+
+```{r}
+ex4 <- nc_open("C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/macquarie_cut/stochastic/MACQ_CC_EFR/licvolfactor_1_0/r1_3_e1_0/910/cutflows.nc")
+
+ex4a <- nc_open("C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/macquarie_cut/stochastic/MACQ_CC_EFR_mkiv/licvolfactor_1_1/r1_0_e1_07/520/cutflows.nc")
+
+ex4a07 <- nc_open("C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/macquarie_cut/stochastic/MACQ_CC_EFR_mkiv/licvolfactor_1_1/r0_07_e1_07/0/cutflows.nc")
+
+ex5 <- nc_open("C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/macquarie_cut/stochastic/MACQ_CC_EFR_mkv/licvolfactor_1_0/r0_7_e1_07/260/cutflows.nc")
+
+ex5a <- nc_open("C:/Users/galen/Deakin University/QAEL - WERP in house - WERP/Toolkit/macquarie_cut/stochastic/MACQ_CC_EFR_mkva/licvolfactor_1_0/r1_3_e1_0/260/cutflows.nc")
+```
+
+```{r}
+ex4
+```
+
+```{r}
+ex4a
+```
+
+```{r}
+ex4a07
+
+```
+```{r}
+ex5
+```
+
+```{r}
+ex5a
+```
+

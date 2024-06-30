@@ -194,6 +194,60 @@ fix_file_scenarios <- function(hydro_paths, scenarios) {
   return(hydro_paths)
 }
 
+#' Figure out the expected outputs
+#'
+#' @param hydro_paths list of paths to scenario files with names scenario names
+#' @param output_path path for outputs
+#' @param outputType types of outputs, for inferring csvs
+#'
+#' @return
+#' @export
+#'
+find_expected_files <- function(hydro_paths, output_path, outputType) {
+
+  # output path should be length 1, but output Type may not be.
+  if (length(output_path) > 1 ) {
+    rlang::abort('More than one output path, unclear where to look for expected outputs.')
+  }
+  expected_files <- foreach::foreach(ot = outputType,
+                              .combine = c) %do% {
+    file.path(names(hydro_paths), paste0(ot, '.csv'))
+                              }
+
+  return(expected_files)
+
+}
+
+#' Figure out missing expected outputs
+#'
+#' @param hydro_paths list of paths to scenario files with names scenario names
+#' @param output_path path for outputs
+#' @param outputType types of outputs, for inferring csvs
+#'
+#' @return
+#' @export
+#'
+find_missing_runs <- function(hydro_paths, output_path, outputType) {
+  # Get the files that exist
+  existing_files <- file.path(list.files(output_path, recursive = TRUE))
+
+  # Get expected
+  expected_files <- find_expected_files(hydro_paths, output_path, outputType)
+
+  # get the expected files that aren't existing
+  missing_files <- expected_files[!expected_files %in% existing_files]
+
+  # what we want is anyting with *any* missing files. so if e.g. there's a
+  # 'summary' that got made but a crash before 'yearly', the yearly will still
+  # be in the file list here, and we then can pick it up. I think that's very
+  # unlikely
+  missing_scenarios <- missing_files |>
+    stringr::str_remove("/[^/]+$") |>
+    unique()
+
+  return(missing_scenarios)
+}
+
 # silly helper
 end_paster <- function(x, npastes) {
   x[length(x)] <- paste0(x[(length(x)-(npastes-1)):length(x)], collapse = '_DIRECTORYAPPEND_')

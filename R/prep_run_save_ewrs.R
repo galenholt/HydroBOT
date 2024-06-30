@@ -46,7 +46,8 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @param returnType list of strings or character vector defining what to return
 #'   to the active R session. Same options as `outputType`
 #' @param scenarios_from character, default 'directory' gets scenario names from directory names. If anything else, gets them from filenames (safest). Expect additional options in future, e.g from metadata.
-#' @param file_search character, regex for additional limitations on filenames. Useful if several files have the extension defined by `model_format`, but only some are hydrographs.
+#' @param file_search character, regex for additional limitations on filenames. Useful to run a subset of scenarios or if several files have the extension defined by `model_format`, but only some are hydrographs.
+#' @param fill_missing logical, default FALSE. If TRUE, figures out the expected outputs and only runs those that are missing. Useful for long runs that might break.
 #' @param datesuffix logical. whether to add a suffix to saved filenames to
 #'   provide a datestamp. Should be deprecated in favour of metadata files.
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
@@ -65,6 +66,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
                                returnType = "none",
                                scenarios_from = 'directory',
                                file_search = NULL,
+                               fill_missing = FALSE,
                                extrameta = NULL,
                                rparallel = FALSE,
                                retries = 2,
@@ -117,6 +119,15 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
       subdir = output_subdir,
       ewr_outtypes = unlist(outputType)
     )
+
+    # Adjust if fillign missing
+    if (fill_missing) {
+      missing_scenarios <- find_missing_runs(hydro_paths, output_path, outputType)
+
+      hydro_paths <- hydro_paths[names(hydro_paths) %in% missing_scenarios]
+    }
+
+
     # set up flags for the metadata in case the ewr fails partway
     init_params <- list(
       meta_message = "Started run, has not finished. New metadata file will write when it does. If this metadata entry persists, the run failed.",
