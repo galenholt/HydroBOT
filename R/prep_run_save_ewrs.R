@@ -53,6 +53,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
 #' @param rparallel logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using `furrr`. To use, install `furrr` and set a [future::plan()] (likely `multisession` or `multicore`)
 #' @param retries Number of retries if there are errors. 0 is no retries, but still runs once. Default 2.
+#' @param print_runs logical, default FALSE. If true, print the set of runs to be done.
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
@@ -70,6 +71,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
                                extrameta = NULL,
                                rparallel = FALSE,
                                retries = 2,
+                               print_runs = FALSE,
                                datesuffix = FALSE) {
 
   # allow sloppy outputTypes and returnTypes
@@ -175,6 +177,11 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
   approx_py_path <- paste0(output_path, '\\', names(hydro_paths[1]),'\\', unout, '\\', names(hydro_paths[1]), '.csv')
   if (nchar(approx_py_path) >= 260 & .Platform$OS.type == 'windows') {
     rlang::warn(glue::glue('Output path is {nchar(approx_py_path)}, windows has about a 260 limit. If files are not saving, try a shorter path.'))
+  }
+
+  if (print_runs) {
+    rlang::inform(c(glue::glue("{length(hydro_paths)} scenarios to run:"),
+                    names(hydro_paths)))
   }
 
   # Run the EWR tool over all hydro_paths
