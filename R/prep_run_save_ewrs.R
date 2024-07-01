@@ -179,10 +179,19 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
     rlang::warn(glue::glue('Output path is {nchar(approx_py_path)}, windows has about a 260 limit. If files are not saving, try a shorter path.'))
   }
 
+  # Spit out info if requested
   if (print_runs) {
+
+    if (length(hydro_paths) < 10) {
+      runprint <- names(hydro_paths)
+    } else {
+      runprint <- c(glue::glue("{names(hydro_paths)[1:10]}"),
+                    glue::glue("and {length(hydro_paths) - 10} more"))
+    }
     rlang::inform(c(glue::glue("{length(hydro_paths)} scenarios to run:"),
-                    names(hydro_paths)))
+                    runprint))
   }
+
 
   # Run the EWR tool over all hydro_paths
   ewr_out <- safe_imap(hydro_paths, ewrfun, retries = retries, parallel = rparallel)
