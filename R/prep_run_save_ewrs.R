@@ -281,6 +281,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
       returnType = returnType,
       ewr_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
       ewr_status = TRUE,
+      ewr_version = get_ewr_version(),
       ewr_git_commit = gitcom
     )
 

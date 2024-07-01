@@ -89,3 +89,17 @@ get_iqqm_gauges <- function() {
   iqqm_gauges <- tibble::tibble(iqqm_node = names(iqqm_gauges), gauge = unlist(iqqm_gauges))
   return(iqqm_gauges)
 }
+
+#' Extract the package version. Does not get complications like git branches.
+#'
+#' @return
+#' @export
+#'
+get_ewr_version <- function() {
+  b <- reticulate::import('pkg_resources')
+  ewrpk <- b$get_distribution('py_ewr')
+
+  return(as.character(ewrpk))
+  # Or
+  # system.time(a <- system2("pip", "show py_ewr", stdout = TRUE))
+}
