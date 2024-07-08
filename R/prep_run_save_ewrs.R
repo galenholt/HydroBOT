@@ -93,8 +93,10 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
       filetype <- "nc"
     }
     hydro_paths <- find_scenario_paths(hydro_dir, type = filetype, file_search = file_search)
+    print("hydro_paths")
   } else {
     hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
+    print("hydro_paths")
   }
 
 
