@@ -18,16 +18,20 @@
 #' @export
 #'
 #' @examples
-get_ewr_output <- function(dir, type = 'achievement', year_roll = 'best',
+get_ewr_output <- function(dir, type = "achievement", year_roll = "best",
                            gaugefilter = NULL, scenariofilter = NULL, add_max = TRUE) {
-
-  if (type != 'achievement') {
-    outdf <- get_any_ewr_output(dir, type = type, gaugefilter = gaugefilter, scenariofilter = scenariofilter)
+  if (type != "achievement") {
+    outdf <- get_any_ewr_output(dir, type = type,
+                                gaugefilter = gaugefilter,
+                                scenariofilter = scenariofilter)
   }
 
   if (type == "achievement") {
-    yeardat <- get_any_ewr_output(dir, type = "yearly", gaugefilter = gaugefilter, scenariofilter = scenariofilter)
-    sumdat <- get_any_ewr_output(dir, type = "summary", gaugefilter = gaugefilter, scenariofilter = scenariofilter)
+    yeardat <- get_any_ewr_output(dir, type = "yearly",
+                                  gaugefilter = gaugefilter,
+                                  scenariofilter = scenariofilter)
+
+    yeardat <- clean_yearly(yeardat)
 
     if (year_roll == "best") {
       year_roll <- ifelse(length(unique(yeardat$year)) >= 10, 10, 1)
@@ -36,12 +40,12 @@ get_ewr_output <- function(dir, type = 'achievement', year_roll = 'best',
     }
 
     # assess achievement
-    outdf <- assess_ewr_achievement(yeardat, sumdat, year_roll = year_roll)
+    outdf <- assess_ewr_achievement(yeardat, year_roll = year_roll)
     # add max
     if (add_max == TRUE) {
       outdf <- bind_max(outdf)
+    }
   }
-}
 
   return(outdf)
 }
@@ -108,8 +112,10 @@ get_any_ewr_output <- function(dir, type,
       .combine = dplyr::bind_rows
     ) %do% {
       # gauge needs to be character, but often looks numeric
-      temp <- readr::read_csv(i, col_types = readr::cols(scenario = readr::col_character(),
-                                                         gauge = readr::col_character()))
+      temp <- readr::read_csv(i, col_types = readr::cols(
+        scenario = readr::col_character(),
+        gauge = readr::col_character()
+      ))
     }
   } else if (is.list(dir)) {
     ewrdata <- dir[[type]]
@@ -128,8 +134,10 @@ get_any_ewr_output <- function(dir, type,
   # places for different gauges
   ewrdata <- ewrdata |>
     dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric)) |>
-    dplyr::mutate(gauge = as.character(gauge),
-                  scenario = as.character(scenario)) # belt and braces- this should never be anything else at this point
+    dplyr::mutate(
+      gauge = as.character(gauge),
+      scenario = as.character(scenario)
+    ) # belt and braces- this should never be anything else at this point
 
   ewrdata <- suppressWarnings(cleanewrs(ewrdata))
 
@@ -152,10 +160,11 @@ get_any_ewr_output <- function(dir, type,
 #'
 #' @examples
 cleanewrs <- function(ewrdf) {
-  # Gauges should be characters
-  ewrdf$gauge <- as.character(ewrdf$gauge)
 
   names(ewrdf) <- nameclean(names(ewrdf))
+
+  # Gauges should be characters
+  ewrdf$gauge <- as.character(ewrdf$gauge)
 
   ewrdf <- ewrdf |>
     separate_ewr_codes()
@@ -163,11 +172,65 @@ cleanewrs <- function(ewrdf) {
   return(ewrdf)
 }
 
+#' Additional cleanup specific to yearly EWR outputs.
+#'
+#' @param annualdf the result of [get_any_ewr_ewr_output()] with `type = 'yearly'`
+#'
+#' @return
+#' @export
+clean_yearly <- function(annualdf) {
+
+  # Dates break on the water/financial year.
+  # and represent the start of the period- macq historic scenario: data starts - 1889-01-01 and the first EWR result is for 1888. confirms dates are the beginning, 2014 = 2014-2015
+  annualdf$date <- as.Date(paste0(as.character(annualdf$year), '-07-01'))
+
+  # The first year is untrustworthy due to how the EWR does its calculations. Make the returned values NA
+
+  ewr_calc_cols <- c('event_years', 'num_achieved', 'num_events', 'num_events_all', 'event_length', 'event_length_achieved', 'total_event_days', 'total_event_days_achieved', 'max_event_days', 'max_rolling_events', 'max_rolling_achievement', 'missing_days', 'total_possible_days', 'rolling_max_inter_event', 'rolling_max_inter_event_achieved')
+
+  annualdf <- annualdf |>
+    dplyr::mutate(dplyr::across(tidyselect::all_of(ewr_calc_cols),
+                                \(x) ifelse(date == min(date, na.rm = TRUE), NA, x)))
+
+
+
+}
+
+
+#' Cleans the EWR table to use for assessing target requirements by the outputs
+#'
+#' @return clean tibble suitable for joining to outputs
+#' @export
+#'
+clean_ewr_requirements <- function() {
+  # Get the target frequencies and interevent durations
+  ewr_requirements <- get_ewr_table() |>
+    tibble::tibble() |>
+    cleanewrs()
+
+  ewr_requirements <- ewr_requirements |>
+    dplyr::select(planning_unit_name, gauge,
+                  tidyselect::contains("ewr_code"),
+                  tidyselect::starts_with('target_frequency'),
+                  tidyselect::contains('interevent'))
+
+  # Target frequencies come in here as character.
+  ewr_requirements <- ewr_requirements |>
+    dplyr::mutate(across(tidyselect::starts_with('target'), as.numeric),
+                  across(tidyselect::contains("interevent"), as.numeric)) |>
+    # Make the NA target frequencies 0, since we can't assess them otherwise.
+    # They only appear for CF_a EWRs, where the corresponding CF_b is 5 and CF_c
+    # is 50
+    dplyr::mutate(across(tidyselect::starts_with('target'), \(x) ifelse(is.na(x), 0, x))) |>
+    dplyr::mutate(across(tidyselect::contains('interevent'), \(x) ifelse(is.na(x), 0, x)))
+
+  return(ewr_requirements)
+}
+
 
 #' Parser for EWR codes into the main code and the extra bits (called 'timing' for some reason)
 #'
-#' I want something that can be used against the whole ewr
-# table and causal networks to keep them matched and standardize the parsing.
+#' This allows keeping the whole ewr table, the EWR outputs, and causal networks matched and standardized parsing.
 #'
 #' @param df a dataframe with an ewr_code column with raw ewr names (e.g. EWR outputs, causal mappings)
 #'
@@ -238,10 +301,11 @@ nameclean <- function(charvec) {
     stringr::str_replace_all("([A-Z])", "_\\1") |>
     tolower() |>
     stringr::str_replace_all(pattern = " ", replacement = "_") |>
-    stringr::str_replace_all(pattern = "-", replacement = "")
+    stringr::str_replace_all(pattern = "-", replacement = "") |>
+    stringr::str_replace_all(pattern ='^_', replacement =  '')
 
   # sometimes the ewr names are ewr_code and sometimes just ewr
-  cleannames[cleannames == "ewr" | cleannames == "Code" | cleannames == "ewrCode"] <- "ewr_code"
+  cleannames[cleannames == "ewr" | cleannames == "Code" | cleannames == "code" |cleannames == "ewrCode"] <- "ewr_code"
   # the planning unit names (and IDs) keep getting changed and dropped, so they might be a few different things.
   cleannames[cleannames == "pu" | cleannames == "PlanningUnitName" | cleannames == "planning_unit"] <- "planning_unit_name"
 
@@ -263,114 +327,89 @@ nameclean <- function(charvec) {
 #' @return tibble reformatted and cleaned for ongoing analysis
 #' @export
 #' @examples
-assess_ewr_achievement <- function(annualdf, summarydf, year_roll = ifelse(nrow(annualdf) >= 10, 10, 1)) {
-  # GET Target frequencies from NSWEWR (could also use NSWEWR from EWR tool?)
-  Target_frequencies <- summarydf |>
-    dplyr::select(planning_unit_name, gauge, ewr_code, ewr_code_timing, target_frequency) |>
-    dplyr::group_by(planning_unit_name, gauge, ewr_code, ewr_code_timing, target_frequency) |>
-    dplyr::distinct() |>
-    dplyr::ungroup()
+assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >= 10, 10, 1)) {
+
+  # Need to get the ewr targets to check against
+  ewr_requirements <- clean_ewr_requirements()
 
   # Join target frequencies to annualdf
-  annualdf <- dplyr::left_join(annualdf, Target_frequencies,
+  annualdf <- dplyr::left_join(annualdf, ewr_requirements,
     by = dplyr::join_by(ewr_code, ewr_code_timing, gauge, planning_unit_name),
     relationship = "many-to-many"
   )
 
   # Frequency checks (ACHIEVEMENT test)
-  if (year_roll > 1) {
-    # Specific rolling time frame
+
     # calculate number of event years, frequency, and EWR pass/fail at defined (year_roll) year rolling time frames.
     # cease to flows are the inverse of success.
     annualdf <- annualdf |>
-      dplyr::group_by(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing) |>
+      # dplyr::group_by(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing) |>
       dplyr::arrange(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing, year) |>
-      # defined n years
-      dplyr::mutate(eventyears_per_n_years = purrr::reduce(purrr::map(1:(year_roll - 1), ~ lag(event_years, ., order_by = year)), `+`) + event_years) |>
-      dplyr::mutate(frequency_per_n_years = (eventyears_per_n_years / year_roll) * 100) |>
-      dplyr::mutate(frequency_check_n_years = ifelse(grepl("CF", ewr_code), frequency_per_n_years <= target_frequency,
-        frequency_per_n_years >= target_frequency
-      )) |>
-      dplyr::ungroup()
-
-    # ACHIEVEMENT test
-    EWR_results <- annualdf |>
-      dplyr::group_by(ewr_code, ewr_code_timing, gauge, scenario, planning_unit_name) |>
-      dplyr::filter(!is.na(frequency_check_n_years)) |>
-      # dplyr::summarise(ewr_achieved = sum(frequency_check_n_years) == dplyr::n()) |> # do all pass?
-      dplyr::summarise(ewr_achieved = mean(frequency_check_n_years)) |> # what proportion passes?
-      dplyr::mutate(ewr_achieved_timeframe = year_roll) |>
-      dplyr::ungroup()
-  } else if (year_roll <= 1) {
-    # Pre-defined time frames
-    # calculate number of event years, frequency, and EWR pass/fail at 10, 20 and all year rolling time frames.
-    # cease to flows are the inverse of success.
-    annualdf <- annualdf |>
-      dplyr::group_by(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing) |>
-      dplyr::arrange(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing, year) |>
-      # 10 years
-      dplyr::mutate(eventyears_per_10_years = purrr::reduce(purrr::map(1:(10 - 1), ~ lag(event_years, ., order_by = year)), `+`) + event_years) |>
-      dplyr::mutate(frequency_per_10_years = (eventyears_per_10_years / 10) * 100) |>
-      dplyr::mutate(frequency_check_10_years = ifelse(grepl("CF", ewr_code), frequency_per_10_years <= target_frequency,
-        frequency_per_10_years >= target_frequency
-      )) |>
-      # 20 years
-      dplyr::mutate(eventyears_per_20_years = purrr::reduce(purrr::map(1:(20 - 1), ~ lag(event_years, ., order_by = year)), `+`) + event_years) |>
-      dplyr::mutate(frequency_per_20_years = (eventyears_per_20_years / 20) * 100) |>
-      dplyr::mutate(frequency_check_20_years = ifelse(grepl("CF", ewr_code), frequency_per_20_years <= target_frequency,
-        frequency_per_20_years >= target_frequency
-      )) |>
-      # All years
-      dplyr::mutate(eventyears_per_all_years = sum(event_years)) |>
-      dplyr::mutate(frequency_per_all_years = (sum(event_years) / dplyr::n()) * 100) |>
-      dplyr::mutate(frequency_check_all_years = ifelse(grepl("CF", ewr_code), frequency_per_all_years <= target_frequency,
-        frequency_per_all_years >= target_frequency
-      )) |>
-      dplyr::ungroup()
-
-    nYdata <- length(unique(annualdf$year))
-
-    # ACHIEVEMENT test
-    if (nYdata < 10) {
-      # less than 10 years data (uses all years as time frame window)
-      EWR_results <- annualdf |>
-        dplyr::group_by(ewr_code, ewr_code_timing, gauge, scenario, planning_unit_name) |>
-        # dplyr::summarise(ewr_achieved = sum(frequency_check_all_years) == dplyr::n()) |> # do all pass?
-        dplyr::summarise(ewr_achieved = mean(frequency_check_all_years)) |> # what proportion passes?
-        dplyr::mutate(ewr_achieved_timeframe = nYdata) |>
-        dplyr::ungroup()
-    } else if (nYdata >= 10 & nYdata < 20) {
-      # less than 20 years data (uses 10 year rolling time frame window)
-      EWR_results <- annualdf |>
-        dplyr::group_by(ewr_code, ewr_code_timing, gauge, scenario, planning_unit_name) |>
-        dplyr::filter(!is.na(frequency_check_10_years)) |>
-        # dplyr::summarise(ewr_achieved = sum(frequency_check_10_years) == dplyr::n()) |> # do all pass?
-        dplyr::summarise(ewr_achieved = mean(frequency_check_10_years)) |> # what proportion passes?
-        dplyr::mutate(ewr_achieved_timeframe = 10) |>
-        dplyr::ungroup()
-    } else if (nYdata >= 20) {
-      # 20 or more years data (uses 10 and 20 year rolling time frame windows depending on EWR)
-      EWR_results <- annualdf |>
-        dplyr::group_by(ewr_code, ewr_code_timing, gauge, scenario, planning_unit_name) |>
-        dplyr::mutate(
-          frequency_check_10and20_years = ifelse(target_frequency < 10 | target_frequency > 90,
-                                                 frequency_check_20_years, frequency_check_10_years),
-          ewr_achieved_timeframe = ifelse(target_frequency < 10 | target_frequency > 90, 20, 10)
-        ) |>
-        dplyr::filter(!is.na(frequency_check_10and20_years)) |>
-        dplyr::summarise(
-          # ewr_achieved = sum(frequency_check_10and20_years) == dplyr::n(), # do all pass?
-          ewr_achieved = mean(frequency_check_10and20_years), # what proportion passes?
-          ewr_achieved_timeframe = unique(ewr_achieved_timeframe)
-        ) |>
-        dplyr::ungroup()
-    }
-  }
+      dplyr::mutate(frequency_occurred = roll_frequency(event_years, year_roll),
+                    .by = c(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing)) |>
+      dplyr::mutate(ewr_achieved = ifelse(grepl("CF", ewr_code),
+                                          frequency_occurred <= target_frequency,
+                                          frequency_occurred >= target_frequency),
+                    .by = c(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing))
 
   # change the logical to numeric to maintain generality with later functions
-  EWR_results$ewr_achieved <- as.numeric(EWR_results$ewr_achieved)
+  annualdf$ewr_achieved <- as.numeric(annualdf$ewr_achieved)
 
-  return(EWR_results)
+  annualdf <- annualdf |>
+    dplyr::select(scenario, year, date, gauge, planning_unit_name,
+                  ewr_code, ewr_code_timing, ewr_achieved)
+
+  return(annualdf)
+}
+
+
+
+#' Helper to get the frequency of occurrence without clogging up the mutates
+#'
+#' if the user has RcppRoll installed, this will go a lot faster, but it's usually not an issue.
+#'
+#' @param x vector to calculate rolling frequencies for
+#' @param year_roll window size for the roll
+#' @param pad_initial Allow calculating values in the first years < year_roll; roll the year_roll if possible, otherwise as much as possible. Note that this makes the 1:year_roll entries less smoothed.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+roll_frequency <- function(x, year_roll, pad_initial = FALSE) {
+
+  if (pad_initial) {
+    x <- c(rep(NA, year_roll), x)
+  }
+
+  if (rlang::is_installed('RcppRoll')) {
+    sumvec <- RcppRoll::roll_sum(x, n = year_roll, align = 'right', fill = NA, na.rm = TRUE)
+  } else {
+    # get a list of the values at each lag, make it a matrix with cols shifte by one, and sum across
+    lagmat <- purrr::map(1:(year_roll - 1), \(y) dplyr::lag(x, y)) |>
+      purrr::list_c() |>
+      matrix(nrow = length(x))
+    # we want na.rm = TRUE to deal with intermediate NA, but it has the side
+    # effect of giving 0 if everythign is NA, and we want to keep those NA.
+    bothna <- rowSums(is.na(lagmat))
+    sumvec <- rowSums(cbind(lagmat, x), na.rm = TRUE)
+    sumvec[bothna == ncol(lagmat)] <- NA
+
+    # The way the rowsums works with na.rm = TRUE, we end up padding initial. Undo that if we don't want it
+    if (!pad_initial) {
+      sumvec[1:(year_roll-1)] <- NA
+    }
+
+  }
+
+  freqvec <- (sumvec/year_roll)*100
+
+  if (pad_initial) {
+    # cut off that pre-padding
+    freqvec <- freqvec[(year_roll+1):length(freqvec)]
+  }
+
+  return(freqvec)
 }
 
 #' Add max scenario
@@ -385,8 +424,10 @@ bind_max <- function(outdf) {
   MAX_scenario <- outdf |>
     dplyr::select(gauge, planning_unit_name, ewr_code, ewr_code_timing) |>
     dplyr::distinct() |>
-    dplyr::mutate(scenario = "MAX",
-           ewr_achieved = 1)|>
+    dplyr::mutate(
+      scenario = "MAX",
+      ewr_achieved = 1
+    ) |>
     dplyr::select(scenario, gauge, planning_unit_name, ewr_achieved, ewr_code, ewr_code_timing)
   outdf <- dplyr::bind_rows(outdf, MAX_scenario)
   return(outdf)
