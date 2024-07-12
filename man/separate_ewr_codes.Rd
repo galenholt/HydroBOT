@@ -13,5 +13,5 @@ separate_ewr_codes(df)
 a dataframe with a clean ewr_code column and an ewr_code_timing column with the extra stuff
 }
 \description{
-I want something that can be used against the whole ewr
+This allows keeping the whole ewr table, the EWR outputs, and causal networks matched and standardized parsing.
 }

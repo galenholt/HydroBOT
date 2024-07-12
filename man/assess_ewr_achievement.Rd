@@ -6,16 +6,15 @@
 \usage{
 assess_ewr_achievement(
   annualdf,
-  summarydf,
   year_roll = ifelse(nrow(annualdf) >= 10, 10, 1)
 )
 }
 \arguments{
 \item{annualdf}{incoming tibble of EWRs after read-in}
 
-\item{summarydf}{incoming tibble of  EWRs after read-in - contains the Target Frequency column}
-
 \item{year_roll}{specific number of years to check assessment for}
+
+\item{summarydf}{incoming tibble of  EWRs after read-in - contains the Target Frequency column}
 }
 \value{
 tibble reformatted and cleaned for ongoing analysis
