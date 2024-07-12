@@ -1,6 +1,6 @@
 Package: werptoolkitr
 Title: Toolkit For Flow-Dependent Outcomes in MDB
-Version: 0.1.4.9014
+Version: 0.1.4.9015
 Authors@R: 
     person("Galen", "Holt", , "g.holt@deakin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7455-9275"))
@@ -17,6 +17,7 @@ Imports:
     ggplot2,
     glue,
     grDevices,
+    lubridate,
     lwgeom,
     paletteer,
     purrr,
@@ -51,8 +52,7 @@ Suggests:
     rsvg,
     metR,
     PCICt,
-    ncdf4,
-    lubridate
+    ncdf4
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)

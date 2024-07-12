@@ -36,6 +36,7 @@ test_that("spatial input data works", {
                            funlist = 'mean',
                            causal_edges = causal_ewr,
                            auto_ewr_PU = TRUE)
+
   expect_equal(names(agged), c('scenario', 'gauge', 'polyID', 'planning_unit_name',
                                'ewr_code', 'ewr_code_mean_ewr_achieved',
                                'geometry'))

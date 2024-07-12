@@ -63,8 +63,11 @@ theme_aggregate <- function(dat,
   # including geometry in non-geometric
   # aggregates takes forever, drop and re-pair if present
 
-  # this is now getting even closer to spatial with the drop/add of geometry.
-  # can they be the same function? probably.
+  # We need to greate a new column and modify groupers here. We don't for things
+  # like temporal, where any relevant time column already exists and we can pass
+  # it in in groupers.
+  # this is now getting even closer to spatial with the
+  # drop/add of geometry. can they be the same function? probably.
   spatialflag <- is_sf(dat)
   polyflag <- is_notpoint(dat)
 
@@ -101,16 +104,16 @@ theme_aggregate <- function(dat,
     names(causal_edges)[names(causal_edges) == "from"] <- causal_edges$fromtype[1]
   }
 
-  # the theme-level outcomes are defined at gauges and planning units (often
-  # many-to-many, e.g. gauges might contribute to EWRs in multiple PUs, and PUs
-  # might include several gauges). we want to map back to that until we've done
-  # spatial aggregation into something larger. this conditional is really ugly
-  # though. This is only true of ewrs. SO check if we're not yet in polys, and
-  # if these are EWRs. If yes, then add planning unit to groupers We don't have
-  # to do something similar for spatial, because this gets taken care of as soon
-  # as we're above hte Planning Unit scale (though I suppose it's possible to
-  # aggregate to something smaller than a PU and larger than a gauge, that's an
-  # edge case to deal with later)
+  # EWRs are defined at gauges and planning units (often many-to-many, e.g.
+  # gauges might contribute to EWRs in multiple PUs, and PUs might include
+  # several gauges). we want to map back to that until we've done spatial
+  # aggregation into something larger. This is only true of ewrs. So check if
+  # we're not yet in polygons (since then we're at least to planning_units), and
+  # if these are EWRs. If yes, then add gauge and planning unit to groupers. We
+  # don't have to do something similar for spatial, because this gets taken care
+  # of as soon as we're above hte Planning Unit scale (though I suppose it's
+  # possible to aggregate to something smaller than a PU and larger than a
+  # gauge, that's an edge case to deal with later)
   if (!polyflag) {
     # Infer EWR from presence in causal_ewr
     ewrnames <- purrr::map(causal_ewr, names) |> unlist()

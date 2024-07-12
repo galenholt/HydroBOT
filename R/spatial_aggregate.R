@@ -39,14 +39,18 @@
 #' @export
 #'
 #' @examples
-spatial_aggregate <- function(dat, to_geo, groupers,
-                             aggCols, funlist, ...,
-                           whichcrs = sf::st_crs(to_geo),
-                           keepAllPolys = FALSE,
-                           failmissing = TRUE,
-                           prefix = 'spatial_',
-                           joinby = 'spatial',
-                           auto_ewr_PU = FALSE) {
+spatial_aggregate <- function(dat,
+                              to_geo,
+                              groupers,
+                              aggCols,
+                              funlist,
+                              ...,
+                              whichcrs = sf::st_crs(to_geo),
+                              keepAllPolys = FALSE,
+                              failmissing = TRUE,
+                              prefix = 'spatial_',
+                              joinby = 'spatial',
+                              auto_ewr_PU = FALSE) {
 
 
   # making valid and adding polyID here and not inside spatial_joiner because
