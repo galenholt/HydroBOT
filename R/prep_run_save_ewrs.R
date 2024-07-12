@@ -194,6 +194,11 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
 
 
   # Run the EWR tool over all hydro_paths
+  # This is abandoned for now, could put an auto cluster looper in here.
+  # inner_imap <- function()
+  # if (outer_parallel > 1) {
+  #   nodeloops <- split(fulloop, cut(1:length(fulloop), nodes_wanted, labels = FALSE))
+  # }
   ewr_out <- safe_imap(hydro_paths, ewrfun, retries = retries, parallel = rparallel)
 
   # rearrange to be a list of the different types of output, instead of the different scenarios

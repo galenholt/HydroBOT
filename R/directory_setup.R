@@ -7,6 +7,7 @@
 #' @param file_search character, regex for additional limitations on filenames. Useful if several files have the extension defined by `type`, but only some are hydrographs.
 #'
 #' @return a list of filepaths to the hydrographs
+#' @export
 #'
 #' @examples
 find_scenario_paths <- function(hydro_dir, type = 'csv', file_search = NULL) {
@@ -76,6 +77,7 @@ find_scenario_paths <- function(hydro_dir, type = 'csv', file_search = NULL) {
 #'  * 'all_successful_interEvents'
 #'
 #' @return path to output directory
+#' @export
 #'
 #' @examples
 make_output_dir <- function(parent_dir,
@@ -244,6 +246,47 @@ find_missing_runs <- function(hydro_paths, output_path, outputType) {
   missing_scenarios <- missing_files |>
     stringr::str_remove("/[^/]+$") |>
     unique()
+
+  return(missing_scenarios)
+}
+
+
+#' Similar to find_missing_runs, but excised from prep_run_save_ewrs to take the same arguments
+#'
+#' @inheritParams prep_run_save_ewrs
+#'
+#' @return
+#' @export
+#'
+#' @examples
+check_missing_runs <- function(hydro_dir,
+                               output_parent_dir,
+                               output_subdir = '',
+                               scenarios = NULL,
+                               file_search = NULL,
+                               model_format = "Standard time-series",
+                               outputType = "none") {
+
+  if (is.null(scenarios)) {
+    if (model_format %in% c("IQQM - NSW 10,000 years", 'Standard time-series')) {
+      filetype <- "csv"
+    }
+    if (grepl("netcdf", model_format)) {
+      filetype <- "nc"
+    }
+    hydro_paths <- find_scenario_paths(hydro_dir, type = filetype, file_search = file_search)
+  } else {
+    hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
+  }
+
+  output_path <- make_output_dir(output_parent_dir,
+                                 scenarios = names(hydro_paths),
+                                 module_name = "EWR",
+                                 subdir = output_subdir,
+                                 ewr_outtypes = unlist(outputType)
+  )
+
+  missing_scenarios <- find_missing_runs(hydro_paths, output_path, outputType)
 
   return(missing_scenarios)
 }
