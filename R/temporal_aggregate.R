@@ -10,7 +10,7 @@
 #'   necessarily the same as `data` in [general_aggregate()]- this function
 #'   makes necessary adjustments to the data before calling
 #'   [general_aggregate()]
-#' @param breaks breaks for the time groupings. default 'all' collapses over the whole period, otherwise as in [base::cut.POSIXt()] (takes the character options there, or time objects)
+#' @param breaks breaks for the time groupings. default 'all_time' collapses over the whole period, otherwise as in [base::cut.POSIXt()] (takes the character options there, or time objects)
 #' @param timecol name of the column with time in it. Default 'infer' infers which it is by looking for POSIXt or Date types.
 #' @param groupers as in [general_aggregate()], with the note that these should
 #'   be all grouping columns *except* any spatial information. Spatial information is automatically added to
@@ -27,7 +27,7 @@
 #'
 #' @examples
 temporal_aggregate <- function(dat,
-                               breaks = 'all',
+                               breaks = 'all_time',
                                timecol = 'infer',
                                groupers,
                                aggCols,
@@ -96,13 +96,13 @@ temporal_aggregate <- function(dat,
         rlang::warn(c("!" = "EWR outputs detected without `group_until`!",
                       "i" = "EWR outputs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
                       "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
-                      "i" = "Lower-level processing should include as `grouper` in `theme_aggregate()`"))
+                      "i" = "Lower-level processing should include as `grouper` in `temporal_aggregate()`"))
       } else {
         rlang::inform(c("EWR outputs auto-grouped!",
                         "i" = "EWRs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
                         "*" = "gauge is less important, since it has the geometry, but the gauge column will be lost otherwise.",
                         "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
-                        "i" = "Lower-level processing handles by including as `grouper` in `theme_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."))
+                        "i" = "Lower-level processing handles by including as `grouper` in `temporal_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."))
         # add gauge and plannng unit name if available.
         groupers <- unique(c(groupers, c('gauge', 'planning_unit_name')))
       }
@@ -113,7 +113,7 @@ temporal_aggregate <- function(dat,
 
 
   # make the groupings for the time dimension
-  if (is.character(breaks) && breaks == 'all') {
+  if (is.character(breaks) && grepl('all', breaks)) {
     dat$time_group = 1
     retime = FALSE
   } else {

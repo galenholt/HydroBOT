@@ -107,7 +107,14 @@ agg_names_to_cols <-
 #' purrr::map(list(ewr_code = c('ewr_code_timing', 'ewr_code'), sdl_units = "sdl_units"), parse_geo)
 parse_geo <- function(x) {
   if (length(x) == 1 & is.character(x)) {
-    return(get(x))
+    xg <- mget(x, inherits = TRUE, ifnotfound = x)
+    xg <- xg[[1]]
+    # only actually return the result of the get if it's an sf
+    if (inherits(xg, 'sf')) {
+      return(xg)
+    } else {
+      return(x)
+    }
   } else {
     return(x)
   }
@@ -230,6 +237,83 @@ parse_aggnum <- function(x, aggsequence) {
   return(gind)
 }
 
+
+#' Helper to identify the dimension of each step in aggsequence
+#'
+#' @inheritParams multi_aggregate
+#'
+#' @return character vector with 'spatial', 'theme' or 'temporal' for each step in aggsequence
+identify_dimension <- function(aggsequence, causal_edges) {
+
+  if (inherits(causal_edges, 'data.frame')) {
+    causalnames <- names(causal_edges)
+
+    # If they're edges, they already have been lengthened
+    if ('fromtype' %in% causalnames) {
+      causalnames <- c(unique(causal_edges$fromtype), unique(causal_edges$totype))
+    }
+
+  } else {
+    causalnames <- purrr::map(causal_edges, names) |> unlist()
+  }
+
+  spatialsteps <- purrr::map_lgl(aggsequence, is_sf)
+  themesteps <- purrr::map_lgl(aggsequence, \(x) is_theme(x, causalnames))
+  timesteps <- purrr::map_lgl(aggsequence, is_time)
+
+  checkassign <- purrr::pmap_int(list(spatialsteps, themesteps, timesteps), sum)
+
+  # Check we haven't duplicated or missed anything
+  if (any(checkassign != 1)) {
+    rlang::abort(c("Cannot infer dimension of aggsequence.",
+                   glue::glue("step(s) {names(checkassign)[checkassign > 1]} are assigned to multiple dimensions"),
+                   glue::glue("step(s) {names(checkassign)[checkassign < 1]} are not assigned to any dimension")))
+  }
+
+  # get a single vector of the dims
+  steptype <- vector(mode = 'character', length = length(aggsequence))
+  steptype[spatialsteps] <- 'spatial'
+  steptype[themesteps] <- 'theme'
+  steptype[timesteps] <- 'temporal'
+
+  return(steptype)
+
+}
+
+#' Test whether a list-item specifies a theme dimension
+#'
+#' Intended to be purrr-ed over from aggsequence
+#'
+#' @param x list-item
+#' @param causalnames names of the columns in a causal network
+#'
+#' @return logical
+is_theme <- function(x, causalnames) {
+  all(inherits(x, 'character') &
+    length(x) == 2 &
+    x %in% causalnames)
+}
+
+#' Test whether a list-item is time, including using [base::cut.Date()] specifications
+#'
+#' Intended to be purrr-ed over from aggsequence
+#'
+#' @param x a list-item
+#'
+#' @return Logical
+is_time <- function(x) {
+  if (all(inherits(x, 'POSIXt') | inherits(x, 'Date'))) {
+    return(TRUE)
+  } else if (inherits(x, 'character') &&
+             length(x) == 1 &&
+             grepl("sec|min|hour|day|DSTday|day|week|month|quarter|year|all_time", x)) {
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}
+
+
 #' Test whether an object is an sf
 #'
 #' @param x anything, but typically a dataframe
@@ -262,6 +346,7 @@ is_point <- function(x) {
   }
   return(FALSE)
 }
+
 
 #' Test whether an object is an sf other than a point
 #'

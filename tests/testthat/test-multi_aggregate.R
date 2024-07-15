@@ -148,6 +148,7 @@ test_that("gauge to poly works", {
     aggCols = "ewr_achieved",
     funsequence = list("mean")
   )
+
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
     "scenario", "polyID", "sdl_units_mean_ewr_achieved",
@@ -192,6 +193,7 @@ test_that("gauge to poly works", {
 
   vdiffr::expect_doppelganger("gauge to sdl multi", g2sdl_plot)
   vdiffr::expect_doppelganger("gauge to sdl all multi", g2sdl_all_plot)
+
 })
 
 test_that("poly to poly works", {
@@ -1795,4 +1797,251 @@ test_that("group_until works", {
 
   # make sure the other groupers persisted
   expect_true("scenario" %in% names(spatagg$target_5_year_2024))
+})
+
+
+# Temporal and sequencing -------------------------------------------------
+
+test_that("Sequencing edge cases", {
+
+  # if we don't pass theme steps, it should drop the theme levels because there's no way to infer them
+  # But SHOULD keep time, because there is
+  # This test is done above, so commenting out here, but keeping for reference
+  # spatagg <- multi_aggregate(ewr_to_agg,
+  #                                  aggsequence = list(sdl_units = sdl_units),
+  #                                  groupers = "scenario",
+  #                                  aggCols = "ewr_achieved",
+  #                                  funsequence = list("mean")
+  # )
+
+  # If we do pass theme steps, but they are in a later stage, they need to be kept around
+
+    # This should have
+    spatagg_s_th_t <- multi_aggregate(ewr_to_agg,
+                                     causal_edges = causal_ewr,
+                                     aggsequence = list(sdl_units = sdl_units,
+                                                        ewr_code = c('ewr_code_timing', 'ewr_code'),
+                                                        yrs = '2 years'),
+                                     groupers = "scenario",
+                                     aggCols = "ewr_achieved",
+                                     saveintermediate = TRUE,
+                                     funsequence = list("mean", 'ArithmeticMean', 'mean')
+    )
+
+    # the sdl sheet should have all the dates and code_timings
+    expect_snapshot_value(spatagg_s_th_t$sdl_units$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_th_t$sdl_units$ewr_code_timing |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_th_t$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+    # The ewr_code sheet should have ewr_codes, sdls, and all dates
+    expect_snapshot_value(spatagg_s_th_t$ewr_code$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_th_t$ewr_code$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_th_t$ewr_code$SWSDLID |> unique(), style = 'deparse')
+
+    # The yrs sheet should have ewr_codes, sdls, and two-year intervals
+    expect_snapshot_value(spatagg_s_th_t$yrs$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_th_t$yrs$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_th_t$yrs$SWSDLID |> unique(), style = 'deparse')
+
+
+    spatagg_s_t_th <- multi_aggregate(ewr_to_agg,
+                                      causal_edges = causal_ewr,
+                                      aggsequence = list(sdl_units = sdl_units,
+                                                         yrs = '2 years',
+                                                         ewr_code = c('ewr_code_timing', 'ewr_code')),
+                                      groupers = "scenario",
+                                      aggCols = "ewr_achieved",
+                                      saveintermediate = TRUE,
+                                      funsequence = list("mean", 'ArithmeticMean', 'mean'),
+                                      auto_ewr_PU = TRUE
+    )
+
+    # the sdl sheet should have all the dates and code_timings
+    expect_snapshot_value(spatagg_s_t_th$sdl_units$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_t_th$sdl_units$ewr_code_timing |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_t_th$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+    # The yrs sheet should have code_timing, sdl, and two-year intervals
+    expect_snapshot_value(spatagg_s_t_th$yrs$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_t_th$yrs$ewr_code_timing |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_t_th$yrs$SWSDLID|> unique(), style = 'deparse')
+
+    # The ewr_code sheet should have ewr_codes, sdls, and 2-year
+    expect_snapshot_value(spatagg_s_t_th$ewr_code$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_t_th$ewr_code$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_t_th$ewr_code$SWSDLID |> unique(), style = 'deparse')
+
+
+    spatagg_th_s_t <- multi_aggregate(ewr_to_agg,
+                                      causal_edges = causal_ewr,
+                                      aggsequence = list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                                                         sdl_units = sdl_units,
+                                                         yrs = '2 years'),
+                                      groupers = "scenario",
+                                      aggCols = "ewr_achieved",
+                                      saveintermediate = TRUE,
+                                      funsequence = list("mean", 'ArithmeticMean', 'mean'),
+                                      auto_ewr_PU = TRUE
+    )
+
+    # The ewr_code sheet should have ewr_codes, planning units (not sdls), and all dates
+    expect_snapshot_value(spatagg_th_s_t$ewr_code$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_s_t$ewr_code$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_s_t$ewr_code$planning_unit_name |> unique(), style = 'deparse')
+
+    # the sdl sheet should have all times and ewr_codes
+    expect_snapshot_value(spatagg_th_s_t$sdl_units$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_s_t$sdl_units$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_s_t$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+    # The yrs sheet should have ewr_codes, sdls, and two-year intervals
+    expect_snapshot_value(spatagg_th_s_t$yrs$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_s_t$yrs$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_s_t$yrs$SWSDLID |> unique(), style = 'deparse')
+
+    spatagg_th_t_s <- multi_aggregate(ewr_to_agg,
+                                      causal_edges = causal_ewr,
+                                      aggsequence = list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                                                         yrs = '2 years',
+                                                         sdl_units = sdl_units),
+                                      groupers = "scenario",
+                                      aggCols = "ewr_achieved",
+                                      saveintermediate = TRUE,
+                                      funsequence = list("mean", 'ArithmeticMean', 'mean'),
+                                      auto_ewr_PU = TRUE
+    )
+
+    # The ewr_code sheet should have ewr_codes, planning units (not sdls), and all dates
+    expect_snapshot_value(spatagg_th_t_s$ewr_code$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_t_s$ewr_code$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_t_s$ewr_code$planning_unit_name |> unique(), style = 'deparse')
+
+    # The yrs sheet should have ewr_codes, planning units, and two-year intervals
+    expect_snapshot_value(spatagg_th_t_s$yrs$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_t_s$yrs$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_t_s$yrs$planning_unit_name |> unique(), style = 'deparse')
+
+    # the sdl sheet should have 2-year intervals and ewr_codes
+    expect_snapshot_value(spatagg_th_t_s$sdl_units$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_t_s$sdl_units$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_t_s$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+    spatagg_t_s_th <- multi_aggregate(ewr_to_agg,
+                                      causal_edges = causal_ewr,
+                                      aggsequence = list(yrs = '2 years',
+                                                         sdl_units = sdl_units,
+                                                         ewr_code = c('ewr_code_timing', 'ewr_code')),
+                                      groupers = "scenario",
+                                      aggCols = "ewr_achieved",
+                                      saveintermediate = TRUE,
+                                      funsequence = list("mean", 'ArithmeticMean', 'mean'),
+                                      auto_ewr_PU = TRUE
+    )
+
+    # The yrs sheet should have code_timing, planning units, and two-year intervals
+    expect_snapshot_value(spatagg_t_s_th$yrs$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_s_th$yrs$ewr_code_timing |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_s_th$yrs$planning_unit_name |> unique(), style = 'deparse')
+
+    # the sdl sheet should have 2-year intervals and code_timing
+    expect_snapshot_value(spatagg_t_s_th$sdl_units$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_s_th$sdl_units$ewr_code_timing |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_s_th$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+    # The ewr_code sheet should have ewr_codes, sdls, and 2-year
+    expect_snapshot_value(spatagg_t_s_th$ewr_code$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_s_th$ewr_code$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_s_th$ewr_code$SWSDLID |> unique(), style = 'deparse')
+
+    spatagg_t_th_s <- multi_aggregate(ewr_to_agg,
+                                      causal_edges = causal_ewr,
+                                      aggsequence = list(yrs = '2 years',
+                                                         ewr_code = c('ewr_code_timing', 'ewr_code'),
+                                                         sdl_units = sdl_units),
+                                      groupers = "scenario",
+                                      aggCols = "ewr_achieved",
+                                      saveintermediate = TRUE,
+                                      funsequence = list("mean", 'ArithmeticMean', 'mean'),
+                                      auto_ewr_PU = TRUE
+    )
+
+    # The yrs sheet should have code_timing, planning units, and two-year intervals
+    expect_snapshot_value(spatagg_t_th_s$yrs$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_th_s$yrs$ewr_code_timing |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_th_s$yrs$planning_unit_name |> unique(), style = 'deparse')
+
+    # The ewr_code sheet should have ewr_codes, planning_untois, and 2-year
+    expect_snapshot_value(spatagg_t_th_s$ewr_code$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_th_s$ewr_code$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_th_s$ewr_code$planning_unit_name |> unique(), style = 'deparse')
+
+    # the sdl sheet should have 2-year intervals and ewr_code
+    expect_snapshot_value(spatagg_t_th_s$sdl_units$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_th_s$sdl_units$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_th_s$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+})
+
+test_that("Temporal", {
+
+  skip_on_os('linux')
+
+  # This should thow warnings about theme if I don't have them in groupers, but not if I do
+
+  # This should not have a time column
+  spatagg_temp <- multi_aggregate(ewr_to_agg,
+                                   causal_edges = causal_ewr,
+                                   aggsequence = list(alltime = 'all_time'),
+                                   groupers = c("scenario", 'ewr_code', 'ewr_code_timing'),
+                                   aggCols = "ewr_achieved",
+                                   saveintermediate = TRUE,
+                                   funsequence = list("mean"),
+                                  auto_ewr_PU = TRUE
+  )
+
+  # This should
+  spatagg_years <- multi_aggregate(ewr_to_agg,
+                                  causal_edges = causal_ewr,
+                                  aggsequence = list(yrs = '2 years'),
+                                  groupers = c("scenario", 'ewr_code', 'ewr_code_timing'),
+                                  aggCols = "ewr_achieved",
+                                  saveintermediate = TRUE,
+                                  funsequence = list("mean"),
+                                  auto_ewr_PU = TRUE
+  )
+
+
+  # also allows checking that the planning unit grouping persists until it shouldn't and then gets dropped
+
+  aggseq <- list(
+    ewr_code = c("ewr_code_timing", "ewr_code"),
+    env_obj = c("ewr_code", "env_obj"),
+    sdl_units = sdl_units,
+    Specific_goal = c("env_obj", "Specific_goal"),
+    catchment = cewo_valleys,
+    Objective = c("Specific_goal", "Objective"),
+    mdb = basin,
+    target_5_year_2024 = c("Objective", "target_5_year_2024")
+  )
+
+  funseq <- list(
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean"
+  )
+
+  spatagg <- multi_aggregate(ewr_to_agg,
+                             aggsequence = aggseq,
+                             groupers = "scenario",
+                             aggCols = "ewr_achieved",
+                             funsequence = funseq,
+                             causal_edges = causal_ewr,
+                             saveintermediate = TRUE,
+                             auto_ewr_PU = TRUE
+  )
 })

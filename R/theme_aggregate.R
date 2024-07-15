@@ -60,6 +60,21 @@ theme_aggregate <- function(dat,
     }
   }
 
+  # check time- this should come in from outside, but check here too
+  timecols <- purrr::map_lgl(dat, \(x) lubridate::is.Date(x) | lubridate::is.POSIXt(x))
+  if (any(timecols)) {
+    timegroup <- names(dat)[which(timecols)]
+  } else {
+    timegroup <- NULL
+  }
+
+  # Force time-aggregation to be explicit
+  if (!is.null(timegroup) && !timegroup %in% groupers) {
+    rlang::abort(c(glue::glue("The time column {timegroup} is not included as a grouper for theme aggregation"),
+                   "Aggregation must explicitly specify dimensions"))
+  }
+
+
   # including geometry in non-geometric
   # aggregates takes forever, drop and re-pair if present
 
@@ -141,7 +156,7 @@ theme_aggregate <- function(dat,
   # join to causal_edges
 
   # A bit of a hacky check
-  extragroups <- groupers[!groupers %in% c('scenario', 'polyID')]
+  extragroups <- groupers[!groupers %in% c('scenario', 'polyID', timegroup)]
   if (any(!(extragroups %in% names(causal_edges)))) {
     rlang::warn(c("Causal network does not have all groupers.",
                   glue::glue("Joining {from_theme} to {to_theme}"),

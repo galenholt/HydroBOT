@@ -82,7 +82,7 @@
 #'
 #' @examples
 multi_aggregate <- function(dat,
-                            causal_edges,
+                            causal_edges = NULL,
                             groupers = "scenario",
                             group_until = rep(NA, length(groupers)),
                             aggCols,
@@ -191,6 +191,35 @@ multi_aggregate <- function(dat,
   # get the index for any pseudo-spatial joins and aggs
   pseudo_indices <- purrr::map_int(pseudo_spatial, \(x) parse_aggnum(x, aggsequence = aggsequence))
 
+
+  # Get the dimension we're moving across at each step
+  stepdim <- identify_dimension(aggsequence,
+                                causal_edges)
+
+  # There's no safe way to auto-catch theme-grouping if everything is spatial or temporal and there's no causal network passed in.
+  if (all(stepdim != 'theme')) {
+    causalnames <- purrr::map(causal_edges, names) |> unlist()
+    if (!any(groupers %in% causalnames)) {
+      rlang::warn(c("Theme grouping difficult to infer without theme steps.",
+                    "Groupers does not appear to contain theme names.",
+                    "Ensure theme grouping is in `groupers` if desired."))
+    }
+    themegroup <- NULL
+  } else {
+    # retain the first theme-level groupings
+    themegroup <- aggsequence[min(which(stepdim == 'theme'))][[1]][1]
+  }
+
+  # We should be able to auto-catch time.
+  timecols <- purrr::map_lgl(dat, \(x) lubridate::is.Date(x) | lubridate::is.POSIXt(x))
+  if (any(timecols)) {
+    timegroup <- names(dat)[which(timecols)]
+  } else {
+    timegroup <- NULL
+  }
+
+  # We do the spatial group-catch internally to the time and theme aggregation functions due to speed issues and stripping the geometry.
+
   # need to track the grouping when switch between theme and spatial- we want to
   # do theme groupings within the current spatial unit, and spatial groupings
   # within the current theme level. Spatial groups (geometry column) are kept
@@ -200,7 +229,7 @@ multi_aggregate <- function(dat,
   # the other spatial info is 1:1 with geometry in the to-polygons. The theme
   # col needs to be explictly grouped_by, since we want to keep the theme
   # groupings when we do spatial.
-  recenttheme <- NULL
+
   spatial_to_info <- NULL
 
   # Don't use a foreach even though it's tempting, since the loop is dependent-
@@ -228,7 +257,7 @@ multi_aggregate <- function(dat,
     thisgroup <- thisgroup[!thisgroup %in% dropgroups]
 
 
-    if (is.character(aggsequence[[i]])) {
+    if (stepdim[i] == 'theme') {
       # If the aggsequence isn't named, name it. This is less obviously doable
       # for sf. deal with that later. There three different ways unnamed lists
       # can end up here, and so need to deal with them all
@@ -244,7 +273,7 @@ multi_aggregate <- function(dat,
         dat = dat,
         from_theme = aggsequence[[i]][1],
         to_theme = aggsequence[[i]][2],
-        groupers = thisgroup,
+        groupers = c(thisgroup, timegroup),
         aggCols = thisagg, # Does not need the tidyselect::ends_with here because it happens in theme_aggregate
         funlist = funsequence[[i]],
         causal_edges = causal_edges,
@@ -253,13 +282,14 @@ multi_aggregate <- function(dat,
         auto_ewr_PU = auto_ewr_PU
       ) # Don't fail if no gauge col
 
-      # Track theme so we don't drop it during spatial
-      recenttheme <- aggsequence[[i]][2]
-    } else if ("sf" %in% class(aggsequence[[i]])) {
+      # Update theme grouping the current level so we don't drop it during spatial
+      themegroup <- aggsequence[[i]][2]
+
+    } else if (stepdim[i] == 'spatial') {
       dat <- spatial_aggregate(
         dat = dat,
         to_geo = aggsequence[[i]],
-        groupers = c(thisgroup, recenttheme),
+        groupers = c(thisgroup, themegroup, timegroup),
         aggCols = thisagg,
         funlist = funsequence[[i]],
         prefix = paste0(names(aggsequence)[i], "_"),
@@ -270,6 +300,28 @@ multi_aggregate <- function(dat,
       )
 
       spatial_to_info <- names(aggsequence[[i]])[names(aggsequence[[i]]) != "geometry"]
+
+    } else if (stepdim[i] == 'temporal') {
+      dat <- temporal_aggregate(
+        dat = dat,
+        breaks = aggsequence[[i]],
+        timecol = timegroup, # identified above
+        groupers = c(thisgroup, themegroup), # retain theme grouping, spatial is retained inside
+        aggCols = thisagg,
+        funlist = funsequence[[i]],
+        geonames = spatial_to_info,
+        # prefix = ,
+        failmissing = FALSE,
+        auto_ewr_PU = auto_ewr_PU
+      ) # Don't fail if no gauge col
+
+      # Update theme grouping the current level so we don't drop it during spatial, though it can get dropped here.
+      timecols <- purrr::map_lgl(dat, \(x) lubridate::is.Date(x) | lubridate::is.POSIXt(x))
+      if (any(timecols)) {
+        timegroup <- names(dat)[which(timecols)]
+      } else {
+        timegroup <- NULL
+      }
     }
 
 
