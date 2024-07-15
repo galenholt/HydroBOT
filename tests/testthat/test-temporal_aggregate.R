@@ -67,7 +67,7 @@ test_that("both above, sf", {
   expect_equal(nrow(agged_sf_t), 890)
   expect_equal(sum(is.na(agged_sf_t$date)), 89)
 
-  expect_snapshot_value(unique(agged$date), style = 'deparse')
+  expect_snapshot_value(unique(agged_sf_t$date), style = 'deparse')
 
 })
 

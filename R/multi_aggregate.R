@@ -100,15 +100,15 @@ multi_aggregate <- function(dat,
   }
 
   # start with the input data
-  # Name the starting data- best is to name it to match the first theme level,
-  # but otherwise it gets named as the incoming object
+  # Name the starting data 'input'
   if (saveintermediate) {
-    datlist <- list(dat)
-    if (is.character(aggsequence[[1]])) {
-      names(datlist) <- aggsequence[[1]][1]
-    } else {
-      names(datlist) <- deparse(substitute(dat))
-    }
+    datlist <- list(dat) |>
+      setNames('agg_input')
+    # if (is.character(aggsequence[[1]])) {
+    #   names(datlist) <- aggsequence[[1]][1]
+    # } else {
+    #   names(datlist) <- deparse(substitute(dat))
+    # }
   }
 
   # `get` from characters if needed

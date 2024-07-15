@@ -124,7 +124,7 @@ test_that("year_roll is rolling correctly", {
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
                                   'planning_unit_name', 'ewr_code',
                                   'ewr_code_timing', 'ewr_achieved'))
-  expect_equal(sum(is.na(assessed$ewr_achieved)), 828)
+  expect_equal(sum(is.na(assessed$ewr_achieved)), 882)
 })
 
 
@@ -173,5 +173,18 @@ test_that("making MAX scenario works", {
   assessed <- get_ewr_output(ewrpath)|>
     dplyr::filter(scenario == "MAX")
   expect_equal(nrow(assessed)> 0,TRUE)
+})
+
+test_that("roll_frequency rolls correctly", {
+  a <- c(0,1,1,0,1,1,1,1,0,0,1)
+ rolled <- roll_frequency(a, year_roll = 3)
+ an <- c(0,1,1,0,1,NA,1,1,0,0,1)
+ rolled_na <- roll_frequency(an, year_roll = 3)
+ rolled_nap <- roll_frequency(an, year_roll = 3, pad_initial = TRUE)
+ expect_snapshot_value(rolled, style = 'deparse')
+ expect_snapshot_value(rolled_na, style = 'deparse')
+ expect_snapshot_value(rolled_nap, style = 'deparse')
+
+
 })
 

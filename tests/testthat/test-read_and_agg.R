@@ -95,6 +95,220 @@ test_that("multi-step theme and spatial works", {
 })
 
 
+test_that("multi-step theme-spatial-time", {
+
+  # These mirror multi_aggregate, but make sure we're not introducing more issues here.
+  aggseq_s_th_t <- list(sdl_units = 'sdl_units',
+                 ewr_code = c('ewr_code_timing', 'ewr_code'),
+                 yrs = '2 years')
+
+  aggseq_s_t_th <- list(sdl_units = 'sdl_units',
+                        yrs = '2 years',
+                        ewr_code = c('ewr_code_timing', 'ewr_code'))
+
+  aggseq_th_s_t <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                        sdl_units = 'sdl_units',
+                        yrs = '2 years')
+
+  aggseq_th_t_s <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                        yrs = '2 years',
+                        sdl_units = 'sdl_units')
+
+  aggseq_t_s_th <- list(yrs = '2 years',
+                        sdl_units = 'sdl_units',
+                        ewr_code = c('ewr_code_timing', 'ewr_code'))
+
+  aggseq_t_th_s <- list(yrs = '2 years',
+                        ewr_code = c('ewr_code_timing', 'ewr_code'),
+                        sdl_units = 'sdl_units')
+
+
+
+  funseq <- list(
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean"
+    )
+
+  spatagg_s_th_t <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq_s_th_t,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    auto_ewr_PU = TRUE,
+    saveintermediate = TRUE
+  )
+
+  # the sdl sheet should have all the dates and code_timings
+  expect_snapshot_value(spatagg_s_th_t$sdl_units$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_s_th_t$sdl_units$ewr_code_timing |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_s_th_t$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+  # The ewr_code sheet should have ewr_codes, sdls, and all dates
+  expect_snapshot_value(spatagg_s_th_t$ewr_code$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_s_th_t$ewr_code$ewr_code |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_s_th_t$ewr_code$SWSDLID |> unique(), style = 'deparse')
+
+  # The yrs sheet should have ewr_codes, sdls, and two-year intervals
+  expect_snapshot_value(spatagg_s_th_t$yrs$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_s_th_t$yrs$ewr_code |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_s_th_t$yrs$SWSDLID |> unique(), style = 'deparse')
+
+  spatagg_s_t_th <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq_s_t_th,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    auto_ewr_PU = TRUE,
+    saveintermediate = TRUE
+  )
+
+  # the sdl sheet should have all the dates and code_timings
+  expect_snapshot_value(spatagg_s_t_th$sdl_units$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_s_t_th$sdl_units$ewr_code_timing |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_s_t_th$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+  # The yrs sheet should have code_timing, sdl, and two-year intervals
+  expect_snapshot_value(spatagg_s_t_th$yrs$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_s_t_th$yrs$ewr_code_timing |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_s_t_th$yrs$SWSDLID|> unique(), style = 'deparse')
+
+  # The ewr_code sheet should have ewr_codes, sdls, and 2-year
+  expect_snapshot_value(spatagg_s_t_th$ewr_code$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_s_t_th$ewr_code$ewr_code |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_s_t_th$ewr_code$SWSDLID |> unique(), style = 'deparse')
+
+  spatagg_th_s_t <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq_th_s_t,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    auto_ewr_PU = TRUE,
+    saveintermediate = TRUE
+  )
+
+  # The ewr_code sheet should have ewr_codes, planning units (not sdls), and all dates
+  expect_snapshot_value(spatagg_th_s_t$ewr_code$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_th_s_t$ewr_code$ewr_code |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_th_s_t$ewr_code$planning_unit_name |> unique(), style = 'deparse')
+
+  # the sdl sheet should have all times and ewr_codes
+  expect_snapshot_value(spatagg_th_s_t$sdl_units$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_th_s_t$sdl_units$ewr_code |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_th_s_t$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+  # The yrs sheet should have ewr_codes, sdls, and two-year intervals
+  expect_snapshot_value(spatagg_th_s_t$yrs$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_th_s_t$yrs$ewr_code |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_th_s_t$yrs$SWSDLID |> unique(), style = 'deparse')
+
+  spatagg_th_t_s <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq_th_t_s,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    auto_ewr_PU = TRUE,
+    saveintermediate = TRUE
+  )
+
+  # The ewr_code sheet should have ewr_codes, planning units (not sdls), and all dates
+  expect_snapshot_value(spatagg_th_t_s$ewr_code$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_th_t_s$ewr_code$ewr_code |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_th_t_s$ewr_code$planning_unit_name |> unique(), style = 'deparse')
+
+  # The yrs sheet should have ewr_codes, planning units, and two-year intervals
+  expect_snapshot_value(spatagg_th_t_s$yrs$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_th_t_s$yrs$ewr_code |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_th_t_s$yrs$planning_unit_name |> unique(), style = 'deparse')
+
+  # the sdl sheet should have 2-year intervals and ewr_codes
+  expect_snapshot_value(spatagg_th_t_s$sdl_units$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_th_t_s$sdl_units$ewr_code |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_th_t_s$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+
+  spatagg_t_s_th <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq_t_s_th,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    auto_ewr_PU = TRUE,
+    saveintermediate = TRUE
+  )
+
+  # The yrs sheet should have code_timing, planning units, and two-year intervals
+  expect_snapshot_value(spatagg_t_s_th$yrs$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_t_s_th$yrs$ewr_code_timing |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_t_s_th$yrs$planning_unit_name |> unique(), style = 'deparse')
+
+  # the sdl sheet should have 2-year intervals and code_timing
+  expect_snapshot_value(spatagg_t_s_th$sdl_units$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_t_s_th$sdl_units$ewr_code_timing |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_t_s_th$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+  # The ewr_code sheet should have ewr_codes, sdls, and 2-year
+  expect_snapshot_value(spatagg_t_s_th$ewr_code$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_t_s_th$ewr_code$ewr_code |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_t_s_th$ewr_code$SWSDLID |> unique(), style = 'deparse')
+
+
+  spatagg_t_th_s <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq_t_th_s,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    auto_ewr_PU = TRUE,
+    saveintermediate = TRUE
+  )
+
+  # The yrs sheet should have code_timing, planning units, and two-year intervals
+  expect_snapshot_value(spatagg_t_th_s$yrs$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_t_th_s$yrs$ewr_code_timing |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_t_th_s$yrs$planning_unit_name |> unique(), style = 'deparse')
+
+  # The ewr_code sheet should have ewr_codes, planning_untois, and 2-year
+  expect_snapshot_value(spatagg_t_th_s$ewr_code$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_t_th_s$ewr_code$ewr_code |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_t_th_s$ewr_code$planning_unit_name |> unique(), style = 'deparse')
+
+  # the sdl sheet should have 2-year intervals and ewr_code
+  expect_snapshot_value(spatagg_t_th_s$sdl_units$date |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_t_th_s$sdl_units$ewr_code |> unique(), style = 'deparse')
+  expect_snapshot_value(spatagg_t_th_s$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+})
+
+
 test_that("nonspatial joins of spatial data (as in multi_agg)", {
   # this is copied over from multi_aggregate testing, just making sure things pass correctly.
   aggseq <- list(

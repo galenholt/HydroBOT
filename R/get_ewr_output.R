@@ -368,7 +368,6 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 
 #' Helper to get the frequency of occurrence without clogging up the mutates
 #'
-#' if the user has RcppRoll installed, this will go a lot faster, but it's usually not an issue.
 #'
 #' @param x vector to calculate rolling frequencies for
 #' @param year_roll window size for the roll
@@ -384,9 +383,12 @@ roll_frequency <- function(x, year_roll, pad_initial = FALSE) {
     x <- c(rep(NA, year_roll), x)
   }
 
-  if (rlang::is_installed('RcppRoll')) {
-    sumvec <- RcppRoll::roll_sum(x, n = year_roll, align = 'right', fill = NA, na.rm = TRUE)
-  } else {
+  # RcppRoll *should* be faster (and is certainly cleaner), but in practice
+  # isn't much faster and rlang::is_installed is really slow, so better to not
+  # take the dependency
+  # if (rlang::is_installed('RcppRoll')) {
+  #   sumvec <- RcppRoll::roll_sum(x, n = year_roll, align = 'right', fill = NA, na.rm = TRUE)
+  #  } else {
     # get a list of the values at each lag, make it a matrix with cols shifte by one, and sum across
     lagmat <- purrr::map(1:(year_roll - 1), \(y) dplyr::lag(x, y)) |>
       purrr::list_c() |>
@@ -402,7 +404,7 @@ roll_frequency <- function(x, year_roll, pad_initial = FALSE) {
       sumvec[1:(year_roll-1)] <- NA
     }
 
-  }
+   # }
 
   freqvec <- (sumvec/year_roll)*100
 

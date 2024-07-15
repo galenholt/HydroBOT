@@ -1991,13 +1991,15 @@ test_that("Temporal", {
   # This should not have a time column
   spatagg_temp <- multi_aggregate(ewr_to_agg,
                                    causal_edges = causal_ewr,
-                                   aggsequence = list(alltime = 'all_time'),
+                                   aggsequence = list(all_time = 'all_time'),
                                    groupers = c("scenario", 'ewr_code', 'ewr_code_timing'),
                                    aggCols = "ewr_achieved",
                                    saveintermediate = TRUE,
                                    funsequence = list("mean"),
                                   auto_ewr_PU = TRUE
   )
+
+  expect_true(!any(purrr::map_lgl(spatagg_temp$all_time, is_time)))
 
   # This should
   spatagg_years <- multi_aggregate(ewr_to_agg,
@@ -2010,38 +2012,20 @@ test_that("Temporal", {
                                   auto_ewr_PU = TRUE
   )
 
+  expect_true(any(purrr::map_lgl(spatagg_years$yrs, is_time)))
 
-  # also allows checking that the planning unit grouping persists until it shouldn't and then gets dropped
-
-  aggseq <- list(
-    ewr_code = c("ewr_code_timing", "ewr_code"),
-    env_obj = c("ewr_code", "env_obj"),
-    sdl_units = sdl_units,
-    Specific_goal = c("env_obj", "Specific_goal"),
-    catchment = cewo_valleys,
-    Objective = c("Specific_goal", "Objective"),
-    mdb = basin,
-    target_5_year_2024 = c("Objective", "target_5_year_2024")
+  # and check we can feed arbitrary posix
+  spatagg_psx <- multi_aggregate(ewr_to_agg,
+                                   causal_edges = causal_ewr,
+                                   aggsequence = list(datebits = c(lubridate::ymd('20150101', '20180404', '20200202'))),
+                                   groupers = c("scenario", 'ewr_code', 'ewr_code_timing'),
+                                   aggCols = "ewr_achieved",
+                                   saveintermediate = TRUE,
+                                   funsequence = list("mean"),
+                                   auto_ewr_PU = TRUE
   )
 
-  funseq <- list(
-    "ArithmeticMean",
-    "ArithmeticMean",
-    "ArithmeticMean",
-    "ArithmeticMean",
-    "ArithmeticMean",
-    "ArithmeticMean",
-    "ArithmeticMean",
-    "ArithmeticMean"
-  )
+  expect_snapshot_value(spatagg_psx$datebits$date |> unique(), style = 'deparse')
 
-  spatagg <- multi_aggregate(ewr_to_agg,
-                             aggsequence = aggseq,
-                             groupers = "scenario",
-                             aggCols = "ewr_achieved",
-                             funsequence = funseq,
-                             causal_edges = causal_ewr,
-                             saveintermediate = TRUE,
-                             auto_ewr_PU = TRUE
-  )
+
 })
