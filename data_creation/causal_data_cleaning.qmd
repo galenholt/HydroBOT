@@ -89,6 +89,7 @@ Known file sources- the ewr definitions and the ltwp table.
 
 ```{r}
 # Get ewr defs from MDBA- This is a cached version, since WatReqID has gone
+# We may want to move to just using the ewr table for the timing to ewr step, with werptoolkitr::get_ewr_table(), 
 ewrs <- file.path(datarawdir, 'ewr_obj_codes_nsw/obj_codes_dec22.csv')
 ```
 

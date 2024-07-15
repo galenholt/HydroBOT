@@ -263,7 +263,9 @@ separate_ewr_codes <- function(df) {
 
   # put back on the df
   df$ewr_code <- ewrpart
-  df$ewr_code_timing <- extrapart
+  # The code_timing needs to actually be unique, i.e. _a shouldn't match to everything with an _a, but to the EWR code with _a.
+  df$ewr_code_timing <- paste0(ewrpart, '_', extrapart) |>
+    gsub('_$', '', x = _)
 
   return(df)
 }
