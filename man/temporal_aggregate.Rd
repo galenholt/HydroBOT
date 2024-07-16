@@ -6,7 +6,7 @@
 \usage{
 temporal_aggregate(
   dat,
-  breaks = "all",
+  breaks = "all_time",
   timecol = "infer",
   groupers,
   aggCols,
@@ -25,7 +25,7 @@ necessarily the same as \code{data} in \code{\link[=general_aggregate]{general_a
 makes necessary adjustments to the data before calling
 \code{\link[=general_aggregate]{general_aggregate()}}}
 
-\item{breaks}{breaks for the time groupings. default 'all' collapses over the whole period, otherwise as in \code{\link[base:cut.POSIXt]{base::cut.POSIXt()}} (takes the character options there, or time objects)}
+\item{breaks}{breaks for the time groupings. default 'all_time' collapses over the whole period, otherwise as in \code{\link[base:cut.POSIXt]{base::cut.POSIXt()}} (takes the character options there, or time objects)}
 
 \item{timecol}{name of the column with time in it. Default 'infer' infers which it is by looking for POSIXt or Date types.}
 

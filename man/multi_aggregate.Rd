@@ -6,7 +6,7 @@
 \usage{
 multi_aggregate(
   dat,
-  causal_edges,
+  causal_edges = NULL,
   groupers = "scenario",
   group_until = rep(NA, length(groupers)),
   aggCols,

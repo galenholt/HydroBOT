@@ -14,5 +14,5 @@ roll_frequency(x, year_roll, pad_initial = FALSE)
 \item{pad_initial}{Allow calculating values in the first years < year_roll; roll the year_roll if possible, otherwise as much as possible. Note that this makes the 1:year_roll entries less smoothed.}
 }
 \description{
-if the user has RcppRoll installed, this will go a lot faster, but it's usually not an issue.
+Helper to get the frequency of occurrence without clogging up the mutates
 }

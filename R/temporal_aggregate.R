@@ -153,6 +153,8 @@ temporal_aggregate <- function(dat,
     dat <- agged
   }
 
+  dat <- dplyr::ungroup(dat)
+
   return(dat)
 
 }
