@@ -310,7 +310,7 @@ multi_aggregate <- function(dat,
         aggCols = thisagg,
         funlist = funsequence[[i]],
         geonames = spatial_to_info,
-        # prefix = ,
+        prefix = paste0(names(aggsequence)[i], "_"),
         failmissing = FALSE,
         auto_ewr_PU = auto_ewr_PU
       ) # Don't fail if no gauge col

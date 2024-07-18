@@ -348,18 +348,23 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
       # dplyr::group_by(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing) |>
       dplyr::arrange(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing, year) |>
       dplyr::mutate(frequency_occurred = roll_frequency(event_years, year_roll),
+                    interevent_occurred = roll_interevent(event_years, year_roll),
                     .by = c(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing)) |>
       dplyr::mutate(ewr_achieved = ifelse(grepl("CF", ewr_code),
                                           frequency_occurred <= target_frequency,
                                           frequency_occurred >= target_frequency),
+                    interevent_achieved = ifelse(grepl("CF", ewr_code),
+                                                 interevent_occurred >= max_interevent,
+                                                 interevent_occurred <= max_interevent),
                     .by = c(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing))
 
   # change the logical to numeric to maintain generality with later functions
   annualdf$ewr_achieved <- as.numeric(annualdf$ewr_achieved)
+  annualdf$interevent_achieved <- as.numeric(annualdf$interevent_achieved)
 
   annualdf <- annualdf |>
     dplyr::select(scenario, year, date, gauge, planning_unit_name,
-                  ewr_code, ewr_code_timing, ewr_achieved)
+                  ewr_code, ewr_code_timing, event_years, ewr_achieved, interevent_achieved)
 
   return(annualdf)
 }
@@ -383,12 +388,15 @@ roll_frequency <- function(x, year_roll, pad_initial = FALSE) {
     x <- c(rep(NA, year_roll), x)
   }
 
-  # RcppRoll *should* be faster (and is certainly cleaner), but in practice
-  # isn't much faster and rlang::is_installed is really slow, so better to not
-  # take the dependency
-  # if (rlang::is_installed('RcppRoll')) {
-  #   sumvec <- RcppRoll::roll_sum(x, n = year_roll, align = 'right', fill = NA, na.rm = TRUE)
-  #  } else {
+  if (year_roll == 1) {
+    sumvec <- x
+  } else {
+    # RcppRoll *should* be faster (and is certainly cleaner), but in practice
+    # isn't much faster and rlang::is_installed is really slow, so better to not
+    # take the dependency
+    # if (rlang::is_installed('RcppRoll')) {
+    #   sumvec <- RcppRoll::roll_sum(x, n = year_roll, align = 'right', fill = NA, na.rm = TRUE)
+    #  } else {
     # get a list of the values at each lag, make it a matrix with cols shifte by one, and sum across
     lagmat <- purrr::map(1:(year_roll - 1), \(y) dplyr::lag(x, y)) |>
       purrr::list_c() |>
@@ -403,6 +411,8 @@ roll_frequency <- function(x, year_roll, pad_initial = FALSE) {
     if (!pad_initial) {
       sumvec[1:(year_roll-1)] <- NA
     }
+  }
+
 
    # }
 
@@ -414,6 +424,89 @@ roll_frequency <- function(x, year_roll, pad_initial = FALSE) {
   }
 
   return(freqvec)
+}
+
+
+#' Helper to get the rolling maximum interevent duration without clogging up the mutates
+#'
+#'
+#' @param x vector to calculate rolling interevents for
+#' @param year_roll window size for the roll
+#' @param pad_initial Allow calculating values in the first years < year_roll; roll the year_roll if possible, otherwise as much as possible. Note that this makes the 1:year_roll entries less smoothed.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+roll_interevent <- function(x, year_roll, pad_initial = FALSE) {
+  if (pad_initial) {
+    x <- c(rep(NA, year_roll), x)
+  }
+
+  if (year_roll == 1) {
+    inters <- x
+    inters[x == 0] <- 1
+    inters[x > 0] <- 0
+  } else {
+    # RcppRoll *should* be faster (and is certainly cleaner), but in practice
+    # isn't much faster and rlang::is_installed is really slow, so better to not
+    # take the dependency
+    # if (rlang::is_installed('RcppRoll')) {
+    #   sumvec <- RcppRoll::roll_sum(x, n = year_roll, align = 'right', fill = NA, na.rm = TRUE)
+    #  } else {
+    # get a list of the values at each lag, make it a matrix with cols shifted by one, and sum across
+    lagmat <- purrr::map(0:(year_roll - 1), \(y) dplyr::lag(x, y)) |>
+      purrr::list_c() |>
+      matrix(nrow = length(x))
+    # get the interevents for each row (target year)
+    inters <- apply(lagmat, MARGIN = 1, FUN = maxInterevent)
+    # NA but no 0 becomes -Inf, make NA instead
+    inters[is.infinite(inters)] <- NA
+
+    # If there are zeros at the beginning, we get results. If we want to only return results for windows with full data, remove
+    if (!pad_initial) {
+      inters[1:(year_roll-1)] <- NA
+    }
+  }
+
+  if (pad_initial) {
+    # cut off that pre-padding
+    inters <- inters[(year_roll+1):length(inters)]
+  }
+
+  return(inters)
+}
+
+#' Get maximum interevent duration of a vector
+#'
+#' Uses [base::rle()] to get the maximum length of 0s
+#'
+#' @param x numeric vector
+#'
+#' @return numeric scalar of the maximum run of 0s
+#' @export
+#'
+maxInterevent <- function(x) {
+
+  # Should be NA if all values are NA
+  if (all(is.na(x))) {
+    maxinter <- NA
+  } else if (any(is.na(x)) & all(x == 1, na.rm = TRUE)) {
+    # Should be NA if all values are 1 or NA (can't assess whether that NA was a 0 or 1)
+    maxinter <- NA
+  } else if (all(x == 1, na.rm = TRUE)) {
+    # If there were all passing, interevent is 0
+    maxinter <- 0
+  } else {
+    rlex <- rle(x)
+
+    # if (all(is.na(rlex$lengths[rlex$values == 0]))) {
+    #   a <- 1
+    # }
+    maxinter <- max(rlex$lengths[rlex$values == 0], na.rm = TRUE)
+  }
+
+  return(maxinter)
 }
 
 #' Add max scenario
