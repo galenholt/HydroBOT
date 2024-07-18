@@ -124,3 +124,16 @@ Sum <- function(x, na.rm = TRUE) {
   y <- sum(x, na.rm = na.rm)
   return(y)
 }
+
+#' Sum aggregation with na.rm = TRUE by default *except* that all-NA vectors still return NA, not 0.
+#'
+#' @param x
+#' @param na.rm
+#'
+#' @return
+#' @export
+#'
+#' @examples
+Max <- function(x, na.rm = TRUE) {
+  ifelse(all(is.na(x)), NA, max(x, na.rm = TRUE))
+}
