@@ -1,8 +1,17 @@
 ewr_to_agg <- make_test_ewr_prepped()
 
+# Sets up the earlier approach with time-means that most tests were built for
+ewr_to_agg_timemean <- temporal_aggregate(ewr_to_agg,
+                                          breaks = 'all_time',
+                                          groupers = c('scenario', 'gauge', 'planning_unit_name', 'ewr_code', 'ewr_code_timing', 'site'),
+                                          aggCols = 'ewr_achieved',
+                                          funlist = 'ArithmeticMean',
+                                          prefix = '') |>
+  dplyr::rename(ewr_achieved = ArithmeticMean_ewr_achieved)
+
 test_that("ewr-obj works, nongeom", {
   # no need to load the demo/test data since it's in /data
-  agged <- theme_aggregate(ewr_to_agg |> sf::st_drop_geometry(),
+  agged <- theme_aggregate(ewr_to_agg_timemean |> sf::st_drop_geometry(),
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
@@ -15,7 +24,7 @@ test_that("ewr-obj works, nongeom", {
 })
 
 test_that("auto-generating causal_edges works", {
-  agged <- theme_aggregate(ewr_to_agg |> sf::st_drop_geometry(),
+  agged <- theme_aggregate(ewr_to_agg_timemean |> sf::st_drop_geometry(),
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
@@ -28,7 +37,7 @@ test_that("auto-generating causal_edges works", {
 })
 
 test_that("spatial input data works", {
-  agged <- theme_aggregate(ewr_to_agg,
+  agged <- theme_aggregate(ewr_to_agg_timemean,
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
@@ -44,7 +53,7 @@ test_that("spatial input data works", {
   expect_s3_class(agged, 'sf')
 
   # Not usually how geonames will be used, but it does work as a test
-  agged <- theme_aggregate(ewr_to_agg,
+  agged <- theme_aggregate(ewr_to_agg_timemean,
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
@@ -62,7 +71,7 @@ test_that("spatial input data works", {
 })
 
 test_that("bare functions", {
-  agged <- theme_aggregate(ewr_to_agg,
+  agged <- theme_aggregate(ewr_to_agg_timemean,
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
@@ -77,7 +86,7 @@ test_that("bare functions", {
 })
 
 test_that("list functions", {
-  agged <- theme_aggregate(ewr_to_agg,
+  agged <- theme_aggregate(ewr_to_agg_timemean,
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
@@ -93,7 +102,7 @@ test_that("list functions", {
 
 test_that("multiple functions", {
   # Character
-  agged_c <- theme_aggregate(ewr_to_agg,
+  agged_c <- theme_aggregate(ewr_to_agg_timemean,
                            from_theme = 'ewr_code_timing',
                            to_theme = 'ewr_code',
                            groupers = c('scenario', 'gauge'),
@@ -109,7 +118,7 @@ test_that("multiple functions", {
   expect_s3_class(agged_c, 'data.frame')
 
   # bare
-  agged_b <- theme_aggregate(ewr_to_agg,
+  agged_b <- theme_aggregate(ewr_to_agg_timemean,
                              from_theme = 'ewr_code_timing',
                              to_theme = 'ewr_code',
                              groupers = c('scenario', 'gauge'),
@@ -125,7 +134,7 @@ test_that("multiple functions", {
   expect_s3_class(agged_b, 'data.frame')
 
   # List
-  agged_l <- theme_aggregate(ewr_to_agg,
+  agged_l <- theme_aggregate(ewr_to_agg_timemean,
                              from_theme = 'ewr_code_timing',
                              to_theme = 'ewr_code',
                              groupers = c('scenario', 'gauge'),
@@ -147,7 +156,7 @@ test_that("multiple functions", {
 # actually test across everything
 
 # test_that("tidyselect groupers and aggcols works", {
-#   agged <- theme_aggregate(ewr_to_agg,
+#   agged <- theme_aggregate(ewr_to_agg_timemean,
 #                            from_theme = 'ewr_code_timing',
 #                            to_theme = 'ewr_code',
 #                            groupers = tidyselect::any_of(c('scenario', 'gauge')),

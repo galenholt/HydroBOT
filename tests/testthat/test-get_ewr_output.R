@@ -104,7 +104,7 @@ test_that("assessment works", {
 
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
                                   'planning_unit_name', 'ewr_code',
-                                  'ewr_code_timing', 'ewr_achieved'))
+                                  'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
 })
 
 
@@ -113,7 +113,7 @@ test_that("making assessment tibble works", {
 
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
                                   'planning_unit_name', 'ewr_code',
-                                  'ewr_code_timing', 'ewr_achieved'))
+                                  'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
   expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
 })
 
@@ -123,7 +123,7 @@ test_that("year_roll is rolling correctly", {
 
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
                                   'planning_unit_name', 'ewr_code',
-                                  'ewr_code_timing', 'ewr_achieved'))
+                                  'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
   expect_equal(sum(is.na(assessed$ewr_achieved)), 882)
 })
 
@@ -134,7 +134,7 @@ test_that("passing in a list from memory works", {
   ewrprepped <- get_ewr_output(ewr_out, type = 'achievement')
   expect_equal(names(ewrprepped), c('scenario', 'year', 'date', 'gauge',
                                     'planning_unit_name', 'ewr_code',
-                                    'ewr_code_timing', 'ewr_achieved'))
+                                    'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
   expect_equal(sum(is.na(ewrprepped$planning_unit_name)), 0)
 })
 

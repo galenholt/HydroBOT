@@ -69,14 +69,14 @@ test_that("multi-step theme and spatial works", {
 
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
-    "scenario", "polyID", "target_5_year_2024",
+    "scenario", 'date', "polyID", "target_5_year_2024",
     "target_5_year_2024_ArithmeticMean_mdb_ArithmeticMean_Objective_ArithmeticMean_catchment_ArithmeticMean_Specific_goal_ArithmeticMean_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_ewr_achieved",
     "OBJECTID", "DDIV_NAME", "AREA_HA", "SHAPE_AREA", "SHAPE_LEN",
     "geometry"
   )
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, "sf")
-  expect_equal(nrow(spatagg), 300)
+  expect_equal(nrow(spatagg), 1425)
 
   # Plots are useful for checking spatial outcomes.
   # There are a million targets. Pick one
@@ -351,7 +351,7 @@ test_that("nonspatial joins of spatial data (as in multi_agg)", {
   )
 
   # stringr::str_flatten(names(spatagg), "', '")
-  expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
+  expect_equal(names(spatagg), c('agg_input', names(aggseq)))
   expect_s3_class(spatagg$planning_units, "sf")
 
   # Check the values are actually right
@@ -431,18 +431,19 @@ test_that("parsing geo and char work for aggsequence", {
 
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
-    "scenario", "polyID", "target_5_year_2024",
+    "scenario", "date", "polyID", "target_5_year_2024",
     "target_5_year_2024_ArithmeticMean_mdb_ArithmeticMean_Objective_ArithmeticMean_Specific_goal_ArithmeticMean_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_ewr_achieved",
     "OBJECTID", "DDIV_NAME", "AREA_HA", "SHAPE_AREA", "SHAPE_LEN",
     "geometry"
   )
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, "sf")
-  expect_equal(nrow(spatagg), 300)
+  expect_equal(nrow(spatagg), 1425)
 })
 
 test_that("parsing bare and char and rlang::quo for funsequence", {
   aggseq <- list(
+    all_time = 'all_time',
     ewr_code = c("ewr_code_timing", "ewr_code"),
     env_obj = c("ewr_code", "env_obj"),
     sdl_units = "sdl_units",
@@ -453,6 +454,7 @@ test_that("parsing bare and char and rlang::quo for funsequence", {
   )
 
   funseq <- list(
+    "ArithmeticMean",
     "ArithmeticMean",
     "ArithmeticMean",
     list(mean = ~ mean(., na.rm = TRUE)),
@@ -478,8 +480,8 @@ test_that("parsing bare and char and rlang::quo for funsequence", {
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
     "scenario", "polyID", "target_5_year_2024",
-    "target_5_year_2024_ArithmeticMean_mdb_wm_Objective_ArithmeticMean_Specific_goal_mean_sdl_units_mean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_ewr_achieved",
-    "target_5_year_2024_LimitingFactor_mdb_wm_Objective_ArithmeticMean_Specific_goal_mean_sdl_units_mean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_ewr_achieved",
+    "target_5_year_2024_ArithmeticMean_mdb_wm_Objective_ArithmeticMean_Specific_goal_mean_sdl_units_mean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_all_time_ArithmeticMean_ewr_achieved",
+    "target_5_year_2024_LimitingFactor_mdb_wm_Objective_ArithmeticMean_Specific_goal_mean_sdl_units_mean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_all_time_ArithmeticMean_ewr_achieved",
     "OBJECTID", "DDIV_NAME", "AREA_HA", "SHAPE_AREA", "SHAPE_LEN",
     "geometry"
   )
@@ -490,6 +492,7 @@ test_that("parsing bare and char and rlang::quo for funsequence", {
 
 test_that("Various group_until formats work", {
   aggseq <- list(
+    all_time = 'all_time',
     ewr_code = c("ewr_code_timing", "ewr_code"),
     env_obj = c("ewr_code", "env_obj"),
     sdl_units = sdl_units,
@@ -501,6 +504,7 @@ test_that("Various group_until formats work", {
   )
 
   funseq <- list(
+    "ArithmeticMean",
     "ArithmeticMean",
     "ArithmeticMean",
     "ArithmeticMean",
@@ -542,7 +546,7 @@ test_that("Various group_until formats work", {
   )
 
   yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
-  expect_equal(yamout$agg_group_until, list(planning_unit_name = 3))
+  expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))
   expect_equal(yamout$auto_ewr_PU, FALSE)
 
   # Vector- this relies on multi_aggregate to make it a list
@@ -561,7 +565,7 @@ test_that("Various group_until formats work", {
   )
 
   yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
-  expect_equal(yamout$agg_group_until, list(planning_unit_name = 3))
+  expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))
   expect_equal(yamout$auto_ewr_PU, FALSE)
 
   # function. As with funsequence and agg sequence, these don't actually have
@@ -582,7 +586,7 @@ test_that("Various group_until formats work", {
   )
 
   yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
-  expect_equal(yamout$agg_group_until, list(planning_unit_name = 3))
+  expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))
   expect_equal(yamout$auto_ewr_PU, FALSE)
 
   # List, and numeric. This is what would get read from params. (though that could have character too.)
@@ -593,7 +597,7 @@ test_that("Various group_until formats work", {
     geopath = bom_basin_gauges,
     causalpath = causal_ewr,
     groupers = c("scenario"),
-    group_until = list(planning_unit_name = 3),
+    group_until = list(planning_unit_name = 4),
     aggCols = "ewr_achieved",
     aggsequence = aggseq,
     funsequence = funseq,
@@ -602,6 +606,6 @@ test_that("Various group_until formats work", {
   )
 
   yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
-  expect_equal(yamout$agg_group_until, list(planning_unit_name = 3))
+  expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))
   expect_equal(yamout$auto_ewr_PU, FALSE)
 })
