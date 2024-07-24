@@ -320,7 +320,7 @@ nameclean <- function(charvec) {
 #'
 #' This is the pass/fail test of whether the criteria (frequency and timing) of EWRs are met or not
 #' Using the Minimum long term average (LTA) target frequencies (Termed Target frequency in summarydf) as suggested in the LTWPs
-#' Includes inverse result for cease to flows (CF) and two frequency checks for longterm data (greater than 20 years)
+#' Includes inverse result for cease to flows (CF) in both the assessment and the event_years themselves
 #'
 #' @param annualdf incoming tibble of EWRs after read-in
 #' @param year_roll specific number of years to check assessment for
@@ -340,6 +340,11 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
     relationship = "many-to-many"
   )
 
+  # FLIP EVENTS FOR CEASE-TO-FLOW
+  # This makes a 1 a good thing, like all the others.
+  annualdf <- annualdf |>
+    dplyr::mutate(event_years = ifelse(grepl('^CF', ewr_code), 1-event_years, event_years))
+
   # Frequency checks (ACHIEVEMENT test)
 
     # calculate number of event years, frequency, and EWR pass/fail at defined (year_roll) year rolling time frames.
@@ -350,12 +355,8 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
       dplyr::mutate(frequency_occurred = roll_frequency(event_years, year_roll),
                     interevent_occurred = roll_interevent(event_years, year_roll),
                     .by = c(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing)) |>
-      dplyr::mutate(ewr_achieved = ifelse(grepl("CF", ewr_code),
-                                          frequency_occurred <= target_frequency,
-                                          frequency_occurred >= target_frequency),
-                    interevent_achieved = ifelse(grepl("CF", ewr_code),
-                                                 interevent_occurred >= max_interevent,
-                                                 interevent_occurred <= max_interevent),
+      dplyr::mutate(ewr_achieved = frequency_occurred >= target_frequency,
+                    interevent_achieved = interevent_occurred <= max_interevent,
                     .by = c(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing))
 
   # change the logical to numeric to maintain generality with later functions
