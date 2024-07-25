@@ -124,7 +124,7 @@ test_that("year_roll is rolling correctly", {
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
                                   'planning_unit_name', 'ewr_code',
                                   'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
-  expect_equal(sum(is.na(assessed$ewr_achieved)), 882)
+  expect_equal(sum(is.na(assessed$ewr_achieved)), 1296)
 })
 
 
@@ -180,11 +180,18 @@ test_that("roll_frequency rolls correctly", {
  rolled <- roll_frequency(a, year_roll = 3)
  an <- c(0,1,1,0,1,NA,1,1,0,0,1)
  rolled_na <- roll_frequency(an, year_roll = 3)
+ rolled_narm <- roll_frequency(an, year_roll = 3, na.rm = TRUE)
  rolled_nap <- roll_frequency(an, year_roll = 3, pad_initial = TRUE)
+
+ ani <- c(NA,1,1,0,1,NA,1,1,0,0,1)
+ rolled_nai <- roll_frequency(ani, year_roll = 3)
+ rolled_nairm <- roll_frequency(ani, year_roll = 3, na.rm = TRUE)
+
  expect_snapshot_value(rolled, style = 'deparse')
  expect_snapshot_value(rolled_na, style = 'deparse')
  expect_snapshot_value(rolled_nap, style = 'deparse')
-
-
+ expect_snapshot_value(rolled_narm, style = 'deparse')
+ expect_snapshot_value(rolled_nai, style = 'deparse')
+ expect_snapshot_value(rolled_nairm, style = 'deparse')
 })
 

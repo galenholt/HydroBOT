@@ -342,8 +342,10 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 
   # FLIP EVENTS FOR CEASE-TO-FLOW
   # This makes a 1 a good thing, like all the others.
+  # we also have to flip the target frequency; e.g. previously had a target that said we needed to have less than 80% ceases, we now need to have more than 20% not-ceases
   annualdf <- annualdf |>
-    dplyr::mutate(event_years = ifelse(grepl('^CF', ewr_code), 1-event_years, event_years))
+    dplyr::mutate(event_years = ifelse(grepl('^CF', ewr_code), 1-event_years, event_years),
+                  target_frequency = ifelse(grepl('^CF', ewr_code), 100-target_frequency, target_frequency))
 
   # Frequency checks (ACHIEVEMENT test)
 
@@ -383,7 +385,7 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 #' @export
 #'
 #' @examples
-roll_frequency <- function(x, year_roll, pad_initial = FALSE) {
+roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = FALSE) {
 
   if (pad_initial) {
     x <- c(rep(NA, year_roll), x)
@@ -399,14 +401,25 @@ roll_frequency <- function(x, year_roll, pad_initial = FALSE) {
     #   sumvec <- RcppRoll::roll_sum(x, n = year_roll, align = 'right', fill = NA, na.rm = TRUE)
     #  } else {
     # get a list of the values at each lag, make it a matrix with cols shifte by one, and sum across
-    lagmat <- purrr::map(1:(year_roll - 1), \(y) dplyr::lag(x, y)) |>
+    lagmat <- purrr::map(0:(year_roll - 1), \(y) dplyr::lag(x, y)) |>
       purrr::list_c() |>
       matrix(nrow = length(x))
-    # we want na.rm = TRUE to deal with intermediate NA, but it has the side
-    # effect of giving 0 if everythign is NA, and we want to keep those NA.
-    bothna <- rowSums(is.na(lagmat))
-    sumvec <- rowSums(cbind(lagmat, x), na.rm = TRUE)
-    sumvec[bothna == ncol(lagmat)] <- NA
+    # we might want na.rm = TRUE to deal with intermediate NA and because we are
+    # checking whether a frequency is greater than a value, and so the sum with
+    # na.rm = TRUE gives us the *minimum* frequency for a sequence with NA,
+    # which may stil be greater than the threshold. But that can cause fails if
+    # the threshold is high, where we dont' really know and so values *should*
+    # be NA. And it has the side effect of giving 0 if everythign is NA, and we
+    # want to keep those NA.
+    if (na.rm) {
+      bothna <- rowSums(is.na(lagmat))
+      sumvec <- rowSums(lagmat, na.rm = TRUE)
+      sumvec[bothna == ncol(lagmat)] <- NA
+    }
+    if (!na.rm) {
+      sumvec <- rowSums(lagmat)
+    }
+
 
     # The way the rowsums works with na.rm = TRUE, we end up padding initial. Undo that if we don't want it
     if (!pad_initial) {
