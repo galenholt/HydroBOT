@@ -4,7 +4,7 @@
 \alias{roll_frequency}
 \title{Helper to get the frequency of occurrence without clogging up the mutates}
 \usage{
-roll_frequency(x, year_roll, pad_initial = FALSE)
+roll_frequency(x, year_roll, pad_initial = FALSE, na.rm = FALSE)
 }
 \arguments{
 \item{x}{vector to calculate rolling frequencies for}

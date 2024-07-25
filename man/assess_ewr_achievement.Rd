@@ -22,5 +22,5 @@ tibble reformatted and cleaned for ongoing analysis
 \description{
 This is the pass/fail test of whether the criteria (frequency and timing) of EWRs are met or not
 Using the Minimum long term average (LTA) target frequencies (Termed Target frequency in summarydf) as suggested in the LTWPs
-Includes inverse result for cease to flows (CF) and two frequency checks for longterm data (greater than 20 years)
+Includes inverse result for cease to flows (CF) in both the assessment and the event_years themselves
 }
