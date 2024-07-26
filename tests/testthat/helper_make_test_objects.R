@@ -54,7 +54,8 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
   # Respects planning units, as in an analysis, but often worse for simple tests.
   if (style == 'PU') {
     # Group_until and other sorts of agg tests are done separately in the relevant file tests
-    aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+    aggseq <- list(all_time = 'all_time',
+                   ewr_code = c('ewr_code_timing', 'ewr_code'),
                    planning_units = planning_units,
                    env_obj =  c('ewr_code', "env_obj"),
                    sdl_units = sdl_units,
@@ -64,7 +65,8 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
                    mdb = basin,
                    target_5_year_2024 = c('Objective', 'target_5_year_2024'))
 
-    funseq <- list('CompensatingFactor',
+    funseq <- list('ArithmeticMean',
+                   'CompensatingFactor',
                    'ArithmeticMean',
                    'ArithmeticMean',
                    'SpatialWeightedMean',
@@ -82,7 +84,8 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
   # This ignores planning units, which yields much better data for testing plots, even if it's not what we would do in an analysis.
   if (style == 'noPU') {
     # Group_until and other sorts of agg tests are done separately in the relevant file tests
-    aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+    aggseq <- list(all_time = 'all_time',
+                   ewr_code = c('ewr_code_timing', 'ewr_code'),
                    env_obj =  c('ewr_code', "env_obj"),
                    sdl_units = sdl_units,
                    Specific_goal = c('env_obj', "Specific_goal"),
@@ -91,7 +94,8 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
                    mdb = basin,
                    target_5_year_2024 = c('Objective', 'target_5_year_2024'))
 
-    funseq <- list('CompensatingFactor',
+    funseq <- list('ArithmeticMean',
+                   'CompensatingFactor',
                    'ArithmeticMean',
                    'ArithmeticMean',
                    "ArithmeticMean",
