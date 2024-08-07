@@ -5,7 +5,7 @@
 ## sensitive to this- I think maybe test shims don't work right?
 controller_functions <- reticulate::import_from_path("controller_functions",
   path = system.file("python",
-    package = "werptoolkitr"
+    package = "HydroBOT"
   ),
   delay_load = TRUE
 )

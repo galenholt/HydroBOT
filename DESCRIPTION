@@ -1,10 +1,10 @@
-Package: werptoolkitr
+Package: HydroBOT
 Title: Toolkit For Flow-Dependent Outcomes in MDB
-Version: 0.1.4.9028
+Version: 0.1.4.9030
 Authors@R: 
     person("Galen", "Holt", , "g.holt@deakin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7455-9275"))
-Description: What the package does (one paragraph).
+Description: Provides tools to assess responses to flows in the MDB. Wraps the EWR tool and provides ongoing modeling of ecological responses with causal networks, as well as analysis, synthesis and visualisation functionality targetted at scenario comparisons.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -60,7 +60,7 @@ LazyData: true
 Config/reticulate:
   list(
     packages = list(
-      list(package = "py-ewr", version = '2.1.6')
+      list(package = "py-ewr")
     )
   )
 VignetteBuilder: knitr

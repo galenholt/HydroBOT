@@ -7,7 +7,7 @@
 
 make_temp_hydro <- function(testdir = '_test_data',
                             temp_hydro_dir = 'hydrographs',
-                            orig_hydro_dir = system.file("extdata/testsmall/hydrographs", package = 'werptoolkitr')) {
+                            orig_hydro_dir = system.file("extdata/testsmall/hydrographs", package = 'HydroBOT')) {
 
 
   # This will throw a warning if the dir exists, which we want, since the test
@@ -24,7 +24,7 @@ make_temp_hydro <- function(testdir = '_test_data',
 
 make_temp_zip <- function(testdir = '_test_data',
                             temp_hydro_dir = 'hydrographs',
-                            orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = 'werptoolkitr')) {
+                            orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = 'HydroBOT')) {
 
 
   # This will throw a warning if the dir exists, which we want, since the test
@@ -56,7 +56,7 @@ set_future_multi <- function() {
 
 make_temp_multifile <- function(testdir = '_test_data',
                                 temp_hydro_dir = 'hydrographs',
-                                orig_hydro_dir = system.file("extdata/testsmall/hydrographs", package = 'werptoolkitr')) {
+                                orig_hydro_dir = system.file("extdata/testsmall/hydrographs", package = 'HydroBOT')) {
 
   full_hydro_path <- file.path(testdir, temp_hydro_dir)
   # Make the directories
@@ -98,7 +98,7 @@ make_temp_multifile <- function(testdir = '_test_data',
 # This avoids some goofy issues with working directory
 if (grepl("testthat", getwd())) {
   if (!dir.exists('yml')) {dir.create('yml')}
-  file.copy(list.files(system.file("yml", package = 'werptoolkitr'), full.names = TRUE),
+  file.copy(list.files(system.file("yml", package = 'HydroBOT'), full.names = TRUE),
             to = 'yml', overwrite = TRUE)
 }
 

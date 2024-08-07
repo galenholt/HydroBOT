@@ -24,12 +24,12 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 #| warning: false
 #| message: false
 
-# library(werptoolkitr) works when running interactively, but not when quarto
+# library(HydroBOT) works when running interactively, but not when quarto
 # rendering. Just use load_all for now.
 # Also have to turn off caching and delete _cache directories or it gets really
 # upset.
 devtools::load_all()
-# library(werptoolkitr)
+# library(HydroBOT)
 ```
 
 # Goal

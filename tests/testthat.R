@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/reference/test_package.html#special-files
 
 library(testthat)
-library(werptoolkitr)
+library(HydroBOT)
 
-test_check("werptoolkitr")
+test_check("HydroBOT")

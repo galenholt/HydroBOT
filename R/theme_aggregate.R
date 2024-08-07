@@ -177,7 +177,7 @@ theme_aggregate <- function(dat,
 
   if (nrow(napairs) > 0) {
 
-    nacount <- napairs |> dplyr::summarise(ntimes = dplyr::n(), .by = from_theme)
+    nacount <- napairs |> dplyr::summarise(ntimes = dplyr::n(), .by = any_of(from_theme))
 
     groupout <- if (ncol(napairs) > 1) {
       groupinform <- glue::glue("Groups with issues: {unique(napairs[2])}")

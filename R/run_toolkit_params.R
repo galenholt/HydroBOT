@@ -26,7 +26,7 @@
 run_toolkit_params <- function(yamlpath = NULL,
                                passed_args = NULL,
                                list_args = NULL,
-                               defaults = system.file("yml/default_params.yml", package = "werptoolkitr")) {
+                               defaults = system.file("yml/default_params.yml", package = "HydroBOT")) {
   # I could have a 'defaults' file and then a params that just changes some.
   # Maybe later. Might make a lot of sense if the only thing being passed in is
   # one value.

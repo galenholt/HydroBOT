@@ -1,5 +1,5 @@
 # Set up some base directory structures
-hydro_dir <- system.file("extdata/testsmall/hydrographs", package = 'werptoolkitr')
+hydro_dir <- system.file("extdata/testsmall/hydrographs", package = 'HydroBOT')
 
 
 # Tests -------------------------------------------------------------------
@@ -102,7 +102,7 @@ test_that("zip works", {
   # create dir so building makes sense
   make_temp_zip(
     temp_hydro_dir = "hydrographs",
-    orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "werptoolkitr")
+    orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "HydroBOT")
   )
 
   temp_hydro <- '_test_data/hydrographs'

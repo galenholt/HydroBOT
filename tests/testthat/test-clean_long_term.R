@@ -4,7 +4,7 @@
 
 test_that("clean_long_term as expected", {
   yrpath <- system.file('data-raw/causal_networks/unknown/EObjYrTargets.csv',
-                        package = 'werptoolkitr')
+                        package = 'HydroBOT')
 
   skip_if_no_file(yrpath)
 

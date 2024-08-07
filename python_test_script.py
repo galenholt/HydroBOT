@@ -70,8 +70,8 @@
 
 # csvs
 # Run make_temp_hydro() first
-scenarios = 'C:/Users/galen/Documents/code/WERP/WERP_toolkit/_test_data/hydrographs/base/412005.csv'
-op = 'C:/Users/galen/Documents/code/WERP/WERP_toolkit/_test_data/module_output/EWR'
+scenarios = 'C:/Users/galen/Documents/code/WERP/HydroBOT/_test_data/hydrographs/base/412005.csv'
+op = 'C:/Users/galen/Documents/code/WERP/HydroBOT/_test_data/module_output/EWR'
 sn = 'base_412005'
 # model_format = 'IQQM - netcdf'
 # model_format = 'Standard time-series'

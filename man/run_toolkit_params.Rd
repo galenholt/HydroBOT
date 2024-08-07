@@ -9,7 +9,7 @@ run_toolkit_params(
   yamlpath = NULL,
   passed_args = NULL,
   list_args = NULL,
-  defaults = system.file("yml/default_params.yml", package = "werptoolkitr")
+  defaults = system.file("yml/default_params.yml", package = "HydroBOT")
 )
 }
 \arguments{

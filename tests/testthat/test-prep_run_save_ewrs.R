@@ -428,7 +428,7 @@ test_that("NETCDF saving and returning works for all (or nearly all) ewr outputs
   # create dir so building makes sense
   make_temp_hydro(
     temp_hydro_dir = "nchydros",
-    orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = "werptoolkitr")
+    orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = "HydroBOT")
   )
 
   # all working as of 2.1.0
@@ -465,7 +465,7 @@ test_that("zipped NETCDF saving and returning works for all (or nearly all) ewr 
   # create dir so building makes sense
   make_temp_zip(
     temp_hydro_dir = "hydrographs",
-    orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "werptoolkitr")
+    orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "HydroBOT")
   )
 
   # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
@@ -508,7 +508,7 @@ test_that("NETCDF saving and returning works in parallel", {
   # create dir so building makes sense
   make_temp_hydro(
     temp_hydro_dir = "nchydros",
-    orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = "werptoolkitr")
+    orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = "HydroBOT")
   )
 
   # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.

@@ -21,12 +21,12 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```{r}
 library(dplyr)
 
-# library(werptoolkitr) works when running interactively, but not when quarto
+# library(HydroBOT) works when running interactively, but not when quarto
 # rendering. Just use load_all for now.
 # Also have to turn off caching and delete _cache directories or it gets really
 # upset.
 devtools::load_all()
-# library(werptoolkitr)
+# library(HydroBOT)
 ```
 
 ## TO REBUILD
@@ -89,7 +89,7 @@ Known file sources- the ewr definitions and the ltwp table.
 
 ```{r}
 # Get ewr defs from MDBA- This is a cached version, since WatReqID has gone
-# We may want to move to just using the ewr table for the timing to ewr step, with werptoolkitr::get_ewr_table(), 
+# We may want to move to just using the ewr table for the timing to ewr step, with HydroBOT::get_ewr_table(), 
 ewrs <- file.path(datarawdir, 'ewr_obj_codes_nsw/obj_codes_dec22.csv')
 ```
 

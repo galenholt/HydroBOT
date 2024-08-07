@@ -26,17 +26,17 @@ library(sf)
 library(reticulate) # Not strictly necessary but allows easier referencing of objects
 library(hydrogauge)
 library(dplyr)
-# library(werptoolkitr) works when running interactively, but not when quarto
+# library(HydroBOT) works when running interactively, but not when quarto
 # rendering. Just use load_all for now.
 # Also have to turn off caching and delete _cache directories or it gets really
 # upset.
 devtools::load_all()
-# library(werptoolkitr)
+# library(HydroBOT)
 ```
 
 ## TO REBUILD
 
-Rebuilding data is done with params. To rebuild, at the terminal in WERP_toolkit run `quarto render data_creation/scenario_creation.qmd -P REBUILD_DATA:TRUE`. or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
+Rebuilding data is done with params. To rebuild, at the terminal in HydroBOT run `quarto render data_creation/scenario_creation.qmd -P REBUILD_DATA:TRUE`. or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
 
 ## Dev note
 
@@ -203,7 +203,7 @@ endtime = lubridate::ymd(20191231)
 How many are actually in the EWR tool?
 
 ```{r, echo = F}
-ewrgauges <- werptoolkitr::get_ewr_gauges()
+ewrgauges <- HydroBOT::get_ewr_gauges()
 ```
 
 What are those gauges, and which are in both the ewr and the desired catchments?
@@ -250,7 +250,7 @@ scale_fill_brewer(type = 'qual', palette = 8))
 For now, the test scenarios are just multiplying by 4 or 0.25 to give something to work with. This section could easily be modified for other simple scenarios.
 
 ```{r}
-# for larger runs in ~/WERP_toolkit/inst/extdata/testscenarios
+# for larger runs in ~/HydroBOT/inst/extdata/testscenarios
 base <- demo_levs
 down4 <- demo_levs
 up4 <- demo_levs
@@ -266,7 +266,7 @@ I also want a very limited set of test data that runs faster through the EWR too
 Which gauges?
 
 ```{r}
-# for smaller runs in ~/WERP_toolkit/inst/extdata/testsmall
+# for smaller runs in ~/HydroBOT/inst/extdata/testsmall
 
 # get gauges for smaller set
 

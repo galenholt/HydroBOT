@@ -2,11 +2,11 @@
 # really just consistency checks for the building of the causal networks, which
 # happens during the dev process and isn't part of the package per se
 
-ewrpath <- system.file('data-raw/causal_networks/ewr_obj_codes_nsw/obj_codes_dec22.csv', package = 'werptoolkitr')
-tarpath <- system.file('data-raw/causal_networks/unknown/Env_objectives_Target_species_nodes.csv', package = 'werptoolkitr')
+ewrpath <- system.file('data-raw/causal_networks/ewr_obj_codes_nsw/obj_codes_dec22.csv', package = 'HydroBOT')
+tarpath <- system.file('data-raw/causal_networks/unknown/Env_objectives_Target_species_nodes.csv', package = 'HydroBOT')
 
-qcs <- c(system.file('data-raw/causal_networks/unknown/Target_species_per_PU_Murray.csv', package = 'werptoolkitr'),
-         system.file('data-raw/causal_networks/unknown/PUs.csv', package = 'werptoolkitr'))
+qcs <- c(system.file('data-raw/causal_networks/unknown/Target_species_per_PU_Murray.csv', package = 'HydroBOT'),
+         system.file('data-raw/causal_networks/unknown/PUs.csv', package = 'HydroBOT'))
 
 
 test_that("produces desired format for obj-target", {

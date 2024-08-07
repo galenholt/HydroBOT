@@ -13,10 +13,10 @@ knitr::opts_chunk$set(
 )
 ```
 
-# werptoolkitr
+# HydroBOT
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/MDBAuth/WERP_toolkit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MDBAuth/WERP_toolkit/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/MDBAuth/HydroBOT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MDBAuth/HydroBOT/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 This R package forms the core of the WERP climate adaptation toolkit, ingesting hydrological scenarios representing historical or future climates or adaptation options, and processing those through various response models (currently [MDBA EWR tool](https://github.com/MDBAuth/EWR_tool), with intention to include other tools in future). Subsequent processing of outcomes along spatial, theme, and temporal axes are available or under development, as well as control over outputs and comparisons between scenarios. Causal networks defining relationships in the response models are included.
@@ -25,11 +25,11 @@ The [template repo](https://github.com/MDBAuth/toolkit_use) can be helpful for e
 
 ## Installation
 
-Install the development version of werptoolkitr from [GitHub](https://github.com/MDBAuth/WERP_toolkit) with 
+Install the development version of HydroBOT from [GitHub](https://github.com/MDBAuth/HydroBOT) with 
 
 ``` r
 # install.packages("devtools")
-devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask', git = 'external')
+devtools::install_git("git@github.com:MDBAuth/HydroBOT.git", ref = 'master', force = TRUE, upgrade = 'ask', git = 'external')
 ```
 
 R uses a different Home directory than standard (typically `~/Documents`), and so if this fails, try to [set up SSH keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) in that location as well.

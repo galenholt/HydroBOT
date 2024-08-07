@@ -1226,7 +1226,7 @@ test_that("facet addition works", {
 })
 
 test_that("hydrographs", {
-  hydro_to_plot <- read_hydro(hydropath = system.file("extdata/testsmall/hydrographs", package = "werptoolkitr"))
+  hydro_to_plot <- read_hydro(hydropath = system.file("extdata/testsmall/hydrographs", package = "HydroBOT"))
 
   hydro_to_plot <- hydro_to_plot |>
     dplyr::mutate(scenario = dplyr::case_when(grepl('down', scenario) ~ 'down4',
@@ -1260,7 +1260,7 @@ test_that("hydrographs", {
   vdiffr::expect_doppelganger("hydroplot", hydplot)
 
   # basic plot, ncdf, swap color and facetting
-  hydcdf <- read_hydro(hydropath = system.file("extdata/ncdfexample/nchydros", package = "werptoolkitr"), format = "nc", gaugemap = "iqqm")
+  hydcdf <- read_hydro(hydropath = system.file("extdata/ncdfexample/nchydros", package = "HydroBOT"), format = "nc", gaugemap = "iqqm")
 
   hydplot_nc <- plot_outcomes(hydcdf,
     outcome_col = "flow",
