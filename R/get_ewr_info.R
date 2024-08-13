@@ -38,7 +38,8 @@ get_ewr_table <- function(type = 'good') {
 }
 
 get_raw_ewrsheet <- function() {
-  rawsheet <- readr::read_csv('.venv/Lib/site-packages/py_ewr/parameter_metadata/parameter_sheet.csv')
+  # There's lots of blanks that get guessed as logical unless we let it see the whole thing.
+  rawsheet <- readr::read_csv('.venv/Lib/site-packages/py_ewr/parameter_metadata/parameter_sheet.csv', guess_max = 5000)
 }
 
 #' Check the ewr version.

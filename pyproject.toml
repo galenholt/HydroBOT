@@ -9,7 +9,7 @@ packages = [{include = "HydroBOT"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-py-ewr = {git = "https://github.com/MDBAuth/EWR_tool.git", rev = "GalenH"}
+py-ewr = "^2.2.3"
 
 [build-system]
 requires = ["poetry-core"]

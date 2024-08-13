@@ -24,7 +24,7 @@ clean_obj_target <- function(ewrobjs,
 
   # This cuts to only a single row per planning unit/objective pair and drops the ewrs
   objpu <- ewrobjs |>
-    dplyr::select(tidyselect::any_of(c('PlanningUnitID', 'planning_unit_name', 'LTWPShortName')), env_obj) |>
+    dplyr::select(tidyselect::any_of(c('PlanningUnitID', 'planning_unit_name', 'LTWPShortName', 'state')), env_obj) |>
     dplyr::distinct()
 
   # This csv has the relationships from objectives to a few other things- target groups, species and other things like refugia, 'Objectives'
@@ -42,11 +42,12 @@ clean_obj_target <- function(ewrobjs,
   targets <- targets |>
     dplyr::mutate(Objective = stringr::str_remove_all(Objective, '\'')) |>
     dplyr::rename(env_obj = Env_obj) |>
-    dplyr::select(-NodeType)
+    dplyr::select(-NodeType) |>
+    dplyr::mutate(state = 'NSW')
 
 
   # Expands the objective to target mapping to all relevant planning units
-  obj2target <- dplyr::full_join(objpu, targets,  by = "env_obj", relationship = "many-to-many")
+  obj2target <- dplyr::full_join(objpu, targets,  by = c("env_obj", 'state'), relationship = "many-to-many")
 
   # adjust for manual QC from Renee This is separate because it's not ideal way
   # to do the QC adjustment.
@@ -91,7 +92,7 @@ clean_obj_target <- function(ewrobjs,
   # cleanup column ordering
   obj2target <- obj2target |>
     dplyr::select(any_of(c('PlanningUnitID', 'planning_unit_name')),
-                  LTWPShortName, env_obj, Specific_goal, Objective, Target)
+                  LTWPShortName, env_obj, Specific_goal, Objective, Target, state)
 
   # final cleanup of weird characters and dplyr::rename to standard
   suppressWarnings(obj2target <- obj2target |>
@@ -103,6 +104,15 @@ clean_obj_target <- function(ewrobjs,
   obj2target <- obj2target |>
     dplyr::filter(!is.na(env_obj)) |>
     dplyr::distinct()
+
+  # infer the ones that aren't there.
+  obj2target <- obj2target |>
+    dplyr::mutate(Target = case_when(is.na(Target) & grepl('^NF', env_obj) ~ "Native fish",
+                                     is.na(Target) & grepl('^NV', env_obj) ~ "Native vegetation",
+                                     is.na(Target) & grepl('^OS', env_obj) ~ "Other species",
+                                     is.na(Target) & grepl('^EF', env_obj) ~ "Priority ecosystem function",
+                                     is.na(Target) & grepl('^WB', env_obj) ~ "Waterbird",
+                                     .default = Target))
 
 
   # save

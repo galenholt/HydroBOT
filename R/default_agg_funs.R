@@ -14,7 +14,7 @@
 #'
 #' @examples
 CompensatingFactor <- function(x, na.rm = TRUE) {
-  y <- max(x, na.rm = na.rm)
+  y <- Max(x, na.rm = na.rm)
   return(y)
 }
 
@@ -29,7 +29,7 @@ CompensatingFactor <- function(x, na.rm = TRUE) {
 #'
 #' @examples
 LimitingFactor <- function(x, na.rm = TRUE) {
-  y <- min(x, na.rm = na.rm)
+  y <- Min(x, na.rm = na.rm)
   return(y)
 }
 

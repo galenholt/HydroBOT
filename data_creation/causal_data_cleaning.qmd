@@ -87,10 +87,12 @@ Known file sources- the ewr definitions and the ltwp table.
 
 **UPDATE** Changed to the NSW mapping from Lara.
 
+**UPDATE 12/8/24** Changed to the embedded links in the EWR table.
+
 ```{r}
 # Get ewr defs from MDBA- This is a cached version, since WatReqID has gone
 # We may want to move to just using the ewr table for the timing to ewr step, with HydroBOT::get_ewr_table(), 
-ewrs <- file.path(datarawdir, 'ewr_obj_codes_nsw/obj_codes_dec22.csv')
+ewrs <- 'ewrtool'
 ```
 
 Unknown file sources- these give nearly all links above environmental objectives (Theme group, Species, yearly targets). Some incorporate manual QC by Renee, but it's still not clear where the originals came from either sometimes.
@@ -146,6 +148,32 @@ yrtarget <- clean_long_term(timepath,
                                savename = "obj_to_yrtarget_")
 ```
 
+The mapping for states other than NSW is in train but not yet completed. We want to be able to use what we have though, so we'll create another set of mappings that are cruder but basin-wide. This won't supersede those above (at least for now), but instead will be provided alongside.
+
+```{r}
+
+# we should not do this unless we don't have the objective-target mapping. It's crude and misses that step.
+objective_mapping <- get_raw_ewrsheet() |>
+  cleanewrs() |>
+  dplyr::select(planning_unit_name, gauge, ewr_code, ewr_code_timing,
+                eco_objective_code, high_level, state,
+                LTWPShortName = l_t_w_p_short_name)
+
+
+ewr2target <- objective_mapping |> 
+  dplyr::select(-eco_objective_code) |> 
+  dplyr::mutate(Target = strsplit(high_level, split = '_')) |> 
+  tidyr::unnest_longer(col = Target) |> 
+  dplyr::select(-high_level) |> 
+  dplyr::mutate(Target = case_when(grepl('^NF', Target) ~ "Native fish",
+                                   grepl('^NV', Target) ~ "Native vegetation",
+                                   grepl('^OS', Target) ~ "Other species",
+                                   grepl('^EF', Target) ~ "Priority ecosystem function",
+                                   grepl('^WB', Target) ~ "Waterbird",
+                                   .default = NA))
+
+```
+
 Looking forward to having more than just the EWRs, it's likely we'll want to be able to have each set of causal relationships packaged up into a single file, likely as a list. `saveRDS` allows reading in with a different name.
 
 In analysis code, we should use saveRDS, but in the package the standard is rda with object of canonical name.
@@ -153,8 +181,14 @@ In analysis code, we should use saveRDS, but in the package the standard is rda 
 ```{r}
 causal_ewr <- list(ewr2obj = ewr2obj, obj2target = obj2target, obj2yrtarget = yrtarget)
 
+# and a simplified version that's basin-scale. The yrtargets aren't as specific as they should be here.
+causal_ewr_simple <- list(ewr2target = ewr2target, target2yrtarget = yrtarget |> 
+                            dplyr::select(-env_obj))
+
 if (params$REBUILD_DATA) {
   usethis::use_data(causal_ewr, overwrite = TRUE)
+    usethis::use_data(causal_ewr_simple, overwrite = TRUE)
+
   # saveRDS(causal_ewr,
   #    file = file.path(datout, 'causal_ewr.rds'))
 }
