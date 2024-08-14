@@ -2,7 +2,7 @@
 % Please edit documentation in R/default_agg_funs.R
 \name{Max}
 \alias{Max}
-\title{Sum aggregation with na.rm = TRUE by default \emph{except} that all-NA vectors still return NA, not 0.}
+\title{Max aggregation with na.rm = TRUE by default \emph{except} that all-NA vectors still return NA, not 0.}
 \usage{
 Max(x, na.rm = TRUE)
 }
@@ -10,5 +10,5 @@ Max(x, na.rm = TRUE)
 \item{na.rm}{}
 }
 \description{
-Sum aggregation with na.rm = TRUE by default \emph{except} that all-NA vectors still return NA, not 0.
+Max aggregation with na.rm = TRUE by default \emph{except} that all-NA vectors still return NA, not 0.
 }

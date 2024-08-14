@@ -1,6 +1,6 @@
 Package: HydroBOT
 Title: Toolkit For Flow-Dependent Outcomes in MDB
-Version: 0.1.4.9033
+Version: 0.1.4.9034
 Authors@R: 
     person("Galen", "Holt", , "g.holt@deakin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7455-9275"))
@@ -8,7 +8,7 @@ Description: Provides tools to assess responses to flows in the MDB. Wraps the E
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Imports: 
     DiagrammeR,
     dplyr,
@@ -25,7 +25,6 @@ Imports:
     reticulate,
     rlang,
     scales,
-    sf,
     stringi,
     stringr,
     tibble,
@@ -55,7 +54,8 @@ Suggests:
     ncdf4
 Config/testthat/edition: 3
 Depends: 
-    R (>= 2.10)
+    R (>= 2.10),
+    sf
 LazyData: true
 Config/reticulate:
   list(

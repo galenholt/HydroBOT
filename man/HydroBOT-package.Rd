@@ -6,7 +6,7 @@
 \alias{HydroBOT-package}
 \title{HydroBOT: Toolkit For Flow-Dependent Outcomes in MDB}
 \description{
-What the package does (one paragraph).
+Provides tools to assess responses to flows in the MDB. Wraps the EWR tool and provides ongoing modeling of ecological responses with causal networks, as well as analysis, synthesis and visualisation functionality targetted at scenario comparisons.
 }
 \author{
 \strong{Maintainer}: Galen Holt \email{g.holt@deakin.edu.au} (\href{https://orcid.org/0000-0002-7455-9275}{ORCID})
