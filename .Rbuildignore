@@ -4,6 +4,7 @@
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^.venv/
+^.git/
 data-raw/
 data_creation/
 .*quarto.*

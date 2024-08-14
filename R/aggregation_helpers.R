@@ -243,6 +243,8 @@ parse_aggnum <- function(x, aggsequence) {
 #' @inheritParams multi_aggregate
 #'
 #' @return character vector with 'spatial', 'theme' or 'temporal' for each step in aggsequence
+#' @export
+#'
 identify_dimension <- function(aggsequence, causal_edges) {
 
   if (inherits(causal_edges, 'data.frame')) {
