@@ -23,8 +23,9 @@ node_plot_atts <- function(nodedf) {
            # Name = stringr::str_wrap(Name, 40),
            fontsize = 25,
            # width = 5, #stringr::str_length(Name)/2,
+           # 1/5 is *approximately* one letter size
            width = ifelse(stringr::str_length(Name) < 40,
-                          stringr::str_length(Name)/5,
+                          stringr::str_length(Name)/5 + 0.4,
                           40/5),
            # x = nodeorder * 15,
            height = (stringr::str_count(Name, '\\n') + 1)/2)

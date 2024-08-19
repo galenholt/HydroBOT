@@ -88,7 +88,7 @@ test_that("networks work", {
                                      node_pal = list(value = 'scico::tokyo'),
                                      node_colorset = 'ewr_achieved',
                                      render = FALSE)
-  # DiagrammeR::render_graph(aggNetworkdown)
+  DiagrammeR::render_graph(aggNetworkdown)
 
   vdiffr::expect_doppelganger("aggNetworkdown", aggNetworkdown, writer = svgnetwriter)
 })
