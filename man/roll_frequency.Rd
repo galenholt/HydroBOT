@@ -4,7 +4,7 @@
 \alias{roll_frequency}
 \title{Helper to get the frequency of occurrence without clogging up the mutates}
 \usage{
-roll_frequency(x, year_roll, pad_initial = FALSE, na.rm = FALSE)
+roll_frequency(x, year_roll, pad_initial = FALSE, na.rm = TRUE)
 }
 \arguments{
 \item{x}{vector to calculate rolling frequencies for}
@@ -12,6 +12,8 @@ roll_frequency(x, year_roll, pad_initial = FALSE, na.rm = FALSE)
 \item{year_roll}{window size for the roll}
 
 \item{pad_initial}{Allow calculating values in the first years < year_roll; roll the year_roll if possible, otherwise as much as possible. Note that this makes the 1:year_roll entries less smoothed.}
+
+\item{na.rm}{default TRUE, na action for the sums over lags}
 }
 \description{
 Helper to get the frequency of occurrence without clogging up the mutates

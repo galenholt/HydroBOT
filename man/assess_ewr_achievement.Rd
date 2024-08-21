@@ -13,8 +13,6 @@ assess_ewr_achievement(
 \item{annualdf}{incoming tibble of EWRs after read-in}
 
 \item{year_roll}{specific number of years to check assessment for}
-
-\item{summarydf}{incoming tibble of  EWRs after read-in - contains the Target Frequency column}
 }
 \value{
 tibble reformatted and cleaned for ongoing analysis

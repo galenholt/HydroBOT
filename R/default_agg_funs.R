@@ -125,8 +125,7 @@ Sum <- function(x, na.rm = TRUE) {
 
 #' Max aggregation with na.rm = TRUE by default *except* that all-NA vectors still return NA, not 0.
 #'
-#' @param x
-#' @param na.rm
+#' @inheritParams CompensatingFactor
 #'
 #' @return
 #' @export
@@ -138,8 +137,7 @@ Max <- function(x, na.rm = TRUE) {
 
 #' Min aggregation with na.rm = TRUE by default *except* that all-NA vectors still return NA, not 0.
 #'
-#' @param x
-#' @param na.rm
+#' @inheritParams CompensatingFactor
 #'
 #' @return
 #' @export

@@ -174,7 +174,7 @@ cleanewrs <- function(ewrdf) {
 
 #' Additional cleanup specific to yearly EWR outputs.
 #'
-#' @param annualdf the result of [get_any_ewr_ewr_output()] with `type = 'yearly'`
+#' @param annualdf the result of [get_any_ewr_output()] with `type = 'yearly'`
 #'
 #' @return
 #' @export
@@ -324,7 +324,6 @@ nameclean <- function(charvec) {
 #'
 #' @param annualdf incoming tibble of EWRs after read-in
 #' @param year_roll specific number of years to check assessment for
-#' @param summarydf incoming tibble of  EWRs after read-in - contains the Target Frequency column
 #'
 #' @return tibble reformatted and cleaned for ongoing analysis
 #' @export
@@ -380,12 +379,12 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 #' @param x vector to calculate rolling frequencies for
 #' @param year_roll window size for the roll
 #' @param pad_initial Allow calculating values in the first years < year_roll; roll the year_roll if possible, otherwise as much as possible. Note that this makes the 1:year_roll entries less smoothed.
-#'
+#' @param na.rm default TRUE, na action for the sums over lags
 #' @return
 #' @export
 #'
 #' @examples
-roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = FALSE) {
+roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = TRUE) {
 
   if (pad_initial) {
     x <- c(rep(NA, year_roll), x)
@@ -413,7 +412,7 @@ roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = FALSE) {
     # want to keep those NA.
     if (na.rm) {
       bothna <- rowSums(is.na(lagmat))
-      sumvec <- rowSums(lagmat, na.rm = TRUE)
+      sumvec <- rowSums(lagmat, na.rm = na.rm)
       sumvec[bothna == ncol(lagmat)] <- NA
     }
     if (!na.rm) {
