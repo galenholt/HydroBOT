@@ -1,9 +1,10 @@
 ^renv$
 ^renv\.lock$
-^werptoolkitr\.Rproj$
+^HydroBOT\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^.venv/
+^.git/
 data-raw/
 data_creation/
 .*quarto.*
@@ -16,7 +17,7 @@ _quarto_output/
 ^\.github$
 ^LICENSE\.md$
 .luarc.json
-WERP_toolkit.qmd
+HydroBOT.qmd
 _environment
 developer.md
 ^doc$

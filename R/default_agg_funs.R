@@ -14,7 +14,7 @@
 #'
 #' @examples
 CompensatingFactor <- function(x, na.rm = TRUE) {
-  y <- max(x, na.rm = na.rm)
+  y <- Max(x, na.rm = na.rm)
   return(y)
 }
 
@@ -29,7 +29,7 @@ CompensatingFactor <- function(x, na.rm = TRUE) {
 #'
 #' @examples
 LimitingFactor <- function(x, na.rm = TRUE) {
-  y <- min(x, na.rm = na.rm)
+  y <- Min(x, na.rm = na.rm)
   return(y)
 }
 
@@ -106,8 +106,7 @@ NumberOfValues <- function(x, na.rm = TRUE) {
 #'
 #' @examples
 Variance <- function(x, na.rm = TRUE) {
-  y <- var(x, na.rm = na.rm)
-  return(y)
+  ifelse(all(is.na(x)), NA, var(x, na.rm = TRUE))
 }
 
 #' Sum  aggregation
@@ -121,6 +120,31 @@ Variance <- function(x, na.rm = TRUE) {
 #'
 #' @examples
 Sum <- function(x, na.rm = TRUE) {
-  y <- sum(x, na.rm = na.rm)
-  return(y)
+  ifelse(all(is.na(x)), NA, sum(x, na.rm = TRUE))
+}
+
+#' Max aggregation with na.rm = TRUE by default *except* that all-NA vectors still return NA, not 0.
+#'
+#' @param x
+#' @param na.rm
+#'
+#' @return
+#' @export
+#'
+#' @examples
+Max <- function(x, na.rm = TRUE) {
+  ifelse(all(is.na(x)), NA, max(x, na.rm = TRUE))
+}
+
+#' Min aggregation with na.rm = TRUE by default *except* that all-NA vectors still return NA, not 0.
+#'
+#' @param x
+#' @param na.rm
+#'
+#' @return
+#' @export
+#'
+#' @examples
+Min <- function(x, na.rm = TRUE) {
+  ifelse(all(is.na(x)), NA, min(x, na.rm = TRUE))
 }

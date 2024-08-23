@@ -39,14 +39,18 @@
 #' @export
 #'
 #' @examples
-spatial_aggregate <- function(dat, to_geo, groupers,
-                             aggCols, funlist, ...,
-                           whichcrs = sf::st_crs(to_geo),
-                           keepAllPolys = FALSE,
-                           failmissing = TRUE,
-                           prefix = 'spatial_',
-                           joinby = 'spatial',
-                           auto_ewr_PU = FALSE) {
+spatial_aggregate <- function(dat,
+                              to_geo,
+                              groupers,
+                              aggCols,
+                              funlist,
+                              ...,
+                              whichcrs = sf::st_crs(to_geo),
+                              keepAllPolys = FALSE,
+                              failmissing = TRUE,
+                              prefix = 'spatial_',
+                              joinby = 'spatial',
+                              auto_ewr_PU = FALSE) {
 
 
   # making valid and adding polyID here and not inside spatial_joiner because
@@ -101,6 +105,21 @@ spatial_aggregate <- function(dat, to_geo, groupers,
   # columns are included.
   groupers <- selectcreator(rlang::enquo(groupers), fromto_pair, failmissing)
   aggCols <- selectcreator(rlang::enquo(aggCols), fromto_pair, failmissing)
+
+  # check time- this should come in from outside, but check here too
+  timecols <- purrr::map_lgl(dat, \(x) lubridate::is.Date(x) | lubridate::is.POSIXt(x))
+  if (any(timecols)) {
+    timegroup <- names(dat)[which(timecols)]
+  } else {
+    timegroup <- NULL
+  }
+
+  # Force time-aggregation to be explicit
+  if (!is.null(timegroup) && !timegroup %in% groupers) {
+    rlang::abort(c(glue::glue("The time column {timegroup} is not included as a grouper for spatial aggregation"),
+                   "Aggregation must explicitly specify dimensions"))
+  }
+
 
   # the code typically drops polygons that have no data. but we might want to keep them for plotting.
 

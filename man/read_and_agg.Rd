@@ -64,7 +64,7 @@ See \code{selectcreator} for formats}
 them. Entries for theme aggregation should be character vectors- e.g. \code{name = c('from_theme', 'to_theme')}. Entries for spatial aggregation should be
 the sf polygon to aggregate to, e.g. \code{name = sfpolygons} or a length-1
 character, e.g. \code{name = "sfpolygons"}. The latter requires the object to be
-available with \verb{get("sfpolygons:)}, but allows passing characters rather
+available with \code{get("sfpolygons")}, but allows passing characters rather
 than objects. Not requiring names and is high on the list of improvements.
 If we want to be able to re-run from auto-saved metadata params, we need
 the names of the spatial levels to match the object, e.g. basin: basin.}

@@ -3,8 +3,16 @@
 # Linux is slightly different than win/mac, so skip all of this
 skip_on_os('linux')
 
-
 ewr_to_agg <- make_test_ewr_prepped()
+
+# Sets up the earlier approach with time-means that most tests were built for
+ewr_to_agg_timemean <- temporal_aggregate(ewr_to_agg,
+                                          breaks = 'all_time',
+                                          groupers = c('scenario', 'gauge', 'planning_unit_name', 'ewr_code', 'ewr_code_timing', 'site'),
+                                          aggCols = 'ewr_achieved',
+                                          funlist = 'ArithmeticMean',
+                                          prefix = '') |>
+  dplyr::rename(ewr_achieved = ArithmeticMean_ewr_achieved)
 
 # use the noPU style that ignores planning units because it yields better tests (gauges as points over polygons, etc)
 agg_theme_space <- make_test_agg(namehistory = FALSE, style = 'noPU')
@@ -1137,7 +1145,7 @@ test_that("ewr works as in `plot_outcomes_bar`", {
 
 
 
-  ewr_to_bar_data <- ewr_to_agg |>
+  ewr_to_bar_data <- ewr_to_agg_timemean |>
     # just grab the first code_timing
     dplyr::group_by(ewr_code, gauge, scenario) |>
     dplyr::slice(1) |>
@@ -1218,7 +1226,7 @@ test_that("facet addition works", {
 })
 
 test_that("hydrographs", {
-  hydro_to_plot <- read_hydro(hydropath = system.file("extdata/testsmall/hydrographs", package = "werptoolkitr"))
+  hydro_to_plot <- read_hydro(hydropath = system.file("extdata/testsmall/hydrographs", package = "HydroBOT"))
 
   hydro_to_plot <- hydro_to_plot |>
     dplyr::mutate(scenario = dplyr::case_when(grepl('down', scenario) ~ 'down4',
@@ -1252,7 +1260,7 @@ test_that("hydrographs", {
   vdiffr::expect_doppelganger("hydroplot", hydplot)
 
   # basic plot, ncdf, swap color and facetting
-  hydcdf <- read_hydro(hydropath = system.file("extdata/ncdfexample/nchydros", package = "werptoolkitr"), format = "nc", gaugemap = "iqqm")
+  hydcdf <- read_hydro(hydropath = system.file("extdata/ncdfexample/nchydros", package = "HydroBOT"), format = "nc", gaugemap = "iqqm")
 
   hydplot_nc <- plot_outcomes(hydcdf,
     outcome_col = "flow",

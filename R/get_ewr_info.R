@@ -14,7 +14,7 @@ get_ewr_gauges <- function() {
   names(gauges_in_pyewr) <- stringr::str_to_lower(names(gauges_in_pyewr))
 
   gauges_in_pyewr <- gauges_in_pyewr |>
-   dplyr::left_join(bom_basin_gauges) |>
+   dplyr::left_join(HydroBOT::bom_basin_gauges) |>
     sf::st_as_sf()
 
   return(gauges_in_pyewr)
@@ -38,7 +38,8 @@ get_ewr_table <- function(type = 'good') {
 }
 
 get_raw_ewrsheet <- function() {
-  rawsheet <- readr::read_csv('.venv/Lib/site-packages/py_ewr/parameter_metadata/parameter_sheet.csv')
+  # There's lots of blanks that get guessed as logical unless we let it see the whole thing.
+  rawsheet <- readr::read_csv('.venv/Lib/site-packages/py_ewr/parameter_metadata/parameter_sheet.csv', guess_max = 5000)
 }
 
 #' Check the ewr version.
@@ -88,4 +89,18 @@ get_iqqm_gauges <- function() {
   iqqm_gauges <- pdi$get_iqqm_codes()
   iqqm_gauges <- tibble::tibble(iqqm_node = names(iqqm_gauges), gauge = unlist(iqqm_gauges))
   return(iqqm_gauges)
+}
+
+#' Extract the package version. Does not get complications like git branches.
+#'
+#' @return
+#' @export
+#'
+get_ewr_version <- function() {
+  b <- reticulate::import('pkg_resources')
+  ewrpk <- b$get_distribution('py_ewr')
+
+  return(as.character(ewrpk))
+  # Or
+  # system.time(a <- system2("pip", "show py_ewr", stdout = TRUE))
 }

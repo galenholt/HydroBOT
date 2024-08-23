@@ -86,11 +86,13 @@ read_and_agg <- function(datpath,
 
   # parse any character names for the spatial data, then character will be the themes
   aggsequence <- purrr::map(aggsequence, parse_geo)
-  themeseq <- aggsequence[purrr::map_lgl(aggsequence, is.character)]
+  stepdim <- identify_dimension(aggsequence,
+                                causalpath)
 
+  # multi_aggregate can handle the raw network just fine, but this saves re-calculating edges dfs each time.
   edges <- make_edges(
     dflist = causalpath,
-    fromtos = themeseq
+    fromtos = aggsequence[stepdim == 'theme']
   )
 
   # be aggressive about parsing tidyselect into characters or expressions get

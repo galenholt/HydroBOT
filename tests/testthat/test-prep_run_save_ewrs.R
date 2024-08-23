@@ -85,6 +85,54 @@ test_that("complex dir structure", {
 
 })
 
+test_that("complex dir structure, missings", {
+  # create dir so building makes sense
+  make_temp_hydro()
+
+  dir.create(file.path(temp_hydro_dir, "S1"))
+  dir.create(file.path(temp_hydro_dir, "S2"))
+  file.copy(file.path(temp_hydro_dir, "base"), file.path(temp_hydro_dir, "S1"), recursive = TRUE)
+  file.copy(file.path(temp_hydro_dir, "up4"), file.path(temp_hydro_dir, "S2"), recursive = TRUE)
+
+  # Let's say I just want to get the S's
+  ewr_out <- prep_run_save_ewrs(
+    hydro_dir = temp_hydro_dir,
+    output_parent_dir = temp_parent_dir,
+    file_search = 'S1|S2',
+    outputType = list("summary", "all"),
+    datesuffix = FALSE,
+    returnType = list("summary", "all")
+  )
+
+  expect_equal(length(ewr_out), 2)
+  expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
+  expect_true(all(unique(ewr_out$summary$scenario) %in%
+                    c("S1_base", "S2_up4")))
+
+  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  expect_snapshot(realised_structure)
+
+  # NOW, do all of them, but DO NOT RE-DO THE S's
+    # This is critical for continuing long runs
+  ewr_out2 <- prep_run_save_ewrs(
+    hydro_dir = temp_hydro_dir,
+    output_parent_dir = temp_parent_dir,
+    fill_missing = TRUE,
+    outputType = list("summary", "all"),
+    datesuffix = FALSE,
+    returnType = list("summary", "all")
+  )
+
+  # now we should have those files
+  realised_structure2 <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  expect_snapshot(realised_structure2)
+
+  # but only have run the missing runs
+  expect_true(all(unique(ewr_out2$summary$scenario) %in%
+                    c("base", "down4", "up4")))
+
+})
+
 test_that("manual scenario naming", {
   # create dir so building makes sense
   make_temp_hydro()
@@ -380,7 +428,7 @@ test_that("NETCDF saving and returning works for all (or nearly all) ewr outputs
   # create dir so building makes sense
   make_temp_hydro(
     temp_hydro_dir = "nchydros",
-    orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = "werptoolkitr")
+    orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = "HydroBOT")
   )
 
   # all working as of 2.1.0
@@ -417,7 +465,7 @@ test_that("zipped NETCDF saving and returning works for all (or nearly all) ewr 
   # create dir so building makes sense
   make_temp_zip(
     temp_hydro_dir = "hydrographs",
-    orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "werptoolkitr")
+    orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "HydroBOT")
   )
 
   # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
@@ -460,7 +508,7 @@ test_that("NETCDF saving and returning works in parallel", {
   # create dir so building makes sense
   make_temp_hydro(
     temp_hydro_dir = "nchydros",
-    orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = "werptoolkitr")
+    orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = "HydroBOT")
   )
 
   # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.

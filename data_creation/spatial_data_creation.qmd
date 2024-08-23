@@ -11,7 +11,7 @@ params:
 
 Rebuilding data is done with params. To rebuild, at the terminal run `quarto render data_creation/spatial_data_creation.qmd -P REBUILD_DATA:TRUE` or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
 
-Set the directory. This got convoluted with the Rproject nested inside quarto, but I think this largely keeps the R self-contained while still allowing Quarto to render. I think I will eventually be able to use `library(werptoolkitr)`, but quarto is grumpy about it, so skip for now.
+Set the directory. This got convoluted with the Rproject nested inside quarto, but I think this largely keeps the R self-contained while still allowing Quarto to render. I think I will eventually be able to use `library(HydroBOT)`, but quarto is grumpy about it, so skip for now.
 
 ```{r setup}
 #| warning: false
@@ -24,12 +24,12 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 library(sf)
 library(patchwork)
 library(ggplot2)
-# library(werptoolkitr) works when running interactively, but not when quarto
+# library(HydroBOT) works when running interactively, but not when quarto
 # rendering. Just use load_all for now.
 # Also have to turn off caching and delete _cache directories or it gets really
 # upset.
 devtools::load_all()
-# library(werptoolkitr)
+# library(HydroBOT)
 ```
 
 Set with params. But that doesn't work with interactive running, so deal with that.

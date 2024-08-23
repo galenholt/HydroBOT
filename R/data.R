@@ -81,6 +81,25 @@
 #' @source various Long-Term Watering Plans and State-based tables.
 "causal_ewr"
 
+#' Simplified causal relationships for the EWRs at the basin scale
+#'
+#' List of dataframes specifying the causal relationships from environmental
+#' water requirements  to Target groups. Skips over the environmental objectives
+#' (e.g. the individual species or life cycle components) because the links from
+#' those to the Targets are not currently available everywhere. If working in
+#' areas where they *are* available, use `causal_ewr`. Extracted and cleaned in
+#' `data_creation/causal_data_cleaning.qmd`, with definitions found and
+#' extracted from the EWR tool. The links in target2yrtarget are from NSW and
+#' so, while general, have not been confirmed to apply in other states.
+#'
+#' @format ## `causal_ewr` A list of dataframes:
+#' \describe{
+#'   \item{ewr2target}{Mapping from EWRs at each gauge to `Target` group}
+#'   \item{target2yrtarget}{Mapping defined without spatial reference from `Target`, to `Target_Category`, `Objective`, `target_5_year_2024`, `target_10_year_2029`, and `target_20_year_2039`, based *only* on NSW at present}
+#' }
+#' @source various Long-Term Watering Plans and State-based tables.
+"causal_ewr_simple"
+
 #' Catchments within the Murray-Darling Basin
 #'
 #' Polygons defining catchment boundaries, as defined by the CEWO. Sourced from

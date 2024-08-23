@@ -38,6 +38,7 @@ clean_long_term <- function(yrpath,
                      dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'-$', ''))) |>
                      dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_squish(.))))
 
+  # now that we have multiple states, but a state on there.
   # save
   if (saveout == 'r') {
 

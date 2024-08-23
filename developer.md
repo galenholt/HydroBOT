@@ -53,7 +53,7 @@ Use [poetry](https://python-poetry.org/docs/) to build python environments. Set 
 Use the `poetry.lock` to build the python environment with poetry. The needed python packages get auto-installed when *using* the package, but developers will need to maintain them here for dev.
 
 ### Building data and HTML documentation
-Some of the data needs to be built, at least right now. And we'll always have the option to do that as the data changes. The easiest way to do it is to run `quarto render -P REBUILD_DATA:TRUE` from WERP_toolkit to rebuild all `.qmd`, `.rmd`, and `.md` files everywhere and rebuild the data. Leaving off the parameter (just `quarto render`) re-renders the project with the default of FALSE if we just want new HTML generated from the notebooks but not new data. Individual files can also be rendered, either with the CLI or the Render buttons in VS or Rstudio.
+Some of the data needs to be built, at least right now. And we'll always have the option to do that as the data changes. The easiest way to do it is to run `quarto render -P REBUILD_DATA:TRUE` from HydroBOT to rebuild all `.qmd`, `.rmd`, and `.md` files everywhere and rebuild the data. Leaving off the parameter (just `quarto render`) re-renders the project with the default of FALSE if we just want new HTML generated from the notebooks but not new data. Individual files can also be rendered, either with the CLI or the Render buttons in VS or Rstudio.
 
 
 
@@ -97,9 +97,9 @@ To add python packages, use `poetry add packagename`. Then, committing the `toml
 
 To add a specific version, `poetry add packagename==1.0.1`. This is sometimes necessary with things like py-ewr that change frequently.
 
-To call the python from R, as long as the venv is in the base project directory, {reticulate} seems to find it. Otherwise, need to tell it where it is with `reticulate::use_virtualenv`. There's more detail about this sort of thing in the developer note in {werptoolkitr}- here, the venv is in the outer directory and just works.
+To call the python from R, as long as the venv is in the base project directory, {reticulate} seems to find it. Otherwise, need to tell it where it is with `reticulate::use_virtualenv`. There's more detail about this sort of thing in the developer note in {HydroBOT}- here, the venv is in the outer directory and just works.
 
-**ON AZURE**- when you first start a vscode session, the bash at the bottom does not use the poetry environment, and so if you try to install or use werptoolkitr, it will try to auto-build one with the right dependencies using miniconda (or just fail with cryptic errors). That might work (but usually doesn't). Instead, *start a new bash terminal*, which will activate the venv, and open R from there. At that point, installing werptoolkitr (or `renv::restore()` generally), and using the code should work.
+**ON AZURE**- when you first start a vscode session, the bash at the bottom does not use the poetry environment, and so if you try to install or use HydroBOT, it will try to auto-build one with the right dependencies using miniconda (or just fail with cryptic errors). That might work (but usually doesn't). Instead, *start a new bash terminal*, which will activate the venv, and open R from there. At that point, installing HydroBOT (or `renv::restore()` generally), and using the code should work.
 
 ## SSH extras
 If we're running from command line, we might have to use `eval "$(ssh-agent -s)"` and then `ssh-add ~/.ssh/NAME_OF_KEY` every time. To avoid that, change the `.bashrc` according to Andrew to auto-run `ssh-add` . I tend to use nano for small edits, so `nano ~/.bashrc` (or `cd` and then `nano .bashrc`), and copy-paste in the below. (and on Windows also add this to `~/.profile`)
@@ -155,7 +155,7 @@ Confirm by starting a bash and typing `cd ~`.
 
 Setting up ssh on Windows is easiest if you use git bash. That should be fine for typical repo use, but we have to do more to get ssh to work for *installing* packages from protected repos. To prepare for this, there seem to be an inability to pass anything other than rsa keys, so create one of those (I have one of those and and an ed25519, but I'm pretty sure the rsa is auto-enforced with the `install_git`). The rigmarole for actually installing from github is dealt with in the developer.md for WERP_toolkit_demo, since that's where we need to install this from.
 
-Windows should connect with SSH so we're using the same system everywhere. What seems to be working is to go to Settings \--\> Services (really, search for Services), \--\> openSSH authentication \--\> properties \--\> startup type Automatic. Run `ls-remote git@github.com:MDBAuth/WERP_toolkit.git` in command prompt interactively to add github as a known location. Then create a `~/.profile` and `~/.bashrc` with the same bits as in the linux bashrc in the werptoolkitr dev docs, and are given [at the github instructions for auto-launching](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/working-with-ssh-key-passphrases#auto-launching-ssh-agent-on-git-for-windows). Both profile and bashrc seem to be needed. And it's unclear why, since those are for bash, and `install_git` calls cmd. cmd must be calling git bash internally. Then, we also need to install the `git2r` package, or `install_git` will still fail, but we *cannot* pass the `credentials` argument, even though that seems like what we should do.
+Windows should connect with SSH so we're using the same system everywhere. What seems to be working is to go to Settings \--\> Services (really, search for Services), \--\> openSSH authentication \--\> properties \--\> startup type Automatic. Run `ls-remote git@github.com:MDBAuth/HydroBOT.git` in command prompt interactively to add github as a known location. Then create a `~/.profile` and `~/.bashrc` with the same bits as in the linux bashrc in the HydroBOT dev docs, and are given [at the github instructions for auto-launching](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/working-with-ssh-key-passphrases#auto-launching-ssh-agent-on-git-for-windows). Both profile and bashrc seem to be needed. And it's unclear why, since those are for bash, and `install_git` calls cmd. cmd must be calling git bash internally. Then, we also need to install the `git2r` package, or `install_git` will still fail, but we *cannot* pass the `credentials` argument, even though that seems like what we should do.
 
 ## R in VScode
 The R environment stuff within the project is managed by `renv`, but there are some packages we want to install globally because they make R work in VScode, help development, etc. So, *outside the repo* (or before cloning it), do these things. 
@@ -173,9 +173,9 @@ Installing `httpgd` globally as well (inside R, `install.packages('httpgd')`).
 
 In settings, I also turned on `LSP:debug` and clicked `use httpgd` in the plots settings. I'll try to keep a record here of these setup things I've done so we don't forget and have different VS behaviour.
 
-VS seems to sometimes struggle to find the library if started in WERP_toolkit. In that case, start a new workspace in WERP_toolkit/werptoolkitr. 
+VS seems to sometimes struggle to find the library if started in HydroBOT. In that case, start a new workspace in HydroBOT/HydroBOT. 
 
-VS opened in WERP_toolkit or werptoolkitr needs to be told the first time we open a workspace where the python interpreter is (in /werptoolkitpy/.venv/Scripts/python.exe) because it's no longer in the top-level.
+VS opened in HydroBOT or HydroBOT needs to be told the first time we open a workspace where the python interpreter is (in /werptoolkitpy/.venv/Scripts/python.exe) because it's no longer in the top-level.
 
 ## Notes on using MDBA systems
 To get to the compute machines, open Azure Machine Learning studio. Get there from [the Azure portal](https://portal.azure.com/#home), then Resources (green grid), then MDBA-NPD-ML-AUE, then 'Launch' (button in middle of main panel, NOT on side bar), then Compute (bottom of left column)
@@ -200,11 +200,11 @@ Then I git checkout the branch I want, and off to setting up environments.
 
 # Installing the package
 
-You should be able to install the development version of werptoolkitr from [GitHub](https://github.com/MDBAuth/WERP_toolkit) with `devtools::install_git`. For `devtools::install_git()` to work with SSH, there are two methods, depending on R version. The easiest is if R < 4.3, in which case install the {git2r} package, and then if you have SSH keys set up, this will work:
+You should be able to install the development version of HydroBOT from [GitHub](https://github.com/MDBAuth/HydroBOT) with `devtools::install_git`. For `devtools::install_git()` to work with SSH, there are two methods, depending on R version. The easiest is if R < 4.3, in which case install the {git2r} package, and then if you have SSH keys set up, this will work:
 
 ``` r
 # install.packages("devtools", "git2r")
-devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask')
+devtools::install_git("git@github.com:MDBAuth/HydroBOT.git", ref = 'master', force = TRUE, upgrade = 'ask')
 ```
 
 If using R 4.3, the {git2r} package does not support ssh, and so you have to use external (system) git. That's uglier, but more robust, and so is what is in the Readme. R uses a different Home directory than standard (typically `~/Documents`), and so for this to work, you need to [set up SSH keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) in that location as well (e.g. in `~/Documents/.ssh/`) and [connect them to github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).

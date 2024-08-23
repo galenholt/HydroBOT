@@ -6,16 +6,15 @@
 \usage{
 assess_ewr_achievement(
   annualdf,
-  summarydf,
   year_roll = ifelse(nrow(annualdf) >= 10, 10, 1)
 )
 }
 \arguments{
 \item{annualdf}{incoming tibble of EWRs after read-in}
 
-\item{summarydf}{incoming tibble of  EWRs after read-in - contains the Target Frequency column}
-
 \item{year_roll}{specific number of years to check assessment for}
+
+\item{summarydf}{incoming tibble of  EWRs after read-in - contains the Target Frequency column}
 }
 \value{
 tibble reformatted and cleaned for ongoing analysis
@@ -23,5 +22,5 @@ tibble reformatted and cleaned for ongoing analysis
 \description{
 This is the pass/fail test of whether the criteria (frequency and timing) of EWRs are met or not
 Using the Minimum long term average (LTA) target frequencies (Termed Target frequency in summarydf) as suggested in the LTWPs
-Includes inverse result for cease to flows (CF) and two frequency checks for longterm data (greater than 20 years)
+Includes inverse result for cease to flows (CF) in both the assessment and the event_years themselves
 }

@@ -1,6 +1,6 @@
 test_that("long data referencing works", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
-                                                package = 'werptoolkitr'))
+                                                package = 'HydroBOT'))
   baselong <- baseline_compare(hydlong, compare_col = 'scenario', comp_fun = difference,
                                base_lev = 'base', values_col = 'flow', group_cols = c('Date', 'gauge'))
   # names are right
@@ -11,7 +11,7 @@ test_that("long data referencing works", {
 
 test_that("auto-grouper works", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
-                                                package = 'werptoolkitr'))
+                                                package = 'HydroBOT'))
   expect_warning(baselong <- baseline_compare(hydlong, compare_col = 'scenario', comp_fun = difference,
                                base_lev = 'base', values_col = 'flow'))
   # names are right
@@ -22,7 +22,7 @@ test_that("auto-grouper works", {
 
 test_that("multiple values columns works", {
   hydwide <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
-                                                package = 'werptoolkitr'),
+                                                package = 'HydroBOT'),
                         long = FALSE)
   expect_warning(basewide <- baseline_compare(hydwide, compare_col = 'scenario', comp_fun = difference,
                                base_lev = 'base', values_col = tidyselect::starts_with('4'),
@@ -35,9 +35,9 @@ test_that("multiple values columns works", {
 
 test_that("scalar refs works", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
-                                                package = 'werptoolkitr'))
+                                                package = 'HydroBOT'))
   hydwide <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
-                                                package = 'werptoolkitr'),
+                                                package = 'HydroBOT'),
                         long = FALSE)
 
   basescalar <- baseline_compare(hydlong, compare_col = 'scenario', comp_fun = difference,
@@ -59,7 +59,7 @@ test_that("scalar refs works", {
 test_that("relative comparison works", {
 
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
-                                                package = 'werptoolkitr'))
+                                                package = 'HydroBOT'))
   baselong <- baseline_compare(hydlong, compare_col = 'scenario', comp_fun = relative,
                                base_lev = 'base', values_col = 'flow', group_cols = c('Date', 'gauge'))
   # names are right
@@ -70,7 +70,7 @@ test_that("relative comparison works", {
 
 test_that("relative comparison works with add_eps", {
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
-                                                package = 'werptoolkitr'))
+                                                package = 'HydroBOT'))
   baselong <- baseline_compare(hydlong, compare_col = 'scenario', comp_fun = relative, add_eps = 1,
                                base_lev = 'base', values_col = 'flow', group_cols = c('Date', 'gauge'))
   # names are right
@@ -82,7 +82,7 @@ test_that("relative comparison works with add_eps", {
 test_that("character functions work", {
 
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
-                                                package = 'werptoolkitr'))
+                                                package = 'HydroBOT'))
   baselong <- baseline_compare(hydlong, compare_col = 'scenario', comp_fun = 'difference',
                                base_lev = 'base', values_col = 'flow', group_cols = c('Date', 'gauge'))
   # names are right
@@ -94,7 +94,7 @@ test_that("character functions work", {
 test_that("list functions work", {
 
   hydlong <- read_hydro(hydropath = system.file('extdata/testsmall/hydrographs',
-                                                package = 'werptoolkitr'))
+                                                package = 'HydroBOT'))
   baselong <- baseline_compare(hydlong, compare_col = 'scenario',
                                comp_fun = rlang::quo(list(difference = ~difference(., y = ref_flow))),
                                base_lev = 'base', values_col = 'flow', group_cols = c('Date', 'gauge'))

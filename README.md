@@ -1,11 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# werptoolkitr
+# HydroBOT
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/MDBAuth/WERP_toolkit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MDBAuth/WERP_toolkit/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/MDBAuth/HydroBOT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MDBAuth/HydroBOT/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 This R package forms the core of the WERP climate adaptation toolkit,
@@ -25,12 +25,12 @@ to manage your python environments.
 
 ## Installation
 
-Install the development version of werptoolkitr from
-[GitHub](https://github.com/MDBAuth/WERP_toolkit) with
+Install the development version of HydroBOT from
+[GitHub](https://github.com/MDBAuth/HydroBOT) with
 
 ``` r
 # install.packages("devtools")
-devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask', git = 'external')
+devtools::install_git("git@github.com:MDBAuth/HydroBOT.git", ref = 'master', force = TRUE, upgrade = 'ask', git = 'external')
 ```
 
 R uses a different Home directory than standard (typically

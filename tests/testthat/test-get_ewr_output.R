@@ -97,21 +97,34 @@ test_that("all_successful_interEvents works", {
 
 test_that("assessment works", {
   yeardat <- get_any_ewr_output(ewrpath, type = 'yearly')
-  sumdat <- get_any_ewr_output(ewrpath, type = 'summary')
+  yeardat <- clean_yearly(yeardat)
 
-  assessed <- assess_ewr_achievement(yeardat, sumdat)
+  # use a 3-year roll since the data only has 5 years
+  assessed <- assess_ewr_achievement(yeardat, year_roll = 3)
 
-  expect_equal(names(assessed), c('ewr_code', 'ewr_code_timing', 'gauge',
-                                  'scenario', 'planning_unit_name', 'ewr_achieved', 'ewr_achieved_timeframe'))
+  expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
+                                  'planning_unit_name', 'ewr_code',
+                                  'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
 })
 
 
 test_that("making assessment tibble works", {
   assessed <- get_ewr_output(ewrpath)
 
-  expect_equal(names(assessed), c('ewr_code', 'ewr_code_timing', 'gauge',
-                                  'scenario', 'planning_unit_name', 'ewr_achieved', 'ewr_achieved_timeframe'))
+  expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
+                                  'planning_unit_name', 'ewr_code',
+                                  'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
   expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
+})
+
+test_that("year_roll is rolling correctly", {
+  # default is 1 if < 10, so have to set manually for the test data
+  assessed <- get_ewr_output(ewrpath, year_roll = 3)
+
+  expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
+                                  'planning_unit_name', 'ewr_code',
+                                  'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
+  expect_equal(sum(is.na(assessed$ewr_achieved)), 1296)
 })
 
 
@@ -119,8 +132,9 @@ test_that("passing in a list from memory works", {
   # ewr_out <- make_test_ewr_output(build_dirs = FALSE)
 
   ewrprepped <- get_ewr_output(ewr_out, type = 'achievement')
-  expect_equal(names(ewrprepped), c('ewr_code', 'ewr_code_timing', 'gauge',
-                                  'scenario', 'planning_unit_name', 'ewr_achieved', 'ewr_achieved_timeframe'))
+  expect_equal(names(ewrprepped), c('scenario', 'year', 'date', 'gauge',
+                                    'planning_unit_name', 'ewr_code',
+                                    'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
   expect_equal(sum(is.na(ewrprepped$planning_unit_name)), 0)
 })
 
@@ -159,5 +173,25 @@ test_that("making MAX scenario works", {
   assessed <- get_ewr_output(ewrpath)|>
     dplyr::filter(scenario == "MAX")
   expect_equal(nrow(assessed)> 0,TRUE)
+})
+
+test_that("roll_frequency rolls correctly", {
+  a <- c(0,1,1,0,1,1,1,1,0,0,1)
+ rolled <- roll_frequency(a, year_roll = 3)
+ an <- c(0,1,1,0,1,NA,1,1,0,0,1)
+ rolled_na <- roll_frequency(an, year_roll = 3)
+ rolled_narm <- roll_frequency(an, year_roll = 3, na.rm = TRUE)
+ rolled_nap <- roll_frequency(an, year_roll = 3, pad_initial = TRUE)
+
+ ani <- c(NA,1,1,0,1,NA,1,1,0,0,1)
+ rolled_nai <- roll_frequency(ani, year_roll = 3)
+ rolled_nairm <- roll_frequency(ani, year_roll = 3, na.rm = TRUE)
+
+ expect_snapshot_value(rolled, style = 'deparse')
+ expect_snapshot_value(rolled_na, style = 'deparse')
+ expect_snapshot_value(rolled_nap, style = 'deparse')
+ expect_snapshot_value(rolled_narm, style = 'deparse')
+ expect_snapshot_value(rolled_nai, style = 'deparse')
+ expect_snapshot_value(rolled_nairm, style = 'deparse')
 })
 

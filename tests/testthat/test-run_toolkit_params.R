@@ -7,7 +7,7 @@ temp_parent_dir <- "_test_data"
 test_that("parameter file works with params.R", {
   make_temp_hydro()
   test <- run_toolkit_params(yamlpath = system.file("yml/package_params.yml",
-    package = "werptoolkitr"
+    package = "HydroBOT"
   ))
 
   # kind of silly- the main thing is that the above doesn't fail
@@ -17,7 +17,7 @@ test_that("parameter file works with params.R", {
 test_that("parameter file works with character aggregation", {
   make_temp_hydro()
   test <- run_toolkit_params(yamlpath = system.file("yml/package_params_charseq.yml",
-    package = "werptoolkitr"
+    package = "HydroBOT"
   ))
 
   # kind of silly- the main thing is that the above doesn't fail
@@ -37,7 +37,7 @@ test_that("passing from command works", {
   # The yaml here becomes a pain if it needs to pass more than one item.
   test <- run_toolkit_params(
     yamlpath = system.file("yml/package_params.yml",
-      package = "werptoolkitr"
+      package = "HydroBOT"
     ),
     passed_args = "output_parent_dir: '_test_data'"
   )
@@ -55,7 +55,7 @@ test_that("list args work", {
   # The yaml here becomes a pain if it needs to pass more than one item.
   test <- run_toolkit_params(
     yamlpath = system.file("yml/package_params.yml",
-      package = "werptoolkitr"
+      package = "HydroBOT"
     ),
     list_args = list(output_parent_dir = "_test_data")
   )
@@ -71,7 +71,7 @@ test_that("list args work", {
   # The yaml here becomes a pain if it needs to pass more than one item.
   test2 <- run_toolkit_params(
     yamlpath = system.file("yml/package_params.yml",
-      package = "werptoolkitr"
+      package = "HydroBOT"
     ),
     list_args = qlist
   )
@@ -84,7 +84,7 @@ test_that("list args work", {
 test_that("re-running from self-defined params works", {
   make_temp_hydro()
   test <- run_toolkit_params(yamlpath = system.file("yml/package_params.yml",
-    package = "werptoolkitr"
+    package = "HydroBOT"
   ))
 
   # now run that off the one it just created

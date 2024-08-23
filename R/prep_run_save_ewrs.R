@@ -5,7 +5,7 @@
 ## sensitive to this- I think maybe test shims don't work right?
 controller_functions <- reticulate::import_from_path("controller_functions",
   path = system.file("python",
-    package = "werptoolkitr"
+    package = "HydroBOT"
   ),
   delay_load = TRUE
 )
@@ -46,12 +46,14 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @param returnType list of strings or character vector defining what to return
 #'   to the active R session. Same options as `outputType`
 #' @param scenarios_from character, default 'directory' gets scenario names from directory names. If anything else, gets them from filenames (safest). Expect additional options in future, e.g from metadata.
-#' @param file_search character, regex for additional limitations on filenames. Useful if several files have the extension defined by `model_format`, but only some are hydrographs.
+#' @param file_search character, regex for additional limitations on filenames. Useful to run a subset of scenarios or if several files have the extension defined by `model_format`, but only some are hydrographs.
+#' @param fill_missing logical, default FALSE. If TRUE, figures out the expected outputs and only runs those that are missing. Useful for long runs that might break.
 #' @param datesuffix logical. whether to add a suffix to saved filenames to
 #'   provide a datestamp. Should be deprecated in favour of metadata files.
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
 #' @param rparallel logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using `furrr`. To use, install `furrr` and set a [future::plan()] (likely `multisession` or `multicore`)
 #' @param retries Number of retries if there are errors. 0 is no retries, but still runs once. Default 2.
+#' @param print_runs logical, default FALSE. If true, print the set of runs to be done.
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
@@ -65,9 +67,11 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
                                returnType = "none",
                                scenarios_from = 'directory',
                                file_search = NULL,
+                               fill_missing = FALSE,
                                extrameta = NULL,
                                rparallel = FALSE,
                                retries = 2,
+                               print_runs = FALSE,
                                datesuffix = FALSE) {
 
   # allow sloppy outputTypes and returnTypes
@@ -117,6 +121,15 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
       subdir = output_subdir,
       ewr_outtypes = unlist(outputType)
     )
+
+    # Adjust if fillign missing
+    if (fill_missing) {
+      missing_scenarios <- find_missing_runs(hydro_paths, output_path, outputType)
+
+      hydro_paths <- hydro_paths[names(hydro_paths) %in% missing_scenarios]
+    }
+
+
     # set up flags for the metadata in case the ewr fails partway
     init_params <- list(
       meta_message = "Started run, has not finished. New metadata file will write when it does. If this metadata entry persists, the run failed.",
@@ -166,7 +179,26 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
     rlang::warn(glue::glue('Output path is {nchar(approx_py_path)}, windows has about a 260 limit. If files are not saving, try a shorter path.'))
   }
 
+  # Spit out info if requested
+  if (print_runs) {
+
+    if (length(hydro_paths) < 10) {
+      runprint <- names(hydro_paths)
+    } else {
+      runprint <- c(glue::glue("{names(hydro_paths)[1:10]}"),
+                    glue::glue("and {length(hydro_paths) - 10} more"))
+    }
+    rlang::inform(c(glue::glue("{length(hydro_paths)} scenarios to run:"),
+                    runprint))
+  }
+
+
   # Run the EWR tool over all hydro_paths
+  # This is abandoned for now, could put an auto cluster looper in here.
+  # inner_imap <- function()
+  # if (outer_parallel > 1) {
+  #   nodeloops <- split(fulloop, cut(1:length(fulloop), nodes_wanted, labels = FALSE))
+  # }
   ewr_out <- safe_imap(hydro_paths, ewrfun, retries = retries, parallel = rparallel)
 
   # rearrange to be a list of the different types of output, instead of the different scenarios
@@ -254,6 +286,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
       returnType = returnType,
       ewr_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
       ewr_status = TRUE,
+      ewr_version = get_ewr_version(),
       ewr_git_commit = gitcom
     )
 

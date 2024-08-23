@@ -4,10 +4,16 @@
 \alias{clean_ewr_obj}
 \title{Pair EWR indicators to environmental objectives}
 \usage{
-clean_ewr_obj(ewrobjpath, gaugescale = TRUE, saveout = FALSE, outdir, savename)
+clean_ewr_obj(
+  ewrobjpath = "ewrtool",
+  gaugescale = TRUE,
+  saveout = FALSE,
+  outdir,
+  savename
+)
 }
 \arguments{
-\item{ewrobjpath}{path to the ewr-obj mapping.}
+\item{ewrobjpath}{path to the ewr-obj mapping. Default 'ewrtool' just uses the version in the tool.}
 
 \item{gaugescale}{logical, whether to return data at the gauge scale by remapping from LTWPShortName to gauge (\code{TRUE}), or to just leave at the LTWPShortName (e.g. sdl unit) scale as NSW now defines the relationships (\code{FALSE})}
 

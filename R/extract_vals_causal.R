@@ -37,32 +37,32 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
   agglist <- agglist[names(agglist) %in% targetlevels]
 
   # Could almost certainly be a purrr::map()
-  stackvalues <- foreach::foreach (i = 1:length(agglist),
+  stackvalues <- foreach::foreach (i = 1:length(targetlevels),
                           .combine = dplyr::bind_rows) %do% {
 
                             # get the name of the nodelevel- the list is named
                             # by which group is aggregated into
                             thesenodes <- targetlevels[i]
+                            # The -1 is because agglist[1] is the raw data and so not
+                            # aggregated
+                            aggindex <- which(names(agglist) == thesenodes)-1
 
                             if (length(thesenodes) > 1) {
                               rlang::abort(glue::glue("Expect each node level to have one value,
                                                       this one {agglist[i]} is {thesenodes}"))
                             }
 
-                            # Filter to the right sort of aggregation- noting
-                            # that agglist[1] is the raw data and so not
-                            # aggregated
+                            # Filter to the right sort of aggregation
+                            simpledf <- agglist[[thesenodes]]
 
-                            simpledf <- agglist[[i]]
-
-                            if (i > 1) {
+                            if (aggindex > 1) {
                               # This bit needs to do ALL the n-1 aggs. Not a fan
                               # of the loop, but getting fancy with purr or
                               # pivots was losing history- ie it would get all
                               # ArithmeticMeans in stage 3 no matter what the
                               # previous stages were.
 
-                              for (j in 1:(i-1)) {
+                              for (j in 1:(aggindex)) {
                                 aggcol <- paste0("aggfun_", as.character(j))
                                 colind <- which(names(simpledf) == aggcol)
                                 simpledf <- simpledf |>

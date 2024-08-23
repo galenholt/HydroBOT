@@ -60,11 +60,29 @@ theme_aggregate <- function(dat,
     }
   }
 
+  # check time- this should come in from outside, but check here too
+  timecols <- purrr::map_lgl(dat, \(x) lubridate::is.Date(x) | lubridate::is.POSIXt(x))
+  if (any(timecols)) {
+    timegroup <- names(dat)[which(timecols)]
+  } else {
+    timegroup <- NULL
+  }
+
+  # Force time-aggregation to be explicit
+  if (!is.null(timegroup) && !timegroup %in% groupers) {
+    rlang::abort(c(glue::glue("The time column {timegroup} is not included as a grouper for theme aggregation"),
+                   "Aggregation must explicitly specify dimensions"))
+  }
+
+
   # including geometry in non-geometric
   # aggregates takes forever, drop and re-pair if present
 
-  # this is now getting even closer to spatial with the drop/add of geometry.
-  # can they be the same function? probably.
+  # We need to greate a new column and modify groupers here. We don't for things
+  # like temporal, where any relevant time column already exists and we can pass
+  # it in in groupers.
+  # this is now getting even closer to spatial with the
+  # drop/add of geometry. can they be the same function? probably.
   spatialflag <- is_sf(dat)
   polyflag <- is_notpoint(dat)
 
@@ -101,16 +119,16 @@ theme_aggregate <- function(dat,
     names(causal_edges)[names(causal_edges) == "from"] <- causal_edges$fromtype[1]
   }
 
-  # the theme-level outcomes are defined at gauges and planning units (often
-  # many-to-many, e.g. gauges might contribute to EWRs in multiple PUs, and PUs
-  # might include several gauges). we want to map back to that until we've done
-  # spatial aggregation into something larger. this conditional is really ugly
-  # though. This is only true of ewrs. SO check if we're not yet in polys, and
-  # if these are EWRs. If yes, then add planning unit to groupers We don't have
-  # to do something similar for spatial, because this gets taken care of as soon
-  # as we're above hte Planning Unit scale (though I suppose it's possible to
-  # aggregate to something smaller than a PU and larger than a gauge, that's an
-  # edge case to deal with later)
+  # EWRs are defined at gauges and planning units (often many-to-many, e.g.
+  # gauges might contribute to EWRs in multiple PUs, and PUs might include
+  # several gauges). we want to map back to that until we've done spatial
+  # aggregation into something larger. This is only true of ewrs. So check if
+  # we're not yet in polygons (since then we're at least to planning_units), and
+  # if these are EWRs. If yes, then add gauge and planning unit to groupers. We
+  # don't have to do something similar for spatial, because this gets taken care
+  # of as soon as we're above hte Planning Unit scale (though I suppose it's
+  # possible to aggregate to something smaller than a PU and larger than a
+  # gauge, that's an edge case to deal with later)
   if (!polyflag) {
     # Infer EWR from presence in causal_ewr
     ewrnames <- purrr::map(causal_ewr, names) |> unlist()
@@ -138,7 +156,7 @@ theme_aggregate <- function(dat,
   # join to causal_edges
 
   # A bit of a hacky check
-  extragroups <- groupers[!groupers %in% c('scenario', 'polyID')]
+  extragroups <- groupers[!groupers %in% c('scenario', 'polyID', timegroup)]
   if (any(!(extragroups %in% names(causal_edges)))) {
     rlang::warn(c("Causal network does not have all groupers.",
                   glue::glue("Joining {from_theme} to {to_theme}"),
@@ -159,7 +177,7 @@ theme_aggregate <- function(dat,
 
   if (nrow(napairs) > 0) {
 
-    nacount <- napairs |> dplyr::summarise(ntimes = dplyr::n(), .by = from_theme)
+    nacount <- napairs |> dplyr::summarise(ntimes = dplyr::n(), .by = any_of(from_theme))
 
     groupout <- if (ncol(napairs) > 1) {
       groupinform <- glue::glue("Groups with issues: {unique(napairs[2])}")

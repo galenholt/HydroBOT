@@ -14,9 +14,11 @@ prep_run_save_ewrs(
   returnType = "none",
   scenarios_from = "directory",
   file_search = NULL,
+  fill_missing = FALSE,
   extrameta = NULL,
   rparallel = FALSE,
   retries = 2,
+  print_runs = FALSE,
   datesuffix = FALSE
 )
 }
@@ -66,13 +68,17 @@ to the active R session. Same options as \code{outputType}}
 
 \item{scenarios_from}{character, default 'directory' gets scenario names from directory names. If anything else, gets them from filenames (safest). Expect additional options in future, e.g from metadata.}
 
-\item{file_search}{character, regex for additional limitations on filenames. Useful if several files have the extension defined by \code{model_format}, but only some are hydrographs.}
+\item{file_search}{character, regex for additional limitations on filenames. Useful to run a subset of scenarios or if several files have the extension defined by \code{model_format}, but only some are hydrographs.}
+
+\item{fill_missing}{logical, default FALSE. If TRUE, figures out the expected outputs and only runs those that are missing. Useful for long runs that might break.}
 
 \item{extrameta}{list, extra information to include in saved metadata documentation for the run. Default NULL.}
 
 \item{rparallel}{logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using \code{furrr}. To use, install \code{furrr} and set a \code{\link[future:plan]{future::plan()}} (likely \code{multisession} or \code{multicore})}
 
 \item{retries}{Number of retries if there are errors. 0 is no retries, but still runs once. Default 2.}
+
+\item{print_runs}{logical, default FALSE. If true, print the set of runs to be done.}
 
 \item{datesuffix}{logical. whether to add a suffix to saved filenames to
 provide a datestamp. Should be deprecated in favour of metadata files.}

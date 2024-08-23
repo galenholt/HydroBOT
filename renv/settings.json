@@ -2,7 +2,7 @@
   "bioconductor.version": [],
   "external.libraries": [],
   "ignored.packages": [
-    "werptoolkitr"
+    "HydroBOT"
   ],
   "package.dependency.fields": [
     "Imports",

@@ -3,7 +3,16 @@
 # edits- change function name, turn aggregation and functions into lists
 ewr_to_agg <- make_test_ewr_prepped()
 
-non_spatial_ewrout <- ewr_to_agg |> sf::st_drop_geometry()
+# Sets up the earlier approach with time-means that most tests were built for
+ewr_to_agg_timemean <- temporal_aggregate(ewr_to_agg,
+                                           breaks = 'all_time',
+                                           groupers = c('scenario', 'gauge', 'planning_unit_name', 'ewr_code', 'ewr_code_timing', 'site'),
+                                           aggCols = 'ewr_achieved',
+                                           funlist = 'ArithmeticMean',
+                                           prefix = '') |>
+  dplyr::rename(ewr_achieved = ArithmeticMean_ewr_achieved)
+
+non_spatial_ewrout <- ewr_to_agg_timemean |> sf::st_drop_geometry()
 
 # Tests from theme_aggregate ----------------------------------------------
 
@@ -35,7 +44,7 @@ test_that("auto-generating causal_edges works", {
 })
 
 test_that("spatial input data works", {
-  agged <- multi_aggregate(ewr_to_agg,
+  agged <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = list(c("ewr_code_timing", "ewr_code")),
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -135,19 +144,20 @@ test_that("gauge to poly works", {
   skip_on_os('linux')
 
   # should error if not list, to keep from iterating over sdl_units itself
-  expect_error(multi_aggregate(ewr_to_agg,
+  expect_error(multi_aggregate(ewr_to_agg_timemean,
     aggsequence = sdl_units,
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list("mean")
   ))
 
-  spatagg <- multi_aggregate(ewr_to_agg,
+  expect_warning(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = list(sdl_units = sdl_units),
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list("mean")
-  )
+  ))
+
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
     "scenario", "polyID", "sdl_units_mean_ewr_achieved",
@@ -158,18 +168,18 @@ test_that("gauge to poly works", {
   expect_equal(nrow(spatagg), 8)
 
   # Keeping the whole set of polys
-  spataggkeep <- multi_aggregate(ewr_to_agg,
+  expect_warning(spataggkeep <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = list(sdl_units = sdl_units),
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list("mean"),
     keepAllPolys = TRUE
-  )
+  ))
   # stringr::str_flatten(names(spatagg), "', '")
   # namestring <- c('scenario', 'polyID', 'sdl_units_mean_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spataggkeep), namestring)
   expect_s3_class(spataggkeep, "sf")
-  expect_equal(nrow(spataggkeep), nrow(sdl_units) * length(unique(ewr_to_agg$scenario)))
+  expect_equal(nrow(spataggkeep), nrow(sdl_units) * length(unique(ewr_to_agg_timemean$scenario)))
 
   # Plots are useful for checking spatial outcomes
   g2sdl_plot <- ggplot2::ggplot() +
@@ -177,7 +187,7 @@ test_that("gauge to poly works", {
       data = spatagg,
       ggplot2::aes(fill = sdl_units_mean_ewr_achieved)
     ) +
-    ggplot2::geom_sf(data = ewr_to_agg) +
+    ggplot2::geom_sf(data = ewr_to_agg_timemean) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = "bottom")
 
@@ -186,31 +196,32 @@ test_that("gauge to poly works", {
       data = spataggkeep,
       ggplot2::aes(fill = sdl_units_mean_ewr_achieved)
     ) +
-    ggplot2::geom_sf(data = ewr_to_agg) +
+    ggplot2::geom_sf(data = ewr_to_agg_timemean) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = "bottom")
 
   vdiffr::expect_doppelganger("gauge to sdl multi", g2sdl_plot)
   vdiffr::expect_doppelganger("gauge to sdl all multi", g2sdl_all_plot)
+
 })
 
 test_that("poly to poly works", {
 
   skip_on_os('linux')
 
-  g2pagg <- multi_aggregate(ewr_to_agg,
+  expect_warning(g2pagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = list(sdl_units = sdl_units),
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list("mean")
-  )
+  ))
 
-  p2pagg <- multi_aggregate(g2pagg,
+  expect_warning(p2pagg <- multi_aggregate(g2pagg,
     aggsequence = list(cewo_valleys = cewo_valleys),
     groupers = "scenario",
     aggCols = "sdl_units_mean_ewr_achieved",
     funsequence = list("mean")
-  )
+  ))
 
   # stringr::str_flatten(names(p2pagg), "', '")
   namestring <- c(
@@ -227,7 +238,7 @@ test_that("poly to poly works", {
       data = p2pagg,
       ggplot2::aes(fill = cewo_valleys_mean_sdl_units_mean_ewr_achieved)
     ) +
-    ggplot2::geom_sf(data = ewr_to_agg) +
+    ggplot2::geom_sf(data = ewr_to_agg_timemean) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = "bottom")
 
@@ -237,14 +248,15 @@ test_that("poly to poly works", {
 
 # argument formats --------------------------------------------------------
 
+# These are largely wrapped in expect_warning because they're purely spatial and ignore the theme dim, whihc throws a warning.
 
 test_that("bare functions", {
-  spatagg <- multi_aggregate(ewr_to_agg,
+  expect_warning(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = list(sdl_units = sdl_units),
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list(mean)
-  )
+  ))
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c("scenario", "polyID", "sdl_units_mean_ewr_achieved", "SWSDLID", "SWSDLName", "StateID", "geometry")
   expect_equal(names(spatagg), namestring)
@@ -253,12 +265,12 @@ test_that("bare functions", {
 })
 
 test_that("list functions", {
-  spatagg <- multi_aggregate(ewr_to_agg,
+  expect_warning(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = list(sdl_units = sdl_units),
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list(list(mean = ~ mean(., na.rm = TRUE)))
-  )
+  ))
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c("scenario", "polyID", "sdl_units_mean_ewr_achieved", "SWSDLID", "SWSDLName", "StateID", "geometry")
   expect_equal(names(spatagg), namestring)
@@ -268,12 +280,12 @@ test_that("list functions", {
 
 test_that("multiple functions", {
   # character
-  spatagg_c <- multi_aggregate(ewr_to_agg,
+  expect_warning(spatagg_c <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = list(sdl_units = sdl_units),
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list(c("mean", "sd"))
-  )
+  ))
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
     "scenario", "polyID", "sdl_units_mean_ewr_achieved",
@@ -284,12 +296,12 @@ test_that("multiple functions", {
   expect_equal(nrow(spatagg_c), 8)
 
   # bare- naming fails
-  spatagg_b <- multi_aggregate(ewr_to_agg,
+  expect_warning(spatagg_b <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = list(sdl_units = sdl_units),
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list(c(mean, sd))
-  )
+  ))
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
     "scenario", "polyID", "sdl_units_mean_ewr_achieved",
@@ -300,14 +312,14 @@ test_that("multiple functions", {
   expect_equal(nrow(spatagg_b), 8)
 
   # list
-  spatagg_l <- multi_aggregate(ewr_to_agg,
+  expect_warning(spatagg_l <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = list(sdl_units = sdl_units),
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = list(list(
       mean = ~ mean(., na.rm = TRUE),
       sd = ~ sd(., na.rm = TRUE)
-    ))
+    )))
   )
 
   expect_equal(names(spatagg_l), namestring)
@@ -400,13 +412,13 @@ test_that("multi-step spatial works", {
     "ArithmeticMean"
   )
 
-  spatagg <- multi_aggregate(ewr_to_agg,
+  expect_warning(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = funseq,
     auto_ewr_PU = TRUE
-  )
+  ))
 
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
@@ -420,19 +432,19 @@ test_that("multi-step spatial works", {
   expect_equal(nrow(spatagg), 4)
 
   # Keeping the whole set of polys doesn't really matter here
-  spataggkeep <- multi_aggregate(ewr_to_agg,
+  expect_warning(spataggkeep <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
     funsequence = funseq,
     keepAllPolys = TRUE,
     auto_ewr_PU = TRUE
-  )
+  ))
   # stringr::str_flatten(names(spatagg), "', '")
   # namestring <- c('scenario', 'polyID', 'sdl_units_mean_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(names(spataggkeep), namestring)
   expect_s3_class(spataggkeep, "sf")
-  expect_equal(nrow(spataggkeep), nrow(basin) * length(unique(ewr_to_agg$scenario)))
+  expect_equal(nrow(spataggkeep), nrow(basin) * length(unique(ewr_to_agg_timemean$scenario)))
 
   # Plots are useful for checking spatial outcomes
   g2sdl_plot <- ggplot2::ggplot() +
@@ -440,7 +452,7 @@ test_that("multi-step spatial works", {
       data = spatagg,
       ggplot2::aes(fill = basin_ArithmeticMean_cewo_valleys_ArithmeticMean_sdl_units_ArithmeticMean_ewr_achieved)
     ) +
-    ggplot2::geom_sf(data = ewr_to_agg) +
+    ggplot2::geom_sf(data = ewr_to_agg_timemean) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = "bottom")
 
@@ -449,7 +461,7 @@ test_that("multi-step spatial works", {
       data = spataggkeep,
       ggplot2::aes(fill = basin_ArithmeticMean_cewo_valleys_ArithmeticMean_sdl_units_ArithmeticMean_ewr_achieved)
     ) +
-    ggplot2::geom_sf(data = ewr_to_agg) +
+    ggplot2::geom_sf(data = ewr_to_agg_timemean) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = "bottom")
 
@@ -484,7 +496,7 @@ test_that("multi-step theme and spatial works", {
     "ArithmeticMean"
   )
 
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -513,7 +525,7 @@ test_that("multi-step theme and spatial works", {
       data = target_5,
       ggplot2::aes(fill = target_5_year_2024_ArithmeticMean_mdb_ArithmeticMean_Objective_ArithmeticMean_catchment_ArithmeticMean_Specific_goal_ArithmeticMean_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_ewr_achieved)
     ) +
-    ggplot2::geom_sf(data = ewr_to_agg) +
+    ggplot2::geom_sf(data = ewr_to_agg_timemean) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = "bottom")
 
@@ -546,7 +558,7 @@ test_that("multi-step theme and spatial works with !namehistory", {
   )
 
 
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -617,7 +629,7 @@ test_that("multi-step theme and spatial works with !namehistory", {
   # )
 
 
-  spatagg_wm <- multi_aggregate(ewr_to_agg,
+  spatagg_wm <- multi_aggregate(ewr_to_agg_timemean,
                                aggsequence = aggseq,
                                groupers = "scenario",
                                aggCols = "ewr_achieved",
@@ -660,7 +672,7 @@ test_that("multi-step theme and spatial works with !namehistory", {
       data = target_5,
       ggplot2::aes(fill = ewr_achieved)
     ) +
-    ggplot2::geom_sf(data = ewr_to_agg) +
+    ggplot2::geom_sf(data = ewr_to_agg_timemean) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = "bottom")
 
@@ -694,7 +706,7 @@ test_that("passing name of sf objects works", {
   )
 
 
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -755,7 +767,7 @@ test_that("backstepping along theme axis throws informative error", {
 
 
   expect_error(
-    spatagg <- multi_aggregate(ewr_to_agg,
+    spatagg <- multi_aggregate(ewr_to_agg_timemean,
       aggsequence = aggseq,
       groupers = "scenario",
       aggCols = "ewr_achieved",
@@ -797,7 +809,7 @@ test_that("saving the list of steps and appropriate persistence of PU grouping",
     "ArithmeticMean"
   )
 
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -808,7 +820,7 @@ test_that("saving the list of steps and appropriate persistence of PU grouping",
   )
 
   # should have planning units and gauge up until we aggregate to sdl
-  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+  expect_true("planning_unit_name" %in% names(spatagg$agg_input) &
     "planning_unit_name" %in% names(spatagg$ewr_code) &
     "planning_unit_name" %in% names(spatagg$env_obj))
 
@@ -816,7 +828,7 @@ test_that("saving the list of steps and appropriate persistence of PU grouping",
     !"planning_unit_name" %in% names(spatagg$Specific_goal) &
     !"planning_unit_name" %in% names(spatagg$catchment))
 
-  expect_true("gauge" %in% names(spatagg$ewr_code_timing) &
+  expect_true("gauge" %in% names(spatagg$agg_input) &
                 "gauge" %in% names(spatagg$ewr_code) &
                 "gauge" %in% names(spatagg$env_obj))
 
@@ -825,7 +837,7 @@ test_that("saving the list of steps and appropriate persistence of PU grouping",
                 !"gauge" %in% names(spatagg$catchment))
   # There are more, but that should cover it
 
-  expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
   expect_s3_class(spatagg[[length(spatagg)]], "sf")
   expect_equal(nrow(spatagg$target_5_year_2024), 300)
@@ -840,7 +852,7 @@ test_that("saving the list of steps and appropriate persistence of PU grouping",
       data = target_5,
       ggplot2::aes(fill = target_5_year_2024_ArithmeticMean_mdb_ArithmeticMean_Objective_ArithmeticMean_catchment_ArithmeticMean_Specific_goal_ArithmeticMean_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_ewr_achieved)
     ) +
-    ggplot2::geom_sf(data = ewr_to_agg) +
+    ggplot2::geom_sf(data = ewr_to_agg_timemean) +
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = "bottom")
 
@@ -874,7 +886,7 @@ test_that("nonspatial joins of spatial data", {
     "ArithmeticMean"
   )
 
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
                              aggsequence = aggseq,
                              groupers = "scenario",
                              aggCols = "ewr_achieved",
@@ -898,7 +910,7 @@ test_that("nonspatial joins of spatial data", {
 
 
   # stringr::str_flatten(names(spatagg), "', '")
-  expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
+  expect_equal(names(spatagg), c('agg_input', names(aggseq)))
   expect_s3_class(spatagg$planning_units, "sf")
 
   # Check the values are actually right
@@ -958,7 +970,7 @@ for (i in unique(gauge412005$planning_unit_name)) {
       data = puinpu,
       ggplot2::aes(fill = planning_unit_name)
     ) +
-    ggplot2::geom_sf(data = ewr_to_agg |> dplyr::select(geometry) |> dplyr::distinct()) +
+    ggplot2::geom_sf(data = ewr_to_agg_timemean |> dplyr::select(geometry) |> dplyr::distinct()) +
     ggplot2::theme(legend.position = "bottom")
 
   # to actually test the intersection (and correct areas), we need to test
@@ -984,7 +996,7 @@ for (i in unique(gauge412005$planning_unit_name)) {
     target_5_year_2024 = c("Objective", "target_5_year_2024")
   )
 
-  spataggc <- multi_aggregate(ewr_to_agg,
+  spataggc <- multi_aggregate(ewr_to_agg_timemean,
                              aggsequence = aggseqc,
                              groupers = "scenario",
                              aggCols = "ewr_achieved",
@@ -999,7 +1011,7 @@ for (i in unique(gauge412005$planning_unit_name)) {
   expect_equal(unique(spataggc$sdl_units$SWSDLName), c('Lachlan', 'Murrumbidgee', 'Macquarie–Castlereagh'))
 
   # check it works for group_until explicitly
-  spatagg_g <- multi_aggregate(ewr_to_agg,
+  spatagg_g <- multi_aggregate(ewr_to_agg_timemean,
                               aggsequence = aggseqc,
                               groupers = "scenario",
                               aggCols = "ewr_achieved",
@@ -1047,7 +1059,7 @@ test_that("single functions at each step, called in different ways", {
   )
 
   # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
-  spatagg_c <- multi_aggregate(ewr_to_agg,
+  spatagg_c <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1057,7 +1069,7 @@ test_that("single functions at each step, called in different ways", {
     auto_ewr_PU = TRUE
   )
 
-  expect_equal(names(spatagg_c), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg_c), c("agg_input", names(aggseq)))
   expect_type(spatagg_c, "list")
   expect_s3_class(spatagg_c[[length(spatagg_c)]], "sf")
   expect_equal(nrow(spatagg_c$sdl_units), 252)
@@ -1071,7 +1083,7 @@ test_that("single functions at each step, called in different ways", {
   )
 
   # Expect_warning because sf throws a warning about spatially constant attributes. and it gets thrown multiple times
-  expect_error(spatagg_b <- multi_aggregate(ewr_to_agg,
+  expect_error(spatagg_b <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1081,7 +1093,7 @@ test_that("single functions at each step, called in different ways", {
     auto_ewr_PU = TRUE
   ))
 
-  spatagg_b <- multi_aggregate(ewr_to_agg,
+  spatagg_b <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1095,7 +1107,7 @@ test_that("single functions at each step, called in different ways", {
     auto_ewr_PU = TRUE
   )
 
-  expect_equal(names(spatagg_b), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg_b), c("agg_input", names(aggseq)))
   expect_type(spatagg_b, "list")
   expect_s3_class(spatagg_b[[length(spatagg_b)]], "sf")
   expect_equal(nrow(spatagg_b$sdl_units), 252)
@@ -1108,7 +1120,7 @@ test_that("single functions at each step, called in different ways", {
     list(~ ArithmeticMean(.))
   )
 
-  spatagg_l <- multi_aggregate(ewr_to_agg,
+  spatagg_l <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1118,7 +1130,7 @@ test_that("single functions at each step, called in different ways", {
     auto_ewr_PU = TRUE
   )
 
-  expect_equal(names(spatagg_l), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg_l), c("agg_input", names(aggseq)))
   expect_type(spatagg_l, "list")
   expect_s3_class(spatagg_l[[length(spatagg_l)]], "sf")
   expect_equal(nrow(spatagg_l$sdl_units), 252)
@@ -1139,7 +1151,7 @@ test_that("multiple functions at each step", {
     c("ArithmeticMean", "CompensatingFactor")
   )
 
-  spatagg_c <- multi_aggregate(ewr_to_agg,
+  spatagg_c <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1149,7 +1161,7 @@ test_that("multiple functions at each step", {
     auto_ewr_PU = TRUE
   )
 
-  expect_equal(names(spatagg_c), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg_c), c("agg_input", names(aggseq)))
   expect_type(spatagg_c, "list")
   expect_s3_class(spatagg_c[[length(spatagg_c)]], "sf")
   expect_equal(nrow(spatagg_c$sdl_units), 252)
@@ -1161,7 +1173,7 @@ test_that("multiple functions at each step", {
   #                  c(ArithmeticMean, GeometricMean),
   #                  c(ArithmeticMean, CompensatingFactor))
 
-  spatagg_b <- multi_aggregate(ewr_to_agg,
+  spatagg_b <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1175,7 +1187,7 @@ test_that("multiple functions at each step", {
     auto_ewr_PU = TRUE
   )
 
-  expect_equal(names(spatagg_b), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg_b), c("agg_input", names(aggseq)))
   expect_type(spatagg_b, "list")
   expect_s3_class(spatagg_b[[length(spatagg_b)]], "sf")
   expect_equal(nrow(spatagg_b$sdl_units), 252)
@@ -1189,7 +1201,7 @@ test_that("multiple functions at each step", {
     list(ArithmeticMean = ~ ArithmeticMean(.), CompensatingFactor = ~ CompensatingFactor(.))
   )
 
-  spatagg_l <- multi_aggregate(ewr_to_agg,
+  spatagg_l <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1199,7 +1211,7 @@ test_that("multiple functions at each step", {
     auto_ewr_PU = TRUE
   )
 
-  expect_equal(names(spatagg_l), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg_l), c("agg_input", names(aggseq)))
   expect_type(spatagg_l, "list")
   expect_s3_class(spatagg_l[[length(spatagg_l)]], "sf")
   expect_equal(nrow(spatagg_l$sdl_units), 252)
@@ -1222,7 +1234,7 @@ test_that("mixed functions between steps", {
     list(ArithmeticMean = ~ ArithmeticMean(.), CompensatingFactor = ~ CompensatingFactor(.))
   )
 
-  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1233,7 +1245,7 @@ test_that("mixed functions between steps", {
   ))
 
   # Directly declaring list
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1247,7 +1259,7 @@ test_that("mixed functions between steps", {
     auto_ewr_PU = TRUE
   )
 
-  expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
   expect_s3_class(spatagg[[length(spatagg)]], "sf")
   expect_equal(nrow(spatagg$sdl_units), 252)
@@ -1261,7 +1273,7 @@ test_that("mixed functions between steps", {
     list(ArithmeticMean = ~ ArithmeticMean(.), CompensatingFactor = ~ CompensatingFactor(.))
   )
 
-  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1279,7 +1291,7 @@ test_that("mixed functions between steps", {
     list(ArithmeticMean = ~ ArithmeticMean(.))
   )
 
-  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1296,7 +1308,7 @@ test_that("mixed functions between steps", {
     list(ArithmeticMean = ~ ArithmeticMean(.), CompensatingFactor = ~ CompensatingFactor(.))
   )
 
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1306,7 +1318,7 @@ test_that("mixed functions between steps", {
     auto_ewr_PU = TRUE
   )
 
-  expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
   expect_s3_class(spatagg[[length(spatagg)]], "sf")
   expect_equal(nrow(spatagg$sdl_units), 252)
@@ -1324,7 +1336,7 @@ test_that("mixed functions between steps", {
     list(ArithmeticMean = ~ ArithmeticMean(.), CompensatingFactor = ~ CompensatingFactor(.))
   )
 
-  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1335,7 +1347,7 @@ test_that("mixed functions between steps", {
   ))
 
   # for dplyr 1.0 these work
-  # expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
+  # expect_equal(names(spatagg), c('agg_input', names(aggseq)))
   # expect_type(spatagg, 'list')
   # expect_s3_class(spatagg[[length(spatagg)]], 'sf')
   # expect_equal(nrow(spatagg$sdl_units), 252)
@@ -1359,7 +1371,7 @@ test_that("mixed functions between steps", {
     list(ArithmeticMean = ~ ArithmeticMean(.), CompensatingFactor = ~ CompensatingFactor(.))
   )
 
-  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1370,7 +1382,7 @@ test_that("mixed functions between steps", {
   ))
 
   # Directly declaring list
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1384,7 +1396,7 @@ test_that("mixed functions between steps", {
     auto_ewr_PU = TRUE
   )
 
-  expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
   expect_s3_class(spatagg[[length(spatagg)]], "sf")
   expect_equal(nrow(spatagg$sdl_units), 252)
@@ -1398,7 +1410,7 @@ test_that("mixed functions between steps", {
     list(ArithmeticMean = ~ ArithmeticMean(.), CompensatingFactor = ~ CompensatingFactor(.))
   )
 
-  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1416,7 +1428,7 @@ test_that("mixed functions between steps", {
     list(ArithmeticMean = ~ ArithmeticMean(.))
   )
 
-  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1433,7 +1445,7 @@ test_that("mixed functions between steps", {
     list(ArithmeticMean = ~ ArithmeticMean(.), CompensatingFactor = ~ CompensatingFactor(.))
   )
 
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1443,7 +1455,7 @@ test_that("mixed functions between steps", {
     auto_ewr_PU = TRUE
   )
 
-  expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
   expect_s3_class(spatagg[[length(spatagg)]], "sf")
   expect_equal(nrow(spatagg$sdl_units), 252)
@@ -1461,7 +1473,7 @@ test_that("mixed functions between steps", {
     list(ArithmeticMean = ~ ArithmeticMean(.), CompensatingFactor = ~ CompensatingFactor(.))
   )
 
-  expect_error(spatagg <- multi_aggregate(ewr_to_agg,
+  expect_error(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1472,7 +1484,7 @@ test_that("mixed functions between steps", {
   ))
 
   # for dplyr 1.0 these work
-  # expect_equal(names(spatagg), c('ewr_code_timing', names(aggseq)))
+  # expect_equal(names(spatagg), c('agg_input', names(aggseq)))
   # expect_type(spatagg, 'list')
   # expect_s3_class(spatagg[[length(spatagg)]], 'sf')
   # expect_equal(nrow(spatagg$sdl_units), 252)
@@ -1506,7 +1518,7 @@ test_that("mixed functions including quosures, singles, multiples, and character
     c("ArithmeticMean", "LimitingFactor")
   )
 
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = "scenario",
     aggCols = "ewr_achieved",
@@ -1516,7 +1528,7 @@ test_that("mixed functions including quosures, singles, multiples, and character
     auto_ewr_PU = TRUE
   )
 
-  expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
   expect_s3_class(spatagg[[length(spatagg)]], "sf")
   expect_equal(nrow(spatagg$sdl_units), 252)
@@ -1554,7 +1566,7 @@ test_that("group_until works", {
   # first, expect it to fail without auto_ewr_PU or group_until
 
   # Need to wrap twice because there are two steps that throw warnings.
-  expect_warning(expect_warning(spatagg <- multi_aggregate(ewr_to_agg,
+  expect_warning(expect_warning(spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = c("scenario"),
     aggCols = "ewr_achieved",
@@ -1565,7 +1577,7 @@ test_that("group_until works", {
 
   # By name, vctor
   # not listing gauge, but geometry makes the data persist
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = c("scenario", "planning_unit_name"),
     group_until = c(NA, "sdl_units"),
@@ -1576,7 +1588,7 @@ test_that("group_until works", {
   )
 
   # should have planning units up until we aggregate to sdl
-  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+  expect_true("planning_unit_name" %in% names(spatagg$agg_input) &
     "planning_unit_name" %in% names(spatagg$ewr_code) &
     "planning_unit_name" %in% names(spatagg$env_obj))
 
@@ -1585,12 +1597,12 @@ test_that("group_until works", {
     !"planning_unit_name" %in% names(spatagg$catchment))
 
   # We've lost the 'gauge' name, but the geometry holds the rows together
-  expect_true('gauge' %in% names(spatagg$ewr_code_timing))
+  expect_true('gauge' %in% names(spatagg$agg_input))
   expect_true(!'gauge' %in% names(spatagg$ewr_code))
   expect_equal(nrow(spatagg$ewr_code), 356)
 
   # with gauge explicitly
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
                              aggsequence = aggseq,
                              groupers = c("scenario", "planning_unit_name", "gauge"),
                              group_until = c(NA, "sdl_units", "sdl_units"),
@@ -1601,7 +1613,7 @@ test_that("group_until works", {
   )
 
   # should have planning units up until we aggregate to sdl
-  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+  expect_true("planning_unit_name" %in% names(spatagg$agg_input) &
                 "planning_unit_name" %in% names(spatagg$ewr_code) &
                 "planning_unit_name" %in% names(spatagg$env_obj))
 
@@ -1610,7 +1622,7 @@ test_that("group_until works", {
                 !"planning_unit_name" %in% names(spatagg$catchment))
 
   # now we should have gauge in the same places as plannign units
-  expect_true("gauge" %in% names(spatagg$ewr_code_timing) &
+  expect_true("gauge" %in% names(spatagg$agg_input) &
                 "gauge" %in% names(spatagg$ewr_code) &
                 "gauge" %in% names(spatagg$env_obj))
 
@@ -1622,7 +1634,7 @@ test_that("group_until works", {
 
 
   # By name, a list, as it should be
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = c("scenario", "planning_unit_name"),
     group_until = list(scenario = NA, planning_unit_name = "sdl_units"),
@@ -1634,7 +1646,7 @@ test_that("group_until works", {
 
 
   # should have planning units up until we aggregate to sdl
-  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+  expect_true("planning_unit_name" %in% names(spatagg$agg_input) &
     "planning_unit_name" %in% names(spatagg$ewr_code) &
     "planning_unit_name" %in% names(spatagg$env_obj))
 
@@ -1644,7 +1656,7 @@ test_that("group_until works", {
   # There are more, but that should cover it
 
   # By index
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = c("scenario", "planning_unit_name"),
     group_until = c(NA, 3),
@@ -1655,7 +1667,7 @@ test_that("group_until works", {
   )
 
   # should have planning units up until we aggregate to sdl
-  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+  expect_true("planning_unit_name" %in% names(spatagg$agg_input) &
     "planning_unit_name" %in% names(spatagg$ewr_code) &
     "planning_unit_name" %in% names(spatagg$env_obj))
 
@@ -1664,11 +1676,11 @@ test_that("group_until works", {
     !"planning_unit_name" %in% names(spatagg$catchment))
   # There are more, but that should cover it
 
-  expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
 
   # by type/test
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = c("scenario", "planning_unit_name"),
     group_until = c(NA, is_notpoint),
@@ -1679,7 +1691,7 @@ test_that("group_until works", {
   )
 
   # should have planning units up until we aggregate to sdl
-  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+  expect_true("planning_unit_name" %in% names(spatagg$agg_input) &
     "planning_unit_name" %in% names(spatagg$ewr_code) &
     "planning_unit_name" %in% names(spatagg$env_obj))
 
@@ -1688,11 +1700,11 @@ test_that("group_until works", {
     !"planning_unit_name" %in% names(spatagg$catchment))
   # There are more, but that should cover it
 
-  expect_equal(names(spatagg), c("ewr_code_timing", names(aggseq)))
+  expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
 
   # a named list, only one entry
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = c("scenario", "planning_unit_name"),
     group_until = list(planning_unit_name = "sdl_units"),
@@ -1703,7 +1715,7 @@ test_that("group_until works", {
   )
 
   # should have planning units up until we aggregate to sdl
-  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+  expect_true("planning_unit_name" %in% names(spatagg$agg_input) &
     "planning_unit_name" %in% names(spatagg$ewr_code) &
     "planning_unit_name" %in% names(spatagg$env_obj))
 
@@ -1715,7 +1727,7 @@ test_that("group_until works", {
   expect_true("scenario" %in% names(spatagg$target_5_year_2024))
 
   # a named list, only one entry, function
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = c("scenario", "planning_unit_name"),
     group_until = list(planning_unit_name = is_notpoint),
@@ -1726,7 +1738,7 @@ test_that("group_until works", {
   )
 
   # should have planning units up until we aggregate to sdl
-  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+  expect_true("planning_unit_name" %in% names(spatagg$agg_input) &
     "planning_unit_name" %in% names(spatagg$ewr_code) &
     "planning_unit_name" %in% names(spatagg$env_obj))
 
@@ -1739,7 +1751,7 @@ test_that("group_until works", {
 
   # a named list, group_until not in groupers and tidyselected grouper
   # Putting 'gauge' in here too, since it usually should be, and checks it works with two
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = tidyselect::starts_with("sce"),
     group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint),
@@ -1750,7 +1762,7 @@ test_that("group_until works", {
   )
 
   # should have planning units up until we aggregate to sdl
-  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+  expect_true("planning_unit_name" %in% names(spatagg$agg_input) &
     "planning_unit_name" %in% names(spatagg$ewr_code) &
     "planning_unit_name" %in% names(spatagg$env_obj))
 
@@ -1759,7 +1771,7 @@ test_that("group_until works", {
     !"planning_unit_name" %in% names(spatagg$catchment))
 
   # now we should have gauge in the same places as plannign units
-  expect_true("gauge" %in% names(spatagg$ewr_code_timing) &
+  expect_true("gauge" %in% names(spatagg$agg_input) &
                 "gauge" %in% names(spatagg$ewr_code) &
                 "gauge" %in% names(spatagg$env_obj))
 
@@ -1774,7 +1786,7 @@ test_that("group_until works", {
   expect_true("scenario" %in% names(spatagg$target_5_year_2024))
 
   # another tidyselect
-  spatagg <- multi_aggregate(ewr_to_agg,
+  spatagg <- multi_aggregate(ewr_to_agg_timemean,
     aggsequence = aggseq,
     groupers = tidyselect::matches("(sce)|(plan)"),
     group_until = list(planning_unit_name = is_notpoint),
@@ -1785,7 +1797,7 @@ test_that("group_until works", {
   )
 
   # should have planning units up until we aggregate to sdl
-  expect_true("planning_unit_name" %in% names(spatagg$ewr_code_timing) &
+  expect_true("planning_unit_name" %in% names(spatagg$agg_input) &
     "planning_unit_name" %in% names(spatagg$ewr_code) &
     "planning_unit_name" %in% names(spatagg$env_obj))
 
@@ -1795,4 +1807,235 @@ test_that("group_until works", {
 
   # make sure the other groupers persisted
   expect_true("scenario" %in% names(spatagg$target_5_year_2024))
+})
+
+
+# Temporal and sequencing -------------------------------------------------
+
+test_that("Sequencing edge cases", {
+
+  # if we don't pass theme steps, it should drop the theme levels because there's no way to infer them
+  # But SHOULD keep time, because there is
+  # This test is done above, so commenting out here, but keeping for reference
+  # spatagg <- multi_aggregate(ewr_to_agg,
+  #                                  aggsequence = list(sdl_units = sdl_units),
+  #                                  groupers = "scenario",
+  #                                  aggCols = "ewr_achieved",
+  #                                  funsequence = list("mean")
+  # )
+
+  # If we do pass theme steps, but they are in a later stage, they need to be kept around
+
+    # This should have
+    spatagg_s_th_t <- multi_aggregate(ewr_to_agg,
+                                     causal_edges = causal_ewr,
+                                     aggsequence = list(sdl_units = sdl_units,
+                                                        ewr_code = c('ewr_code_timing', 'ewr_code'),
+                                                        yrs = '2 years'),
+                                     groupers = "scenario",
+                                     aggCols = "ewr_achieved",
+                                     saveintermediate = TRUE,
+                                     funsequence = list("mean", 'ArithmeticMean', 'mean')
+    )
+
+    # the sdl sheet should have all the dates and code_timings
+    expect_snapshot_value(spatagg_s_th_t$sdl_units$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_th_t$sdl_units$ewr_code_timing |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_th_t$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+    # The ewr_code sheet should have ewr_codes, sdls, and all dates
+    expect_snapshot_value(spatagg_s_th_t$ewr_code$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_th_t$ewr_code$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_th_t$ewr_code$SWSDLID |> unique(), style = 'deparse')
+
+    # The yrs sheet should have ewr_codes, sdls, and two-year intervals
+    expect_snapshot_value(spatagg_s_th_t$yrs$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_th_t$yrs$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_th_t$yrs$SWSDLID |> unique(), style = 'deparse')
+
+
+    spatagg_s_t_th <- multi_aggregate(ewr_to_agg,
+                                      causal_edges = causal_ewr,
+                                      aggsequence = list(sdl_units = sdl_units,
+                                                         yrs = '2 years',
+                                                         ewr_code = c('ewr_code_timing', 'ewr_code')),
+                                      groupers = "scenario",
+                                      aggCols = "ewr_achieved",
+                                      saveintermediate = TRUE,
+                                      funsequence = list("mean", 'ArithmeticMean', 'mean'),
+                                      auto_ewr_PU = TRUE
+    )
+
+    # the sdl sheet should have all the dates and code_timings
+    expect_snapshot_value(spatagg_s_t_th$sdl_units$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_t_th$sdl_units$ewr_code_timing |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_t_th$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+    # The yrs sheet should have code_timing, sdl, and two-year intervals
+    expect_snapshot_value(spatagg_s_t_th$yrs$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_t_th$yrs$ewr_code_timing |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_t_th$yrs$SWSDLID|> unique(), style = 'deparse')
+
+    # The ewr_code sheet should have ewr_codes, sdls, and 2-year
+    expect_snapshot_value(spatagg_s_t_th$ewr_code$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_t_th$ewr_code$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_s_t_th$ewr_code$SWSDLID |> unique(), style = 'deparse')
+
+
+    spatagg_th_s_t <- multi_aggregate(ewr_to_agg,
+                                      causal_edges = causal_ewr,
+                                      aggsequence = list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                                                         sdl_units = sdl_units,
+                                                         yrs = '2 years'),
+                                      groupers = "scenario",
+                                      aggCols = "ewr_achieved",
+                                      saveintermediate = TRUE,
+                                      funsequence = list("mean", 'ArithmeticMean', 'mean'),
+                                      auto_ewr_PU = TRUE
+    )
+
+    # The ewr_code sheet should have ewr_codes, planning units (not sdls), and all dates
+    expect_snapshot_value(spatagg_th_s_t$ewr_code$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_s_t$ewr_code$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_s_t$ewr_code$planning_unit_name |> unique(), style = 'deparse')
+
+    # the sdl sheet should have all times and ewr_codes
+    expect_snapshot_value(spatagg_th_s_t$sdl_units$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_s_t$sdl_units$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_s_t$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+    # The yrs sheet should have ewr_codes, sdls, and two-year intervals
+    expect_snapshot_value(spatagg_th_s_t$yrs$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_s_t$yrs$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_s_t$yrs$SWSDLID |> unique(), style = 'deparse')
+
+    spatagg_th_t_s <- multi_aggregate(ewr_to_agg,
+                                      causal_edges = causal_ewr,
+                                      aggsequence = list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                                                         yrs = '2 years',
+                                                         sdl_units = sdl_units),
+                                      groupers = "scenario",
+                                      aggCols = "ewr_achieved",
+                                      saveintermediate = TRUE,
+                                      funsequence = list("mean", 'ArithmeticMean', 'mean'),
+                                      auto_ewr_PU = TRUE
+    )
+
+    # The ewr_code sheet should have ewr_codes, planning units (not sdls), and all dates
+    expect_snapshot_value(spatagg_th_t_s$ewr_code$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_t_s$ewr_code$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_t_s$ewr_code$planning_unit_name |> unique(), style = 'deparse')
+
+    # The yrs sheet should have ewr_codes, planning units, and two-year intervals
+    expect_snapshot_value(spatagg_th_t_s$yrs$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_t_s$yrs$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_t_s$yrs$planning_unit_name |> unique(), style = 'deparse')
+
+    # the sdl sheet should have 2-year intervals and ewr_codes
+    expect_snapshot_value(spatagg_th_t_s$sdl_units$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_t_s$sdl_units$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_th_t_s$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+    spatagg_t_s_th <- multi_aggregate(ewr_to_agg,
+                                      causal_edges = causal_ewr,
+                                      aggsequence = list(yrs = '2 years',
+                                                         sdl_units = sdl_units,
+                                                         ewr_code = c('ewr_code_timing', 'ewr_code')),
+                                      groupers = "scenario",
+                                      aggCols = "ewr_achieved",
+                                      saveintermediate = TRUE,
+                                      funsequence = list("mean", 'ArithmeticMean', 'mean'),
+                                      auto_ewr_PU = TRUE
+    )
+
+    # The yrs sheet should have code_timing, planning units, and two-year intervals
+    expect_snapshot_value(spatagg_t_s_th$yrs$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_s_th$yrs$ewr_code_timing |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_s_th$yrs$planning_unit_name |> unique(), style = 'deparse')
+
+    # the sdl sheet should have 2-year intervals and code_timing
+    expect_snapshot_value(spatagg_t_s_th$sdl_units$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_s_th$sdl_units$ewr_code_timing |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_s_th$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+    # The ewr_code sheet should have ewr_codes, sdls, and 2-year
+    expect_snapshot_value(spatagg_t_s_th$ewr_code$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_s_th$ewr_code$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_s_th$ewr_code$SWSDLID |> unique(), style = 'deparse')
+
+    spatagg_t_th_s <- multi_aggregate(ewr_to_agg,
+                                      causal_edges = causal_ewr,
+                                      aggsequence = list(yrs = '2 years',
+                                                         ewr_code = c('ewr_code_timing', 'ewr_code'),
+                                                         sdl_units = sdl_units),
+                                      groupers = "scenario",
+                                      aggCols = "ewr_achieved",
+                                      saveintermediate = TRUE,
+                                      funsequence = list("mean", 'ArithmeticMean', 'mean'),
+                                      auto_ewr_PU = TRUE
+    )
+
+    # The yrs sheet should have code_timing, planning units, and two-year intervals
+    expect_snapshot_value(spatagg_t_th_s$yrs$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_th_s$yrs$ewr_code_timing |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_th_s$yrs$planning_unit_name |> unique(), style = 'deparse')
+
+    # The ewr_code sheet should have ewr_codes, planning_untois, and 2-year
+    expect_snapshot_value(spatagg_t_th_s$ewr_code$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_th_s$ewr_code$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_th_s$ewr_code$planning_unit_name |> unique(), style = 'deparse')
+
+    # the sdl sheet should have 2-year intervals and ewr_code
+    expect_snapshot_value(spatagg_t_th_s$sdl_units$date |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_th_s$sdl_units$ewr_code |> unique(), style = 'deparse')
+    expect_snapshot_value(spatagg_t_th_s$sdl_units$SWSDLID |> unique(), style = 'deparse')
+
+})
+
+test_that("Temporal", {
+
+  skip_on_os('linux')
+
+  # This should thow warnings about theme if I don't have them in groupers, but not if I do
+
+  # This should not have a time column
+  spatagg_temp <- multi_aggregate(ewr_to_agg,
+                                   causal_edges = causal_ewr,
+                                   aggsequence = list(all_time = 'all_time'),
+                                   groupers = c("scenario", 'ewr_code', 'ewr_code_timing'),
+                                   aggCols = "ewr_achieved",
+                                   saveintermediate = TRUE,
+                                   funsequence = list("mean"),
+                                  auto_ewr_PU = TRUE
+  )
+
+  expect_true(!any(purrr::map_lgl(spatagg_temp$all_time, is_time)))
+
+  # This should
+  spatagg_years <- multi_aggregate(ewr_to_agg,
+                                  causal_edges = causal_ewr,
+                                  aggsequence = list(yrs = '2 years'),
+                                  groupers = c("scenario", 'ewr_code', 'ewr_code_timing'),
+                                  aggCols = "ewr_achieved",
+                                  saveintermediate = TRUE,
+                                  funsequence = list("mean"),
+                                  auto_ewr_PU = TRUE
+  )
+
+  expect_true(any(purrr::map_lgl(spatagg_years$yrs, is_time)))
+
+  # and check we can feed arbitrary posix
+  spatagg_psx <- multi_aggregate(ewr_to_agg,
+                                   causal_edges = causal_ewr,
+                                   aggsequence = list(datebits = c(lubridate::ymd('20150101', '20180404', '20200202'))),
+                                   groupers = c("scenario", 'ewr_code', 'ewr_code_timing'),
+                                   aggCols = "ewr_achieved",
+                                   saveintermediate = TRUE,
+                                   funsequence = list("mean"),
+                                   auto_ewr_PU = TRUE
+  )
+
+  expect_snapshot_value(spatagg_psx$datebits$date |> unique(), style = 'deparse')
+
+
 })
