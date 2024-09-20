@@ -42,7 +42,7 @@ def save_ewrs(ewr_results, ewr_type, output_path, scenarios_from = 'directory', 
 
     # Now, we can toss the file names if we are getting scenario names from the directory. I was doing this in R, but we need the gauge names all the way in here.
     if scenarios_from == 'directory':
-        ewrresults['scenario'] = ewrresults['scenario'].str.replace(r'^(.*)_.*$', r'\1', regex=True)
+        ewrresults['scenario'] = ewrresults['scenario']#.str.replace(r'^(.*)_.*$', r'\1', regex=True)
 
     for i in ewr_scenarionames:
         scene_outpath = os.path.join(output_path, i)
@@ -60,8 +60,8 @@ def save_ewrs(ewr_results, ewr_type, output_path, scenarios_from = 'directory', 
             print(f'''path length {len(outfile)} longer than 250, may not save output. 260 is typical cutoff, +-. If saving is failing, shorten paths or disable the path length limit for your system.''')
 
         # If we're collapsing off gauge files, do that here for the search  
-        if scenarios_from == 'directory':
-            i = re.sub(r'^(.*)_.*$', r'\1', i)
+        # if scenarios_from == 'directory':
+        #     i = re.sub(r'^(.*)_.*$', r'\1', i)
 
         sceneresults = ewrresults.query('scenario == @i')
         sceneresults.to_csv(outfile, index = False)
