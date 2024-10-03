@@ -54,6 +54,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @param rparallel logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using `furrr`. To use, install `furrr` and set a [future::plan()] (likely `multisession` or `multicore`)
 #' @param retries Number of retries if there are errors. 0 is no retries, but still runs once. Default 2.
 #' @param print_runs logical, default FALSE. If true, print the set of runs to be done.
+#' @param fix_doublenames logical; remove duplicated names as often happens with /scenario/scenario.csv directory structures
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
@@ -72,7 +73,8 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
                                rparallel = FALSE,
                                retries = 2,
                                print_runs = FALSE,
-                               datesuffix = FALSE) {
+                               datesuffix = FALSE,
+                               fix_doublenames = TRUE) {
 
   # allow sloppy outputTypes and returnTypes
   if (!is.list(outputType)) {
@@ -96,7 +98,9 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
     if (grepl("netcdf", model_format)) {
       filetype <- "nc"
     }
-    hydro_paths <- find_scenario_paths(hydro_dir, type = filetype, file_search = file_search)
+    hydro_paths <- find_scenario_paths(hydro_dir, type = filetype,
+                                       file_search = file_search,
+                                       fix_doublenames = fix_doublenames)
   } else {
     hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
   }

@@ -5,12 +5,13 @@
 #' @param hydro_dir directory with hydrographs
 #' @param type filetype, default 'csv', likely will also need 'ncdf'
 #' @param file_search character, regex for additional limitations on filenames. Useful if several files have the extension defined by `type`, but only some are hydrographs.
+#' @param fix_doublenames logical; remove duplicated names as often happens with /scenario/scenario.csv directory structures
 #'
 #' @return a list of filepaths to the hydrographs
 #' @export
 #'
 #' @examples
-find_scenario_paths <- function(hydro_dir, type = 'csv', file_search = NULL) {
+find_scenario_paths <- function(hydro_dir, type = 'csv', file_search = NULL, fix_doublenames = TRUE) {
 
 
   # get the paths relative to hydro_dir
@@ -45,17 +46,19 @@ find_scenario_paths <- function(hydro_dir, type = 'csv', file_search = NULL) {
   names(hydro_paths) <- gsub('_StraightNodeGauge', '', names(hydro_paths))
 
   # If the scenario names are just duplicated, as happens with scenario/scenario.csv, cut.
-  splitnames <- stringr::str_split(names(hydro_paths), '_')
-  check_double_names <- function(x) {
-    if (length(x) == 2 && x[1] == x[2]) {
-      doubled <- TRUE
-    } else {
-      doubled <- FALSE
+  if (fix_doublenames) {
+    splitnames <- stringr::str_split(names(hydro_paths), '_')
+    check_double_names <- function(x) {
+      if (length(x) == 2 && x[1] == x[2]) {
+        doubled <- TRUE
+      } else {
+        doubled <- FALSE
+      }
     }
-  }
 
-  if (all(purrr::map_lgl(splitnames, check_double_names))) {
-    names(hydro_paths) <- stringr::str_split_i(names(hydro_paths), '_', 1)
+    if (all(purrr::map_lgl(splitnames, check_double_names))) {
+      names(hydro_paths) <- stringr::str_split_i(names(hydro_paths), '_', 1)
+    }
   }
 
   return(hydro_paths)

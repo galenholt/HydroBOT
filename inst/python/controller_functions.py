@@ -40,10 +40,6 @@ def save_ewrs(ewr_results, ewr_type, output_path, scenarios_from = 'directory', 
     # Get scenario names
     ewr_scenarionames = ewrresults['scenario'].unique()
 
-    # Now, we can toss the file names if we are getting scenario names from the directory. I was doing this in R, but we need the gauge names all the way in here.
-    if scenarios_from == 'directory':
-        ewrresults['scenario'] = ewrresults['scenario'].str.replace(r'^(.*)_.*$', r'\1', regex=True)
-
     for i in ewr_scenarionames:
         scene_outpath = os.path.join(output_path, i)
         
