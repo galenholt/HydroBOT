@@ -85,7 +85,14 @@ def unzip_and_pathparse(pathlist, output_path):
         return(pathlist)
 
 # Main function to run and save the EWRs
-def run_save_ewrs(pathlist, output_path, model_format, outputType = 'none', returnType = 'none', scenario_name = '_UNNAMEDSCENARIO_', scenarios_from = 'directory', datesuffix = False):
+def run_save_ewrs(pathlist, 
+                  output_path, 
+                  model_format, 
+                  outputType = 'none', 
+                  returnType = 'none', 
+                  scenario_name = '_UNNAMEDSCENARIO_', 
+                  scenarios_from = 'directory', 
+                  datesuffix = False):
       
     # I'm not convinced we want to support in-function unzipping, but it would work, I guess.
     # The goal here is to unzip only the needed file, and so paralleling does that once per process
@@ -164,7 +171,7 @@ def run_save_ewrs(pathlist, output_path, model_format, outputType = 'none', retu
     # Have to wait until here and not do it in clean_ewrs because we need the gauges for saving unique files.
     if scenarios_from == 'directory':
         for i in returndict.keys():
-            returndict[i]['scenario'] = returndict[i]['scenario'].str.replace(r'^(.*)_.*$', r'\1', regex=True)
+            returndict[i]['scenario'] = returndict[i]['scenario']#.str.replace(r'^(.*)_.*$', r'\1', regex=True)
 
     return(returndict)
   
