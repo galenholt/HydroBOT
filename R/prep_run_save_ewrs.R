@@ -92,7 +92,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
   # that's no longer true, it makes the now-required loops easier to use one in
   # R
   if (is.null(scenarios)) {
-    if (model_format %in% c("IQQM - NSW 10,000 years", 'Standard time-series')) {
+    if (model_format %in% c("IQQM - NSW 10,000 years", "Standard time-series", "Bigmod - MDBA")) {
       filetype <- "csv"
     }
     if (grepl("netcdf", model_format)) {
