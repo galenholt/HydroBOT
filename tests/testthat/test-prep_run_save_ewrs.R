@@ -78,7 +78,7 @@ test_that("complex dir structure", {
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_true(all(unique(ewr_out$summary$scenario) %in%
-    c("base", "down4", "S1_base", "S2_up4", "up4")))
+    c("base_base", "down4_down4", "S1_base_base", "S2_up4_up4", "up4_up4")))
 
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
   expect_snapshot(realised_structure)
@@ -107,7 +107,7 @@ test_that("complex dir structure, missings", {
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_true(all(unique(ewr_out$summary$scenario) %in%
-                    c("S1_base", "S2_up4")))
+                    c("S1_base_base", "S2_up4_up4")))
 
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
   expect_snapshot(realised_structure)
@@ -129,7 +129,7 @@ test_that("complex dir structure, missings", {
 
   # but only have run the missing runs
   expect_true(all(unique(ewr_out2$summary$scenario) %in%
-                    c("base", "down4", "up4")))
+                    c("base_base", "down4_down4", "up4_up4")))
 
 })
 
@@ -249,7 +249,8 @@ test_that("do different length gauge records break EWR", {
     returnType = list("summary", "all")
   )
 
-
+  # The separates have _gauge in scenario
+  ewr_out <- purrr::map(ewr_out, \(x) x |> dplyr::mutate(scenario = stringr::str_remove_all(scenario, '_.*')))
   expect_equal(ewr_out$summary, smoosh_out$summary)
 
   # all_events gets sorted, but if we sort, should match
@@ -282,16 +283,8 @@ test_that("csv per gauge works", {
   # These no longer come in with directory_gauge. Split gauge off and should be left with scenarios.
   # ewr_out$summary <- ewr_out$summary |>
   #   dplyr::mutate(scenario = purrr::map_chr(scenario, \(x) stringr::str_split_1(x, "_")[1]))
-  expect_equal(unique(ewr_out$summary$scenario), c(
-    "base",
-    "down4",
-    "up4"
-  ))
-  expect_equal(unique(ewr_out$all_events$scenario), c(
-    "base",
-    "down4",
-    "up4"
-  ))
+  expect_snapshot(unique(ewr_out$summary$scenario))
+  expect_snapshot(unique(ewr_out$all_events$scenario))
 
   # I'm now controlling the scenario names in the toolkit, so this should work.
 
@@ -769,6 +762,8 @@ test_that("safety works", {
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_equal(
     unique(ewr_out$summary$scenario),
-    c("base", "down4", "up4")
+    c("base_base",
+      "down4_down4",
+      "up4_up4")
   )
 })

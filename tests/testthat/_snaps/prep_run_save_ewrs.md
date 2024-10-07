@@ -146,6 +146,26 @@
 # csv per gauge works
 
     Code
+      unique(ewr_out$summary$scenario)
+    Output
+       [1] "base_412002"  "base_412005"  "base_412038"  "base_421001"  "base_421004" 
+       [6] "base_421011"  "down4_412002" "down4_412005" "down4_412038" "down4_421001"
+      [11] "down4_421004" "down4_421011" "up4_412002"   "up4_412005"   "up4_412038"  
+      [16] "up4_421001"   "up4_421004"   "up4_421011"  
+
+---
+
+    Code
+      unique(ewr_out$all_events$scenario)
+    Output
+       [1] "base_412002"  "base_412005"  "base_412038"  "base_421001"  "base_421004" 
+       [6] "base_421011"  "down4_412002" "down4_412005" "down4_412038" "down4_421001"
+      [11] "down4_421004" "down4_421011" "up4_412002"   "up4_412005"   "up4_412038"  
+      [16] "up4_421001"   "up4_421004"   "up4_421011"  
+
+---
+
+    Code
       realised_structure
     Output
        [1] "hydrographs"                               

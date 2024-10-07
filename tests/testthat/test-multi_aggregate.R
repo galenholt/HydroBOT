@@ -1329,7 +1329,7 @@ test_that("mixed functions between steps", {
   # Mixed character and list within a single level- this is no longer supported
   # as of dplyr 1.1. It *does* work with dplyr 1.0, but I think we need to move
   # forward from that.
-  skip_if_not_installed("dplyr", minimum_version = 1.1)
+  skip_if_not_installed("dplyr", minimum_version = '1.1')
   funseq_clc <- list(
     c("ArithmeticMean", "LimitingFactor"),
     list("ArithmeticMean", GeometricMean = ~ GeometricMean(.)),
@@ -1466,7 +1466,7 @@ test_that("mixed functions between steps", {
   # Mixed character and list within a single level- this is no longer supported
   # as of dplyr 1.1. It *does* work with dplyr 1.0, but I think we need to move
   # forward from that.
-  skip_if_not_installed("dplyr", minimum_version = 1.1)
+  skip_if_not_installed("dplyr", minimum_version = '1.1')
   funseq_clc <- list(
     c("ArithmeticMean", "LimitingFactor"),
     list("ArithmeticMean", GeometricMean = ~ GeometricMean(.)),

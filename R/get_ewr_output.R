@@ -379,14 +379,18 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 #' @param x vector to calculate rolling frequencies for
 #' @param year_roll window size for the roll
 #' @param pad_initial Allow calculating values in the first years < year_roll; roll the year_roll if possible, otherwise as much as possible. Note that this makes the 1:year_roll entries less smoothed.
-#' @param na.rm default TRUE, na action for the sums over lags
+#' @param na.rm default FALSE, na action for the sums over lags- TRUE is tempting, but can cause fails for high thresholds when we don't actually know whether they're met, and so FALSE is more appropriate (keeps intermediates NA).
 #' @return
 #' @export
 #'
 #' @examples
-roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = TRUE) {
+roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = FALSE) {
 
   if (pad_initial) {
+    if (!na.rm) {
+      rlang::abort(c('Using `pad_initial = TRUE` and `na.rm = FALSE` is not logical.',
+                    'pad_initial requires estimating over subsets of the `year_roll` span, and so implies `na.rm = TRUE`.'))
+    }
     x <- c(rep(NA, year_roll), x)
   }
 
@@ -406,13 +410,13 @@ roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = TRUE) {
     # we might want na.rm = TRUE to deal with intermediate NA and because we are
     # checking whether a frequency is greater than a value, and so the sum with
     # na.rm = TRUE gives us the *minimum* frequency for a sequence with NA,
-    # which may stil be greater than the threshold. But that can cause fails if
+    # which may still be greater than the threshold. But that can cause fails if
     # the threshold is high, where we dont' really know and so values *should*
     # be NA. And it has the side effect of giving 0 if everythign is NA, and we
     # want to keep those NA.
     if (na.rm) {
       bothna <- rowSums(is.na(lagmat))
-      sumvec <- rowSums(lagmat, na.rm = na.rm)
+      sumvec <- rowSums(lagmat, na.rm = TRUE)
       sumvec[bothna == ncol(lagmat)] <- NA
     }
     if (!na.rm) {
