@@ -2,13 +2,13 @@
 # CITATION file created with {cffr} R package
 # See also: https://docs.ropensci.org/cffr/
 # --------------------------------------------
-
+ 
 cff-version: 1.2.0
 message: 'To cite package "HydroBOT" in publications use:'
 type: software
 license: MIT
 title: 'HydroBOT: Toolkit For Flow-Dependent outcomes in the Murray-Darling Basin'
-version: 0.2.0.9001
+version: 0.2.0.9004
 abstract: Provides tools to assess responses to flows in the MDB. Wraps the EWR tool
   and provides ongoing modeling of ecological responses with causal networks, as well
   as analysis, synthesis and visualisation functionality targetted at scenario comparisons.
@@ -17,10 +17,6 @@ authors:
   given-names: Galen
   email: g.holt@deakin.edu.au
   orcid: https://orcid.org/0000-0002-7455-9275
-- family-names: Dwyer
-  given-names: Georgia
-  email: g.dwyer@deakin.edu.au
-  orcid:
 contact:
 - family-names: Holt
   given-names: Galen
@@ -647,7 +643,7 @@ references:
   authors:
   - family-names: Ooms
     given-names: Jeroen
-    email: jeroen@berkeley.edu
+    email: jeroenooms@gmail.com
     orcid: https://orcid.org/0000-0002-4035-0289
   year: '2024'
   identifiers:
@@ -704,7 +700,7 @@ references:
   authors:
   - family-names: Ooms
     given-names: Jeroen
-    email: jeroen@berkeley.edu
+    email: jeroenooms@gmail.com
     orcid: https://orcid.org/0000-0002-4035-0289
   year: '2024'
   doi: 10.32614/CRAN.package.rsvg
@@ -747,6 +743,7 @@ references:
   - family-names: Pierce
     given-names: David
     email: dpierce@ucsd.edu
+    orcid: https://orcid.org/0000-0002-2453-9030
   year: '2024'
   doi: 10.32614/CRAN.package.ncdf4
 - type: software
