@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-find_scenario_paths <- function(hydro_dir, type = 'csv', file_search = NULL, fix_doublenames = TRUE) {
+find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'directory', file_search = NULL, fix_doublenames = TRUE) {
 
 
   # get the paths relative to hydro_dir
@@ -29,23 +29,32 @@ find_scenario_paths <- function(hydro_dir, type = 'csv', file_search = NULL, fix
   }
 
   # This removes the extension and turns / into _, since paths must be unique
-  unique_names <- hydro_paths |>
-    stringr::str_remove_all(paste0('\\.', type)) |>
-    stringr::str_replace_all("/", "_")
+  if (scenarios_from == 'directory') {
+    # Remove the final file, leaving only the directory
+    scenario_names <- gsub("/[^/]+$",'', hydro_paths) |>
+      stringr::str_remove_all(paste0('\\.', type)) |>
+      stringr::str_replace_all("/", "_")
+  } else {
+    scenario_names <- hydro_paths |>
+      stringr::str_remove_all(paste0('\\.', type)) |>
+      stringr::str_replace_all("/", "_")
+  }
 
-  # no need for a scenarios_from == 'file', since that's what unique_names is originally.
+
+  # no need for a scenarios_from == 'file', since that's what scenario_names is originally.
 
   # add the path to hydro_dir back on. This keeps things relative to whatever hydro_dir is relative to
   hydro_paths <- file.path(hydro_dir, hydro_paths)
 
   hydro_paths <- as.list(hydro_paths) |>
-    setNames(unique_names)
+    setNames(scenario_names)
 
   # a specific bit of cleanup
   names(hydro_paths) <- gsub(' |\\(|\\)', '', names(hydro_paths))
   names(hydro_paths) <- gsub('_StraightNodeGauge', '', names(hydro_paths))
 
   # If the scenario names are just duplicated, as happens with scenario/scenario.csv, cut.
+  # This is handled better if we get it from the directory
   if (fix_doublenames) {
     splitnames <- stringr::str_split(names(hydro_paths), '_')
     check_double_names <- function(x) {

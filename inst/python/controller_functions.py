@@ -27,15 +27,14 @@ def clean_ewrs(ewr_results, scenario_name):
     return(ewr_results)
 
 # save the new cleaner ewr structure
-def save_ewrs(ewr_results, ewr_type, output_path, scenarios_from = 'directory', datesuffix = True):
+def save_ewrs(ewr_results, ewr_type, output_path, suff = '', datesuffix = True):
     # The data comes in with different scenarios in one df, but typically the
     # scenarios will be in different directories. This sorts that out
 
     ewrresults = copy.deepcopy(ewr_results)
     # If we want a date suffix
-    suff = ''
     if datesuffix:
-        suff = "_" + time.strftime("%Y%m%d-%H%M%S")
+        suff = suff + "_" + time.strftime("%Y%m%d-%H%M%S")
         
     # Get scenario names
     ewr_scenarionames = ewrresults['scenario'].unique()
@@ -54,10 +53,6 @@ def save_ewrs(ewr_results, ewr_type, output_path, scenarios_from = 'directory', 
         # paths longer than 259 seem to fail on Windows, but do so silently. Try to be informative
         if (len(outfile) > 250) & (os.name == 'nt'):
             print(f'''path length {len(outfile)} longer than 250, may not save output. 260 is typical cutoff, +-. If saving is failing, shorten paths or disable the path length limit for your system.''')
-
-        # If we're collapsing off gauge files, do that here for the search  
-        # if scenarios_from == 'directory':
-        #     i = re.sub(r'^(.*)_.*$', r'\1', i)
 
         sceneresults = ewrresults.query('scenario == @i')
         sceneresults.to_csv(outfile, index = False)
@@ -129,19 +124,27 @@ def run_save_ewrs(pathlist,
     if ('hydrozipextract' in pathlist):
         shutil.rmtree(os.path.join(output_path, 'hydrozipextract'))
 
+    # get the filepart in case we're using directories to make sure we save all potential internal files
+    # This is *much* safer than appending them together into one file.
+    filepart = ''
+    if scenarios_from == 'directory':
+        filepart = re.search(r'/[^/]+$', pathlist)[0]
+        filepart = re.sub(r'[/\.csv\.nc]+', '', filepart)
+        filepart = '_' + filepart
+
     # only save the parts we want
     if ('summary' in outputType) | ('everything' in outputType):
-        save_ewrs(ewr_sum, 'summary', output_path, scenarios_from = scenarios_from, datesuffix = datesuffix)
+        save_ewrs(ewr_sum, 'summary', output_path, suff = filepart, datesuffix = datesuffix)
     if (('annual' in outputType) | ('everything' in outputType) | ('yearly' in outputType)):
-        save_ewrs(ewr_yr, 'yearly', output_path, scenarios_from = scenarios_from, datesuffix = datesuffix)
+        save_ewrs(ewr_yr, 'yearly', output_path, suff = filepart, datesuffix = datesuffix)
     if ('all' in outputType) | ('everything' in outputType) | ('all_events' in outputType):
-        save_ewrs(ewr_all, 'all_events', output_path, scenarios_from = scenarios_from, datesuffix = datesuffix)
+        save_ewrs(ewr_all, 'all_events', output_path, suff = filepart, datesuffix = datesuffix)
     if (('all_successful_events' in outputType) | ('everything' in outputType) | ('successful' in outputType)):
-        save_ewrs(ewr_success, 'all_successful_events', output_path, scenarios_from = scenarios_from, datesuffix = datesuffix)
+        save_ewrs(ewr_success, 'all_successful_events', output_path, suff = filepart, datesuffix = datesuffix)
     if (('all_interEvents' in outputType) | ('everything' in outputType)):
-        save_ewrs(ewr_inter, 'all_interEvents', output_path, scenarios_from = scenarios_from, datesuffix = datesuffix)
+        save_ewrs(ewr_inter, 'all_interEvents', output_path, suff = filepart, datesuffix = datesuffix)
     if (('all_successful_interEvents' in outputType) | ('everything' in outputType)):
-        save_ewrs(ewr_successInter, 'all_successful_interEvents', output_path, scenarios_from = scenarios_from, datesuffix = datesuffix)
+        save_ewrs(ewr_successInter, 'all_successful_interEvents', output_path, suff = filepart, datesuffix = datesuffix)
     
 
     # Only return the parts we want. also should be list comprehension or at

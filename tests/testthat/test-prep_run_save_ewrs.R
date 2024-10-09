@@ -782,7 +782,11 @@ test_that("directory works for scenario naming with multiple files", {
     returnType = list("summary", "all")
   )
 
-  ewr_out$summary$scenario |> unique()
-  ewr_out$summary$gauge |> unique()
+  # Does it return what we expect?
+  expect_snapshot(ewr_out$summary$scenario |> unique())
+  expect_snapshot(ewr_out$summary$gauge |> unique())
 
+  # does it create the files we expect, in a way they read in as expected?
+  ewrsum <- get_any_ewr_output(file.path(temp_parent_dir, 'module_output', 'EWR'), type = 'summary')
+  expect_snapshot(table(ewrsum$scenario, ewrsum$gauge))
 })
