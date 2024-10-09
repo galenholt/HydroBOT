@@ -767,3 +767,22 @@ test_that("safety works", {
       "up4_up4")
   )
 })
+
+test_that("directory works for scenario naming with multiple files", {
+  # First, generate temporary hydrograph files
+
+  make_temp_multifile()
+
+  ewr_out <- prep_run_save_ewrs(
+    hydro_dir = temp_hydro_multi,
+    scenarios_from = 'directory',
+    output_parent_dir = temp_parent_dir,
+    outputType = list("summary", "yearly"),
+    datesuffix = FALSE,
+    returnType = list("summary", "all")
+  )
+
+  ewr_out$summary$scenario |> unique()
+  ewr_out$summary$gauge |> unique()
+
+})

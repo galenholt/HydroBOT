@@ -609,3 +609,72 @@ test_that("Various group_until formats work", {
   expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))
   expect_equal(yamout$auto_ewr_PU, FALSE)
 })
+
+
+test_that("parallel works", {
+
+  set_future_multi()
+
+  # These mirror multi_aggregate, but make sure we're not introducing more issues here.
+  aggseq_s_th_t <- list(sdl_units = 'sdl_units',
+                        ewr_code = c('ewr_code_timing', 'ewr_code'),
+                        yrs = '2 years')
+  funseq <- list(
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean"
+  )
+
+  spatagg_pt <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq_s_th_t,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    auto_ewr_PU = TRUE,
+    saveintermediate = TRUE,
+    rparallel = TRUE,
+    par_recursive = TRUE
+  )
+
+  spatagg_pf <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq_s_th_t,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    auto_ewr_PU = TRUE,
+    saveintermediate = TRUE,
+    rparallel = TRUE,
+    par_recursive = FALSE
+  )
+
+  spatagg_np <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq_s_th_t,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    auto_ewr_PU = TRUE,
+    saveintermediate = TRUE,
+    rparallel = TRUE,
+    par_recursive = FALSE
+  )
+
+  expect_equal(spatagg_np, spatagg_pf)
+  expect_equal(spatagg_np, spatagg_pt)
+
+
+})

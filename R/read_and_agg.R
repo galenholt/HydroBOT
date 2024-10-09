@@ -8,6 +8,7 @@
 #'
 #' @inheritParams multi_aggregate
 #' @inherit multi_aggregate params return
+#' @inherit prep_run_save_ewrs params rparallel
 #'
 #' @param datpath path to indicator data. Currently needs to be EWR (same as
 #'   `ewrpath` argument in [prep_ewr_agg()]), but left more general here for
@@ -27,6 +28,7 @@
 #'   `savepath = NULL` and `returnList = FALSE`, the function errors to avoid
 #'   wasting resources.
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
+#' @param par_recursive logical, default TRUE. If parallel, do we use the innermost level of directory containing EWR outputs (TRUE) or the next level in from datpath (FALSE)
 #' @param ... passed to [prep_ewr_agg()]
 #'
 #' @export
@@ -50,8 +52,50 @@ read_and_agg <- function(datpath,
                          returnList = TRUE,
                          savepath = NULL,
                          extrameta = NULL,
+                         rparallel = FALSE,
+                         par_recursive = TRUE,
+                         whichcrs = 4283,
                          ...) {
   # The ... pass gauge and scenario filters to `prep_ewr_agg`
+
+  # Recurse over inner directories if parallel
+  if (rparallel) {
+    if (par_recursive) {
+      # Go all the way in (i.e. loop over every folder with a csv)
+      gfiles <- list.files(datpath, pattern = '.csv', full.names = TRUE, recursive = TRUE)
+      dps <- gsub("/[^/]+$",'', gfiles) |> unique()
+    } else {
+      # only first level
+      dps <- list.dirs(datpath, recursive = FALSE)
+    }
+    aggout <- safe_imap(dps, \(x, y) read_and_agg(x,
+                                               type = type,
+                                               geopath = geopath,
+                                               causalpath = causalpath,
+                                               groupers = groupers,
+                                               group_until = group_until,
+                                               aggCols = aggCols,
+                                               aggsequence = aggsequence,
+                                               funsequence = funsequence,
+                                               saveintermediate = saveintermediate,
+                                               namehistory = namehistory,
+                                               keepAllPolys = keepAllPolys,
+                                               failmissing = failmissing,
+                                               auto_ewr_PU = auto_ewr_PU,
+                                               pseudo_spatial = pseudo_spatial,
+                                               returnList = returnList,
+                                               savepath = savepath,
+                                               extrameta = extrameta,
+                                               rparallel = FALSE,
+                                               whichcrs = whichcrs,
+                                               y, # so I can not write safe_map
+                                               ...),
+                        parallel = TRUE)
+    aggout <- purrr::list_transpose(aggout) |>
+      purrr::map(dplyr::bind_rows)
+    return(aggout)
+  }
+
 
   if (!returnList & is.null(savepath)) {
     rlang::abort(message = "not returning output to disk or session. aborting to not use the resources.")
@@ -82,7 +126,7 @@ read_and_agg <- function(datpath,
     }
   }
 
-  data <- prep_ewr_agg(datpath, type = type, geopath = geopath, ...)
+  data <- prep_ewr_agg(datpath, type = type, geopath = geopath, whichcrs = whichcrs, ...)
 
   # parse any character names for the spatial data, then character will be the themes
   aggsequence <- purrr::map(aggsequence, parse_geo)
