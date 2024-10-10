@@ -20,7 +20,6 @@ ewr_out <- prep_run_save_ewrs(
   hydro_dir = temp_hydro_dir,
   output_parent_dir = temp_parent_dir,
   outputType = ewroutlist,
-  datesuffix = FALSE,
   returnType = ewroutlist
 )
 

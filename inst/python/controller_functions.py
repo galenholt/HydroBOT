@@ -27,14 +27,11 @@ def clean_ewrs(ewr_results, scenario_name):
     return(ewr_results)
 
 # save the new cleaner ewr structure
-def save_ewrs(ewr_results, ewr_type, output_path, suff = '', datesuffix = True):
+def save_ewrs(ewr_results, ewr_type, output_path, suff = ''):
     # The data comes in with different scenarios in one df, but typically the
     # scenarios will be in different directories. This sorts that out
 
     ewrresults = copy.deepcopy(ewr_results)
-    # If we want a date suffix
-    if datesuffix:
-        suff = suff + "_" + time.strftime("%Y%m%d-%H%M%S")
         
     # Get scenario names
     ewr_scenarionames = ewrresults['scenario'].unique()
@@ -82,8 +79,7 @@ def run_save_ewrs(pathlist,
                   outputType = 'none', 
                   returnType = 'none', 
                   scenario_name = '_UNNAMEDSCENARIO_', 
-                  scenarios_from = 'directory', 
-                  datesuffix = False):
+                  scenarios_from = 'directory'):
       
     # I'm not convinced we want to support in-function unzipping, but it would work, I guess.
     # The goal here is to unzip only the needed file, and so paralleling does that once per process
@@ -129,22 +125,22 @@ def run_save_ewrs(pathlist,
     filepart = ''
     if scenarios_from == 'directory':
         filepart = re.search(r'/[^/]+$', pathlist)[0]
-        filepart = re.sub(r'[/\.csv\.nc]+', '', filepart)
+        filepart = re.sub(r'(/|\.csv|\.nc)', '', filepart)
         filepart = '_' + filepart
 
     # only save the parts we want
     if ('summary' in outputType) | ('everything' in outputType):
-        save_ewrs(ewr_sum, 'summary', output_path, suff = filepart, datesuffix = datesuffix)
+        save_ewrs(ewr_sum, 'summary', output_path, suff = filepart)
     if (('annual' in outputType) | ('everything' in outputType) | ('yearly' in outputType)):
-        save_ewrs(ewr_yr, 'yearly', output_path, suff = filepart, datesuffix = datesuffix)
+        save_ewrs(ewr_yr, 'yearly', output_path, suff = filepart)
     if ('all' in outputType) | ('everything' in outputType) | ('all_events' in outputType):
-        save_ewrs(ewr_all, 'all_events', output_path, suff = filepart, datesuffix = datesuffix)
+        save_ewrs(ewr_all, 'all_events', output_path, suff = filepart)
     if (('all_successful_events' in outputType) | ('everything' in outputType) | ('successful' in outputType)):
-        save_ewrs(ewr_success, 'all_successful_events', output_path, suff = filepart, datesuffix = datesuffix)
+        save_ewrs(ewr_success, 'all_successful_events', output_path, suff = filepart)
     if (('all_interEvents' in outputType) | ('everything' in outputType)):
-        save_ewrs(ewr_inter, 'all_interEvents', output_path, suff = filepart, datesuffix = datesuffix)
+        save_ewrs(ewr_inter, 'all_interEvents', output_path, suff = filepart)
     if (('all_successful_interEvents' in outputType) | ('everything' in outputType)):
-        save_ewrs(ewr_successInter, 'all_successful_interEvents', output_path, suff = filepart, datesuffix = datesuffix)
+        save_ewrs(ewr_successInter, 'all_successful_interEvents', output_path, suff = filepart)
     
 
     # Only return the parts we want. also should be list comprehension or at

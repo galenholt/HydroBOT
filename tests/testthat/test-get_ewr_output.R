@@ -15,7 +15,6 @@ ewroutlist <- list('summary',
 ewr_out <- prep_run_save_ewrs(hydro_dir = file.path(temp_parent_dir, 'hydrographs'),
                               output_parent_dir = temp_parent_dir,
                               outputType = ewroutlist,
-                              datesuffix = FALSE,
                               returnType = ewroutlist)
 
 # The path to those

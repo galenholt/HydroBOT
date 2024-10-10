@@ -20,7 +20,6 @@ make_test_ewr_output <- function(build_dirs = TRUE) {
   ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
                                 output_parent_dir = temp_parent_dir,
                                 outputType = list('none'),
-                                datesuffix = FALSE,
                                 returnType = list('summary', 'yearly'))
   return(ewr_out)
 }

@@ -19,8 +19,7 @@ test_that("returns one result, no saving", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("none"),
-    datesuffix = FALSE,
-    returnType = list("summary")
+        returnType = list("summary")
   )
   )
 
@@ -45,8 +44,7 @@ test_that("returns list", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("none"),
-    datesuffix = FALSE,
-    returnType = list("summary", "all")
+        returnType = list("summary", "all")
   )
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
@@ -71,14 +69,13 @@ test_that("complex dir structure", {
     output_parent_dir = temp_parent_dir,
     # scenarios = c('S1', 'S2', 'S3'),
     outputType = list("summary", "all"),
-    datesuffix = FALSE,
-    returnType = list("summary", "all")
+        returnType = list("summary", "all")
   )
 
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_true(all(unique(ewr_out$summary$scenario) %in%
-    c("base_base", "down4_down4", "S1_base_base", "S2_up4_up4", "up4_up4")))
+    c("base", "down4", "S1_base", "S2_up4", "up4")))
 
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
   expect_snapshot(realised_structure)
@@ -100,14 +97,13 @@ test_that("complex dir structure, missings", {
     output_parent_dir = temp_parent_dir,
     file_search = 'S1|S2',
     outputType = list("summary", "all"),
-    datesuffix = FALSE,
-    returnType = list("summary", "all")
+        returnType = list("summary", "all")
   )
 
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_true(all(unique(ewr_out$summary$scenario) %in%
-                    c("S1_base_base", "S2_up4_up4")))
+                    c("S1_base", "S2_up4")))
 
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
   expect_snapshot(realised_structure)
@@ -119,8 +115,7 @@ test_that("complex dir structure, missings", {
     output_parent_dir = temp_parent_dir,
     fill_missing = TRUE,
     outputType = list("summary", "all"),
-    datesuffix = FALSE,
-    returnType = list("summary", "all")
+        returnType = list("summary", "all")
   )
 
   # now we should have those files
@@ -129,9 +124,10 @@ test_that("complex dir structure, missings", {
 
   # but only have run the missing runs
   expect_true(all(unique(ewr_out2$summary$scenario) %in%
-                    c("base_base", "down4_down4", "up4_up4")))
+                    c("base", "down4", "up4")))
 
 })
+
 
 test_that("manual scenario naming", {
   # create dir so building makes sense
@@ -145,8 +141,7 @@ test_that("manual scenario naming", {
     output_parent_dir = temp_parent_dir,
     scenarios = scenelist,
     outputType = list("summary", "all"),
-    datesuffix = FALSE,
-    returnType = list("summary", "all")
+        returnType = list("summary", "all")
   )
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
@@ -237,16 +232,14 @@ test_that("do different length gauge records break EWR", {
     hydro_dir = temp_hydro_multi,
     output_parent_dir = temp_parent_dir,
     outputType = list("none"),
-    datesuffix = FALSE,
-    returnType = list("summary", "all")
+        returnType = list("summary", "all")
   )
 
   smoosh_out <- prep_run_save_ewrs(
     hydro_dir = file.path(temp_parent_dir, 'hydrosmoosh'),
     output_parent_dir = temp_parent_dir,
     outputType = list("none"),
-    datesuffix = FALSE,
-    returnType = list("summary", "all")
+        returnType = list("summary", "all")
   )
 
   # The separates have _gauge in scenario
@@ -273,8 +266,7 @@ test_that("csv per gauge works", {
     hydro_dir = temp_hydro_multi,
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-    datesuffix = FALSE,
-    returnType = list("summary", "all")
+        returnType = list("summary", "all")
   )
 
   expect_equal(length(ewr_out), 2)
@@ -305,8 +297,7 @@ test_that("csv per gauge works for filenames", {
     scenarios_from = 'file',
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-    datesuffix = FALSE,
-    returnType = list("summary", "all")
+        returnType = list("summary", "all")
   )
 
   expect_equal(length(ewr_out), 2)
@@ -334,8 +325,7 @@ test_that("subset using file_search works", {
     file_search = '412', # half start with this, the other half with 421
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-    datesuffix = FALSE,
-    returnType = list("summary", "all")
+        returnType = list("summary", "all")
   )
 
   expect_equal(length(ewr_out), 2)
@@ -354,8 +344,7 @@ test_that("saving works for one", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("summary"),
-    datesuffix = FALSE,
-    returnType = list("summary")
+        returnType = list("summary")
   )
 
   expect_equal(length(ewr_out), 1)
@@ -375,8 +364,7 @@ test_that("saving works with subdir", {
     output_parent_dir = temp_parent_dir,
     output_subdir = 'testsub',
     outputType = list("summary"),
-    datesuffix = FALSE,
-    returnType = list("summary")
+        returnType = list("summary")
   )
   expect_equal(length(ewr_out), 1)
   expect_equal(names(ewr_out), "summary")
@@ -405,8 +393,7 @@ test_that("saving and returning works for all (or nearly all) ewr outputs", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = ewroutlist,
-    datesuffix = FALSE,
-    returnType = ewroutlist
+        returnType = ewroutlist
   )
 
   expect_equal(length(ewr_out), length(ewroutlist))
@@ -440,8 +427,7 @@ test_that("NETCDF saving and returning works for all (or nearly all) ewr outputs
     output_parent_dir = temp_parent_dir,
     model_format = "IQQM - netcdf",
     outputType = ewroutlist,
-    datesuffix = FALSE,
-    returnType = ewroutlist
+        returnType = ewroutlist
   )
 
   expect_equal(length(ewr_out), length(ewroutlist))
@@ -479,8 +465,7 @@ test_that("zipped NETCDF saving and returning works for all (or nearly all) ewr 
     file_search = 'Straight Node',
     scenarios_from = 'file',
     outputType = ewroutlist,
-    datesuffix = FALSE,
-    returnType = ewroutlist
+        returnType = ewroutlist
   )
 
 
@@ -513,8 +498,7 @@ test_that("NETCDF saving and returning works in parallel", {
     output_parent_dir = temp_parent_dir,
     model_format = "IQQM - netcdf",
     outputType = ewroutlist,
-    datesuffix = FALSE,
-    returnType = ewroutlist,
+        returnType = ewroutlist,
     rparallel = TRUE
   )
 
@@ -540,8 +524,7 @@ test_that("specifying *Type as character instead of list", {
       "summary",
       "all"
     ),
-    datesuffix = FALSE,
-    returnType = c("summary", "all")
+        returnType = c("summary", "all")
   )
   expect_equal(length(ewr_out), 2)
   expect_equal(names(ewr_out), c("summary", "all_events"))
@@ -563,8 +546,7 @@ test_that("Single scenario among many, with access to the outer directory", {
     hydro_dir = file.path(temp_hydro_dir, "base"),
     output_parent_dir = temp_parent_dir,
     outputType = list("summary"),
-    datesuffix = FALSE,
-    returnType = list("summary")
+        returnType = list("summary")
   )
 
 
@@ -572,7 +554,7 @@ test_that("Single scenario among many, with access to the outer directory", {
   # Expect only the single output, not for all the scenarios
   expect_equal(
     list.files(file.path(temp_parent_dir, "module_output", "EWR"), recursive = TRUE),
-    c("base/summary.csv", "ewr_metadata.json", "ewr_metadata.yml")
+    c("base/summary_base.csv", "ewr_metadata.json", "ewr_metadata.yml")
   )
 
   # Tear down
@@ -592,8 +574,7 @@ test_that("Single scenario among many, no access to the outer directory", {
     hydro_dir = scenario_path,
     output_parent_dir = scenario_path,
     outputType = list("summary"),
-    datesuffix = FALSE,
-    returnType = list("summary")
+        returnType = list("summary")
   )
 
 
@@ -624,8 +605,7 @@ test_that("Single scenario among many, no access to the outer directory, differe
     hydro_dir = scenario_path,
     output_parent_dir = scenario_path,
     outputType = list("summary"),
-    datesuffix = FALSE,
-    returnType = list("summary")
+        returnType = list("summary")
   )
 
 
@@ -649,8 +629,7 @@ test_that("parallel works for two", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-    datesuffix = FALSE,
-    returnType = list("summary", "yearly"),
+        returnType = list("summary", "yearly"),
     rparallel = TRUE
   )
 
@@ -675,8 +654,7 @@ test_that("parallel works for one", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("summary"),
-    datesuffix = FALSE,
-    returnType = list("summary"),
+        returnType = list("summary"),
     rparallel = TRUE
   )
 
@@ -699,8 +677,7 @@ test_that("parallel works for no return", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-    datesuffix = FALSE,
-    returnType = list("none"),
+        returnType = list("none"),
     rparallel = TRUE
   )
 
@@ -724,8 +701,7 @@ test_that("speed test", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-    datesuffix = FALSE,
-    returnType = list("summary", "yearly"),
+        returnType = list("summary", "yearly"),
     rparallel = TRUE
   ))
 
@@ -733,8 +709,7 @@ test_that("speed test", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-    datesuffix = FALSE,
-    returnType = list("summary", "yearly"),
+        returnType = list("summary", "yearly"),
     rparallel = FALSE
   ))
   tp
@@ -754,17 +729,16 @@ test_that("safety works", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("none"),
-    datesuffix = FALSE,
-    returnType = list("summary", "all")
+        returnType = list("summary", "all")
   )
 
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_equal(
     unique(ewr_out$summary$scenario),
-    c("base_base",
-      "down4_down4",
-      "up4_up4")
+    c("base",
+      "down4",
+      "up4")
   )
 })
 
@@ -778,8 +752,7 @@ test_that("directory works for scenario naming with multiple files", {
     scenarios_from = 'directory',
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-    datesuffix = FALSE,
-    returnType = list("summary", "all")
+        returnType = list("summary", "all")
   )
 
   # Does it return what we expect?

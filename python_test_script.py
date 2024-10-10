@@ -80,9 +80,20 @@
 # ewr_sh = controller_functions.run_save_ewrs(scenarios, output_path = op, model_format = 'IQQM - NSW 10,000 years', outputType = ['summary', 'yearly'], returnType = ['summary', 'yearly', 'all_events'], scenario_name = sn)
 
 
-#  Run make_temp_multifile() first and stop prep_run_save_ewrs just before actually running them.
-scenarios = 'C:/Users/galen/Documents/code/WERP/HydroBOT/_test_data/hydrographs/base/412005.csv'
-scenarios2 = 'C:/Users/galen/Documents/code/WERP/HydroBOT/_test_data/hydrographs/base/412002.csv'
+# #  Run make_temp_multifile() first and stop prep_run_save_ewrs just before actually running them.
+# scenarios = 'C:/Users/galen/Documents/code/WERP/HydroBOT/_test_data/hydrographs/base/412005.csv'
+# scenarios2 = 'C:/Users/galen/Documents/code/WERP/HydroBOT/_test_data/hydrographs/base/412002.csv'
+
+# op = 'C:/Users/galen/Documents/code/WERP/HydroBOT/_test_data/module_output/EWR'
+# sn = 'base'
+# # model_format = 'IQQM - netcdf'
+# # model_format = 'Standard time-series'
+# # Testing the controller
+# from inst.python import controller_functions
+# ewr_sh = controller_functions.run_save_ewrs(scenarios, output_path = op, model_format = 'Standard time-series', outputType = ['summary', 'yearly'], returnType = ['summary', 'yearly', 'all_events'], scenario_name = sn)
+# ewr_sh2 = controller_functions.run_save_ewrs(scenarios2, output_path = op, model_format = 'Standard time-series', outputType = ['summary', 'yearly'], returnType = ['summary', 'yearly', 'all_events'], scenario_name = sn)
+
+scenarios = 'C:/Users/galen/Documents/code/WERP/HydroBOT/_test_data/hydrographs/base/base.csv'
 
 op = 'C:/Users/galen/Documents/code/WERP/HydroBOT/_test_data/module_output/EWR'
 sn = 'base'
@@ -91,4 +102,3 @@ sn = 'base'
 # Testing the controller
 from inst.python import controller_functions
 ewr_sh = controller_functions.run_save_ewrs(scenarios, output_path = op, model_format = 'Standard time-series', outputType = ['summary', 'yearly'], returnType = ['summary', 'yearly', 'all_events'], scenario_name = sn)
-ewr_sh2 = controller_functions.run_save_ewrs(scenarios2, output_path = op, model_format = 'Standard time-series', outputType = ['summary', 'yearly'], returnType = ['summary', 'yearly', 'all_events'], scenario_name = sn)

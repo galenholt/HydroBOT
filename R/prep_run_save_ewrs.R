@@ -48,13 +48,10 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @param scenarios_from character, default 'directory' gets scenario names from directory names. If anything else, gets them from filenames (safest). Expect additional options in future, e.g from metadata.
 #' @param file_search character, regex for additional limitations on filenames. Useful to run a subset of scenarios or if several files have the extension defined by `model_format`, but only some are hydrographs.
 #' @param fill_missing logical, default FALSE. If TRUE, figures out the expected outputs and only runs those that are missing. Useful for long runs that might break.
-#' @param datesuffix logical. whether to add a suffix to saved filenames to
-#'   provide a datestamp. Should be deprecated in favour of metadata files.
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
 #' @param rparallel logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using `furrr`. To use, install `furrr` and set a [future::plan()] (likely `multisession` or `multicore`)
 #' @param retries Number of retries if there are errors. 0 is no retries, but still runs once. Default 2.
 #' @param print_runs logical, default FALSE. If true, print the set of runs to be done.
-#' @param fix_doublenames logical; remove duplicated names as often happens with /scenario/scenario.csv directory structures
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
@@ -72,9 +69,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
                                extrameta = NULL,
                                rparallel = FALSE,
                                retries = 2,
-                               print_runs = FALSE,
-                               datesuffix = FALSE,
-                               fix_doublenames = TRUE) {
+                               print_runs = FALSE) {
 
   # allow sloppy outputTypes and returnTypes
   if (!is.list(outputType)) {
@@ -100,8 +95,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
     }
     hydro_paths <- find_scenario_paths(hydro_dir, type = filetype,
                                        scenarios_from = scenarios_from,
-                                       file_search = file_search,
-                                       fix_doublenames = fix_doublenames)
+                                       file_search = file_search)
   } else {
     hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
   }
@@ -129,7 +123,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
 
     # Adjust if fillign missing
     if (fill_missing) {
-      missing_scenarios <- find_missing_runs(hydro_paths, output_path, outputType)
+      missing_scenarios <- find_missing_runs(hydro_paths, output_path, outputType, scenarios_from)
 
       hydro_paths <- hydro_paths[names(hydro_paths) %in% missing_scenarios]
     }
@@ -170,8 +164,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
       outputType = outputType,
       returnType = returnType,
       scenario_name = y,
-      scenarios_from = scenarios_from,
-      datesuffix = datesuffix
+      scenarios_from = scenarios_from
     )
   }
 
@@ -221,7 +214,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
       ewr_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
       ewr_status = TRUE,
       ewr_version = get_ewr_version(),
-      HydroBOT_version_at_EWR = packageVersion('HydroBOT')
+      HydroBOT_version_at_EWR = as.character(packageVersion('HydroBOT'))
     )
 
     # add any passed metadata info

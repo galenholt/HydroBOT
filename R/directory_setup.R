@@ -5,13 +5,12 @@
 #' @param hydro_dir directory with hydrographs
 #' @param type filetype, default 'csv', likely will also need 'ncdf'
 #' @param file_search character, regex for additional limitations on filenames. Useful if several files have the extension defined by `type`, but only some are hydrographs.
-#' @param fix_doublenames logical; remove duplicated names as often happens with /scenario/scenario.csv directory structures
 #'
 #' @return a list of filepaths to the hydrographs
 #' @export
 #'
 #' @examples
-find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'directory', file_search = NULL, fix_doublenames = TRUE) {
+find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'directory', file_search = NULL) {
 
 
   # get the paths relative to hydro_dir
@@ -52,23 +51,6 @@ find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'direc
   # a specific bit of cleanup
   names(hydro_paths) <- gsub(' |\\(|\\)', '', names(hydro_paths))
   names(hydro_paths) <- gsub('_StraightNodeGauge', '', names(hydro_paths))
-
-  # If the scenario names are just duplicated, as happens with scenario/scenario.csv, cut.
-  # This is handled better if we get it from the directory
-  if (fix_doublenames) {
-    splitnames <- stringr::str_split(names(hydro_paths), '_')
-    check_double_names <- function(x) {
-      if (length(x) == 2 && x[1] == x[2]) {
-        doubled <- TRUE
-      } else {
-        doubled <- FALSE
-      }
-    }
-
-    if (all(purrr::map_lgl(splitnames, check_double_names))) {
-      names(hydro_paths) <- stringr::str_split_i(names(hydro_paths), '_', 1)
-    }
-  }
 
   return(hydro_paths)
 }
@@ -217,15 +199,22 @@ fix_file_scenarios <- function(hydro_paths, scenarios) {
 #' @return
 #' @export
 #'
-find_expected_files <- function(hydro_paths, output_path, outputType) {
+find_expected_files <- function(hydro_paths, output_path, outputType, scenarios_from) {
 
   # output path should be length 1, but output Type may not be.
   if (length(output_path) > 1 ) {
     rlang::abort('More than one output path, unclear where to look for expected outputs.')
   }
+
+  filepart <- ''
+  if (scenarios_from == 'directory') {
+    filepart <- stringr::str_extract(hydro_paths, '/[^/]+$') |>
+      stringr::str_remove_all('/|\\.csv|\\.nc')
+    filepart <- paste0('_', filepart)
+  }
   expected_files <- foreach::foreach(ot = outputType,
                               .combine = c) %do% {
-    file.path(names(hydro_paths), paste0(ot, '.csv'))
+    file.path(names(hydro_paths), paste0(ot, filepart, '.csv'))
                               }
 
   return(expected_files)
@@ -241,12 +230,12 @@ find_expected_files <- function(hydro_paths, output_path, outputType) {
 #' @return
 #' @export
 #'
-find_missing_runs <- function(hydro_paths, output_path, outputType) {
+find_missing_runs <- function(hydro_paths, output_path, outputType, scenarios_from) {
   # Get the files that exist
   existing_files <- file.path(list.files(output_path, recursive = TRUE))
 
   # Get expected
-  expected_files <- find_expected_files(hydro_paths, output_path, outputType)
+  expected_files <- find_expected_files(hydro_paths, output_path, outputType, scenarios_from)
 
   # get the expected files that aren't existing
   missing_files <- expected_files[!expected_files %in% existing_files]
@@ -277,10 +266,11 @@ check_missing_runs <- function(hydro_dir,
                                scenarios = NULL,
                                file_search = NULL,
                                model_format = "Standard time-series",
-                               outputType = "none") {
+                               outputType = "none",
+                               scenarios_from = 'directory') {
 
   if (is.null(scenarios)) {
-    if (model_format %in% c("IQQM - NSW 10,000 years", 'Standard time-series')) {
+    if (model_format %in% c("IQQM - NSW 10,000 years", 'Standard time-series', "Bigmod - MDBA")) {
       filetype <- "csv"
     }
     if (grepl("netcdf", model_format)) {
@@ -298,7 +288,7 @@ check_missing_runs <- function(hydro_dir,
                                  ewr_outtypes = unlist(outputType)
   )
 
-  missing_scenarios <- find_missing_runs(hydro_paths, output_path, outputType)
+  missing_scenarios <- find_missing_runs(hydro_paths, output_path, outputType, scenarios_from)
 
   return(missing_scenarios)
 }
