@@ -104,7 +104,7 @@ NumberOfValues <- function(x, na.rm = TRUE) {
 #'
 
 Variance <- function(x, na.rm = TRUE) {
-  ifelse(all(is.na(x)), NA, var(x, na.rm = TRUE))
+  ifelse(all(is.na(x)), NA, stats::var(x, na.rm = TRUE))
 }
 
 #' Sum  aggregation

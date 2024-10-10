@@ -1,7 +1,7 @@
 #' Function to ensure colors match across plots
 #'
 #' @param levels character vector of levels to use (should be all possible for the variable)
-#' @param palette character vector of palette name from {paletteer}
+#' @param palette character vector of palette name from `paletteer`
 #' @param refvals character vector of levels we want to set manually (typically as references)
 #' @param refcols character vector (names or hex) of colors to set manually in order matching `refvals`
 #' @param includeRef logical, defailt FALSE. Should the colors be chosen including (TRUE) or not including (FALSE, the default) the levels in `refvals`. Typically `TRUE` if we sometimes want to accentuate a level, and sometimes not.

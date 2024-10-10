@@ -4,7 +4,7 @@
 #' website](https://www.mdba.gov.au/publications-and-data/maps-and-spatial-data/spatial-data),
 #' with direct link given below.
 #'
-#' @format ## `basin` An {sf} object with one polygon:
+#' @format ## `basin` An `sf` object with one polygon:
 #' \describe{
 #'   \item{DDIV_NAME}{Polygon name}
 #'   \item{AREA_HA, SHAPE_AREA, SHAPE_LEN}{basic descriptions}
@@ -20,7 +20,7 @@
 #' with direct link given below. Polygons have been slightly simplified (reduced
 #' vertices) to save size.
 #'
-#' @format ## `sd_units` An {sf} object:
+#' @format ## `sd_units` An `sf` object:
 #' \describe{
 #'   \item{SWSDLID, SWSDLName}{ID and name of SDL unit}
 #'   \item{StateID}{State}
@@ -36,7 +36,7 @@
 #' with direct link given below. Polygons have been slightly simplified (reduced
 #' vertices) to save size.
 #'
-#' @format ## `resource_plan_areas` An {sf} object:
+#' @format ## `resource_plan_areas` An `sf` object:
 #' \describe{
 #'   \item{SWWRPANAME, SWWRPACODE}{Name and code for resource plan area}
 #'   \item{STATE}{State}
@@ -54,7 +54,7 @@
 #' The BOM locations are used here for consistency with the EWR tool. Full list
 #' of gauges has been clipped to the `basin` polygon.
 #'
-#' @format ## `bom_basin_gauges` An {sf} object:
+#' @format ## `bom_basin_gauges` An `sf` object:
 #' \describe{
 #'   \item{site, gauge}{Name and code for gauge}
 #'   \item{owner}{State from which data is available}
@@ -108,7 +108,7 @@
 #' with direct link given below. The 'Northern Unregulated' polygon has been
 #' removed, as it is the combination of several other polygons.
 #'
-#' @format ## `cewo_valleys` An {sf} object:
+#' @format ## `cewo_valleys` An `sf` object:
 #' \describe{
 #'   \item{ValleyName, ValleyID, ValleyCode}{Name, ID, and code for each catchment}
 #' }
@@ -121,7 +121,7 @@
 #' Polygons defining planning units. Currently just for NSW, sourced from MDBA
 #' Environmental Assets and Functions Database. Have been merged across resource plan areas, allowing them to be split into other, arbitrary polygons
 #'
-#' @format ## `planning_units` An {sf} object:
+#' @format ## `planning_units` An `sf` object:
 #' \describe{
 #'   \item{LTWPShortName, PlanningUnitName, geometry}{The long-term watering plan area and planning unit name matching, to the extent possible, the EWR table. Geometry is polygons. Other columns for reference.}
 #'   \item{planning_unit_name}{same as PlanningUnitName, but matches toolkit naming instead of EWR naming, allowing easier joining to either}
@@ -134,7 +134,7 @@
 #'
 #' Spatial lines for the major rivers in the basin, from geofabric. Has been clipped to basin and paths simplified.
 #'
-#' @format ## `basin_rivers` An {sf} object:
+#' @format ## `basin_rivers` An `sf` object:
 #' \describe{
 #'   \item{geometry}{The geometry, all LINESTRING or MULTILINESTRING}
 #'   \item{other values}{As documented at http://www.bom.gov.au/water/geofabric/}

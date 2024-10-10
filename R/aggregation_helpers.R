@@ -43,37 +43,37 @@ agg_names_to_cols <-
         # This removes the aggregation level name ('ewr_code', 'catchment', etc)
         dplyr::mutate(
           allfuns = stringr::str_remove_all(
-            name,
+            .data$name,
             stringr::str_flatten(
               stringr::str_c("(", unlist(aggsequence), ")"),
               collapse = "|"
             )
           ),
-          allfuns = stringr::str_remove(allfuns, "^_")
+          allfuns = stringr::str_remove(.data$allfuns, "^_")
         ) |>
         tidyr::separate(
-          allfuns,
+          .data$allfuns,
           into = paste0("aggfun_", length(funsequence):1),
           sep = "__"
         ) |>
         tidyr::separate(
-          aggfun_1,
+          .data$aggfun_1,
           into = c("aggfun_1", "original"),
           sep = "_",
           extra = "merge"
         ) |>
         dplyr::mutate(alllevs = stringr::str_remove_all(
-          name,
+          .data$name,
           stringr::str_flatten(stringr::str_c("(", unlist(funsequence), ")"),
             collapse = "|"
           )
         )) |>
         tidyr::separate(
-          alllevs,
+          .data$alllevs,
           into = paste0("aggLevel_", length(funsequence):1),
           sep = "__"
         ) |>
-        dplyr::select(-name) |>
+        dplyr::select(-.data$name) |>
         # sf seems to be behind tidyverse, and needs characters here instead of bare
         # names. Both seem to work for normal df/tibbles
         tidyr::pivot_wider(names_from = "original", values_from = "value") |>

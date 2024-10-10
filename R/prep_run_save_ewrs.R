@@ -295,7 +295,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
 
 #' Clean up the EWR outputs so returns look like they do when read from csv. Mostly dateparsing from py objects
 #'
-#' @param ewr_out
+#' @param ewr_out EWR output dataframe as returned directly from python to R
 #'
 #' @return tibble, cleaned EWR outputs
 #'
@@ -352,7 +352,7 @@ clean_ewr_in_R <- function(ewr_out) {
 
 #' handle some different naming conventions
 #'
-#' @param typearg
+#' @param typearg list of characters for the EWR types
 #'
 #' @return list of EWR types with standard names
 make_ewr_consistent <- function(typearg) {

@@ -55,7 +55,6 @@ read_and_agg <- function(datpath,
                          extrameta = NULL,
                          rparallel = FALSE,
                          par_recursive = TRUE,
-                         whichcrs = 4283,
                          ...) {
   # The ... pass gauge and scenario filters to `prep_ewr_agg`
 
@@ -88,7 +87,6 @@ read_and_agg <- function(datpath,
                                                savepath = savepath,
                                                extrameta = extrameta,
                                                rparallel = FALSE,
-                                               whichcrs = whichcrs,
                                                y, # so I can not write safe_map
                                                ...),
                         parallel = TRUE)
@@ -127,7 +125,7 @@ read_and_agg <- function(datpath,
     }
   }
 
-  data <- prep_ewr_agg(datpath, type = type, geopath = geopath, whichcrs = whichcrs, ...)
+  data <- prep_ewr_agg(datpath, type = type, geopath = geopath, whichcrs = 4283, ...)
 
   # parse any character names for the spatial data, then character will be the themes
   aggsequence <- purrr::map(aggsequence, parse_geo)

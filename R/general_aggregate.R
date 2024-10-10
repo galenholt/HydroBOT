@@ -18,7 +18,7 @@
 #'   because we need a name. Use a named list if using anonymous functions, e.g.
 #'   `list(mean = ~mean(., na.rm = T))`. *If using functions with a
 #'   data-variable argument*, e.g. weighted.mean with a column of weights, we
-#'   now (as of {dplyr} 1.1) have some workarounds. One option is if specified
+#'   now (as of `dplyr` 1.1) have some workarounds. One option is if specified
 #'   *as a function argument*, the function can just go in as a bare name or
 #'   anonymous. If specified elsewhere, it can be wrapped in [rlang::quo()],
 #'   e.g. `agglist <- rlang::quo(list(mean = mean, wm = ~weighted.mean(.,

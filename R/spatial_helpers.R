@@ -16,7 +16,7 @@ add_polyID <- function(geosf, failduplicate = TRUE) {
   # something unique, but this ensures it rather than assumes, and gives it a
   # standard name
   geosf <- geosf |>
-    dplyr::mutate(polyID = lwgeom::st_geohash(geometry, precision = 11))
+    dplyr::mutate(polyID = lwgeom::st_geohash(.data$geometry, precision = 11))
 
   # Check
   # I could throw this in a while loop and increase precision, but if they

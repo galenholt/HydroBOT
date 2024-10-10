@@ -1,7 +1,7 @@
 #' Sets up colors within groups according to separate palettes
 #'
 #' @param df input dataframe
-#' @param pal_list list of palettes, or color name or color object that maps to `colorgroups`, `colorset`, or `scenario`. Typically a list of names of {palletteer} palettes of the same length as unique values in `colorgroups`
+#' @param pal_list list of palettes, or color name or color object that maps to `colorgroups`, `colorset`, or `scenario`. Typically a list of names of `palletteer` palettes of the same length as unique values in `colorgroups`
 #' @param pal_direction vector of length pal_list, either 1 (default) or -1 (reversed) direction of the palettes
 #' @param colorgroups character column name of column defining the groups that define different palettes to use
 #' @param colorset  character column name of the values to assign colors from those palettes

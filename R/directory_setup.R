@@ -5,6 +5,7 @@
 #' @param hydro_dir directory with hydrographs
 #' @param type filetype, default 'csv', likely will also need 'ncdf'
 #' @param file_search character, regex for additional limitations on filenames. Useful if several files have the extension defined by `type`, but only some are hydrographs.
+#' @param scenarios_from as in [prep_run_save_ewrs()]
 #'
 #' @return a list of filepaths to the hydrographs
 #' @export
@@ -195,6 +196,7 @@ fix_file_scenarios <- function(hydro_paths, scenarios) {
 #' @param hydro_paths list of paths to scenario files with names scenario names
 #' @param output_path path for outputs
 #' @param outputType types of outputs, for inferring csvs
+#' @param scenarios_from as in [prep_run_save_ewrs()]
 #'
 #' @return character vector of expected filepaths
 #' @export
@@ -223,9 +225,7 @@ find_expected_files <- function(hydro_paths, output_path, outputType, scenarios_
 
 #' Figure out missing expected outputs
 #'
-#' @param hydro_paths list of paths to scenario files with names scenario names
-#' @param output_path path for outputs
-#' @param outputType types of outputs, for inferring csvs
+#' @inheritParams find_expected_files
 #'
 #' @return character vector of missing paths
 #' @export
