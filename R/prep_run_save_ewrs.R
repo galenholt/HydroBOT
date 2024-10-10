@@ -17,6 +17,20 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' metadata files with all parameters needed to run this part of the toolkit
 #' with parameters. Scenario metadata is prepended, if found.
 #'
+#' By far the cleanest way for this to work is to have your input hydrographs in
+#' a file structure with the directories defining the scenarios, and single or
+#' multiple hydrograph files within them. I.e. a structure that does not mix
+#' files of different scenarios in the final directory. If you have that
+#' structure, using `scenarios_from = 'directory'` will ensure your scenarios
+#' are named uniquely and output files are also unique and not mixed between
+#' scenarios. This is particularly important for parallelising, which depends on
+#' parallelling over scenarios. This structure is then retained in the output
+#' structure, making aggregation simpler as well. If for some reason you
+#' *cannot* establish this structure, set `scenarios_from = 'file'`, and
+#' everythign will be given a unique name, but your life will probably be
+#' difficult when aggregating and other subsequent processing, requiring more
+#' work in scripts to make the appropriate comparisons.
+#'
 #' @param hydro_dir Directory containing hydrographs. Can be an outer directory,
 #'   e.g. `hydrographs` that splits into scenario subdirs, or can be a single
 #'   scenario subdir.
@@ -24,7 +38,8 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'   but two typical cases:
 #'  * The directory containing `hydro_dir`, which puts the `module_outputs` at the same level as the hydrographs
 #'  * If running in batches for single scenarios, may be `hydro_dir`, which just puts the `module_outputs` in `hydro_dir`
-#' @param output_subdir a sub-directory for the outputs, if for example we want `module_output/EWR/V1` and `module_output/EWR/V2`
+#' @param output_subdir a sub-directory for the outputs, if for example we want
+#'   `module_output/EWR/V1` and `module_output/EWR/V2`
 #' @param scenarios `NULL` (default) or named list.
 #'  * `NULL`- finds scenario names by parsing directory names in `hydro_dir`. If no internal directories, just stays in `hydro_dir`. This captures the two typical situations discussed for `output_parent_dir`. If there are other directories in `hydro_dir` that do not contain hydrological scenarios, should use a character vector.
 #'  * named list of paths to files. names become scenario names, paths should be relative to `hydro_dir`. This allows unusual directory structures.
@@ -45,13 +60,24 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'  * 'all_successful_interEvents'
 #' @param returnType list of strings or character vector defining what to return
 #'   to the active R session. Same options as `outputType`
-#' @param scenarios_from character, default 'directory' gets scenario names from directory names. If anything else, gets them from filenames (safest). Expect additional options in future, e.g from metadata.
-#' @param file_search character, regex for additional limitations on filenames. Useful to run a subset of scenarios or if several files have the extension defined by `model_format`, but only some are hydrographs.
-#' @param fill_missing logical, default FALSE. If TRUE, figures out the expected outputs and only runs those that are missing. Useful for long runs that might break.
-#' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
-#' @param rparallel logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using `furrr`. To use, install `furrr` and set a [future::plan()] (likely `multisession` or `multicore`)
-#' @param retries Number of retries if there are errors. 0 is no retries, but still runs once. Default 2.
-#' @param print_runs logical, default FALSE. If true, print the set of runs to be done.
+#' @param scenarios_from character, default 'directory' gets scenario names from
+#'   directory names. If anything else, gets them from filenames (safest).
+#'   Expect additional options in future, e.g from metadata.
+#' @param file_search character, regex for additional limitations on filenames.
+#'   Useful to run a subset of scenarios or if several files have the extension
+#'   defined by `model_format`, but only some are hydrographs.
+#' @param fill_missing logical, default FALSE. If TRUE, figures out the expected
+#'   outputs and only runs those that are missing. Useful for long runs that
+#'   might break.
+#' @param extrameta list, extra information to include in saved metadata
+#'   documentation for the run. Default NULL.
+#' @param rparallel logical, default FALSE. If TRUE, parallelises over the
+#'   scenarios in hydro_dir using `furrr`. To use, install `furrr` and set a
+#'   [future::plan()] (likely `multisession` or `multicore`)
+#' @param retries Number of retries if there are errors. 0 is no retries, but
+#'   still runs once. Default 2.
+#' @param print_runs logical, default FALSE. If true, print the set of runs to
+#'   be done.
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
