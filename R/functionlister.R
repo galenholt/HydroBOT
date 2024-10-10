@@ -3,10 +3,9 @@
 #' @param funs a function to evaluate inside something else, could be character, bare name, or list
 #' @param forcenames force-name the functions. Often used if the names don't auto-populate correctly
 #'
-#' @return
+#' @return a named list of functions
 #' @export
 #'
-#' @examples
 functionlister <- function(funs, forcenames = NULL) {
 
   # if this is nested, there's no good way to get names for the cases with bare

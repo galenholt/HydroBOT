@@ -6,7 +6,6 @@
 #'
 #' @return object of class colors
 #'
-#' @examples
 as_colors <- function(colvec) {
   class(colvec) <- 'colors'
   return(colvec)

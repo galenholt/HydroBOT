@@ -4,7 +4,7 @@
 \alias{find_expected_files}
 \title{Figure out the expected outputs}
 \usage{
-find_expected_files(hydro_paths, output_path, outputType)
+find_expected_files(hydro_paths, output_path, outputType, scenarios_from)
 }
 \arguments{
 \item{hydro_paths}{list of paths to scenario files with names scenario names}
@@ -12,6 +12,9 @@ find_expected_files(hydro_paths, output_path, outputType)
 \item{output_path}{path for outputs}
 
 \item{outputType}{types of outputs, for inferring csvs}
+}
+\value{
+character vector of expected filepaths
 }
 \description{
 Figure out the expected outputs

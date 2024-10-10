@@ -18,8 +18,7 @@ prep_run_save_ewrs(
   extrameta = NULL,
   rparallel = FALSE,
   retries = 2,
-  print_runs = FALSE,
-  datesuffix = FALSE
+  print_runs = FALSE
 )
 }
 \arguments{
@@ -34,7 +33,8 @@ but two typical cases:
 \item If running in batches for single scenarios, may be \code{hydro_dir}, which just puts the \code{module_outputs} in \code{hydro_dir}
 }}
 
-\item{output_subdir}{a sub-directory for the outputs, if for example we want \code{module_output/EWR/V1} and \code{module_output/EWR/V2}}
+\item{output_subdir}{a sub-directory for the outputs, if for example we want
+\code{module_output/EWR/V1} and \code{module_output/EWR/V2}}
 
 \item{scenarios}{\code{NULL} (default) or named list.
 \itemize{
@@ -66,22 +66,30 @@ to disk. One or more of:
 \item{returnType}{list of strings or character vector defining what to return
 to the active R session. Same options as \code{outputType}}
 
-\item{scenarios_from}{character, default 'directory' gets scenario names from directory names. If anything else, gets them from filenames (safest). Expect additional options in future, e.g from metadata.}
+\item{scenarios_from}{character, default 'directory' gets scenario names from
+directory names. If anything else, gets them from filenames (safest).
+Expect additional options in future, e.g from metadata.}
 
-\item{file_search}{character, regex for additional limitations on filenames. Useful to run a subset of scenarios or if several files have the extension defined by \code{model_format}, but only some are hydrographs.}
+\item{file_search}{character, regex for additional limitations on filenames.
+Useful to run a subset of scenarios or if several files have the extension
+defined by \code{model_format}, but only some are hydrographs.}
 
-\item{fill_missing}{logical, default FALSE. If TRUE, figures out the expected outputs and only runs those that are missing. Useful for long runs that might break.}
+\item{fill_missing}{logical, default FALSE. If TRUE, figures out the expected
+outputs and only runs those that are missing. Useful for long runs that
+might break.}
 
-\item{extrameta}{list, extra information to include in saved metadata documentation for the run. Default NULL.}
+\item{extrameta}{list, extra information to include in saved metadata
+documentation for the run. Default NULL.}
 
-\item{rparallel}{logical, default FALSE. If TRUE, parallelises over the scenarios in hydro_dir using \code{furrr}. To use, install \code{furrr} and set a \code{\link[future:plan]{future::plan()}} (likely \code{multisession} or \code{multicore})}
+\item{rparallel}{logical, default FALSE. If TRUE, parallelises over the
+scenarios in hydro_dir using \code{furrr}. To use, install \code{furrr} and set a
+\code{\link[future:plan]{future::plan()}} (likely \code{multisession} or \code{multicore})}
 
-\item{retries}{Number of retries if there are errors. 0 is no retries, but still runs once. Default 2.}
+\item{retries}{Number of retries if there are errors. 0 is no retries, but
+still runs once. Default 2.}
 
-\item{print_runs}{logical, default FALSE. If true, print the set of runs to be done.}
-
-\item{datesuffix}{logical. whether to add a suffix to saved filenames to
-provide a datestamp. Should be deprecated in favour of metadata files.}
+\item{print_runs}{logical, default FALSE. If true, print the set of runs to
+be done.}
 }
 \value{
 a list of dataframe(s) if \code{returnType} is not 'none', otherwise, NULL
@@ -91,4 +99,19 @@ This does some directory setup and parsing, runs the EWR tool and, if asked,
 saves the output. If the output saves, it also auto-saves both yaml and json
 metadata files with all parameters needed to run this part of the toolkit
 with parameters. Scenario metadata is prepended, if found.
+}
+\details{
+By far the cleanest way for this to work is to have your input hydrographs in
+a file structure with the directories defining the scenarios, and single or
+multiple hydrograph files within them. I.e. a structure that does not mix
+files of different scenarios in the final directory. If you have that
+structure, using \code{scenarios_from = 'directory'} will ensure your scenarios
+are named uniquely and output files are also unique and not mixed between
+scenarios. This is particularly important for parallelising, which depends on
+parallelling over scenarios. This structure is then retained in the output
+structure, making aggregation simpler as well. If for some reason you
+\emph{cannot} establish this structure, set \code{scenarios_from = 'file'}, and
+everythign will be given a unique name, but your life will probably be
+difficult when aggregating and other subsequent processing, requiring more
+work in scripts to make the appropriate comparisons.
 }

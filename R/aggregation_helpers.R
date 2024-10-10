@@ -175,7 +175,7 @@ parse_char_funs <- function(x) {
 #' @inheritParams multi_aggregate
 #'
 #' @return a named list of the group_until groupers with numeric index.
-#' @examples
+
 parse_group_until <- function(group_until, groupers, aggsequence) {
   # get indexing for group_until drops
   if (!is.list(group_until)) {
@@ -206,7 +206,6 @@ parse_group_until <- function(group_until, groupers, aggsequence) {
 #'
 #' @return numeric index for each group_until
 #'
-#' @examples
 parse_aggnum <- function(x, aggsequence) {
   # if na, make grouper persist (if we test a closure it `warn`s)
   if (!rlang::is_function(x) && is.na(x)) {
@@ -339,7 +338,6 @@ is_sf <- function(x) {
 #' @return logical, TRUE if is sf and all data are POINTs
 #' @export
 #'
-#' @examples
 is_point <- function(x) {
   if (is_sf(x)) {
     if (all(sf::st_is(x, "POINT"))) {
@@ -359,7 +357,6 @@ is_point <- function(x) {
 #' @return logical, TRUE if sf and not all data are POINTs
 #' @export
 #'
-#' @examples
 is_notpoint <- function(x) {
   if (is_sf(x)) {
     if (!all(sf::st_is(x, "POINT"))) {

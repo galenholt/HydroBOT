@@ -11,7 +11,6 @@
 #' @return typically a named character vector of colors, unless `includeRef = TRUE` and `returnUnref = TRUE`. In that case, a list of two named color vectors.
 #' @export
 #'
-#' @examples
 make_pal <- function(levels, palette,
                      refvals = NULL, refcols = NULL,
                      includeRef = FALSE, returnUnref = FALSE,

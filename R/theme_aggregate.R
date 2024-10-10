@@ -39,7 +39,6 @@
 #'   included
 #' @export
 #'
-#' @examples
 theme_aggregate <- function(dat,
                             from_theme,
                             to_theme,

@@ -13,6 +13,9 @@ roll_interevent(x, year_roll, pad_initial = FALSE)
 
 \item{pad_initial}{Allow calculating values in the first years < year_roll; roll the year_roll if possible, otherwise as much as possible. Note that this makes the 1:year_roll entries less smoothed.}
 }
+\value{
+numeric vector
+}
 \description{
 Helper to get the rolling maximum interevent duration without clogging up the mutates
 }

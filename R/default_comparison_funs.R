@@ -10,10 +10,10 @@
 #' @param x data to compare
 #' @param y reference data
 #'
-#' @return
+#' @return numeric, as `-`
 #' @export
 #'
-#' @examples
+
 difference <- function(x,y) {x-y}
 
 # Relative provides an add_eps argument to prevent divide by zero. need to add
@@ -28,10 +28,10 @@ difference <- function(x,y) {x-y}
 #' @param y reference data
 #' @param add_eps default 0. epsilon to add to prevent divide-by-zero infs. Can be `'auto'` to use half of the minimum nonzero value
 #'
-#' @return
+#' @return numeric, as `/`
 #' @export
 #'
-#' @examples
+
 relative <- function(x,y, add_eps = 0) {
   if (add_eps == 'auto') {
     allvals <- c(x,y)
@@ -50,10 +50,10 @@ relative <- function(x,y, add_eps = 0) {
 #'   be `'auto'` to use half of the minimum nonzero value. Adjusts zeros up and
 #'   ones down, but nothing else.
 #'
-#' @return
+#' @return numeric
 #' @export
 #'
-#' @examples
+
 oddsratio <- function(x,y, add_eps = 0) {
   if (any(x > 1 | x < 0 | y > 1 | y < 0)) {
     rlang::abort("odds ratios need data on 0-1")

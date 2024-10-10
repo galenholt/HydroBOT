@@ -23,7 +23,6 @@
 #' @return a tibble matching `val_df` (or a long version thereof if `val_df` is wide), with an added column for the reference level (named `ref_values_col`) and a column of the compared values (named `comp_fun_values_col`)
 #' @export
 #'
-#' @examples
 baseline_compare <- function(val_df, compare_col, base_lev, values_col,
                              group_cols = NULL, comp_fun, ...,
                              failmissing = TRUE,
@@ -112,7 +111,6 @@ baseline_compare <- function(val_df, compare_col, base_lev, values_col,
 #' @return a tibble matching `val_df` (or a long version thereof if `val_df` is wide), with an added column for the reference level (named `ref_values_col`)
 #' @export
 #'
-#' @examples
 create_base <- function(val_df, compare_col, base_lev, values_col, group_cols = NULL,
                              failmissing = TRUE, names_to, values_to) {
 

@@ -66,10 +66,10 @@ find_color_type <- function(pal_list) {
 #' @param color_type from [find_color_type()]
 #' @param nbins number of bins for contours
 #'
-#' @return
+#' @return modified ggplot object
 #' @export
 #'
-#' @examples
+
 handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
                             transoutcome = 'identity', setLimits = NULL,
                             pal_direction = rep(1, length(pal_list)),
@@ -190,10 +190,10 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
 #'
 #' @param data the prepped data to be plotted
 #'
-#' @return
+#' @return TRUE if there's no overplotting, otherwise aborts
 #' @export
 #'
-#' @examples
+
 test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col = NULL, y_col = NULL) {
 
   # Get the geometry column if there is one (will be NULL otherwise)
@@ -210,35 +210,6 @@ test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col =
   data <- data |>
     dplyr::group_by(dplyr::across(tidyselect::all_of(groupcols)))
 
-
-  # This works, but seems unecessary? Keep until tests pass clean.
-  # # group by geometry if an sf- allows use for heatmaps
-  # if (inherits(data, 'sf')) {
-  #   data <- data |>
-  #     dplyr::group_by(geometry)
-  # }
-  #
-  # # heatmaps need to group by the x-y pairs instead of geometry
-  # if (!inherits(data, 'sf')) {
-  #   data <- data |>
-  #     dplyr::group_by(.data[[x_col]]) |>
-  #     dplyr::group_by(.data[[y_col]], .add = TRUE)
-  # }
-  #
-  #
-  # if (!is.null(facet_wrapper)) {
-  #   data <- data |>
-  #     dplyr::group_by(.data[[facet_wrapper]], .add = TRUE)
-  # }
-  # if (!is.null(facet_row) && facet_row != '.') {
-  #   data <- data |>
-  #     dplyr::group_by(.data[[facet_row]], .add = TRUE)
-  # }
-  # if (!is.null(facet_col) && facet_col != '.') {
-  #   data <- data |>
-  #     dplyr::group_by(.data[[facet_col]], .add = TRUE)
-  # }
-
   data <- data |>
     dplyr::summarise(nrows = dplyr::n()) |>
     dplyr::ungroup()
@@ -249,6 +220,8 @@ test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col =
                    Something is duplicated-
                    do you need more facetting or filtering?"))
   }
+
+  return(invisible(TRUE))
 }
 
 
@@ -341,7 +314,7 @@ find_limits <- function(limcol, lims, trans, base_list) {
 #' Finds limits for the color scale, accounting for prepped data and baselining.
 #'
 #' allows (by crude inference) centering diverging palettes with baseline
-#' comparisons This has been deprectated in favor of [find_limits()], though it
+#' comparisons This has been deprecated in favor of [find_limits()], though it
 #' was nice that this could be inserted into the function call directly, since
 #' it took the x as an argument.
 #'
@@ -352,10 +325,9 @@ find_limits <- function(limcol, lims, trans, base_list) {
 #' @param lims desired limits. see `setLimits` in [plot_outcomes()]
 #' @param base_list as in [plot_outcomes()]
 #'
-#' @return
-#' @export
+#' @return length-2 limits
 #'
-#' @examples
+
 findlimits <- function(x, lims, base_list) {
 
   rlang::abort("findlimits deprecated for now, in favour of the seemingly more general find_limits")

@@ -4,7 +4,7 @@
 \alias{roll_frequency}
 \title{Helper to get the frequency of occurrence without clogging up the mutates}
 \usage{
-roll_frequency(x, year_roll, pad_initial = FALSE, na.rm = TRUE)
+roll_frequency(x, year_roll, pad_initial = FALSE, na.rm = FALSE)
 }
 \arguments{
 \item{x}{vector to calculate rolling frequencies for}
@@ -13,7 +13,10 @@ roll_frequency(x, year_roll, pad_initial = FALSE, na.rm = TRUE)
 
 \item{pad_initial}{Allow calculating values in the first years < year_roll; roll the year_roll if possible, otherwise as much as possible. Note that this makes the 1:year_roll entries less smoothed.}
 
-\item{na.rm}{default TRUE, na action for the sums over lags}
+\item{na.rm}{default FALSE, na action for the sums over lags- TRUE is tempting, but can cause fails for high thresholds when we don't actually know whether they're met, and so FALSE is more appropriate (keeps intermediates NA).}
+}
+\value{
+numeric vector
 }
 \description{
 Helper to get the frequency of occurrence without clogging up the mutates

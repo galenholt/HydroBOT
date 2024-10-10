@@ -38,7 +38,6 @@
 #'   polygons in `to_geo` and retaining desired theme-level information
 #' @export
 #'
-#' @examples
 spatial_aggregate <- function(dat,
                               to_geo,
                               groupers,

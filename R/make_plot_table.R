@@ -5,7 +5,6 @@
 #' @return a table with the aggregation step, the function used, and the level of aggregation
 #' @export
 #'
-#' @examples
 make_plot_table <- function(werp_plot) {
   # I'm not convinced we need more than this- the facets etc should be
   # self-explanatory, but I'll leave the framework here if we want to do more.

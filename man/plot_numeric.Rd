@@ -57,6 +57,9 @@ If others are desired, we can develop something more general.
 covers several different date types). Dates can't be \code{trans-ed}, so need to
 be identified.}
 }
+\value{
+ggplot object
+}
 \description{
 Often (but not always) this is used when scenario is defined numerically.
 Uses \code{\link[ggplot2:geom_path]{ggplot2::geom_line()}} or \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. Takes a

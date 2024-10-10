@@ -9,7 +9,7 @@
 #' @return a list of filepaths to the hydrographs
 #' @export
 #'
-#' @examples
+
 find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'directory', file_search = NULL) {
 
 
@@ -73,7 +73,7 @@ find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'direc
 #' @return path to output directory
 #' @export
 #'
-#' @examples
+
 make_output_dir <- function(parent_dir,
                             scenarios,
                             module_name = 'EWR',
@@ -115,7 +115,7 @@ make_output_dir <- function(parent_dir,
 #'
 #' @return character vector of scenario names
 #'
-#' @examples
+
 scenario_names_from_hydro <- function(hydro_dir) {
 
   # Remove files with extensions- we only want directories
@@ -152,7 +152,7 @@ scenario_names_from_hydro <- function(hydro_dir) {
 #'
 #' @return paths to hydrographs, possibly fixed
 #'
-#' @examples
+
 fix_file_scenarios <- function(hydro_paths, scenarios) {
   # Do the split exactly like the ewr tool to make sure the scenarios will work
   split_path <- sapply(hydro_paths, strsplit, '/')
@@ -196,7 +196,7 @@ fix_file_scenarios <- function(hydro_paths, scenarios) {
 #' @param output_path path for outputs
 #' @param outputType types of outputs, for inferring csvs
 #'
-#' @return
+#' @return character vector of expected filepaths
 #' @export
 #'
 find_expected_files <- function(hydro_paths, output_path, outputType, scenarios_from) {
@@ -227,7 +227,7 @@ find_expected_files <- function(hydro_paths, output_path, outputType, scenarios_
 #' @param output_path path for outputs
 #' @param outputType types of outputs, for inferring csvs
 #'
-#' @return
+#' @return character vector of missing paths
 #' @export
 #'
 find_missing_runs <- function(hydro_paths, output_path, outputType, scenarios_from) {
@@ -256,10 +256,10 @@ find_missing_runs <- function(hydro_paths, output_path, outputType, scenarios_fr
 #'
 #' @inheritParams prep_run_save_ewrs
 #'
-#' @return
+#' @return character vector of missing filepaths
 #' @export
 #'
-#' @examples
+
 check_missing_runs <- function(hydro_dir,
                                output_parent_dir,
                                output_subdir = '',

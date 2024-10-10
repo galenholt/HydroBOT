@@ -9,6 +9,9 @@ bind_max(outdf)
 \arguments{
 \item{outdf}{#EWR summary output with pass fail results}
 }
+\value{
+tibble with a MAX scenario added
+}
 \description{
 Add max scenario
 }

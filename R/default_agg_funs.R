@@ -12,7 +12,6 @@
 #' @return summarised data
 #' @export
 #'
-#' @examples
 CompensatingFactor <- function(x, na.rm = TRUE) {
   y <- Max(x, na.rm = na.rm)
   return(y)
@@ -27,7 +26,6 @@ CompensatingFactor <- function(x, na.rm = TRUE) {
 #' @return summarised data
 #' @export
 #'
-#' @examples
 LimitingFactor <- function(x, na.rm = TRUE) {
   y <- Min(x, na.rm = na.rm)
   return(y)
@@ -42,7 +40,7 @@ LimitingFactor <- function(x, na.rm = TRUE) {
 #' @return summarised data
 #' @export
 #'
-#' @examples
+
 GeometricMean <- function(x, na.rm = TRUE) {
   y <- exp(mean(log(x), na.rm = na.rm))
   return(y)
@@ -57,7 +55,7 @@ GeometricMean <- function(x, na.rm = TRUE) {
 #' @return summarised data
 #' @export
 #'
-#' @examples
+
 ArithmeticMean <- function(x, na.rm = TRUE) {
   y <- mean(x, na.rm = na.rm)
   return(y)
@@ -72,7 +70,7 @@ ArithmeticMean <- function(x, na.rm = TRUE) {
 #' @return summarised data
 #' @export
 #'
-#' @examples
+
 SpatialWeightedMean <- function(x, na.rm = TRUE) {
   y <- stats::weighted.mean(x = x, w = area, na.rm = na.rm)
 }
@@ -86,7 +84,7 @@ SpatialWeightedMean <- function(x, na.rm = TRUE) {
 #' @return summarised data
 #' @export
 #'
-#' @examples
+
 NumberOfValues <- function(x, na.rm = TRUE) {
   if(na.rm == TRUE){
     y <- length(x[!is.na(x)])}
@@ -104,7 +102,7 @@ NumberOfValues <- function(x, na.rm = TRUE) {
 #' @return summarised data
 #' @export
 #'
-#' @examples
+
 Variance <- function(x, na.rm = TRUE) {
   ifelse(all(is.na(x)), NA, var(x, na.rm = TRUE))
 }
@@ -118,7 +116,7 @@ Variance <- function(x, na.rm = TRUE) {
 #' @return summarised data
 #' @export
 #'
-#' @examples
+
 Sum <- function(x, na.rm = TRUE) {
   ifelse(all(is.na(x)), NA, sum(x, na.rm = TRUE))
 }
@@ -127,10 +125,10 @@ Sum <- function(x, na.rm = TRUE) {
 #'
 #' @inheritParams CompensatingFactor
 #'
-#' @return
+#' @return numeric
 #' @export
 #'
-#' @examples
+
 Max <- function(x, na.rm = TRUE) {
   ifelse(all(is.na(x)), NA, max(x, na.rm = TRUE))
 }
@@ -139,10 +137,10 @@ Max <- function(x, na.rm = TRUE) {
 #'
 #' @inheritParams CompensatingFactor
 #'
-#' @return
+#' @return numeric
 #' @export
 #'
-#' @examples
+
 Min <- function(x, na.rm = TRUE) {
   ifelse(all(is.na(x)), NA, min(x, na.rm = TRUE))
 }

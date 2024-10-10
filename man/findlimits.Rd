@@ -13,9 +13,12 @@ findlimits(x, lims, base_list)
 
 \item{base_list}{as in \code{\link[=plot_outcomes]{plot_outcomes()}}}
 }
+\value{
+length-2 limits
+}
 \description{
 allows (by crude inference) centering diverging palettes with baseline
-comparisons This has been deprectated in favor of \code{\link[=find_limits]{find_limits()}}, though it
+comparisons This has been deprecated in favor of \code{\link[=find_limits]{find_limits()}}, though it
 was nice that this could be inserted into the function call directly, since
 it took the x as an argument.
 }

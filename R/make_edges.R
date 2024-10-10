@@ -33,9 +33,6 @@
 #'   an `edgeorder` column for the order in which the edges were passed
 #'   (previously used for plotting, now deprecated).
 #' @export
-#'
-#' @examples
-#'
 make_edges <- function(dflist,
                 fromtos,
                 fromfilter = NULL,

@@ -9,6 +9,9 @@ clean_yearly(annualdf)
 \arguments{
 \item{annualdf}{the result of \code{\link[=get_any_ewr_output]{get_any_ewr_output()}} with \code{type = 'yearly'}}
 }
+\value{
+tibble of the cleaned yearly EWR output
+}
 \description{
 Additional cleanup specific to yearly EWR outputs.
 }

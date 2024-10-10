@@ -19,8 +19,6 @@
 #' @return an edge tibble with a `color` column or a node tibble with `fillcolor` and `fontcolor`
 #' @export
 #'
-#' @examples
-#'
 causal_colors_general <- function(df, pal_list,
                                   pal_direction = rep(1, length(pal_list)),
                                   colorgroups = NULL,

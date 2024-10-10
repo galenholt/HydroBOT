@@ -26,7 +26,6 @@
 #'   allow joining to the node df.
 #' @export
 #'
-#' @examples
 extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names(agglist)) {
   # this assumes the history is in columns and not names. Relatively easy to
   # throw the parser on it if not though.

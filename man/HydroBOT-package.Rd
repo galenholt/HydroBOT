@@ -4,7 +4,7 @@
 \name{HydroBOT-package}
 \alias{HydroBOT}
 \alias{HydroBOT-package}
-\title{HydroBOT: Toolkit For Flow-Dependent Outcomes in MDB}
+\title{HydroBOT: Toolkit For Flow-Dependent outcomes in the Murray-Darling Basin}
 \description{
 Provides tools to assess responses to flows in the MDB. Wraps the EWR tool and provides ongoing modeling of ecological responses with causal networks, as well as analysis, synthesis and visualisation functionality targetted at scenario comparisons.
 }

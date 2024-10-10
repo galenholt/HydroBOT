@@ -17,7 +17,7 @@
 #' @return a tibble with ewr_achieved
 #' @export
 #'
-#' @examples
+
 get_ewr_output <- function(dir, type = "achievement", year_roll = "best",
                            gaugefilter = NULL, scenariofilter = NULL, add_max = TRUE) {
   if (type != "achievement") {
@@ -74,7 +74,7 @@ get_ewr_output <- function(dir, type = "achievement", year_roll = "best",
 #' @return a tibble of EWR results if `type == "annual"` or `type == "summary"`. A named list of those tibbles if `type == "both"`
 #' @export
 #'
-#' @examples
+
 get_any_ewr_output <- function(dir, type,
                                gaugefilter = NULL, scenariofilter = NULL) {
   if (is.character(dir)) {
@@ -158,7 +158,7 @@ get_any_ewr_output <- function(dir, type,
 #' @return a tibble of EWR outputs with cleaned up names, separated ewr_code_timing, and gauges as characters
 #' @export
 #'
-#' @examples
+
 cleanewrs <- function(ewrdf) {
 
   names(ewrdf) <- nameclean(names(ewrdf))
@@ -176,7 +176,7 @@ cleanewrs <- function(ewrdf) {
 #'
 #' @param annualdf the result of [get_any_ewr_output()] with `type = 'yearly'`
 #'
-#' @return
+#' @return tibble of the cleaned yearly EWR output
 #' @export
 clean_yearly <- function(annualdf) {
 
@@ -237,7 +237,7 @@ clean_ewr_requirements <- function() {
 #' @return a dataframe with a clean ewr_code column and an ewr_code_timing column with the extra stuff
 #' @export
 #'
-#' @examples
+
 separate_ewr_codes <- function(df) {
   # We need a consistent way to parse ewr codes from EWR tool and causal
   # networks. This isnt' perfect, but it's much better than before
@@ -281,7 +281,7 @@ separate_ewr_codes <- function(df) {
 #' @return tibble reformatted and cleaned for ongoing analysis
 #' @export
 #'
-#' @examples
+
 cleanSummary <- function(summarydf) {
   summarydf <- cleanewrs(summarydf)
 
@@ -327,7 +327,7 @@ nameclean <- function(charvec) {
 #'
 #' @return tibble reformatted and cleaned for ongoing analysis
 #' @export
-#' @examples
+
 assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >= 10, 10, 1)) {
 
   # Need to get the ewr targets to check against
@@ -380,10 +380,10 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 #' @param year_roll window size for the roll
 #' @param pad_initial Allow calculating values in the first years < year_roll; roll the year_roll if possible, otherwise as much as possible. Note that this makes the 1:year_roll entries less smoothed.
 #' @param na.rm default FALSE, na action for the sums over lags- TRUE is tempting, but can cause fails for high thresholds when we don't actually know whether they're met, and so FALSE is more appropriate (keeps intermediates NA).
-#' @return
+#' @return numeric vector
 #' @export
 #'
-#' @examples
+
 roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = FALSE) {
 
   if (pad_initial) {
@@ -451,10 +451,10 @@ roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = FALSE) {
 #' @param year_roll window size for the roll
 #' @param pad_initial Allow calculating values in the first years < year_roll; roll the year_roll if possible, otherwise as much as possible. Note that this makes the 1:year_roll entries less smoothed.
 #'
-#' @return
+#' @return numeric vector
 #' @export
 #'
-#' @examples
+
 roll_interevent <- function(x, year_roll, pad_initial = FALSE) {
   if (pad_initial) {
     x <- c(rep(NA, year_roll), x)
@@ -530,10 +530,10 @@ maxInterevent <- function(x) {
 #'
 #' @param outdf #EWR summary output with pass fail results
 #'
-#' @return
+#' @return tibble with a MAX scenario added
 #' @export
 #'
-#' @examples
+
 bind_max <- function(outdf) {
   MAX_scenario <- outdf |>
     dplyr::select(gauge, planning_unit_name, ewr_code, ewr_code_timing) |>

@@ -77,6 +77,10 @@ limited, and does not work with data arguments under most conditions.
 Almost always better to specify explicitly when building \code{funlist}, but
 works OK with simple functions, e.g. passing \code{na.rm = TRUE} to mean}
 }
+\value{
+a tibble (possibly \code{sf} if fed an \code{sf}) with columns for the grouping variables aggregated into the
+time periods specified by \code{breaks}
+}
 \description{
 Takes data with a column in a time format (posix or date) and aggregates into groups defined by \code{breaks} while retaining theme and spatial information. Much of the setup and checks mirrors that of \code{\link[=theme_aggregate]{theme_aggregate()}} and \code{\link[=spatial_aggregate]{spatial_aggregate()}}, and then passes to \code{\link[=general_aggregate]{general_aggregate()}}.
 }

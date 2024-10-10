@@ -126,7 +126,6 @@
 #' @return a ggplot stacked bar plot with standard formatting and data cleaning
 #' @export
 #'
-#' @examples
 plot_outcomes <- function(outdf,
                           outcome_col,
                           outcome_lab = outcome_col,

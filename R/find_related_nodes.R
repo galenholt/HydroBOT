@@ -15,8 +15,6 @@
 #'
 #' @export
 #'
-#' @examples
-#'
 find_related_nodes <- function(edgedf, nodenames) {
 
   # Basically recursive, but with directionality- we don't want all nodes going

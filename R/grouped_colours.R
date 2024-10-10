@@ -10,7 +10,6 @@
 #' @return a dataframe with new column `color` with hex colors
 #' @export
 #'
-#' @examples
 grouped_colors <- function(df, pal_list,
                            pal_direction = rep(1, length(pal_list)),
                             colorgroups = NULL,

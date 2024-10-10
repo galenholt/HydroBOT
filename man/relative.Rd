@@ -13,6 +13,9 @@ relative(x, y, add_eps = 0)
 
 \item{add_eps}{default 0. epsilon to add to prevent divide-by-zero infs. Can be \code{'auto'} to use half of the minimum nonzero value}
 }
+\value{
+numeric, as \code{/}
+}
 \description{
 Easily-callable wrapper for \code{/}, with ability to avoid divide-by-0
 }

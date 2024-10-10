@@ -9,7 +9,6 @@
 #' @return tibble of hydrographs
 #' @export
 #'
-#' @examples
 read_hydro <- function(hydropath, scenariofilter = NULL, long = TRUE, format = 'csv', gaugemap = 'iqqm') {
   if (format == 'csv') {
     return(read_hydro_csv(hydropath, scenariofilter, long))
@@ -29,7 +28,6 @@ read_hydro <- function(hydropath, scenariofilter = NULL, long = TRUE, format = '
 #' @return tibble of hydrographs
 #' @export
 #'
-#' @examples
 read_hydro_csv <- function(hydropath, scenariofilter, long) {
   hydro_paths <- find_scenario_paths(hydropath, type = 'csv')
 
@@ -71,7 +69,6 @@ read_hydro_csv <- function(hydropath, scenariofilter, long) {
 #' @return tibble of hydrographs
 #' @export
 #'
-#' @examples
 read_hydro_nc <- function(hydropath, scenariofilter, long, gaugemap) {
 
   rlang::check_installed(c('metR', 'PCICt', 'ncdf4'), reason = "reading netcdf hydrographs requires `metR`, which requires `PCICt`.")

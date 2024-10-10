@@ -6,10 +6,10 @@
 #'
 #' @param prepped prepared data from `plot_data_prep() |>  plot_style_prep()`
 #'
-#' @return
+#' @return ggplot object
 #' @export
 #'
-#' @examples
+
 plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
                      position, transoutcome) {
   outcome_plot <- prepped$data |>
@@ -47,10 +47,10 @@ plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
 #'   covers several different date types). Dates can't be `trans-ed`, so need to
 #'   be identified.
 #'
-#' @return
+#' @return ggplot object
 #' @export
 #'
-#' @examples
+
 plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
                          position, transoutcome, transx,
                          smooth_arglist, xtype = "numeric") {
@@ -150,10 +150,10 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
 #'
 #' @param prepped prepared data from `plot_data_prep() |>  plot_style_prep()`
 #'
-#' @return
+#' @return ggplot object
 #' @export
 #'
-#' @examples
+
 plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = 'grey35', outcome_lab,
                      facet_wrapper, facet_row, facet_col,
                      sceneorder, transoutcome, setLimits, base_list) {
@@ -305,10 +305,10 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = 'g
 #' @param maincolorpal palette for the main data
 #' @param uotype character, 'overlay', 'underlay', or 'internal' (default, it is an item in 'underover_list'). Not used, except for compatibility
 #'
-#' @return
+#' @return ggplot object composed of stacked maps according to underover_list
 #' @export
 #'
-#' @examples
+
 make_underover <- function(underover_list,
                            outcome_plot,
                            sceneorder,
@@ -491,10 +491,10 @@ make_underover <- function(underover_list,
 #' @param ytype character, 'qual', 'numeric' or 'date' (which
 #'   covers several different date types). Determines how axes are handled
 #'
-#' @return
+#' @return ggplot object
 #' @export
 #'
-#' @examples
+
 plot_heatmap <- function(prepped,
                          x_col, x_lab,
                          y_col, y_lab,

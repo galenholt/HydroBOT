@@ -4,7 +4,12 @@
 \alias{find_scenario_paths}
 \title{get the paths to scenarios}
 \usage{
-find_scenario_paths(hydro_dir, type = "csv", file_search = NULL)
+find_scenario_paths(
+  hydro_dir,
+  type = "csv",
+  scenarios_from = "directory",
+  file_search = NULL
+)
 }
 \arguments{
 \item{hydro_dir}{directory with hydrographs}

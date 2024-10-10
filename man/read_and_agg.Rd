@@ -23,6 +23,9 @@ read_and_agg(
   returnList = TRUE,
   savepath = NULL,
   extrameta = NULL,
+  rparallel = FALSE,
+  par_recursive = TRUE,
+  whichcrs = 4283,
   ...
 )
 }
@@ -133,6 +136,12 @@ should include only the directory structure.  If \code{NULL}, does not save. If
 wasting resources.}
 
 \item{extrameta}{list, extra information to include in saved metadata documentation for the run. Default NULL.}
+
+\item{rparallel}{logical, default FALSE. If TRUE, parallelises over the
+scenarios in hydro_dir using \code{furrr}. To use, install \code{furrr} and set a
+\code{\link[future:plan]{future::plan()}} (likely \code{multisession} or \code{multicore})}
+
+\item{par_recursive}{logical, default TRUE. If parallel, do we use the innermost level of directory containing EWR outputs (TRUE) or the next level in from datpath (FALSE)}
 
 \item{...}{passed to \code{\link[=prep_ewr_agg]{prep_ewr_agg()}}}
 }

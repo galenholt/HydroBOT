@@ -6,6 +6,9 @@
 \usage{
 get_ewr_version()
 }
+\value{
+character version number of the py-ewr package
+}
 \description{
 Extract the package version. Does not get complications like git branches.
 }

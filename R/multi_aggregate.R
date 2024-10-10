@@ -80,7 +80,6 @@
 #'   values at each step (`saveintermediate = TRUE`)
 #' @export
 #'
-#' @examples
 multi_aggregate <- function(dat,
                             causal_edges = NULL,
                             groupers = "scenario",

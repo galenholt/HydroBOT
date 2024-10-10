@@ -85,6 +85,9 @@ produced by \code{DiagrammeR} be returned?}
 \item{savename}{character, filename for the output plots.
 .pdf and .png are automatically appended.}
 }
+\value{
+causal network in DiagrammeR format
+}
 \description{
 Takes node and edges dfs, along with arguments to specify attributes
 (particularly color), and how to return the output. Internally, this finds

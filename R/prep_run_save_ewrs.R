@@ -82,7 +82,6 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
 #'
-#' @examples
 prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
                                output_subdir = '',
                                scenarios = NULL,
@@ -298,7 +297,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
 #'
 #' @param ewr_out
 #'
-#' @return
+#' @return tibble, cleaned EWR outputs
 #'
 clean_ewr_in_R <- function(ewr_out) {
   # some ewr outputs have list-columns, and sometimes within those columns are
@@ -355,7 +354,7 @@ clean_ewr_in_R <- function(ewr_out) {
 #'
 #' @param typearg
 #'
-#' @return
+#' @return list of EWR types with standard names
 make_ewr_consistent <- function(typearg) {
   if (length(typearg) == 1 && typearg[[1]] == 'everything') {
     typearg <- list('summary',

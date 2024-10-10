@@ -15,7 +15,6 @@
 #' @return a `tibble` linking the `env_obj` to several different outcomes- `Specific_goal` (roughly species, but also things like refugia), `Objective` (bigger-picture, e.g. no loss of native fish species), and `Target` (Native Fish, Ecosystem Function, etc). At the Planning Unit scale.
 #' @export
 #'
-#' @examples
 clean_obj_target <- function(ewrobjs,
                               targetpath,
                               qcfiles,

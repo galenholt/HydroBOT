@@ -4,7 +4,7 @@
 \alias{find_missing_runs}
 \title{Figure out missing expected outputs}
 \usage{
-find_missing_runs(hydro_paths, output_path, outputType)
+find_missing_runs(hydro_paths, output_path, outputType, scenarios_from)
 }
 \arguments{
 \item{hydro_paths}{list of paths to scenario files with names scenario names}
@@ -12,6 +12,9 @@ find_missing_runs(hydro_paths, output_path, outputType)
 \item{output_path}{path for outputs}
 
 \item{outputType}{types of outputs, for inferring csvs}
+}
+\value{
+character vector of missing paths
 }
 \description{
 Figure out missing expected outputs

@@ -8,7 +8,6 @@
 #'
 #' @inheritParams multi_aggregate
 #' @inherit multi_aggregate params return
-#' @inherit prep_run_save_ewrs params rparallel
 #'
 #' @param datpath path to indicator data. Currently needs to be EWR (same as
 #'   `ewrpath` argument in [prep_ewr_agg()]), but left more general here for
@@ -28,12 +27,14 @@
 #'   `savepath = NULL` and `returnList = FALSE`, the function errors to avoid
 #'   wasting resources.
 #' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
+#' @param rparallel logical, default FALSE. If TRUE, parallelises over the
+#'   scenarios in hydro_dir using `furrr`. To use, install `furrr` and set a
+#'   [future::plan()] (likely `multisession` or `multicore`)
 #' @param par_recursive logical, default TRUE. If parallel, do we use the innermost level of directory containing EWR outputs (TRUE) or the next level in from datpath (FALSE)
 #' @param ... passed to [prep_ewr_agg()]
 #'
 #' @export
 #'
-#' @examples
 read_and_agg <- function(datpath,
                          type,
                          geopath,

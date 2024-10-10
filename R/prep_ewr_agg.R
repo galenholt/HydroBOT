@@ -24,7 +24,6 @@
 #'   prepare data to send to [multi_aggregate()]
 #' @export
 #'
-#' @examples
 prep_ewr_agg <- function(ewrpath, type = 'achievement', geopath, whichcrs = 4283, ...) {
   # Dots pass gaugefilter and scenariofilter
     dat <- get_ewr_output(ewrpath, type, ...)

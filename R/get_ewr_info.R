@@ -3,7 +3,7 @@
 #' @return sf with unique gauges with good EWRs
 #' @export
 #'
-#' @examples
+
 get_ewr_gauges <- function() {
   ewrs_in_pyewr <- get_ewr_table()
   gauges_in_pyewr <- ewrs_in_pyewr |>
@@ -27,7 +27,7 @@ get_ewr_gauges <- function() {
 #' @return dataframe of the ewr table
 #' @export
 #'
-#' @examples
+
 get_ewr_table <- function(type = 'good') {
   pdi <- reticulate::import("py_ewr.data_inputs")
   ewrs_in_pyewr <- pdi$get_EWR_table()
@@ -68,7 +68,7 @@ check_ewr_version <- function() {
 #'
 #' @return ggplot
 #'
-#' @examples
+
 map_ewr_gauges <- function() {
   ewrgauges <- get_ewr_gauges()
   gaugemap <- ggplot2::ggplot() +
@@ -83,7 +83,7 @@ map_ewr_gauges <- function() {
 #' @return dataframe of the ewr table
 #' @export
 #'
-#' @examples
+
 get_iqqm_gauges <- function() {
   pdi <- reticulate::import("py_ewr.data_inputs")
   iqqm_gauges <- pdi$get_iqqm_codes()
@@ -93,7 +93,7 @@ get_iqqm_gauges <- function() {
 
 #' Extract the package version. Does not get complications like git branches.
 #'
-#' @return
+#' @return character version number of the py-ewr package
 #' @export
 #'
 get_ewr_version <- function() {

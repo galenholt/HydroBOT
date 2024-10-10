@@ -11,6 +11,9 @@ difference(x, y)
 
 \item{y}{reference data}
 }
+\value{
+numeric, as \code{-}
+}
 \description{
 Easily-callable wrapper for \code{-}
 }

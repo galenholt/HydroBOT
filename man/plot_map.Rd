@@ -85,6 +85,9 @@ If \code{comp_fun} is 'difference' or 'relative', midpoint auto-set at 0 or 1
 respectively unless otherwise specified with \code{setLimits}
 }}
 }
+\value{
+ggplot object
+}
 \description{
 Plots a standard map, with potentially underlay and overlays, specified by
 \code{underlay_list} and \code{overlay_list}. These are recursed through the

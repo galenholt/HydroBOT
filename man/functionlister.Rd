@@ -11,6 +11,9 @@ functionlister(funs, forcenames = NULL)
 
 \item{forcenames}{force-name the functions. Often used if the names don't auto-populate correctly}
 }
+\value{
+a named list of functions
+}
 \description{
 Function cleanup to allow passing character, bare names, and list-formatted functions
 }

@@ -85,6 +85,9 @@ If \code{comp_fun} is 'difference' or 'relative', midpoint auto-set at 0 or 1
 respectively unless otherwise specified with \code{setLimits}
 }}
 }
+\value{
+ggplot object
+}
 \description{
 Make a heatmap
 }

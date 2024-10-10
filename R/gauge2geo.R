@@ -9,7 +9,6 @@
 #' @return an `sf` dataframe with gauge locations as points in the geometry
 #' @export
 #'
-#' @examples
 gauge2geo <- function(gaugedf, gaugelocs, whichcrs = 4283) {
   # assume since lat/long this is wgs84 but could be some other geodetic datum
   # the parsing failure warnings are because of the undefineds that i then remove

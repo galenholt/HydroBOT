@@ -46,8 +46,6 @@
 #'   named according to the function applied and original name.
 #' @export
 #'
-#' @examples
-#'
 general_aggregate <- function(data, groupers,
                               aggCols, funlist,
                               prefix = 'agg_',

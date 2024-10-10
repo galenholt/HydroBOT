@@ -22,7 +22,7 @@
 #'   the params have `aggReturn: TRUE`
 #' @export
 #'
-#' @examples
+
 run_toolkit_params <- function(yamlpath = NULL,
                                passed_args = NULL,
                                list_args = NULL,
@@ -167,7 +167,7 @@ run_toolkit_params <- function(yamlpath = NULL,
 #'
 #' @param arglist list of arguments
 #'
-#' @examples
+
 make_default_args <- function(arglist) {
   if (arglist$hydro_dir == "default" || is.null(arglist$hydro_dir)) {
     arglist$hydro_dir <- file.path(arglist$output_parent_dir, "hydrographs")
@@ -193,7 +193,7 @@ make_default_args <- function(arglist) {
 #'
 #' @param arglist list of arguments
 #'
-#' @examples
+
 type_cleanup <- function(arglist) {
   if (!is.list(arglist$returnType)) {
     arglist$returnType <- as.list(arglist$returnType)

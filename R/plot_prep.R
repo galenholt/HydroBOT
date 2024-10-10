@@ -23,7 +23,7 @@
 #'   to be used in plot calls
 #' @export
 #'
-#' @examples
+
 plot_data_prep <- function(data, outcome_col,
                       sceneorder = NULL,
                       base_list = NULL,
@@ -105,7 +105,7 @@ plot_data_prep <- function(data, outcome_col,
 #' @return a prepped data list with more information needed to make the plots
 #' @export
 #'
-#' @examples
+
 plot_style_prep <- function(prepped, colorset, colorgroups, pal_list, pal_direction,
                             transoutcome, transx, point_group) {
   # Warn about conflicts with outcome trans

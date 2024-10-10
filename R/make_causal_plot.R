@@ -48,10 +48,9 @@
 #' @param edge_pal_direction either 1 (default) or -1 (reversed) direction of the palettes
 #' @param node_pal_direction either 1 (default) or -1 (reversed) direction of the palettes
 #'
-#' @return
+#' @return causal network in DiagrammeR format
 #' @export
 #'
-#' @examples
 make_causal_plot <- function(nodes, edges,
                              focalnodes = unique(nodes$Name),
                              drop_unused_nodes = TRUE,

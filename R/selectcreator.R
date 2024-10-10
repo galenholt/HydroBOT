@@ -23,7 +23,6 @@
 #'   throughout the calling function(s)
 #' @export
 #'
-#' @examples
 selectcreator <- function(selectvals, data, failmissing = TRUE) {
 
   # Simple if they're characters

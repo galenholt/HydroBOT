@@ -26,6 +26,9 @@ e.g. 'jitter' or a function, e.g. \code{ggplot2::position_jitter(width = 0.1, he
 Default \code{transoutcome = 'identity'} just uses the data. Most common change
 likely \verb{transoutcome = 'log10}}
 }
+\value{
+ggplot object
+}
 \description{
 main function to make a standard bar plot with \code{\link[ggplot2:geom_bar]{ggplot2::geom_col()}}
 }

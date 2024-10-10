@@ -58,6 +58,9 @@ respectively unless otherwise specified with \code{setLimits}
 
 \item{nbins}{number of bins for contours}
 }
+\value{
+modified ggplot object
+}
 \description{
 Uses \code{aes_type} to know the color/fill, and \code{color_type} (from \code{\link[=find_color_type]{find_color_type()}}) to know what ggplot function to use to add the color. Needs to handle any color trans as well with \code{transoutcome}
 }

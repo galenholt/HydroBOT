@@ -11,7 +11,8 @@ check_missing_runs(
   scenarios = NULL,
   file_search = NULL,
   model_format = "Standard time-series",
-  outputType = "none"
+  outputType = "none",
+  scenarios_from = "directory"
 )
 }
 \arguments{
@@ -26,7 +27,8 @@ but two typical cases:
 \item If running in batches for single scenarios, may be \code{hydro_dir}, which just puts the \code{module_outputs} in \code{hydro_dir}
 }}
 
-\item{output_subdir}{a sub-directory for the outputs, if for example we want \code{module_output/EWR/V1} and \code{module_output/EWR/V2}}
+\item{output_subdir}{a sub-directory for the outputs, if for example we want
+\code{module_output/EWR/V1} and \code{module_output/EWR/V2}}
 
 \item{scenarios}{\code{NULL} (default) or named list.
 \itemize{
@@ -34,7 +36,9 @@ but two typical cases:
 \item named list of paths to files. names become scenario names, paths should be relative to \code{hydro_dir}. This allows unusual directory structures.
 }}
 
-\item{file_search}{character, regex for additional limitations on filenames. Useful to run a subset of scenarios or if several files have the extension defined by \code{model_format}, but only some are hydrographs.}
+\item{file_search}{character, regex for additional limitations on filenames.
+Useful to run a subset of scenarios or if several files have the extension
+defined by \code{model_format}, but only some are hydrographs.}
 
 \item{model_format}{see EWR tool. One of:
 \itemize{
@@ -56,6 +60,13 @@ to disk. One or more of:
 \item 'all_interEvents', # Does not work with EWR 2.0 tool
 \item 'all_successful_interEvents'
 }}
+
+\item{scenarios_from}{character, default 'directory' gets scenario names from
+directory names. If anything else, gets them from filenames (safest).
+Expect additional options in future, e.g from metadata.}
+}
+\value{
+character vector of missing filepaths
 }
 \description{
 Similar to find_missing_runs, but excised from prep_run_save_ewrs to take the same arguments

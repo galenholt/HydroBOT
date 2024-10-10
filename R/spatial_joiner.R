@@ -22,7 +22,7 @@
 #'   after aggregation or other processing.
 #' @export
 #'
-#' @examples
+
 spatial_joiner <- function(from_geo, to_geo, whichcrs) {
 
   if (!('polyID' %in% names(from_geo))) {
@@ -122,7 +122,7 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
 #'
 #' @return an sf on the scale of to_geo
 #'
-#' @examples
+
 pseudo_spatial_joiner <- function(from_geo, to_geo, prefix) {
   from_geo <- from_geo |> dplyr::select(-any_of('polyID'))
 

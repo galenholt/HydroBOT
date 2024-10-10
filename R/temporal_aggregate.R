@@ -22,10 +22,10 @@
 #' @param prefix prefix character, differs from [general_aggregate()] in that default
 #'   is `'temporal_'` instead of `'agg_'`.
 #'
-#' @return
+#' @return a tibble (possibly `sf` if fed an `sf`) with columns for the grouping variables aggregated into the
+#'   time periods specified by `breaks`
 #' @export
 #'
-#' @examples
 temporal_aggregate <- function(dat,
                                breaks = 'all_time',
                                timecol = 'infer',

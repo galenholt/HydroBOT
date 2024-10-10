@@ -15,6 +15,9 @@ oddsratio(x, y, add_eps = 0)
 be \code{'auto'} to use half of the minimum nonzero value. Adjusts zeros up and
 ones down, but nothing else.}
 }
+\value{
+numeric
+}
 \description{
 Odds ratio
 }

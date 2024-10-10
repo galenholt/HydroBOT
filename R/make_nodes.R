@@ -18,9 +18,6 @@
 #'   that nodetype is in the causal flow. May also include grouping column(s)
 #'
 #' @export
-#'
-#' @examples
-#'
 make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
 
   # make the default node order- some may not be passed in, but this defines how

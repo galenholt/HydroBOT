@@ -30,6 +30,9 @@ to have one column and row-facets}
 \item{y_col}{character, default \code{outcome_col}. Allows separately specifying
 y-axis from outcome (e.g. maps, heatmaps, networks)}
 }
+\value{
+TRUE if there's no overplotting, otherwise aborts
+}
 \description{
 Fill in maps and heatmaps can silently plot multiple values on top of each
 other. THis checks data dimension to ensure only a single value is plotted

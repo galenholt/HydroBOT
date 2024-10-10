@@ -66,6 +66,9 @@ respectively unless otherwise specified with \code{setLimits}
 
 \item{uotype}{character, 'overlay', 'underlay', or 'internal' (default, it is an item in 'underover_list'). Not used, except for compatibility}
 }
+\value{
+ggplot object composed of stacked maps according to underover_list
+}
 \description{
 This gets run once each for under and overlays. It is itself agnostic to
 whether it is under or over the 'main' plot.
