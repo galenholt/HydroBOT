@@ -5,7 +5,7 @@
 \alias{bom_basin_gauges}
 \title{Gauge locations}
 \format{
-\subsection{\code{bom_basin_gauges} An {sf} object:}{
+\subsection{\code{bom_basin_gauges} An \code{sf} object:}{
 
 \describe{
 \item{site, gauge}{Name and code for gauge}

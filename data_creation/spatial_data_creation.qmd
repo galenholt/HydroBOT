@@ -375,6 +375,17 @@ bomg <- readr::read_csv(file.path(datarawdir, 'bom_gauge_locations', 'bom_gauge_
 
 Make BOM geographic
 
+The barrage flow is not available from any database I can find easily, but it is available from [SA water](https://water.data.sa.gov.au/Data/Location/Summary/Location/A4261002/Interval/Latest).
+
+```{r}
+barrage_gauge <- tibble::tibble(`site name` = "River Murray Calculated Barrage Flow",
+                        `gauge number` = "A4261002", 
+                        owner = "SA - Department of Environment, Water and Natural Resources",
+                        lat = "-35.57316", lon = "138.98371")
+
+bomg <- dplyr::bind_rows(bomg, barrage_gauge)
+```
+
 ```{r}
 bomg <- bomg |> 
     dplyr::rename(site = 'site name', gauge = 'gauge number') |>

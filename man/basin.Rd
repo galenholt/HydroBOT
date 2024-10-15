@@ -5,7 +5,7 @@
 \alias{basin}
 \title{Murray-Darling Basin Polygon}
 \format{
-\subsection{\code{basin} An {sf} object with one polygon:}{
+\subsection{\code{basin} An \code{sf} object with one polygon:}{
 
 \describe{
 \item{DDIV_NAME}{Polygon name}

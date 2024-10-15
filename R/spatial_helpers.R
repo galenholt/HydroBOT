@@ -15,8 +15,20 @@ add_polyID <- function(geosf, failduplicate = TRUE) {
   # Make unique IDs for  the polygons being aggregated into. They probably have
   # something unique, but this ensures it rather than assumes, and gives it a
   # standard name
-  geosf <- geosf |>
-    dplyr::mutate(polyID = lwgeom::st_geohash(.data$geometry, precision = 11))
+
+  # Empty geometries cause R to crash.
+  # geosf <- geosf |>
+  #   dplyr::mutate(polyID = lwgeom::st_geohash(.data$geometry, precision = 11))
+
+  badgeom <- which(sf::st_is_empty(geosf$geometry))
+  goodgeom <- which(!sf::st_is_empty(geosf$geometry))
+  geosf$polyID <- NA
+  geosf$polyID[goodgeom] <- lwgeom::st_geohash(geosf$geometry[goodgeom], precision = 11)
+
+  if (length(badgeom) > 0) {
+    rlang::warn(c("Empty geometries while geohashing replaced with NA.",
+                  glue::glue("{length(badgeom)} rows have empty geometries.")))
+  }
 
   # Check
   # I could throw this in a while loop and increase precision, but if they
@@ -24,8 +36,8 @@ add_polyID <- function(geosf, failduplicate = TRUE) {
   # the loop would go infinite
   # Could also probably do something with st_equals to check that, I guess. But
   # I don't have a good test case handy
-  if (failduplicate & any(duplicated(geosf$polyID))) {
-    stop('polygons not unique at a precision of 11')
+  if (failduplicate & any(duplicated(geosf$polyID[!is.na(geosf$polyID)]))) {
+    rlang::abort('polygons not unique at a precision of 11')
   }
 
   return(geosf)

@@ -5,7 +5,7 @@
 \alias{basin_rivers}
 \title{River lines in the basin}
 \format{
-\subsection{\code{basin_rivers} An {sf} object:}{
+\subsection{\code{basin_rivers} An \code{sf} object:}{
 
 \describe{
 \item{geometry}{The geometry, all LINESTRING or MULTILINESTRING}

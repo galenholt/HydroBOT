@@ -5,7 +5,7 @@
 \alias{cewo_valleys}
 \title{Catchments within the Murray-Darling Basin}
 \format{
-\subsection{\code{cewo_valleys} An {sf} object:}{
+\subsection{\code{cewo_valleys} An \code{sf} object:}{
 
 \describe{
 \item{ValleyName, ValleyID, ValleyCode}{Name, ID, and code for each catchment}

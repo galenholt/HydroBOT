@@ -5,7 +5,7 @@
 \alias{sdl_units}
 \title{Sustainable diversion limits units}
 \format{
-\subsection{\code{sd_units} An {sf} object:}{
+\subsection{\code{sd_units} An \code{sf} object:}{
 
 \describe{
 \item{SWSDLID, SWSDLName}{ID and name of SDL unit}
