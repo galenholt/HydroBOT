@@ -21,14 +21,20 @@ add_polyID <- function(geosf, failduplicate = TRUE) {
   #   dplyr::mutate(polyID = lwgeom::st_geohash(.data$geometry, precision = 11))
 
   badgeom <- which(sf::st_is_empty(geosf$geometry))
+  if (length(badgeom) > 0 & failduplicate) {
+    rlang::abort(c("Empty geometries while geohashing. Fix to proceed.",
+                  glue::glue("{length(badgeom)} rows have empty geometries.")))
+  }
+  if (length(badgeom) > 0 & !failduplicate) {
+    rlang::warn(c("Empty geometries while geohashing replaced with NA.",
+                   glue::glue("{length(badgeom)} rows have empty geometries."),
+                  "NA is likely to cause issues with rejoining data and duplication."))
+  }
   goodgeom <- which(!sf::st_is_empty(geosf$geometry))
   geosf$polyID <- NA
   geosf$polyID[goodgeom] <- lwgeom::st_geohash(geosf$geometry[goodgeom], precision = 11)
 
-  if (length(badgeom) > 0) {
-    rlang::warn(c("Empty geometries while geohashing replaced with NA.",
-                  glue::glue("{length(badgeom)} rows have empty geometries.")))
-  }
+
 
   # Check
   # I could throw this in a while loop and increase precision, but if they

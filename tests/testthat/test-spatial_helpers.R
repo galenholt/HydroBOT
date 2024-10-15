@@ -6,6 +6,7 @@ test_that("polyID", {
 test_that("polyID with empty geoms", {
   sdle <- sdl_units
   sdle$geometry[2] <- NULL
-  expect_warning(sdlid <- add_polyID(sdle))
+  expect_error(sdlid <- add_polyID(sdle))
+  expect_warning(sdlid <- add_polyID(sdle, failduplicate = FALSE))
   expect_snapshot(sdlid$polyID)
 })
