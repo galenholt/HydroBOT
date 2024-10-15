@@ -16,6 +16,8 @@ find_scenario_paths(
 
 \item{type}{filetype, default 'csv', likely will also need 'ncdf'}
 
+\item{scenarios_from}{as in \code{\link[=prep_run_save_ewrs]{prep_run_save_ewrs()}}}
+
 \item{file_search}{character, regex for additional limitations on filenames. Useful if several files have the extension defined by \code{type}, but only some are hydrographs.}
 }
 \value{

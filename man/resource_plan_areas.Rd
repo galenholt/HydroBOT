@@ -5,7 +5,7 @@
 \alias{resource_plan_areas}
 \title{Resource plan areas}
 \format{
-\subsection{\code{resource_plan_areas} An {sf} object:}{
+\subsection{\code{resource_plan_areas} An \code{sf} object:}{
 
 \describe{
 \item{SWWRPANAME, SWWRPACODE}{Name and code for resource plan area}

@@ -7,7 +7,7 @@
 make_ewr_consistent(typearg)
 }
 \arguments{
-\item{typearg}{}
+\item{typearg}{list of characters for the EWR types}
 }
 \value{
 list of EWR types with standard names

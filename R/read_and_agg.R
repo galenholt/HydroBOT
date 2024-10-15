@@ -177,19 +177,6 @@ read_and_agg <- function(datpath,
     }
     saveRDS(aggout, file.path(savepath, paste0(type, "_aggregated.rds")))
 
-    if (!rlang::is_installed("git2r")) {
-      rlang::inform("git sha not available. Install `git2r`",
-        .frequency = "regularly", .frequency_id = "git2rcheck"
-      )
-      gitcom <- NULL
-    }
-    if (rlang::is_installed("git2r")) {
-      gitcom <- try(git2r::sha(git2r::commits()[[1]]), silent = TRUE)
-      if (inherits(gitcom, "try-error")) {
-        gitcom <- NULL
-      }
-    }
-
     char_aggsequence <- purrr::imap(aggsequence, parse_char)
     char_funsequence <- purrr::map(funsequence, parse_char_funs)
     # using names makes the yaml cleaner
@@ -210,7 +197,7 @@ read_and_agg <- function(datpath,
       aggReturn = returnList,
       agg_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
       agg_status = TRUE,
-      agg_git_commit = gitcom
+      agg_HydroBOT_version = as.character(packageVersion('HydroBOT'))
     )
 
     # add any passed metadata info

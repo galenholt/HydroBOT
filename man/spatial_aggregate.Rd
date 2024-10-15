@@ -40,7 +40,7 @@ bare anonymous function, e.g. \code{~mean(., na.rm = T)} is not supported
 because we need a name. Use a named list if using anonymous functions, e.g.
 \code{list(mean = ~mean(., na.rm = T))}. \emph{If using functions with a
 data-variable argument}, e.g. weighted.mean with a column of weights, we
-now (as of {dplyr} 1.1) have some workarounds. One option is if specified
+now (as of \code{dplyr} 1.1) have some workarounds. One option is if specified
 \emph{as a function argument}, the function can just go in as a bare name or
 anonymous. If specified elsewhere, it can be wrapped in \code{\link[rlang:defusing-advanced]{rlang::quo()}},
 e.g. \code{agglist <- rlang::quo(list(mean = mean, wm = ~weighted.mean(., weight_column_name, na.rm = T)))}. If it isn't, there is now an internal

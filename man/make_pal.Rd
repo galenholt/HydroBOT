@@ -17,7 +17,7 @@ make_pal(
 \arguments{
 \item{levels}{character vector of levels to use (should be all possible for the variable)}
 
-\item{palette}{character vector of palette name from {paletteer}}
+\item{palette}{character vector of palette name from \code{paletteer}}
 
 \item{refvals}{character vector of levels we want to set manually (typically as references)}
 

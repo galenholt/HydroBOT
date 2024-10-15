@@ -7,7 +7,7 @@
 clean_ewr_in_R(ewr_out)
 }
 \arguments{
-\item{ewr_out}{}
+\item{ewr_out}{EWR output dataframe as returned directly from python to R}
 }
 \value{
 tibble, cleaned EWR outputs

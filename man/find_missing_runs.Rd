@@ -12,6 +12,8 @@ find_missing_runs(hydro_paths, output_path, outputType, scenarios_from)
 \item{output_path}{path for outputs}
 
 \item{outputType}{types of outputs, for inferring csvs}
+
+\item{scenarios_from}{as in \code{\link[=prep_run_save_ewrs]{prep_run_save_ewrs()}}}
 }
 \value{
 character vector of missing paths

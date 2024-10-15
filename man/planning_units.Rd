@@ -5,7 +5,7 @@
 \alias{planning_units}
 \title{Planning Units for long-term watering plans}
 \format{
-\subsection{\code{planning_units} An {sf} object:}{
+\subsection{\code{planning_units} An \code{sf} object:}{
 
 \describe{
 \item{LTWPShortName, PlanningUnitName, geometry}{The long-term watering plan area and planning unit name matching, to the extent possible, the EWR table. Geometry is polygons. Other columns for reference.}
