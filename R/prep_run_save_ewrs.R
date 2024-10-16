@@ -307,14 +307,7 @@ prep_run_save_ewrs <- function(hydro_dir,
     }
 
     # append any scenario metadata, so it all stays together
-    if (!is.null(scenarios) &
-            is.null(hydro_dir) & url == TRUE){
-      hydro_dir <- unique(dirname(unlist(scenarios)))
-      # ymlscenepath <- list.files(hydro_dir, pattern = "*.yml")
-    } else {
-      ymlscenepath <- list.files(hydro_dir, pattern = "*.yml")
-    }
-
+    ymlscenepath <- list.files(hydro_dir, pattern = "*.yml")
     if (length(ymlscenepath) != 0) {
       ymlscenes <- file.path(hydro_dir, ymlscenepath) |>
         yaml::read_yaml()
