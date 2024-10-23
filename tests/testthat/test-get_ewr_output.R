@@ -1,4 +1,6 @@
 
+rlang::local_options(lifecycle_verbosity = "error")
+
 temp_parent_dir <- '_test_data'
 # create dir so building makes sense
 make_temp_hydro()

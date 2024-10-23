@@ -270,27 +270,6 @@ separate_ewr_codes <- function(df) {
   return(df)
 }
 
-#' Clean the incoming summary EWRs
-#'
-#' There is some data organisation that happens for the toolkit in the scenario
-#' controller, but this does a bit more cleaning of data format for further
-#' analysis
-#'
-#' @param summarydf incoming tibble of EWRs after read-in
-#'
-#' @return tibble reformatted and cleaned for ongoing analysis
-#' @export
-#'
-
-cleanSummary <- function(summarydf) {
-  summarydf <- cleanewrs(summarydf)
-
-  summarydf <- summarydf |>
-    dplyr::mutate(ewr_achieved = target_frequency <= frequency)
-}
-
-
-
 #
 #' Helper to sort the names
 #'
@@ -335,7 +314,7 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 
   # Join target frequencies to annualdf
   annualdf <- dplyr::left_join(annualdf, ewr_requirements,
-    by = dplyr::join_by(ewr_code, ewr_code_timing, gauge, planning_unit_name),
+    by = c('ewr_code', 'ewr_code_timing', 'gauge', 'planning_unit_name'),
     relationship = "many-to-many"
   )
 
@@ -343,8 +322,10 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
   # This makes a 1 a good thing, like all the others.
   # we also have to flip the target frequency; e.g. previously had a target that said we needed to have less than 80% ceases, we now need to have more than 20% not-ceases
   annualdf <- annualdf |>
-    dplyr::mutate(event_years = ifelse(grepl('^CF', ewr_code), 1-event_years, event_years),
-                  target_frequency = ifelse(grepl('^CF', ewr_code), 100-target_frequency, target_frequency))
+    dplyr::mutate(event_years = ifelse(grepl('^CF', .data$ewr_code),
+                                       1-.data$event_years, .data$event_years),
+                  target_frequency = ifelse(grepl('^CF', .data$ewr_code),
+                                            100-.data$target_frequency, .data$target_frequency))
 
   # Frequency checks (ACHIEVEMENT test)
 
@@ -352,21 +333,27 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
     # cease to flows are the inverse of success.
     annualdf <- annualdf |>
       # dplyr::group_by(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing) |>
-      dplyr::arrange(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing, year) |>
-      dplyr::mutate(frequency_occurred = roll_frequency(event_years, year_roll),
-                    interevent_occurred = roll_interevent(event_years, year_roll),
-                    .by = c(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing)) |>
-      dplyr::mutate(ewr_achieved = frequency_occurred >= target_frequency,
-                    interevent_achieved = interevent_occurred <= max_interevent,
-                    .by = c(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing))
+      dplyr::arrange(.data$scenario, .data$planning_unit_name,
+                     .data$gauge, .data$ewr_code, .data$ewr_code_timing,
+                     .data$year) |>
+      dplyr::mutate(frequency_occurred = roll_frequency(.data$event_years, year_roll),
+                    interevent_occurred = roll_interevent(.data$event_years, year_roll),
+                    .by = c(scenario, planning_unit_name,
+                            gauge, ewr_code, ewr_code_timing)) |>
+      dplyr::mutate(ewr_achieved = .data$frequency_occurred >= .data$target_frequency,
+                    interevent_achieved = .data$interevent_occurred <= .data$max_interevent,
+                    .by = c(scenario, planning_unit_name, gauge,
+                            ewr_code, ewr_code_timing))
 
   # change the logical to numeric to maintain generality with later functions
   annualdf$ewr_achieved <- as.numeric(annualdf$ewr_achieved)
   annualdf$interevent_achieved <- as.numeric(annualdf$interevent_achieved)
 
   annualdf <- annualdf |>
-    dplyr::select(scenario, year, date, gauge, planning_unit_name,
-                  ewr_code, ewr_code_timing, event_years, ewr_achieved, interevent_achieved)
+    dplyr::select(scenario, year, date, gauge,
+                  planning_unit_name, ewr_code, ewr_code_timing,
+                  event_years, ewr_achieved,
+                  interevent_achieved)
 
   return(annualdf)
 }
@@ -542,7 +529,8 @@ bind_max <- function(outdf) {
       scenario = "MAX",
       ewr_achieved = 1
     ) |>
-    dplyr::select(scenario, gauge, planning_unit_name, ewr_achieved, ewr_code, ewr_code_timing)
+    dplyr::select(scenario, gauge, planning_unit_name,
+                  ewr_achieved, ewr_code, ewr_code_timing)
   outdf <- dplyr::bind_rows(outdf, MAX_scenario)
   return(outdf)
 }

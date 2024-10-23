@@ -146,7 +146,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
       ewr_outtypes = unlist(outputType)
     )
 
-    # Adjust if fillign missing
+    # Adjust if filling missing
     if (fill_missing) {
       missing_scenarios <- find_missing_runs(hydro_paths, output_path, outputType, scenarios_from)
 
@@ -331,8 +331,8 @@ clean_ewr_in_R <- function(ewr_out) {
       return(df |> tibble::tibble())
     }
     df <- df |>
-      dplyr::mutate(across(where(ispydatelist), fixpydatelist)) |> # The python dates
-      tidyr::unnest(cols = where(is.list)) |> # other list-cols
+      dplyr::mutate(dplyr::across(dplyr::where(ispydatelist), fixpydatelist)) |> # The python dates
+      tidyr::unnest(cols = dplyr::where(is.list)) |> # other list-cols
       tibble::tibble() # for consistency
 
     # check that the unlisting hasn't changed the data- could happen if the list-cols have multiple numbers per cell
