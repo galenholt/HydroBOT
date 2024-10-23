@@ -23,12 +23,12 @@ find_color_type <- function(pal_list) {
 
   # Two options need the paletteer names
   cnames <- paletteer::palettes_c_names |>
-    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) |>
-    dplyr::select(formatted) |> dplyr::pull()
+    dplyr::mutate(formatted = stringr::str_c(.data$package, .data$palette, sep = '::')) |>
+    dplyr::select("formatted") |> dplyr::pull()
 
   dnames <- paletteer::palettes_d_names |>
-    dplyr::mutate(formatted = stringr::str_c(package, palette, sep = '::')) |>
-    dplyr::select(formatted) |> dplyr::pull()
+    dplyr::mutate(formatted = stringr::str_c(.data$package, .data$palette, sep = '::')) |>
+    dplyr::select("formatted") |> dplyr::pull()
 
   if (length(pal_list) == 1 & pal_list[[1]] %in% cnames) {
     return('paletteer_c')
@@ -199,8 +199,6 @@ test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col =
   # Get the geometry column if there is one (will be NULL otherwise)
   geom_col_name <- attr(data, "sf_column")
 
-  # This way is WAY cleaner than below, but there must be a reason I was using
-  # the convoluted .data stuff?
   groupcols <- c(geom_col_name, facet_wrapper, facet_row, facet_col, x_col, y_col)
 
   # NULLs above get dropped, but facet_col and facet_row can be '.' to indicate

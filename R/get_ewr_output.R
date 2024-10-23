@@ -216,13 +216,13 @@ clean_ewr_requirements <- function() {
 
   # Target frequencies come in here as character.
   ewr_requirements <- ewr_requirements |>
-    dplyr::mutate(across(tidyselect::starts_with('target'), as.numeric),
-                  across(tidyselect::contains("interevent"), as.numeric)) |>
+    dplyr::mutate(dplyr::across(tidyselect::starts_with('target'), as.numeric),
+                  dplyr::across(tidyselect::contains("interevent"), as.numeric)) |>
     # Make the NA target frequencies 0, since we can't assess them otherwise.
     # They only appear for CF_a EWRs, where the corresponding CF_b is 5 and CF_c
     # is 50
-    dplyr::mutate(across(tidyselect::starts_with('target'), \(x) ifelse(is.na(x), 0, x))) |>
-    dplyr::mutate(across(tidyselect::contains('interevent'), \(x) ifelse(is.na(x), 0, x)))
+    dplyr::mutate(dplyr::across(tidyselect::starts_with('target'), \(x) ifelse(is.na(x), 0, x))) |>
+    dplyr::mutate(dplyr::across(tidyselect::contains('interevent'), \(x) ifelse(is.na(x), 0, x)))
 
   return(ewr_requirements)
 }

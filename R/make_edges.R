@@ -142,27 +142,33 @@ filtergroups <- function(edgedf,
 
   # These don't enforce column names, so use select to allow accepting a character
   if (is.null(fromfilter)) {
-    fromfilter <- edgedf |> dplyr::select(tidyselect::all_of(fromcol)) |> dplyr::distinct() |> dplyr::pull()
+    fromfilter <- edgedf |>
+      dplyr::select(tidyselect::all_of(fromcol)) |>
+      dplyr::distinct() |>
+      dplyr::pull()
   }
 
   if (is.null(tofilter)) {
-    tofilter <- edgedf |> dplyr::select(tidyselect::all_of(tocol)) |> dplyr::distinct() |> dplyr::pull()
+    tofilter <- edgedf |>
+      dplyr::select(tidyselect::all_of(tocol)) |>
+      dplyr::distinct() |>
+      dplyr::pull()
   }
 
   # Gauges and planning units
   # Get matching values if a matching df is passed in as an argument
   if (!is.null(gaugefilter) & !is.null(gaugeplanmatch)) {
     pfromg <- gaugeplanmatch |>
-      dplyr::filter(gauge %in% gaugefilter) |>
-      dplyr::select(planning_unit_name) |>
+      dplyr::filter(.data$gauge %in% gaugefilter) |>
+      dplyr::select("planning_unit_name") |>
       dplyr::distinct() |>
       dplyr::pull()
   }
 
   if (!is.null(pufilter) & !is.null(gaugeplanmatch)) {
     gfromp <- gaugeplanmatch |>
-      dplyr::filter(planning_unit_name %in% pufilter) |>
-      dplyr::select(gauge) |>
+      dplyr::filter(.data$planning_unit_name %in% pufilter) |>
+      dplyr::select("gauge") |>
       dplyr::distinct() |>
       dplyr::pull()
   }

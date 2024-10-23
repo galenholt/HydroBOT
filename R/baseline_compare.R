@@ -191,7 +191,7 @@ create_base <- function(val_df, compare_col, base_lev, values_col, group_cols = 
     val_df <- val_df |>
       dplyr::mutate(refcol = base_lev) |>
       dplyr::rename_with(.fn = ~stringr::str_c('ref_', valcols),
-                         .cols = refcol)
+                         .cols = tidyselect::all_of('refcol'))
   }
 
   # we might also want to feed base_lev as a dataframe (e.g. as historical
@@ -208,9 +208,9 @@ create_base <- function(val_df, compare_col, base_lev, values_col, group_cols = 
       (is.numeric(base_lev))) {
     refdf <- tibble::tibble(name = orig_valcols, refcol = base_lev) |>
       dplyr::rename_with(.fn = ~stringr::str_c('ref_', valcols),
-                         .cols = refcol)  |>
+                         .cols = "refcol")  |>
       dplyr::rename_with(.fn = ~names_to,
-                         .cols = name) |>
+                         .cols = "name") |>
       sf::st_drop_geometry()
 
     val_df <- val_df |>

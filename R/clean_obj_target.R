@@ -23,7 +23,8 @@ clean_obj_target <- function(ewrobjs,
 
   # This cuts to only a single row per planning unit/objective pair and drops the ewrs
   objpu <- ewrobjs |>
-    dplyr::select(tidyselect::any_of(c('PlanningUnitID', 'planning_unit_name', 'LTWPShortName', 'state')), env_obj) |>
+    dplyr::select(tidyselect::any_of(c('PlanningUnitID', 'planning_unit_name', 'LTWPShortName', 'state')),
+                  .data$env_obj) |>
     dplyr::distinct()
 
   # This csv has the relationships from objectives to a few other things- target groups, species and other things like refugia, 'Objectives'
@@ -39,9 +40,9 @@ clean_obj_target <- function(ewrobjs,
   # annoying that there are special characters, but since I don't know where the
   # data comes from I can't clean it on that side
   targets <- targets |>
-    dplyr::mutate(Objective = stringr::str_remove_all(Objective, '\'')) |>
-    dplyr::rename(env_obj = Env_obj) |>
-    dplyr::select(-NodeType) |>
+    dplyr::mutate(Objective = stringr::str_remove_all(.data$Objective, '\'')) |>
+    dplyr::rename(env_obj = .data$Env_obj) |>
+    dplyr::select(-.data$NodeType) |>
     dplyr::mutate(state = 'NSW')
 
 
@@ -52,10 +53,10 @@ clean_obj_target <- function(ewrobjs,
   # to do the QC adjustment.
 
   obj2target <- obj2target |>
-    dplyr::filter(!LTWPShortName == "Murray Lower Darling")|> #REmove the Murray to add in the data that Renee has already checked
-    dplyr::filter(!(LTWPShortName == "Macquarie-Castlereagh" & Macquarie_Castlereagh == 0))|>
-    dplyr::filter(!(LTWPShortName == "Murrumbidgee" & Murrumbidgee == 0)) |>
-    dplyr::select(-c(Murray_Lower_Darling,	Macquarie_Castlereagh,	Murrumbidgee))
+    dplyr::filter(!.data$LTWPShortName == "Murray Lower Darling")|> #REmove the Murray to add in the data that Renee has already checked
+    dplyr::filter(!(.data$LTWPShortName == "Macquarie-Castlereagh" & .data$Macquarie_Castlereagh == 0))|>
+    dplyr::filter(!(.data$LTWPShortName == "Murrumbidgee" & .data$Murrumbidgee == 0)) |>
+    dplyr::select(-c(.data$Murray_Lower_Darling,	.data$Macquarie_Castlereagh,	.data$Murrumbidgee))
 
   #add in the data that Renee has already checked these have already been
   #checked.
@@ -64,9 +65,9 @@ clean_obj_target <- function(ewrobjs,
   # need to do this weird multi-level joining just to get the names?
   # warnings suppressed because there's an annoying first column that gets a new name
   qc_fix <- readr::read_csv(qcfiles[1], col_types = readr::cols(), col_select = -1) |>
-    dplyr::rename(Specific_goal = Target.species,
-           env_obj = Env_obj) |>
-    dplyr::select(-NodeType)
+    dplyr::rename(Specific_goal = .data$Target.species,
+           env_obj = .data$Env_obj) |>
+    dplyr::select(-.data$NodeType)
 
   PUs_names <- readr::read_csv(qcfiles[2], col_types = readr::cols(), col_select = -1)
 
@@ -76,22 +77,23 @@ clean_obj_target <- function(ewrobjs,
   # This is crazy how much re-joining we're doing. Need to find where all this
   # came from and just build it cleanly
   pu2ltwp <- objpu |>
-    dplyr::select(-env_obj) |>
+    dplyr::select(-.data$env_obj) |>
     dplyr::distinct()
 
   qc_fix <- dplyr::left_join(qc_fix, pu2ltwp, by = 'LTWPShortName', relationship = 'many-to-many')
 
   qc_fix <- qc_fix |>
-    dplyr::filter(link != 0 & !is.na(LTWPShortName)) |>  #watch out for the 2s = Renee changes
-    dplyr::select(-c(link, PU, PlanningUnitName)) |>  # get rid of extra cols not in the main data
+    dplyr::filter(.data$link != 0 & !is.na(.data$LTWPShortName)) |>  #watch out for the 2s = Renee changes
+    dplyr::select(-c(.data$link, .data$PU, .data$PlanningUnitName)) |>  # get rid of extra cols not in the main data
     dplyr::distinct()
 
   obj2target <- dplyr::bind_rows(obj2target, qc_fix)
 
   # cleanup column ordering
   obj2target <- obj2target |>
-    dplyr::select(any_of(c('PlanningUnitID', 'planning_unit_name')),
-                  LTWPShortName, env_obj, Specific_goal, Objective, Target, state)
+    dplyr::select(tidyselect::any_of(c('PlanningUnitID', 'planning_unit_name')),
+                  .data$LTWPShortName, .data$env_obj, .data$Specific_goal,
+                  .data$Objective, .data$Target, .data$state)
 
   # final cleanup of weird characters and dplyr::rename to standard
   suppressWarnings(obj2target <- obj2target |>
@@ -101,17 +103,19 @@ clean_obj_target <- function(ewrobjs,
     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_squish(.))))
 
   obj2target <- obj2target |>
-    dplyr::filter(!is.na(env_obj)) |>
+    dplyr::filter(!is.na(.data$env_obj)) |>
     dplyr::distinct()
 
   # infer the ones that aren't there.
   obj2target <- obj2target |>
-    dplyr::mutate(Target = case_when(is.na(Target) & grepl('^NF', env_obj) ~ "Native fish",
-                                     is.na(Target) & grepl('^NV', env_obj) ~ "Native vegetation",
-                                     is.na(Target) & grepl('^OS', env_obj) ~ "Other species",
-                                     is.na(Target) & grepl('^EF', env_obj) ~ "Priority ecosystem function",
-                                     is.na(Target) & grepl('^WB', env_obj) ~ "Waterbird",
-                                     .default = Target))
+    dplyr::mutate(Target = dplyr::case_when(
+      is.na(.data$Target) & grepl('^NF', .data$env_obj) ~ "Native fish",
+      is.na(.data$Target) & grepl('^NV', .data$env_obj) ~ "Native vegetation",
+      is.na(.data$Target) & grepl('^OS', .data$env_obj) ~ "Other species",
+      is.na(.data$Target) & grepl('^EF', .data$env_obj) ~ "Priority ecosystem function",
+      is.na(.data$Target) & grepl('^WB', .data$env_obj) ~ "Waterbird",
+      .default = .data$Target
+    ))
 
 
   # save

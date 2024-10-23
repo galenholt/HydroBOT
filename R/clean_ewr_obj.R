@@ -23,16 +23,16 @@ clean_ewr_obj <- function(ewrobjpath = 'ewrtool',
     # the python in the EWR tool that gives `get_ewr_table` drops the columns we need, so get the sheet directly
     objective_mapping <- get_raw_ewrsheet() |>
       cleanewrs() |>
-      dplyr::select(.data$planning_unit_name, .data$gauge, .data$ewr_code, .data$ewr_code_timing,
-                    .data$eco_objective_code, .data$high_level, .data$state,
-                    LTWPShortName = .data$l_t_w_p_short_name)
+      dplyr::select("planning_unit_name", "gauge", "ewr_code", "ewr_code_timing",
+                    "eco_objective_code", "high_level", "state",
+                    LTWPShortName = "l_t_w_p_short_name")
 
     # we can't do a good job linking these yet, so make a few versions that will do the best we can.
     ewr2obj_embedded <- objective_mapping |>
-      dplyr::select(-.data$high_level) |>
+      dplyr::select(-"high_level") |>
       dplyr::mutate(env_obj = strsplit(.data$eco_objective_code, split = '_')) |>
-      tidyr::unnest_longer(col = .data$env_obj) |>
-      dplyr::select(-.data$eco_objective_code)
+      tidyr::unnest_longer(col = "env_obj") |>
+      dplyr::select(-"eco_objective_code")
 
     ewr2obj <- ewr2obj_embedded |>
       dplyr::mutate(Target = dplyr::case_when(grepl('^NF', .data$env_obj) ~ "Native fish",
@@ -44,9 +44,9 @@ clean_ewr_obj <- function(ewrobjpath = 'ewrtool',
   } else {
     # read in and minor cleanup
     ewr2obj <- readr::read_csv(ewrobjpath, show_col_types = FALSE)  |>
-      dplyr::rename(ewr_code = .data$EWR,
+      dplyr::rename(ewr_code = "EWR",
                     # These are nearly sdl units, but the name 'LTWPShortName' comes from the EWR tool itself
-                    LTWPShortName = .data$Planning_area) |>
+                    LTWPShortName = "Planning_area") |>
       dplyr::distinct()
 
     # separate out the Objectives into rows- we want a row for each Planning_area, EWR, Objective combo.
@@ -54,8 +54,8 @@ clean_ewr_obj <- function(ewrobjpath = 'ewrtool',
       # Some annoying typos with spaces and ., and we need to split the comma seps
       dplyr::mutate(env_obj = stringr::str_remove_all(.data$Objectives, ' ')) |>
       dplyr::mutate(env_obj = stringr::str_split(.data$env_obj, ',|\\.')) |>
-      dplyr::select(-.data$Objectives) |>
-      tidyr::unnest_longer(col = .data$env_obj)
+      dplyr::select(-"Objectives") |>
+      tidyr::unnest_longer(col = "env_obj")
 
     ewr2obj <- ewr2obj |>
       separate_ewr_codes()
@@ -64,8 +64,8 @@ clean_ewr_obj <- function(ewrobjpath = 'ewrtool',
       # Expand out to gauge scale- give the relevant LTWP area and ewr_code to each gauge and PlanningUnit
       # This may not be needed here, but it retains maximal information, including some that got lost in the switch to NSW ewr-obj mapping
       ewrs_in_pyewr <- get_ewr_table() |>
-        dplyr::select(.data$PlanningUnitID, planning_unit_name = .data$PlanningUnitName,
-                      .data$LTWPShortName, gauge = .data$Gauge, ewr_code = .data$Code) |>
+        dplyr::select("PlanningUnitID", planning_unit_name = "PlanningUnitName",
+                      "LTWPShortName", gauge = "Gauge", ewr_code = "Code") |>
         separate_ewr_codes()
 
       ewr2obj <- dplyr::left_join(ewrs_in_pyewr, ewr2obj, by = c('LTWPShortName', 'ewr_code', 'ewr_code_timing'))
