@@ -25,13 +25,14 @@
 #'
 agg_names_to_cols <-
   function(aggdf, aggsequence, funsequence, aggCols) {
-
-    # we actually want the names of the functions. That's easy if they come in as characters, but not if they come in bare or a lambda function or ...
+    # we actually want the names of the functions. That's easy if they come in
+    # as characters, but not if they come in bare or a lambda function or ...
 
     fs <- purrr::map_lgl(funsequence, is.character)
     if (any(!fs)) {
       rlang::inform(c("Attempting to deparse lambda function in funsequence. ",
-      "i" = "It is better to use named functions than lambdas in the funsequence, because they are more clearly defined and can be more easily known later."))
+        "i" = "It is better to use named functions than lambdas in the funsequence, because they are more clearly defined and can be more easily known later."
+      ))
       funsequence[!fs] <- names(unlist(funsequence[!fs]))
     }
 
@@ -110,7 +111,7 @@ parse_geo <- function(x) {
     xg <- mget(x, inherits = TRUE, ifnotfound = x)
     xg <- xg[[1]]
     # only actually return the result of the get if it's an sf
-    if (inherits(xg, 'sf')) {
+    if (inherits(xg, "sf")) {
       return(xg)
     } else {
       return(x)
@@ -245,15 +246,13 @@ parse_aggnum <- function(x, aggsequence) {
 #' @export
 #'
 identify_dimension <- function(aggsequence, causal_edges) {
-
-  if (inherits(causal_edges, 'data.frame')) {
+  if (inherits(causal_edges, "data.frame")) {
     causalnames <- names(causal_edges)
 
     # If they're edges, they already have been lengthened
-    if ('fromtype' %in% causalnames) {
+    if ("fromtype" %in% causalnames) {
       causalnames <- c(unique(causal_edges$fromtype), unique(causal_edges$totype))
     }
-
   } else {
     causalnames <- purrr::map(causal_edges, names) |> unlist()
   }
@@ -266,19 +265,20 @@ identify_dimension <- function(aggsequence, causal_edges) {
 
   # Check we haven't duplicated or missed anything
   if (any(checkassign != 1)) {
-    rlang::abort(c("Cannot infer dimension of aggsequence.",
-                   glue::glue("step(s) {names(checkassign)[checkassign > 1]} are assigned to multiple dimensions"),
-                   glue::glue("step(s) {names(checkassign)[checkassign < 1]} are not assigned to any dimension")))
+    rlang::abort(c(
+      "Cannot infer dimension of aggsequence.",
+      glue::glue("step(s) {names(checkassign)[checkassign > 1]} are assigned to multiple dimensions"),
+      glue::glue("step(s) {names(checkassign)[checkassign < 1]} are not assigned to any dimension")
+    ))
   }
 
   # get a single vector of the dims
-  steptype <- vector(mode = 'character', length = length(aggsequence))
-  steptype[spatialsteps] <- 'spatial'
-  steptype[themesteps] <- 'theme'
-  steptype[timesteps] <- 'temporal'
+  steptype <- vector(mode = "character", length = length(aggsequence))
+  steptype[spatialsteps] <- "spatial"
+  steptype[themesteps] <- "theme"
+  steptype[timesteps] <- "temporal"
 
   return(steptype)
-
 }
 
 #' Test whether a list-item specifies a theme dimension
@@ -290,7 +290,7 @@ identify_dimension <- function(aggsequence, causal_edges) {
 #'
 #' @return logical
 is_theme <- function(x, causalnames) {
-  all(inherits(x, 'character') &
+  all(inherits(x, "character") &
     length(x) == 2 &
     x %in% causalnames)
 }
@@ -303,11 +303,11 @@ is_theme <- function(x, causalnames) {
 #'
 #' @return Logical
 is_time <- function(x) {
-  if (all(inherits(x, 'POSIXt') | inherits(x, 'Date'))) {
+  if (all(inherits(x, "POSIXt") | inherits(x, "Date"))) {
     return(TRUE)
-  } else if (inherits(x, 'character') &&
-             length(x) == 1 &&
-             grepl("sec|min|hour|day|DSTday|day|week|month|quarter|year|all_time", x)) {
+  } else if (inherits(x, "character") &&
+    length(x) == 1 &&
+    grepl("sec|min|hour|day|DSTday|day|week|month|quarter|year|all_time", x)) {
     return(TRUE)
   } else {
     return(FALSE)

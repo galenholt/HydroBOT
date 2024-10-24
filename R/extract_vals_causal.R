@@ -36,6 +36,8 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
   agglist <- agglist[names(agglist) %in% targetlevels]
 
   # Could almost certainly be a purrr::map()
+  # make CHECK happy
+  i <- NULL
   stackvalues <- foreach::foreach (i = 1:length(targetlevels),
                           .combine = dplyr::bind_rows) %do% {
 

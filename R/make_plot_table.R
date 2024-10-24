@@ -24,7 +24,7 @@ get_data_agg <- function(werp_plot) {
 
   dataseq <- werp_plot$data |>
     sf::st_drop_geometry() |>
-    dplyr::select(starts_with("agg")) |>
+    dplyr::select(tidyselect::starts_with("agg")) |>
     dplyr::distinct()
 
   # Check there's anything (ie are there columsn with the aggregations?)
@@ -45,12 +45,12 @@ get_data_agg <- function(werp_plot) {
 
   dataseqtab <- dataseq |>
     tidyr::pivot_longer(cols = tidyselect::everything()) |>
-    dplyr::mutate(name = stringr::str_remove_all(name, "agg")) |>
-    tidyr::separate(name, into = c("type", "step"), sep = "_") |>
-    tidyr::pivot_wider(id_cols = step, names_from = type, values_from = value) |>
+    dplyr::mutate(name = stringr::str_remove_all(.data$name, "agg")) |>
+    tidyr::separate("name", into = c("type", "step"), sep = "_") |>
+    tidyr::pivot_wider(id_cols = "step", names_from = "type", values_from = "value") |>
     dplyr::rename(
-      `aggregation function` = fun,
-      `aggregation level` = Level
+      `aggregation function` = "fun",
+      `aggregation level` = "Level"
     )
 
   # add the starting level

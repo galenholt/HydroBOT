@@ -7,7 +7,7 @@
 get_ewr_gauges <- function() {
   ewrs_in_pyewr <- get_ewr_table()
   gauges_in_pyewr <- ewrs_in_pyewr |>
-    dplyr::select(Gauge, PlanningUnitName, LTWPShortName, GaugeType) |>
+    dplyr::select('Gauge', 'PlanningUnitName', 'LTWPShortName', 'GaugeType') |>
     dplyr::distinct() |>
     tibble::tibble()
 

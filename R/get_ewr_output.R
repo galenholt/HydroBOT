@@ -107,6 +107,8 @@ get_any_ewr_output <- function(dir, type,
     }
 
     # read into one df
+    # make CHECK happy
+    i <- NULL
     ewrdata <- foreach::foreach(
       i = relevantfiles,
       .combine = dplyr::bind_rows
@@ -121,11 +123,11 @@ get_any_ewr_output <- function(dir, type,
     ewrdata <- dir[[type]]
 
     if (!is.null(gaugefilter)) {
-      ewrdata <- ewrdata |> dplyr::filter(gauge %in% gaugefilter)
+      ewrdata <- ewrdata |> dplyr::filter(.data$gauge %in% gaugefilter)
     }
 
     if (!is.null(scenariofilter)) {
-      ewrdata <- ewrdata |> dplyr::filter(scenario %in% scenariofilter)
+      ewrdata <- ewrdata |> dplyr::filter(.data$scenario %in% scenariofilter)
     }
   }
 
@@ -135,8 +137,8 @@ get_any_ewr_output <- function(dir, type,
   ewrdata <- ewrdata |>
     dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric)) |>
     dplyr::mutate(
-      gauge = as.character(gauge),
-      scenario = as.character(scenario)
+      gauge = as.character(.data$gauge),
+      scenario = as.character(.data$scenario)
     ) # belt and braces- this should never be anything else at this point
 
   ewrdata <- suppressWarnings(cleanewrs(ewrdata))
@@ -209,7 +211,7 @@ clean_ewr_requirements <- function() {
     cleanewrs()
 
   ewr_requirements <- ewr_requirements |>
-    dplyr::select(planning_unit_name, gauge,
+    dplyr::select('planning_unit_name', 'gauge',
                   tidyselect::contains("ewr_code"),
                   tidyselect::starts_with('target_frequency'),
                   tidyselect::contains('interevent'))
@@ -338,22 +340,22 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
                      .data$year) |>
       dplyr::mutate(frequency_occurred = roll_frequency(.data$event_years, year_roll),
                     interevent_occurred = roll_interevent(.data$event_years, year_roll),
-                    .by = c(scenario, planning_unit_name,
-                            gauge, ewr_code, ewr_code_timing)) |>
+                    .by = c("scenario", "planning_unit_name",
+                            "gauge", "ewr_code", "ewr_code_timing")) |>
       dplyr::mutate(ewr_achieved = .data$frequency_occurred >= .data$target_frequency,
                     interevent_achieved = .data$interevent_occurred <= .data$max_interevent,
-                    .by = c(scenario, planning_unit_name, gauge,
-                            ewr_code, ewr_code_timing))
+                    .by = c("scenario", "planning_unit_name",
+                            "gauge", "ewr_code", "ewr_code_timing"))
 
   # change the logical to numeric to maintain generality with later functions
   annualdf$ewr_achieved <- as.numeric(annualdf$ewr_achieved)
   annualdf$interevent_achieved <- as.numeric(annualdf$interevent_achieved)
 
   annualdf <- annualdf |>
-    dplyr::select(scenario, year, date, gauge,
-                  planning_unit_name, ewr_code, ewr_code_timing,
-                  event_years, ewr_achieved,
-                  interevent_achieved)
+    dplyr::select('scenario', 'year', 'date', 'gauge',
+                  'planning_unit_name', 'ewr_code', 'ewr_code_timing',
+                  'event_years', 'ewr_achieved',
+                  'interevent_achieved')
 
   return(annualdf)
 }
@@ -523,14 +525,14 @@ maxInterevent <- function(x) {
 
 bind_max <- function(outdf) {
   MAX_scenario <- outdf |>
-    dplyr::select(gauge, planning_unit_name, ewr_code, ewr_code_timing) |>
+    dplyr::select('gauge', 'planning_unit_name', 'ewr_code', 'ewr_code_timing') |>
     dplyr::distinct() |>
     dplyr::mutate(
       scenario = "MAX",
       ewr_achieved = 1
     ) |>
-    dplyr::select(scenario, gauge, planning_unit_name,
-                  ewr_achieved, ewr_code, ewr_code_timing)
+    dplyr::select('scenario', 'gauge', 'planning_unit_name',
+                  'ewr_achieved', 'ewr_code', 'ewr_code_timing')
   outdf <- dplyr::bind_rows(outdf, MAX_scenario)
   return(outdf)
 }

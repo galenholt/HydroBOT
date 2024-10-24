@@ -17,7 +17,7 @@ find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'direc
   # get the paths relative to hydro_dir
   if (grepl('.zip', hydro_dir)) {
     # rlang::inform("data in zip is assumed to be 'Straight Node (Gauge).nc'. If that is not the case, will need to allow an argument to specify.")
-    hydro_paths <- unzip(hydro_dir, list = TRUE)$Name
+    hydro_paths <- utils::unzip(hydro_dir, list = TRUE)$Name
     # hydro_paths <- hydro_paths[grepl('Straight Node \\(Gauge\\)\\.nc', hydro_paths)]
   } else {
     hydro_paths <- list.files(hydro_dir, pattern = paste0('.', type, '$'), recursive = TRUE)
@@ -47,7 +47,7 @@ find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'direc
   hydro_paths <- file.path(hydro_dir, hydro_paths)
 
   hydro_paths <- as.list(hydro_paths) |>
-    setNames(scenario_names)
+    stats::setNames(scenario_names)
 
   # a specific bit of cleanup
   names(hydro_paths) <- gsub(' |\\(|\\)', '', names(hydro_paths))
@@ -214,6 +214,8 @@ find_expected_files <- function(hydro_paths, output_path, outputType, scenarios_
       stringr::str_remove_all('/|\\.csv|\\.nc')
     filepart <- paste0('_', filepart)
   }
+  # make CHECK happy
+  ot <- NULL
   expected_files <- foreach::foreach(ot = outputType,
                               .combine = c) %do% {
     file.path(names(hydro_paths), paste0(ot, filepart, '.csv'))
