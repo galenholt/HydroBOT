@@ -17,5 +17,6 @@ pseudo_spatial_joiner(from_geo, to_geo, prefix)
 an sf on the scale of to_geo
 }
 \description{
-This is really just a left join that bypasses the geometry, and has some checks.
+This is really just a left join that bypasses the geometry, and has some
+checks.
 }

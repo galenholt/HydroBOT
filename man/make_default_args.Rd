@@ -2,7 +2,8 @@
 % Please edit documentation in R/run_toolkit_params.R
 \name{make_default_args}
 \alias{make_default_args}
-\title{Helper to allow making the directory structure programatically from the base directory}
+\title{Helper to allow making the directory structure programatically from the base
+directory}
 \usage{
 make_default_args(arglist)
 }
@@ -10,5 +11,6 @@ make_default_args(arglist)
 \item{arglist}{list of arguments}
 }
 \description{
-Helper to allow making the directory structure programatically from the base directory
+Helper to allow making the directory structure programatically from the base
+directory
 }

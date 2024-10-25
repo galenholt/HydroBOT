@@ -109,7 +109,7 @@ run_toolkit_params <- function(yamlpath = NULL,
   arglist <- type_cleanup(arglist)
 
   # a simple EWR error catch (the aggregator does a more complete job internally)
-  if (grepl('ewr', arglist$output_parent_dir) & is.null(arglist$agg_group_until) & is.null(arglist$agg_pseudo_spatial) & !arglist$auto_ewr_PU) {
+  if (grepl("ewr", arglist$output_parent_dir) & is.null(arglist$agg_group_until) & is.null(arglist$agg_pseudo_spatial) & !arglist$auto_ewr_PU) {
     rlang::warn(c("It appears that you're processing EWRs and not managing planning units with `auto_ewr_PU = TRUE` or with a combination of group_until and pseudo_spatial."))
   }
 
@@ -132,8 +132,8 @@ run_toolkit_params <- function(yamlpath = NULL,
   aggout <- read_and_agg(
     datpath = arglist$agg_input_path,
     type = arglist$aggType,
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
+    geopath = HydroBOT::bom_basin_gauges,
+    causalpath = HydroBOT::causal_ewr,
     groupers = arglist$agg_groups,
     group_until = arglist$agg_group_until,
     pseudo_spatial = arglist$agg_pseudo_spatial,
@@ -162,8 +162,9 @@ run_toolkit_params <- function(yamlpath = NULL,
   }
 }
 
-#
-#' Helper to allow making the directory structure programatically from the base directory
+
+#' Helper to allow making the directory structure programatically from the base
+#' directory
 #'
 #' @param arglist list of arguments
 #'

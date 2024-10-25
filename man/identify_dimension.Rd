@@ -21,7 +21,8 @@ the names of the spatial levels to match the object, e.g. basin: basin.}
 the theme grouping}
 }
 \value{
-character vector with 'spatial', 'theme' or 'temporal' for each step in aggsequence
+character vector with 'spatial', 'theme' or 'temporal' for each step
+in aggsequence
 }
 \description{
 Helper to identify the dimension of each step in aggsequence

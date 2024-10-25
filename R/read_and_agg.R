@@ -197,7 +197,7 @@ read_and_agg <- function(datpath,
       aggReturn = returnList,
       agg_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
       agg_status = TRUE,
-      agg_HydroBOT_version = as.character(packageVersion('HydroBOT'))
+      agg_HydroBOT_version = as.character(utils::packageVersion('HydroBOT'))
     )
 
     # add any passed metadata info

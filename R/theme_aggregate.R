@@ -51,7 +51,8 @@ theme_aggregate <- function(dat,
                             auto_ewr_PU = FALSE,
                             ...) {
   # Bare names get lost as we go down into further functions, so use characters
-  # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
+  # and throw an ugly conditional on to do that. It's extra ugly with multiple
+  # bare names.
   if (is.function(funlist) || (is.list(funlist) & is.function(funlist[[1]]))) {
     funlist <- as.character(substitute(funlist))
     if (funlist[1] == "c") {
@@ -69,8 +70,10 @@ theme_aggregate <- function(dat,
 
   # Force time-aggregation to be explicit
   if (!is.null(timegroup) && !timegroup %in% groupers) {
-    rlang::abort(c(glue::glue("The time column {timegroup} is not included as a grouper for theme aggregation"),
-                   "Aggregation must explicitly specify dimensions"))
+    rlang::abort(c(
+      glue::glue("The time column {timegroup} is not included as a grouper for theme aggregation"),
+      "Aggregation must explicitly specify dimensions"
+    ))
   }
 
 
@@ -92,8 +95,8 @@ theme_aggregate <- function(dat,
     }
 
     geodat <- dat |>
-      dplyr::select(polyID, tidyselect::all_of(geonames)) |>
-      dplyr::group_by(polyID) |>
+      dplyr::select("polyID", tidyselect::all_of(geonames)) |>
+      dplyr::group_by(.data$polyID) |>
       dplyr::slice(1) |> # usual use of dplyr::distinct() checks the polys factorially. slice just indexes.
       dplyr::ungroup()
 
@@ -107,7 +110,7 @@ theme_aggregate <- function(dat,
     causal_edges <- make_edges(causal_edges, list(c(from_theme, to_theme)))
   }
   causal_edges <- causal_edges |>
-    dplyr::filter(fromtype == from_theme & totype == to_theme) |>
+    dplyr::filter(.data$fromtype == from_theme & .data$totype == to_theme) |>
     dplyr::select(tidyselect::where(~ !all(is.na(.))))
 
   # check and dplyr::rename
@@ -125,70 +128,74 @@ theme_aggregate <- function(dat,
   # we're not yet in polygons (since then we're at least to planning_units), and
   # if these are EWRs. If yes, then add gauge and planning unit to groupers. We
   # don't have to do something similar for spatial, because this gets taken care
-  # of as soon as we're above hte Planning Unit scale (though I suppose it's
+  # of as soon as we're above the Planning Unit scale (though I suppose it's
   # possible to aggregate to something smaller than a PU and larger than a
   # gauge, that's an edge case to deal with later)
   if (!polyflag) {
     # Infer EWR from presence in causal_ewr
-    ewrnames <- purrr::map(causal_ewr, names) |> unlist()
+    ewrnames <- purrr::map(HydroBOT::causal_ewr, names) |> unlist()
     isewr <- to_theme %in% ewrnames
-    if (isewr & !'planning_unit_name' %in% groupers) {
+    if (isewr & !"planning_unit_name" %in% groupers) {
       if (!auto_ewr_PU) {
-        rlang::warn(c("!" = "EWR outputs detected without `group_until`!",
-                      "i" = "EWR outputs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
-                      "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
-                      "i" = "Lower-level processing should include as `grouper` in `theme_aggregate()`"))
+        rlang::warn(c(
+          "!" = "EWR outputs detected without `group_until`!",
+          "i" = "EWR outputs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
+          "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
+          "i" = "Lower-level processing should include as `grouper` in `theme_aggregate()`"
+        ))
       } else {
         rlang::inform(c("EWR outputs auto-grouped!",
-                        "i" = "EWRs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
-                        "*" = "gauge is less important, since it has the geometry, but the gauge column will be lost otherwise.",
-                        "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
-                        "i" = "Lower-level processing handles by including as `grouper` in `theme_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."))
+          "i" = "EWRs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
+          "*" = "gauge is less important, since it has the geometry, but the gauge column will be lost otherwise.",
+          "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
+          "i" = "Lower-level processing handles by including as `grouper` in `theme_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."
+        ))
         # add gauge and plannng unit name if available.
-        groupers <- unique(c(groupers, intersect(c('gauge', 'planning_unit_name'), names(causal_edges))))
+        groupers <- unique(c(groupers, intersect(c("gauge", "planning_unit_name"), names(causal_edges))))
       }
-
-
     }
   }
 
   # join to causal_edges
 
   # A bit of a hacky check
-  extragroups <- groupers[!groupers %in% c('scenario', 'polyID', timegroup)]
+  extragroups <- groupers[!groupers %in% c("scenario", "polyID", timegroup)]
   if (any(!(extragroups %in% names(causal_edges)))) {
-    rlang::warn(c("Causal network does not have all groupers.",
-                  glue::glue("Joining {from_theme} to {to_theme}"),
-                  glue::glue("Groupers are {paste0(groupers, collapse = ', ')}."),
-                             glue::glue("expect causal network to have {paste0(extragroups, collapse = ', ')}; it has {paste0(names(causal_edges), collapse = ', ')}."),
-                  "Do you need to use `group_until`? Or is your network missing columns?"))
+    rlang::warn(c(
+      "Causal network does not have all groupers.",
+      glue::glue("Joining {from_theme} to {to_theme}"),
+      glue::glue("Groupers are {paste0(groupers, collapse = ', ')}."),
+      glue::glue("expect causal network to have {paste0(extragroups, collapse = ', ')}; it has {paste0(names(causal_edges), collapse = ', ')}."),
+      "Do you need to use `group_until`? Or is your network missing columns?"
+    ))
   }
   pairdat <- dat |>
     dplyr::left_join(causal_edges, relationship = "many-to-many")
 
 
   # Check for NA in the causal network
-  ergroups <- c(from_theme, groupers[groupers != 'scenario'])
+  ergroups <- c(from_theme, groupers[groupers != "scenario"])
   napairs <- pairdat |>
     dplyr::filter(is.na(.data[[to_theme]])) |>
     dplyr::select(tidyselect::any_of(ergroups)) |>
     dplyr::distinct()
 
   if (nrow(napairs) > 0) {
+    nacount <- napairs |> dplyr::summarise(ntimes = dplyr::n(), .by = tidyselect::any_of(from_theme))
 
-    nacount <- napairs |> dplyr::summarise(ntimes = dplyr::n(), .by = any_of(from_theme))
-
-    groupout <- if (ncol(napairs) > 1) {
+    if (ncol(napairs) > 1) {
       groupinform <- glue::glue("Groups with issues: {unique(napairs[2])}")
     } else {
       groupinform <- NULL
     }
 
-    rlang::inform(c("!" = "Unmatched links in causal network",
-                    "*" = glue::glue("From {from_theme} to {to_theme}"),
-                    glue::glue("{from_theme}s {nacount[,from_theme]}"),
-                    glue::glue("{nacount[,'ntimes']} times each."),
-                    groupinform))
+    rlang::inform(c(
+      "!" = "Unmatched links in causal network",
+      "*" = glue::glue("From {from_theme} to {to_theme}"),
+      glue::glue("{from_theme}s {nacount[,from_theme]}"),
+      glue::glue("{nacount[,'ntimes']} times each."),
+      groupinform
+    ))
 
     # Now delete the NA
     pairdat <- pairdat |>

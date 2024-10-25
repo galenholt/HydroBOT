@@ -34,14 +34,13 @@
 #'   (previously used for plotting, now deprecated).
 #' @export
 make_edges <- function(dflist,
-                fromtos,
-                fromfilter = NULL,
-                tofilter = NULL,
-                gaugefilter = NULL,
-                pufilter = NULL,
-                gaugeplanmatch = NULL,
-                extrasave = NULL) {
-
+                       fromtos,
+                       fromfilter = NULL,
+                       tofilter = NULL,
+                       gaugefilter = NULL,
+                       pufilter = NULL,
+                       gaugeplanmatch = NULL,
+                       extrasave = NULL) {
   # Ideally gaugeplanmatch will be passed a canonical list. Otherwise this tries
   # to find one
 
@@ -51,20 +50,21 @@ make_edges <- function(dflist,
   }
 
   # if it's a bare single dataframe, wrap it in a list so the purrrs etc work.
-  if (inherits(dflist, 'data.frame')) {
+  if (inherits(dflist, "data.frame")) {
     dflist <- list(dflist)
   }
 
   # Get names
   dfnames <- purrr::map(dflist, names)
   # Get whether each df has a gauge or planning unit column
-  dfgauge <- unlist(purrr::map(dfnames, ~'gauge' %in% .))
-  dfpu <- unlist(purrr::map(dfnames, ~'planning_unit_name' %in% .))
+  dfgauge <- unlist(purrr::map(dfnames, ~ "gauge" %in% .))
+  dfpu <- unlist(purrr::map(dfnames, ~ "planning_unit_name" %in% .))
 
-  # We can use that to try to generate a matching gauge-pu if there wasn't one passed
+  # We can use that to try to generate a matching gauge-pu if there wasn't one
+  # passed
   if (is.null(gaugeplanmatch) & any(dfgauge & dfpu)) {
     gaugeplanmatch <- dflist[[which(dfgauge & dfpu)[1]]] |>
-      dplyr::select(gauge, planning_unit_name) |>
+      dplyr::select("gauge", "planning_unit_name") |>
       dplyr::distinct()
   }
 
@@ -74,18 +74,20 @@ make_edges <- function(dflist,
   # them all together
 
 
-  #
+  # make CHECK happy
+  p <- NULL
   counter <- 0
-  alledges <- foreach::foreach (p = fromtos, .combine = dplyr::bind_rows) %do% {
-
+  alledges <- foreach::foreach(p = fromtos, .combine = dplyr::bind_rows) %do% {
     counter <- counter + 1
 
     # Find the right causal sheet
-    # If there are multiple sheets, use the first one (No obvious heuristic here, and the index is simpler than anything more complex.)
-    dfindex <- which(unlist(purrr::map(dfnames, ~all(p %in% .))))[1]
+    # If there are multiple sheets, use the first one (No obvious heuristic
+    # here, and the index is simpler than anything more complex.)
+    dfindex <- which(unlist(purrr::map(dfnames, ~ all(p %in% .))))[1]
 
-    if(is.na(dfindex)) {
-      rlang::abort(glue::glue("Cannot find causal relationship between {p[1]} and {p[2]}. This tends to be misspellings, but could also be mis-specification of the causal relationships"))
+    if (is.na(dfindex)) {
+      rlang::abort(glue::glue("Cannot find causal relationship between {p[1]} and {p[2]}.
+                              This tends to be misspellings, but could also be mis-specification of the causal relationships"))
     }
 
     thisdf <- dflist[[dfindex]]
@@ -93,23 +95,24 @@ make_edges <- function(dflist,
     # Get the filtering values- this is its own function because it has
     # error-catching and cross-checks
     filterlist <- filtergroups(thisdf,
-                               fromcol = p[1], tocol = p[2],
-                               fromfilter = fromfilter, tofilter = tofilter,
-                               gaugefilter = gaugefilter, pufilter = pufilter,
-                               gaugeplanmatch = gaugeplanmatch)
+      fromcol = p[1], tocol = p[2],
+      fromfilter = fromfilter, tofilter = tofilter,
+      gaugefilter = gaugefilter, pufilter = pufilter,
+      gaugeplanmatch = gaugeplanmatch
+    )
 
 
 
-    # these ifs are annoying, needed to filter to the gauge and planning unit only if
-    # the columns exist
+    # these ifs are annoying, needed to filter to the gauge and planning unit
+    # only if the columns exist
     if (dfgauge[dfindex]) {
       thisdf <- thisdf |>
-        dplyr::filter(gauge %in% filterlist$gaugefilter)
+        dplyr::filter(.data$gauge %in% filterlist$gaugefilter)
     }
 
     if (dfpu[dfindex]) {
       thisdf <- thisdf |>
-        dplyr::filter(planning_unit_name %in% filterlist$pufilter)
+        dplyr::filter(.data$planning_unit_name %in% filterlist$pufilter)
     }
 
     # we can assume the fromto exist
@@ -117,20 +120,22 @@ make_edges <- function(dflist,
       dplyr::filter(.data[[p[1]]] %in% filterlist$fromfilter) |>
       dplyr::filter(.data[[p[2]]] %in% filterlist$tofilter) |>
       dplyr::rename(from = p[1], to = p[2]) |>
-      dplyr::select(tidyselect::any_of(c('gauge', 'planning_unit_name', extrasave, 'from', 'to', 'color'))) |>
-      dplyr::mutate(fromtype = p[1],
-             totype = p[2],
-             edgeorder = counter) |> # I was using this to set the nodeorder, but dropping that.
+      dplyr::select(tidyselect::any_of(c("gauge", "planning_unit_name",
+                                         extrasave, "from", "to", "color"))) |>
+      dplyr::mutate(
+        fromtype = p[1],
+        totype = p[2],
+        edgeorder = counter
+      ) |> # I was using this to set the nodeorder, but dropping that.
       dplyr::distinct() # kill duplicates
-
   }
 
   return(alledges)
-
 }
 
 
-# helper function to filter edge dfs. Primarily deals with nulls and cross-checking and error-catching in the from-tos
+# helper function to filter edge dfs. Primarily deals with nulls and
+# cross-checking and error-catching in the from-tos
 
 filtergroups <- function(edgedf,
                          fromcol, tocol,
@@ -139,8 +144,8 @@ filtergroups <- function(edgedf,
                          gaugefilter = NULL,
                          pufilter = NULL,
                          gaugeplanmatch = NULL) {
-
-  # These don't enforce column names, so use select to allow accepting a character
+  # These don't enforce column names, so use select to allow accepting a
+  # character
   if (is.null(fromfilter)) {
     fromfilter <- edgedf |>
       dplyr::select(tidyselect::all_of(fromcol)) |>
@@ -182,7 +187,7 @@ filtergroups <- function(edgedf,
 
   # Now build and check
 
-  # If planning unit passed, but not gauge, use the gauges from the planning unit
+  # If planning unit passed but not gauge, use gauges from the planning unit
   if (is.null(gaugefilter) & !is.null(pufilter)) {
     gaugefilter <- gfromp
   } else if (!is.null(gaugefilter) & is.null(pufilter)) {
@@ -201,20 +206,18 @@ filtergroups <- function(edgedf,
     }
   } else if (is.null(gaugefilter) & is.null(pufilter)) {
     # if neither filter given, use all of both, if the columns exist
-    if ('gauge' %in% names(edgedf)) {
+    if ("gauge" %in% names(edgedf)) {
       gaugefilter <- unique(edgedf$gauge)
     }
-    if ('planning_unit_name' %in% names(edgedf)) {
+    if ("planning_unit_name" %in% names(edgedf)) {
       pufilter <- unique(edgedf$planning_unit_name)
     }
-
-
   }
 
-  return(tibble::lst(fromfilter = fromfilter,
-                     tofilter = tofilter,
-                     gaugefilter = gaugefilter,
-                     pufilter = pufilter))
+  return(tibble::lst(
+    fromfilter = fromfilter,
+    tofilter = tofilter,
+    gaugefilter = gaugefilter,
+    pufilter = pufilter
+  ))
 }
-
-

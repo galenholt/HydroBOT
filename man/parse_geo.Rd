@@ -8,15 +8,19 @@ only characters.}
 parse_geo(x)
 }
 \arguments{
-\item{x}{character vector or dataframe, typically one entry in the aggregation list}
+\item{x}{character vector or dataframe, typically one entry in the
+aggregation list}
 }
 \value{
-aggregation sequence, with length-1 character vectors attempted to \code{get}
+aggregation sequence, with length-1 character vectors attempted to
+\code{get}
 
 No \code{examples} tag here because we don't export this
-purrr::map(list(ewr_code = c('ewr_code_timing', 'ewr_code'), sdl_units = "sdl_units"), parse_geo)
+purrr::map(list(ewr_code = c('ewr_code_timing', 'ewr_code'), sdl_units =
+"sdl_units"), parse_geo)
 }
 \description{
-Only length-1 entries in aggregation sequence are turned into dataframes.
-See \code{\link[=multi_aggregate]{multi_aggregate()}} for use. Intended to be used with \code{\link[purrr:map]{purrr::map()}} or similar.
+Only length-1 entries in aggregation sequence are turned into dataframes. See
+\code{\link[=multi_aggregate]{multi_aggregate()}} for use. Intended to be used with \code{\link[purrr:map]{purrr::map()}} or
+similar.
 }

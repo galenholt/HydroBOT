@@ -10,14 +10,15 @@ node_plot_atts(nodedf)
 \item{nodedf}{a tibble, the dataframe of nodes}
 }
 \value{
-a tibble of nodes with new attribute columns needed to control the look in \code{DiagrammeR}
+a tibble of nodes with new attribute columns needed to control the
+look in \code{DiagrammeR}
 }
 \description{
 This function primarily sets attributes related to size and position.
 (fontsize, width, height, x, y) as well as shape and tooltips. It effectively
 sets a default look for the structure of the graph. It also needs work- the
-numbers are hardcoded, and need to be made relative. It's possible to
-add other attributes (see \code{DiagrammeR} documentation), and we'll likely also
-want to set some of these (especially height and width) functionally (like we
-do with color)
+numbers are hardcoded, and need to be made relative. It's possible to add
+other attributes (see \code{DiagrammeR} documentation), and we'll likely also want
+to set some of these (especially height and width) functionally (like we do
+with color)
 }

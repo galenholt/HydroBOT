@@ -123,19 +123,19 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
     aes_type = "color",
     pal_list = prepped$pal_list,
     color_type = prepped$color_type,
-    pal_direction = prepped$direction)
+    pal_direction = prepped$direction
+  )
 
   if (!is.null(smooth_arglist)) {
     outcome_plot <- handle_palettes(outcome_plot,
       aes_type = "fill",
       pal_list = prepped$pal_list,
       color_type = prepped$color_type,
-      pal_direction = prepped$direction)
+      pal_direction = prepped$direction
+    )
   }
 
   return(outcome_plot)
-
-
 }
 
 #' Title
@@ -154,7 +154,7 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
 #' @export
 #'
 
-plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = 'grey35', outcome_lab,
+plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "grey35", outcome_lab,
                      facet_wrapper, facet_row, facet_col,
                      sceneorder, transoutcome, setLimits, base_list) {
   # Check whether we're accidentally overplotting. This either completes
@@ -241,7 +241,8 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = 'g
     outcome_plot <- outcome_plot +
       ggplot2::geom_sf(
         data = prepped$data,
-        ggplot2::aes(fill = .data$color), color = map_outlinecolor) + ggplot2::theme_bw()
+        ggplot2::aes(fill = .data$color), color = map_outlinecolor
+      ) + ggplot2::theme_bw()
     outcome_plot <- handle_palettes(outcome_plot,
       aes_type = "fill",
       pal_list = prepped$pal_list,
@@ -259,7 +260,8 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = 'g
 
   # I'm not sure this still has to happen here, but it works so leave it for
   # now. Would be better to do the facet smash for all plots at the end
-  # The facetting is really causing issues for maps below. Try to do the map facets here
+  # The facetting is really causing issues for maps below. Try to do the map
+  # facets here
   if (!is.null(facet_wrapper)) {
     outcome_plot <- outcome_plot +
       ggplot2::facet_wrap(facet_wrapper)
@@ -298,12 +300,17 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = 'g
 #'
 #' @inheritParams plot_outcomes
 #'
-#' @param underover_list List of layers to put either under or over the main layer
-#' @param outcome_plot The plot, as it stands before the layers in `underover_list` are added
+#' @param underover_list List of layers to put either under or over the main
+#'   layer
+#' @param outcome_plot The plot, as it stands before the layers in
+#'   `underover_list` are added
 #' @param maindata The data going into the primary ('main') layer
-#' @param maindatatype character, 'point' (point, multipoint) or 'areal' (polygon, multipolygon) used to know if the main layer uses a color (if 'point') or fill (if 'areal') aes
+#' @param maindatatype character, 'point' (point, multipoint) or 'areal'
+#'   (polygon, multipolygon) used to know if the main layer uses a color (if
+#'   'point') or fill (if 'areal') aes
 #' @param maincolorpal palette for the main data
-#' @param uotype character, 'overlay', 'underlay', or 'internal' (default, it is an item in 'underover_list'). Not used, except for compatibility
+#' @param uotype character, 'overlay', 'underlay', or 'internal' (default, it is
+#'   an item in 'underover_list'). Not used, except for compatibility
 #'
 #' @return ggplot object composed of stacked maps according to underover_list
 #' @export
@@ -326,7 +333,7 @@ make_underover <- function(underover_list,
     pal_list = NA, # NA will show something, NULL just fails
     pal_direction = 1,
     colorgroups = NULL,
-    map_outlinecolor = 'grey35',
+    map_outlinecolor = "grey35",
     outcome_lab = outcome_lab, # inherit from outer, but can be overwritten
     base_list = NULL, zero_adjust = 0,
     onlyzeros = FALSE,
@@ -337,8 +344,8 @@ make_underover <- function(underover_list,
     clip = FALSE
   )
 
-  # To make this function generic, it can have the main piece named 'underover', 'underlay', or 'overlay'
-  # but we need some errorchecking
+  # To make this function generic, it can have the main piece named 'underover',
+  # 'underlay', or 'overlay' but we need some errorchecking
 
   # We don't currently *use* the uotype entry in the underover_list, but this is
   # here to provide first backwards compatibility, but also set us up with the
@@ -381,7 +388,7 @@ make_underover <- function(underover_list,
     }
 
     # NULL-fill slots without arguments
-    uo <- modifyList(full_list, uo)
+    uo <- utils::modifyList(full_list, uo)
 
     # clip to the main geometry
     if (uo$clip) {
@@ -453,8 +460,10 @@ make_underover <- function(underover_list,
     if (uo_datatype == "areal") {
       if (uprep$color_type == "fixed") {
         outcome_plot <- outcome_plot +
-          ggplot2::geom_sf(data = uprep$data, fill = uprep$pal_list,
-                           color = uo$map_outlinecolor)
+          ggplot2::geom_sf(
+            data = uprep$data, fill = uprep$pal_list,
+            color = uo$map_outlinecolor
+          )
       } else {
         outcome_plot <- outcome_plot +
           ggplot2::geom_sf(
@@ -546,9 +555,10 @@ plot_heatmap <- function(prepped,
       na.rm = FALSE
     )
 
-    contour_arglist <- modifyList(default_contour_arglist, contour_arglist)
+    contour_arglist <- utils::modifyList(default_contour_arglist, contour_arglist)
 
-    # We need to do the trans to the data itself for contours because of the way they're binned.
+    # We need to do the trans to the data itself for contours because of the way
+    # they're binned.
     if (!rlang::is_function(get(transoutcome))) {
       rlang::abort(glue::glue("`transoutcome` ({transoutcome}) is not a named function and so cannot be applied to this data.
                               If it is an acceptable trans for ggplot/scales, it should work for anything other than contour plots.\n"))
@@ -570,7 +580,8 @@ plot_heatmap <- function(prepped,
   }
 
   # do I need to do this for fill as well when I have smooth?
-  # get the number of bins (10 is default, otherwise, get the number of bins or breaks)
+  # get the number of bins (10 is default, otherwise, get the number of bins or
+  # breaks)
   if (is.null(contour_arglist)) {
     nbins <- 10
   } else {

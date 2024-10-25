@@ -2,7 +2,8 @@
 % Please edit documentation in R/aggregation_helpers.R
 \name{parse_aggnum}
 \alias{parse_aggnum}
-\title{Main function of parse_group_until, finds the index for different ways of specifying group_until}
+\title{Main function of parse_group_until, finds the index for different ways of
+specifying group_until}
 \usage{
 parse_aggnum(x, aggsequence)
 }
@@ -15,5 +16,6 @@ parse_aggnum(x, aggsequence)
 numeric index for each group_until
 }
 \description{
-Main function of parse_group_until, finds the index for different ways of specifying group_until
+Main function of parse_group_until, finds the index for different ways of
+specifying group_until
 }

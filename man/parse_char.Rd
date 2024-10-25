@@ -8,17 +8,16 @@ dataframes back to their names}
 parse_char(x, idx)
 }
 \arguments{
-\item{x}{character vector or dataframe, typically one entry in the aggregation list}
+\item{x}{character vector or dataframe, typically one entry in the
+aggregation list}
 
 \item{idx}{name of the list item}
 }
 \value{
 character vector
 
-No \code{examples} tag because we don't export this
-purrr::imap(list(ewr_code = c('ewr_code_timing', 'ewr_code'),
-sdl_units = sdl_units),
-parse_char)
+No \code{examples} tag because we don't export this purrr::imap(list(ewr_code =
+c('ewr_code_timing', 'ewr_code'), sdl_units = sdl_units), parse_char)
 }
 \description{
 Intended to be used with \code{\link[purrr:imap]{purrr::imap()}}.

@@ -2,7 +2,8 @@
 % Please edit documentation in R/aggregation_helpers.R
 \name{is_time}
 \alias{is_time}
-\title{Test whether a list-item is time, including using \code{\link[base:cut.POSIXt]{base::cut.Date()}} specifications}
+\title{Test whether a list-item is time, including using \code{\link[base:cut.POSIXt]{base::cut.Date()}}
+specifications}
 \usage{
 is_time(x)
 }

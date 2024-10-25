@@ -20,9 +20,11 @@ make_underover(
 )
 }
 \arguments{
-\item{underover_list}{List of layers to put either under or over the main layer}
+\item{underover_list}{List of layers to put either under or over the main
+layer}
 
-\item{outcome_plot}{The plot, as it stands before the layers in \code{underover_list} are added}
+\item{outcome_plot}{The plot, as it stands before the layers in
+\code{underover_list} are added}
 
 \item{sceneorder}{Default NULL, otherwise, character or factor giving the
 order to present scenario levels}
@@ -32,7 +34,9 @@ the outcome_col (y-axis or color/fill)}
 
 \item{maindata}{The data going into the primary ('main') layer}
 
-\item{maindatatype}{character, 'point' (point, multipoint) or 'areal' (polygon, multipolygon) used to know if the main layer uses a color (if 'point') or fill (if 'areal') aes}
+\item{maindatatype}{character, 'point' (point, multipoint) or 'areal'
+(polygon, multipolygon) used to know if the main layer uses a color (if
+'point') or fill (if 'areal') aes}
 
 \item{maincolorpal}{palette for the main data}
 
@@ -64,7 +68,8 @@ If \code{comp_fun} is 'difference' or 'relative', midpoint auto-set at 0 or 1
 respectively unless otherwise specified with \code{setLimits}
 }}
 
-\item{uotype}{character, 'overlay', 'underlay', or 'internal' (default, it is an item in 'underover_list'). Not used, except for compatibility}
+\item{uotype}{character, 'overlay', 'underlay', or 'internal' (default, it is
+an item in 'underover_list'). Not used, except for compatibility}
 }
 \value{
 ggplot object composed of stacked maps according to underover_list

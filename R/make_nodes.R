@@ -18,14 +18,15 @@
 #'   that nodetype is in the causal flow. May also include grouping column(s)
 #'
 #' @export
-make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
-
+make_nodes <- function(edgedf, groupers = NULL, typeorder = "werp") {
   # make the default node order- some may not be passed in, but this defines how
   # they should appear on the graph if they exist
-  if (length(typeorder) == 1 && typeorder == 'werp') {
-    typeorder <- c('ewr_code', 'env_obj', 'Env_obj_main',
-                   'Specific_goal', 'Objective', 'Target',
-                   'target_5_year_2024', 'target_10_year_2029', 'target_20_year_2039')
+  if (length(typeorder) == 1 && typeorder == "werp") {
+    typeorder <- c(
+      "ewr_code", "env_obj", "Env_obj_main",
+      "Specific_goal", "Objective", "Target",
+      "target_5_year_2024", "target_10_year_2029", "target_20_year_2039"
+    )
   }
 
   # typeorder could be a df or a character vector
@@ -35,21 +36,21 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
   } else if (is.data.frame(typeorder)) {
     nodetib <- typeorder
   } else {
-    stop('typeorder not a df or character vector')
+    stop("typeorder not a df or character vector")
   }
 
 
 
   fromnodes <- edgedf |>
-    dplyr::select(tidyselect::any_of(groupers), Name = from, NodeType = fromtype)
+    dplyr::select(tidyselect::any_of(groupers),
+                  Name = "from", NodeType = "fromtype")
 
   tonodes <- edgedf |>
-    dplyr::mutate(nodeorder = edgeorder + 1) |>
-    dplyr::select(tidyselect::any_of(groupers), Name = to, NodeType = totype)
+    dplyr::mutate(nodeorder = .data$edgeorder + 1) |>
+    dplyr::select(tidyselect::any_of(groupers),
+                  Name = "to", NodeType = "totype")
 
   allnodes <- dplyr::bind_rows(fromnodes, tonodes) |>
-    dplyr::group_by(Name, NodeType) |>
-    dplyr::ungroup() |>
     dplyr::group_by(dplyr::across(tidyselect::any_of(groupers))) |>
     dplyr::distinct() |>
     dplyr::ungroup()
@@ -59,20 +60,20 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = 'werp') {
   # deal with missing levels- using tibble not vectors because need to join
   # based on nodetype
   realisedorders <- nodetib |>
-    dplyr::filter(NodeType %in% unique(allnodes$NodeType)) |>
-    dplyr::mutate(shiftorders = (nodeorder - min(nodeorder)) + 1,
-           ordersteps = cumsum(c(0, (diff(shiftorders)-1))),
-           neworders = shiftorders - ordersteps) |>
-    dplyr::select(NodeType, nodeorder = neworders)
+    dplyr::filter(.data$NodeType %in% unique(allnodes$NodeType)) |>
+    dplyr::mutate(
+      shiftorders = (.data$nodeorder - min(.data$nodeorder)) + 1,
+      ordersteps = cumsum(c(0, (diff(.data$shiftorders) - 1))),
+      neworders = .data$shiftorders - .data$ordersteps
+    ) |>
+    dplyr::select("NodeType", nodeorder = "neworders")
 
   # Join o get the orders set
-  allnodes <- dplyr::left_join(allnodes, realisedorders, by = 'NodeType')
+  allnodes <- dplyr::left_join(allnodes, realisedorders, by = "NodeType")
 
   # Remove nodes with NA names- that's not usable
   allnodes <- allnodes |>
-    dplyr::filter(!is.na(Name))
+    dplyr::filter(!is.na(.data$Name))
 
   return(allnodes)
-
 }
-

@@ -239,7 +239,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
       ewr_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
       ewr_status = TRUE,
       ewr_version = get_ewr_version(),
-      HydroBOT_version_at_EWR = as.character(packageVersion('HydroBOT'))
+      HydroBOT_version_at_EWR = as.character(utils::packageVersion('HydroBOT'))
     )
 
     # add any passed metadata info

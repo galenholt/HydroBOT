@@ -102,12 +102,7 @@ multi_aggregate <- function(dat,
   # Name the starting data 'input'
   if (saveintermediate) {
     datlist <- list(dat) |>
-      setNames('agg_input')
-    # if (is.character(aggsequence[[1]])) {
-    #   names(datlist) <- aggsequence[[1]][1]
-    # } else {
-    #   names(datlist) <- deparse(substitute(dat))
-    # }
+      stats::setNames("agg_input")
   }
 
   # `get` from characters if needed
@@ -127,18 +122,21 @@ multi_aggregate <- function(dat,
       }
     }
     dupped <- purrr::map(causalsteps, \(x) dupfind(x))
-    rlang::abort(glue::glue("Aggregating multiple times from the same causal level(s):
+    rlang::abort(
+      glue::glue("Aggregating multiple times from the same causal level(s):
                             {glue::glue_collapse(dupped[!purrr::map_lgl(dupped, is.null)], sep = ',\n')}.
                             This non-nested causal aggregation is currently not supported.
                             Until it is, do multiple aggregations to get to the
                             multiple outcome levels.
-                            And please raise an issue on github."))
+                            And please raise an issue on github.")
+    )
   }
 
 
   # Bare names get lost as we go down into further functions, so use characters
-  # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
-  # and now we have to loop over the funsequence and the names are even harder to extract
+  # and throw an ugly conditional on to do that. It's extra ugly with multiple
+  # bare names. and now we have to loop over the funsequence and the names are
+  # even harder to extract
   namefunsequence <- vector(mode = "list", length = length(funsequence))
   for (i in 1:length(funsequence)) {
     funlist <- funsequence[[i]]
@@ -149,7 +147,8 @@ multi_aggregate <- function(dat,
       if (length(substitute(funsequence)) == 1) {
         rlang::abort("Cannot infer names of funsequence, likely because it's a named object. Use something other than a pre-built list of bare function names.")
       }
-      funlist <- as.character(substitute(funsequence)[[i + 1]]) # The +1 is because the first item is 'list'.
+      # The +1 is because the first item is 'list'.
+      funlist <- as.character(substitute(funsequence)[[i + 1]])
       if (funlist[1] == "c") {
         funlist <- funlist[2:length(funlist)]
       }
@@ -177,47 +176,53 @@ multi_aggregate <- function(dat,
     aggsequence = aggsequence
   )
 
-  # a simple fix to leaving group_until out of groupers, but won't work if groupers is fancy
+  # a simple fix to leaving group_until out of groupers, but won't work if
+  # groupers is fancy
   # If groupers is a character, we can just add the missing
   if (is.character(groupers) && !(all(names(group_indices) %in% groupers))) {
     groupers <- c(groupers, names(group_indices)[!(names(group_indices) %in% groupers)])
   }
-  # # If groupers is *not* a character, we'll have to enforce. We have to check against basegroupers, since that will have the characters
-  # if (!is.character(groupers) && !(all(names(group_indices) %in% basegroupers))) {
-  #   rlang::abort("If not using characters for groupers, groupers needs to cover everything in group_until")
-  # }
 
   # get the index for any pseudo-spatial joins and aggs
   pseudo_indices <- purrr::map_int(pseudo_spatial, \(x) parse_aggnum(x, aggsequence = aggsequence))
 
 
   # Get the dimension we're moving across at each step
-  stepdim <- identify_dimension(aggsequence,
-                                causal_edges)
+  stepdim <- identify_dimension(
+    aggsequence,
+    causal_edges
+  )
 
-  # There's no safe way to auto-catch theme-grouping if everything is spatial or temporal and there's no causal network passed in.
-  if (all(stepdim != 'theme')) {
+  # There's no safe way to auto-catch theme-grouping if everything is spatial or
+  # temporal and there's no causal network passed in.
+  if (all(stepdim != "theme")) {
     causalnames <- purrr::map(causal_edges, names) |> unlist()
     if (!any(groupers %in% causalnames)) {
-      rlang::warn(c("Theme grouping difficult to infer without theme steps.",
-                    "Groupers does not appear to contain theme names.",
-                    "Ensure theme grouping is in `groupers` if desired."))
+      rlang::warn(c(
+        "Theme grouping difficult to infer without theme steps.",
+        "Groupers does not appear to contain theme names.",
+        "Ensure theme grouping is in `groupers` if desired."
+      ))
     }
     themegroup <- NULL
   } else {
     # retain the first theme-level groupings
-    themegroup <- aggsequence[min(which(stepdim == 'theme'))][[1]][1]
+    themegroup <- aggsequence[min(which(stepdim == "theme"))][[1]][1]
   }
 
   # We should be able to auto-catch time.
-  timecols <- purrr::map_lgl(dat, \(x) lubridate::is.Date(x) | lubridate::is.POSIXt(x))
+  timecols <- purrr::map_lgl(
+    dat,
+    \(x) lubridate::is.Date(x) | lubridate::is.POSIXt(x)
+  )
   if (any(timecols)) {
     timegroup <- names(dat)[which(timecols)]
   } else {
     timegroup <- NULL
   }
 
-  # We do the spatial group-catch internally to the time and theme aggregation functions due to speed issues and stripping the geometry.
+  # We do the spatial group-catch internally to the time and theme aggregation
+  # functions due to speed issues and stripping the geometry.
 
   # need to track the grouping when switch between theme and spatial- we want to
   # do theme groupings within the current spatial unit, and spatial groupings
@@ -239,7 +244,8 @@ multi_aggregate <- function(dat,
     # spatial aggs are the polygons being agged into. That allows autodetect
 
     # turn the groupers and aggcols into character vectors however they came in
-    # need to do this in the loop because dat changes and so available cols will too
+    # need to do this in the loop because dat changes and so available cols will
+    # too
     thisgroup <- selectcreator(rlang::enquo(groupers), dat, failmissing)
     thisagg <- selectcreator(
       rlang::expr(tidyselect::ends_with(!!aggCols)),
@@ -256,7 +262,7 @@ multi_aggregate <- function(dat,
     thisgroup <- thisgroup[!thisgroup %in% dropgroups]
 
 
-    if (stepdim[i] == 'theme') {
+    if (stepdim[i] == "theme") {
       # If the aggsequence isn't named, name it. This is less obviously doable
       # for sf. deal with that later. There three different ways unnamed lists
       # can end up here, and so need to deal with them all
@@ -273,7 +279,7 @@ multi_aggregate <- function(dat,
         from_theme = aggsequence[[i]][1],
         to_theme = aggsequence[[i]][2],
         groupers = c(thisgroup, timegroup),
-        aggCols = thisagg, # Does not need the tidyselect::ends_with here because it happens in theme_aggregate
+        aggCols = thisagg, # No tidyselect::ends_with; happens in theme_aggregate
         funlist = funsequence[[i]],
         causal_edges = causal_edges,
         geonames = spatial_to_info,
@@ -281,10 +287,10 @@ multi_aggregate <- function(dat,
         auto_ewr_PU = auto_ewr_PU
       ) # Don't fail if no gauge col
 
-      # Update theme grouping the current level so we don't drop it during spatial
+      # Update theme grouping the current level so we don't drop it during
+      # spatial
       themegroup <- aggsequence[[i]][2]
-
-    } else if (stepdim[i] == 'spatial') {
+    } else if (stepdim[i] == "spatial") {
       dat <- spatial_aggregate(
         dat = dat,
         to_geo = aggsequence[[i]],
@@ -294,13 +300,12 @@ multi_aggregate <- function(dat,
         prefix = paste0(names(aggsequence)[i], "_"),
         failmissing = failmissing,
         keepAllPolys = keepAllPolys,
-        joinby = ifelse(i %in% pseudo_indices, 'nonspatial', 'spatial'),
+        joinby = ifelse(i %in% pseudo_indices, "nonspatial", "spatial"),
         auto_ewr_PU = auto_ewr_PU
       )
 
       spatial_to_info <- names(aggsequence[[i]])[names(aggsequence[[i]]) != "geometry"]
-
-    } else if (stepdim[i] == 'temporal') {
+    } else if (stepdim[i] == "temporal") {
       dat <- temporal_aggregate(
         dat = dat,
         breaks = aggsequence[[i]],
@@ -314,8 +319,12 @@ multi_aggregate <- function(dat,
         auto_ewr_PU = auto_ewr_PU
       ) # Don't fail if no gauge col
 
-      # Update theme grouping the current level so we don't drop it during spatial, though it can get dropped here.
-      timecols <- purrr::map_lgl(dat, \(x) lubridate::is.Date(x) | lubridate::is.POSIXt(x))
+      # Update theme grouping the current level so we don't drop it during
+      # spatial, though it can get dropped here.
+      timecols <- purrr::map_lgl(
+        dat,
+        \(x) lubridate::is.Date(x) | lubridate::is.POSIXt(x)
+      )
       if (any(timecols)) {
         timegroup <- names(dat)[which(timecols)]
       } else {
@@ -336,7 +345,6 @@ multi_aggregate <- function(dat,
           aggCols = aggCols
         )
       } else {
-        # aggsequence[[i]][2]
         thisname <- names(aggsequence)[i]
         if (is.null(names(aggsequence)[i])) {
           thisname <- length(datlist) + 1

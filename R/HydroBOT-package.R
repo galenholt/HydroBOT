@@ -2,9 +2,10 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @import sf
 #' @importFrom foreach %do%
 #' @importFrom foreach %dopar%
 #' @importFrom rlang .data
-#' @import sf
+#' @importFrom rlang :=
 ## usethis namespace: end
 NULL

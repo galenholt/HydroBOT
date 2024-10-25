@@ -97,15 +97,19 @@ agg_names_to_cols <-
 #' `get` character names for geographic data, allowing aggsequences that are
 #' only characters.
 #'
-#' Only length-1 entries in aggregation sequence are turned into dataframes.
-#' See [multi_aggregate()] for use. Intended to be used with [purrr::map()] or similar.
+#' Only length-1 entries in aggregation sequence are turned into dataframes. See
+#' [multi_aggregate()] for use. Intended to be used with [purrr::map()] or
+#' similar.
 #'
-#' @param x character vector or dataframe, typically one entry in the aggregation list
+#' @param x character vector or dataframe, typically one entry in the
+#'   aggregation list
 #'
-#' @return aggregation sequence, with length-1 character vectors attempted to `get`
+#' @return aggregation sequence, with length-1 character vectors attempted to
+#'   `get`
 #'
-#' No `examples` tag here because we don't export this
-#' purrr::map(list(ewr_code = c('ewr_code_timing', 'ewr_code'), sdl_units = "sdl_units"), parse_geo)
+#'   No `examples` tag here because we don't export this
+#'   purrr::map(list(ewr_code = c('ewr_code_timing', 'ewr_code'), sdl_units =
+#'   "sdl_units"), parse_geo)
 parse_geo <- function(x) {
   if (length(x) == 1 & is.character(x)) {
     xg <- mget(x, inherits = TRUE, ifnotfound = x)
@@ -124,17 +128,16 @@ parse_geo <- function(x) {
 #' Get an all-character version of the aggsequence by parsing entries that are
 #' dataframes back to their names
 #'
-#'  Intended to be used with [purrr::imap()].
+#' Intended to be used with [purrr::imap()].
 #'
-#' @param x character vector or dataframe, typically one entry in the aggregation list
+#' @param x character vector or dataframe, typically one entry in the
+#'   aggregation list
 #' @param idx name of the list item
 #'
 #' @return character vector
 #'
-#' No `examples` tag because we don't export this
-#' purrr::imap(list(ewr_code = c('ewr_code_timing', 'ewr_code'),
-#' sdl_units = sdl_units),
-#' parse_char)
+#'   No `examples` tag because we don't export this purrr::imap(list(ewr_code =
+#'   c('ewr_code_timing', 'ewr_code'), sdl_units = sdl_units), parse_char)
 #'
 parse_char <- function(x, idx) {
   if (inherits(x, "data.frame")) {
@@ -182,25 +185,30 @@ parse_group_until <- function(group_until, groupers, aggsequence) {
   if (!is.list(group_until)) {
     # Try to fix, but not too hard
     if (is.character(groupers) & length(group_until) == length(groupers)) {
-      group_until <- as.list(group_until) |> setNames(groupers)
+      group_until <- as.list(group_until) |> stats::setNames(groupers)
     } else {
       rlang::abort("group_until should always be a named list.
       If used with types other than character or numeric, it *must* be.")
     }
   }
 
-  # Try a bit harder with the names; they fall off for unnamed vectors with functions
-  if (is.null(names(group_until)) & length(group_until) == length(groupers) & is.character(groupers)) {
+  # Try a bit harder with the names; they fall off for unnamed vectors with
+  # functions
+  if (is.null(names(group_until)) &
+      length(group_until) == length(groupers) &
+      is.character(groupers)) {
     names(group_until) <- groupers
   }
 
-  group_indices <- purrr::map(group_until, \(x) parse_aggnum(x, aggsequence)) |>
+  group_indices <- purrr::map(group_until,
+                              \(x) parse_aggnum(x, aggsequence)) |>
     purrr::discard(is.null)
 
   return(group_indices)
 }
 
-#' Main function of parse_group_until, finds the index for different ways of specifying group_until
+#' Main function of parse_group_until, finds the index for different ways of
+#' specifying group_until
 #'
 #' @param x one of the group_until items
 #' @param aggsequence as in [multi_aggregate()]
@@ -213,7 +221,8 @@ parse_aggnum <- function(x, aggsequence) {
     # gind <- length(aggsequence) + 1
     gind <- NULL
   } else {
-    # the is.na in an outer level, because we can have NA characters and numeric and etc
+    # the is.na in an outer level, because we can have NA characters and numeric
+    # and etc
     # if character, find the aggsequence name
     if (is.character(x)) {
       if (!x %in% names(aggsequence)) {
@@ -242,7 +251,8 @@ parse_aggnum <- function(x, aggsequence) {
 #'
 #' @inheritParams multi_aggregate
 #'
-#' @return character vector with 'spatial', 'theme' or 'temporal' for each step in aggsequence
+#' @return character vector with 'spatial', 'theme' or 'temporal' for each step
+#'   in aggsequence
 #' @export
 #'
 identify_dimension <- function(aggsequence, causal_edges) {
@@ -295,7 +305,8 @@ is_theme <- function(x, causalnames) {
     x %in% causalnames)
 }
 
-#' Test whether a list-item is time, including using [base::cut.Date()] specifications
+#' Test whether a list-item is time, including using [base::cut.Date()]
+#' specifications
 #'
 #' Intended to be purrr-ed over from aggsequence
 #'

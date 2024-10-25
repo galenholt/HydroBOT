@@ -150,7 +150,7 @@ plot_outcomes <- function(outdf,
                           transx = "identity",
                           zero_adjust = 0,
                           position = "stack",
-                          map_outlinecolor = 'grey35',
+                          map_outlinecolor = "grey35",
                           base_list = NULL,
                           smooth_arglist = NULL,
                           underlay_list = NULL,
@@ -221,7 +221,7 @@ plot_outcomes <- function(outdf,
     pal_list = pal_list,
     pal_direction = pal_direction,
     transoutcome = transoutcome,
-    transx = tranx,
+    transx = transx,
     point_group = point_group
   )
 
@@ -275,10 +275,12 @@ plot_outcomes <- function(outdf,
     # Adjustments to all 2d plots
     # y limits
     if (!is.null(setLimits)) {
-      new_y_lims <- find_limits(limcol = sf::st_drop_geometry(prepped$data[prepped$outcome_col]),
-                                lims = setLimits,
-                               trans = transoutcome,
-                               base_list = base_list)
+      new_y_lims <- find_limits(
+        limcol = sf::st_drop_geometry(prepped$data[prepped$outcome_col]),
+        lims = setLimits,
+        trans = transoutcome,
+        base_list = base_list
+      )
       outcome_plot <- outcome_plot + ggplot2::coord_cartesian(ylim = new_y_lims)
     }
     # labels and themes and facets. Can I really get away with doing color and
@@ -315,7 +317,7 @@ plot_outcomes <- function(outdf,
   }
 
   if (plot_type == "map") {
-    if (!inherits(pal_list, 'colors') && length(pal_list) > 1) {
+    if (!inherits(pal_list, "colors") && length(pal_list) > 1) {
       rlang::warn(glue::glue("using first palette for {outcome_col}.
                              Splitting up palettes in maps needs more thought"))
     }

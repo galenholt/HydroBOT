@@ -20,18 +20,22 @@ temporal_aggregate(
 }
 \arguments{
 \item{dat}{sf or tibble or dataframe of values to aggregate, with necessary
-grouping information for non-temporal axes (e.g. scenario, location, theme). \emph{Not}
-necessarily the same as \code{data} in \code{\link[=general_aggregate]{general_aggregate()}}- this function
-makes necessary adjustments to the data before calling
+grouping information for non-temporal axes (e.g. scenario, location,
+theme). \emph{Not} necessarily the same as \code{data} in \code{\link[=general_aggregate]{general_aggregate()}}- this
+function makes necessary adjustments to the data before calling
 \code{\link[=general_aggregate]{general_aggregate()}}}
 
-\item{breaks}{breaks for the time groupings. default 'all_time' collapses over the whole period, otherwise as in \code{\link[base:cut.POSIXt]{base::cut.POSIXt()}} (takes the character options there, or time objects)}
+\item{breaks}{breaks for the time groupings. default 'all_time' collapses
+over the whole period, otherwise as in \code{\link[base:cut.POSIXt]{base::cut.POSIXt()}} (takes the
+character options there, or time objects)}
 
-\item{timecol}{name of the column with time in it. Default 'infer' infers which it is by looking for POSIXt or Date types.}
+\item{timecol}{name of the column with time in it. Default 'infer' infers
+which it is by looking for POSIXt or Date types.}
 
 \item{groupers}{as in \code{\link[=general_aggregate]{general_aggregate()}}, with the note that these should
-be all grouping columns \emph{except} any spatial information. Spatial information is automatically added to
-\code{groupers} before passing to \code{\link[=general_aggregate]{general_aggregate()}}.}
+be all grouping columns \emph{except} any spatial information. Spatial
+information is automatically added to \code{groupers} before passing to
+\code{\link[=general_aggregate]{general_aggregate()}}.}
 
 \item{aggCols}{an expression for the columns to aggregate (the data columns).
 See \code{selectcreator} for formats}
@@ -57,8 +61,8 @@ aggregation. Cannot change with the main \code{groupers}. Developed to persist
 information about polygons through subsequent theme aggregations, but could
 be more general}
 
-\item{prefix}{prefix character, differs from \code{\link[=general_aggregate]{general_aggregate()}} in that default
-is \code{'temporal_'} instead of \code{'agg_'}.}
+\item{prefix}{prefix character, differs from \code{\link[=general_aggregate]{general_aggregate()}} in that
+default is \code{'temporal_'} instead of \code{'agg_'}.}
 
 \item{failmissing}{logical, default \code{TRUE}: fail if the requested grouping or
 aggregation columns not exist. If \code{FALSE}, proceed with those that do exist
@@ -78,9 +82,12 @@ Almost always better to specify explicitly when building \code{funlist}, but
 works OK with simple functions, e.g. passing \code{na.rm = TRUE} to mean}
 }
 \value{
-a tibble (possibly \code{sf} if fed an \code{sf}) with columns for the grouping variables aggregated into the
-time periods specified by \code{breaks}
+a tibble (possibly \code{sf} if fed an \code{sf}) with columns for the grouping
+variables aggregated into the time periods specified by \code{breaks}
 }
 \description{
-Takes data with a column in a time format (posix or date) and aggregates into groups defined by \code{breaks} while retaining theme and spatial information. Much of the setup and checks mirrors that of \code{\link[=theme_aggregate]{theme_aggregate()}} and \code{\link[=spatial_aggregate]{spatial_aggregate()}}, and then passes to \code{\link[=general_aggregate]{general_aggregate()}}.
+Takes data with a column in a time format (posix or date) and aggregates into
+groups defined by \code{breaks} while retaining theme and spatial information.
+Much of the setup and checks mirrors that of \code{\link[=theme_aggregate]{theme_aggregate()}} and
+\code{\link[=spatial_aggregate]{spatial_aggregate()}}, and then passes to \code{\link[=general_aggregate]{general_aggregate()}}.
 }

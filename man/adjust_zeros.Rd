@@ -11,10 +11,14 @@ adjust_zeros(data, adjust_col, amount, onlyzeros = FALSE)
 
 \item{adjust_col}{column to adjust (numeric)}
 
-\item{amount}{how much to adjust, default 0. Either numeric or \code{'auto'}. Auto shifts by
-\code{0.1*min(abs(data[data != 0]))}. If all nonzero data is positive or negative, the zeros are shifted only up or down. Otherwise, they are shifted randomly up and down \code{abs(amount)}}
+\item{amount}{how much to adjust, default 0. Either numeric or \code{'auto'}. Auto
+shifts by \code{0.1*min(abs(data[data != 0]))}. If all nonzero data is positive
+or negative, the zeros are shifted only up or down. Otherwise, they are
+shifted randomly up and down \code{abs(amount)}}
 
-\item{onlyzeros}{logical, default \code{FALSE}. Shift all data or only zeros (\code{TRUE}). Nonzero data is shifted away from 0 in whatever direction it already is if \code{FALSE}}
+\item{onlyzeros}{logical, default \code{FALSE}. Shift all data or only zeros
+(\code{TRUE}). Nonzero data is shifted away from 0 in whatever direction it
+already is if \code{FALSE}}
 }
 \value{
 dataframe with no zeros in \code{adjust_col}

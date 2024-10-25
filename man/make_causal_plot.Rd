@@ -40,9 +40,9 @@ all their upstream and downstream nodes.}
 connections. \code{FALSE} could be useful to keep unconnected nodes if we want
 to see if there are any that are not causally related to the others.}
 
-\item{edge_pal}{a named list of color palettes or color values for the
-edges.  Currently only supports paletteer palettes, vectors of colors, or
-single colors. See \code{\link{causal_colors_general}}}
+\item{edge_pal}{a named list of color palettes or color values for the edges.
+Currently only supports paletteer palettes, vectors of colors, or single
+colors. See \code{\link{causal_colors_general}}}
 
 \item{edge_colorgroups}{NULL (the default) or a column name (character)
 specifying a grouping column for different color palettes for the edges.
@@ -51,11 +51,12 @@ See \code{\link{causal_colors_general}}}
 \item{edge_colorset}{a column name (character) giving the column to define
 edge color. See \code{\link{causal_colors_general}}}
 
-\item{edge_pal_direction}{either 1 (default) or -1 (reversed) direction of the palettes}
+\item{edge_pal_direction}{either 1 (default) or -1 (reversed) direction of
+the palettes}
 
-\item{node_pal}{a named list of color palettes or color values for the
-nodes. Currently only supports paletteer palettes, vectors of colors, or
-single colors. See \code{\link{causal_colors_general}}}
+\item{node_pal}{a named list of color palettes or color values for the nodes.
+Currently only supports paletteer palettes, vectors of colors, or single
+colors. See \code{\link{causal_colors_general}}}
 
 \item{node_colorgroups}{NULL (the default) or a column name (character)
 specifying a grouping column for different color palettes for the nodes.
@@ -64,9 +65,11 @@ See \code{\link{causal_colors_general}}}
 \item{node_colorset}{a column name (character) giving the column to define
 node color. See \code{\link{causal_colors_general}}}
 
-\item{node_pal_direction}{either 1 (default) or -1 (reversed) direction of the palettes}
+\item{node_pal_direction}{either 1 (default) or -1 (reversed) direction of
+the palettes}
 
-\item{setLimits}{NULL (default) or length-2 numeric vector to force limits of the color scale.}
+\item{setLimits}{NULL (default) or length-2 numeric vector to force limits of
+the color scale.}
 
 \item{wrap_names}{logical, default \code{TRUE}, should long node names be wrapped
 to multiple lines}
@@ -82,8 +85,8 @@ produced by \code{DiagrammeR} be returned?}
 
 \item{savedir}{path to directory for saving outputs. Only needed if \code{save = TRUE}}
 
-\item{savename}{character, filename for the output plots.
-.pdf and .png are automatically appended.}
+\item{savename}{character, filename for the output plots. .pdf and .png are
+automatically appended.}
 }
 \value{
 causal network in DiagrammeR format

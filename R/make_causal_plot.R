@@ -144,14 +144,14 @@ make_causal_plot <- function(nodes, edges,
     DiagrammeR::create_graph() |>
     DiagrammeR::add_nodes_from_table(
       table = nodes,
-      label_col = Name,
-      type_col = NodeType
+      label_col = "Name",
+      type_col = "NodeType"
     ) |>
     DiagrammeR::add_edges_from_table(
       table = edges,
-      from_col = from,
-      to_col = to,
-      from_to_map = label
+      from_col = "from",
+      to_col = "to",
+      from_to_map = "label"
     ) |>
     DiagrammeR::add_global_graph_attrs(
       attr = c("layout", "splines"),
