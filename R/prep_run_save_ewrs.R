@@ -82,7 +82,9 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
 #'
-prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
+#' @examples
+prep_run_save_ewrs <- function(hydro_dir,
+                               output_parent_dir,
                                output_subdir = '',
                                scenarios = NULL,
                                model_format = "Standard time-series",
@@ -94,7 +96,8 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
                                extrameta = NULL,
                                rparallel = FALSE,
                                retries = 2,
-                               print_runs = FALSE) {
+                               print_runs = FALSE,
+                               url = FALSE) {
 
   # allow sloppy outputTypes and returnTypes
   if (!is.list(outputType)) {
@@ -112,7 +115,9 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
   # that's no longer true, it makes the now-required loops easier to use one in
   # R
   if (is.null(scenarios)) {
-    if (model_format %in% c("IQQM - NSW 10,000 years", "Standard time-series", "Bigmod - MDBA")) {
+    if (model_format %in% c("IQQM - NSW 10,000 years",
+                            "Standard time-series",
+                            "Bigmod - MDBA")) {
       filetype <- "csv"
     }
     if (grepl("netcdf", model_format)) {
@@ -121,6 +126,9 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
     hydro_paths <- find_scenario_paths(hydro_dir, type = filetype,
                                        scenarios_from = scenarios_from,
                                        file_search = file_search)
+  } else if (!is.null(scenarios) &
+    hydro_paths <- scenarios
+             is.null(hydro_dir) & url == TRUE) {
   } else {
     hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
   }
@@ -222,6 +230,7 @@ prep_run_save_ewrs <- function(hydro_dir, output_parent_dir,
   # if (outer_parallel > 1) {
   #   nodeloops <- split(fulloop, cut(1:length(fulloop), nodes_wanted, labels = FALSE))
   # }
+  print(hydro_paths)
   ewr_out <- safe_imap(hydro_paths, ewrfun, retries = retries, parallel = rparallel)
 
   # save metadata immediately after processing so any errors in the returning don't prevent its creation.
