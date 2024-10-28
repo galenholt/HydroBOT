@@ -18,7 +18,8 @@ prep_run_save_ewrs(
   extrameta = NULL,
   rparallel = FALSE,
   retries = 2,
-  print_runs = FALSE
+  print_runs = FALSE,
+  url = FALSE
 )
 }
 \arguments{
@@ -90,6 +91,10 @@ still runs once. Default 2.}
 
 \item{print_runs}{logical, default FALSE. If true, print the set of runs to
 be done.}
+
+\item{url}{logical, default FALSE. If TRUE, \code{scenarios} needs to be a named
+list with full file paths (URLs). This bypasses the otherwise automatic
+prepending of hydro_dir onto a named scenario list.}
 }
 \value{
 a list of dataframe(s) if \code{returnType} is not 'none', otherwise, NULL

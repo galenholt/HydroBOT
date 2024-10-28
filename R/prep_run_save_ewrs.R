@@ -78,11 +78,12 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'   still runs once. Default 2.
 #' @param print_runs logical, default FALSE. If true, print the set of runs to
 #'   be done.
+#' @param url logical, default FALSE. If TRUE, `scenarios` needs to be a named
+#'   list with full file paths (URLs). This bypasses the otherwise automatic
+#'   prepending of hydro_dir onto a named scenario list.
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
-#'
-#' @examples
 prep_run_save_ewrs <- function(hydro_dir,
                                output_parent_dir,
                                output_subdir = '',
@@ -126,14 +127,15 @@ prep_run_save_ewrs <- function(hydro_dir,
     hydro_paths <- find_scenario_paths(hydro_dir, type = filetype,
                                        scenarios_from = scenarios_from,
                                        file_search = file_search)
-  } else if (!is.null(scenarios) &
-    hydro_paths <- scenarios
-             is.null(hydro_dir) & url == TRUE) {
   } else {
-    hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
+    # if files are from URL (blob), we have to pre-create the paths
+    if (url) {
+      hydro_paths <- scenarios
+    }
+    if (!url) {
+      hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
+    }
   }
-
-
 
   # We need to check the files have unique names (and fix if not), since the EWR
   # tool makes them the 'scenario' column.
