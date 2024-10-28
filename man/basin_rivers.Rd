@@ -9,17 +9,17 @@
 
 \describe{
 \item{geometry}{The geometry, all LINESTRING or MULTILINESTRING}
-\item{other values}{As documented at http://www.bom.gov.au/water/geofabric/}
+\item{other values}{As documented at https://www.hydrosheds.org/products/hydrorivers}
 }
 }
 }
 \source{
-BOM, \url{http://www.bom.gov.au/water/geofabric/}
+HydroRIVERS, \url{https://www.hydrosheds.org/products/hydrorivers}
 }
 \usage{
 basin_rivers
 }
 \description{
-Spatial lines for the major rivers in the basin, from geofabric. Has been clipped to basin and paths simplified.
+Spatial lines for the major rivers in the basin, from HydroRIVERS. Has been clipped to basin and paths simplified.
 }
 \keyword{datasets}

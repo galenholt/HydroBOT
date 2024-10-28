@@ -1,9 +1,11 @@
 Package: HydroBOT
 Title: Toolkit For Flow-Dependent outcomes in the Murray-Darling Basin
-Version: 0.2.0.9027
+Version: 0.2.0.9028
 Authors@R: 
-    person("Galen", "Holt", , "g.holt@deakin.edu.au", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-7455-9275"))
+    c(person("Galen", "Holt", , "g.holt@deakin.edu.au", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-7455-9275")),
+    person("Georgia", "Dwyer", , "g.dwyer@deakin.edu.au", role = c("aut"),
+           comment = c(ORCID = "")))
 Description: Provides tools to assess responses to flows in the MDB. Wraps the EWR tool and provides ongoing modeling of ecological responses with causal networks, as well as analysis, synthesis and visualisation functionality targetted at scenario comparisons.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -62,4 +64,3 @@ Config/reticulate:
       list(package = "py-ewr")
     )
   )
-VignetteBuilder: knitr

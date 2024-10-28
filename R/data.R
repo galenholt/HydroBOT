@@ -132,15 +132,15 @@
 
 #' River lines in the basin
 #'
-#' Spatial lines for the major rivers in the basin, from geofabric. Has been clipped to basin and paths simplified.
+#' Spatial lines for the major rivers in the basin, from HydroRIVERS. Has been clipped to basin and paths simplified.
 #'
 #' @format ## `basin_rivers` An `sf` object:
 #' \describe{
 #'   \item{geometry}{The geometry, all LINESTRING or MULTILINESTRING}
-#'   \item{other values}{As documented at http://www.bom.gov.au/water/geofabric/}
+#'   \item{other values}{As documented at https://www.hydrosheds.org/products/hydrorivers}
 #' }
 #' @source
-#' BOM, <http://www.bom.gov.au/water/geofabric/>
+#' HydroRIVERS, <https://www.hydrosheds.org/products/hydrorivers>
 "basin_rivers"
 
 #' Example output from EWR tool

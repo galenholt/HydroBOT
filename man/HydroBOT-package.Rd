@@ -11,5 +11,10 @@ Provides tools to assess responses to flows in the MDB. Wraps the EWR tool and p
 \author{
 \strong{Maintainer}: Galen Holt \email{g.holt@deakin.edu.au} (\href{https://orcid.org/0000-0002-7455-9275}{ORCID})
 
+Authors:
+\itemize{
+  \item Georgia Dwyer \email{g.dwyer@deakin.edu.au}
+}
+
 }
 \keyword{internal}

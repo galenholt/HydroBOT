@@ -9,8 +9,10 @@ test_that("csv read-in works", {
 })
 
 test_that("shp read-in works", {
+  gaugeshp <- system.file('data-raw/cleanspatial/bom_gauges.shp', package = 'HydroBOT')
+  skip_if_no_file(gaugeshp)
   spatialewr <- gauge2geo(summary_ewr_output,
-                          gaugelocs = system.file('extdata/bom_gauges.shp', package = 'HydroBOT'))
+                          gaugelocs = gaugeshp)
   expect_s3_class(spatialewr, 'sf')
 })
 

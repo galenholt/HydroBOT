@@ -48,11 +48,11 @@ Trying to be as intentional as possible with the data dirs. `data-raw` is for ra
 ```{r}
 datarawdir <- 'data-raw'
 dataoutdir <- 'data'
-dataextdir <- 'inst/extdata'
+cleanspatialdir <- 'data-raw/cleanspatial'
 
 if (!dir.exists(datarawdir)) {dir.create(datarawdir, recursive = TRUE)} 
 if (!dir.exists(dataoutdir)) {dir.create(dataoutdir, recursive = TRUE)} 
-if (!dir.exists(dataextdir)) {dir.create(dataextdir, recursive = TRUE)} 
+if (!dir.exists(cleanspatialdir)) {dir.create(cleanspatialdir, recursive = TRUE)} 
 ```
 
 ## File purpose
@@ -465,7 +465,7 @@ ggplot(cewo_valleys) +
   geom_sf(aes(fill = ValleyName))
 ```
 
-## River lines
+## River lines (geofabric)
 
 The toolkit does not (at present) use river lines for processing, but they are very useful for visualisation.
 
@@ -499,37 +499,95 @@ st_crs(major_rivers) == st_crs(basin)
 Clip to the basin
 
 ```{r}
-basin_rivers <- major_rivers |> 
+basin_fabric_rivers_full <- major_rivers |> 
   st_intersection(basin)
 ```
 
 We should probably smooth that out again
 
 ```{r}
-print(vertcount(basin_rivers))
+print(vertcount(basin_fabric_rivers_full))
 ```
 
 ```{r}
-basin_rivers <- basin_rivers |> 
-  rmapshaper::ms_simplify(keep = 0.01)
+basin_fabric_rivers <- basin_fabric_rivers_full |> 
+  rmapshaper::ms_simplify(keep = 0.001, drop_null_geometries = TRUE, 
+                          method = 'vis')
 
-print(vertcount(basin_rivers))
+print(vertcount(basin_fabric_rivers))
 ```
 
 Change the Shape to geometry for consistency
 
 ```{r}
-basin_rivers <- basin_rivers |> 
-  dplyr::rename(geometry = Shape)
+basin_fabric_rivers <- basin_fabric_rivers |> 
+  dplyr::rename(geometry = Shape) |> 
+  dplyr::select(Name)
 ```
 
 ```{r}
 ggplot() +
   geom_sf(data = basin, fill = 'grey96') +
-  geom_sf(data = basin_rivers, aes(color = log(UpstrGeoLn))) +
+  geom_sf(data = basin_fabric_rivers, aes(color = log(UpstrGeoLn))) +
   scale_color_viridis_c() +
   theme_void() +
   theme(legend.position = 'none')
+```
+
+## River lines (HydroRIVERS)
+
+```{r}
+data_load('downloaded/HydroRIVERS', 
+          datarawdir,
+          "https://data.hydrosheds.org/file/HydroRIVERS/HydroRIVERS_v10_au.gdb.zip")
+```
+
+```{r}
+st_layers(file.path('data-raw/downloaded', 'HydroRIVERS',
+                    'HydroRIVERS_v10_au.gdb'))
+```
+
+```{r}
+hydro_rivers <- st_read(file.path('data-raw/downloaded', 'HydroRIVERS',
+                    'HydroRIVERS_v10_au.gdb'),
+                  layer = 'HydroRIVERS_v10_au')
+```
+
+```{r}
+basin_hydro_rivers_full <- hydro_rivers |> 
+  st_transform(crs = st_crs(basin)) |> 
+  st_intersection(basin)
+```
+
+```{r}
+basin_hydro_rivers <- basin_hydro_rivers_full |> 
+  rmapshaper::ms_simplify(keep = 0.001, drop_null_geometries = TRUE, 
+                          method = 'vis')
+
+print(vertcount(basin_hydro_rivers))
+```
+
+```{r}
+basin_hydro_rivers <- basin_hydro_rivers |> 
+  dplyr::rename(geometry = Shape) |> 
+  dplyr::filter(ORD_STRA >= 3) |> 
+  dplyr::select(ORD_STRA, DIST_UP_KM, geometry)
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = basin, fill = 'grey96') +
+  geom_sf(data = basin_hydro_rivers |> dplyr::filter(ORD_STRA >= 3), 
+          aes(color = log(DIST_UP_KM))) +
+  scale_color_viridis_c() +
+  theme_void() +
+  theme(legend.position = 'none')
+```
+
+Use this one as `basin_rivers` to provide- it's cleaner.
+
+```{r}
+basin_rivers <- basin_hydro_rivers
 ```
 
 # Save clean files
@@ -545,28 +603,27 @@ I *could* save these objects as the sf objects in `.rda` files, as would be typi
 if (REBUILD_DATA) {
   # The shapefiles to /inst/extdata/
   st_write(basin, 
-           file.path(dataextdir, 'basin.shp'), 
+           file.path(cleanspatialdir, 'basin.shp'), 
            append = FALSE)
   st_write(resource_plan_areas, 
-           file.path(dataextdir, 'resource_plan.shp'), 
+           file.path(cleanspatialdir, 'resource_plan.shp'), 
            append = FALSE)
   st_write(sdl_units, 
-           file.path(dataextdir, 'sdl_units.shp'), 
+           file.path(cleanspatialdir, 'sdl_units.shp'), 
            append = FALSE)
   st_write(bom_basin_gauges, 
-           file.path(dataextdir, 'bom_gauges.shp'), 
+           file.path(cleanspatialdir, 'bom_gauges.shp'), 
            append = FALSE)
   st_write(cewo_valleys, 
-           file.path(dataextdir, 'cewo_valleys.shp'), 
+           file.path(cleanspatialdir, 'cewo_valleys.shp'), 
            append = FALSE)
     st_write(planning_units, 
-           file.path(dataextdir, 'planning_units.shp'), 
+           file.path(cleanspatialdir, 'planning_units.shp'), 
            append = FALSE)
     st_write(basin_rivers, 
-           file.path(dataextdir, 'basin_rivers.shp'), 
+           file.path(cleanspatialdir, 'basin_rivers.shp'), 
            append = FALSE)
-  
-  
+
   
   # The R objects to /data/
   usethis::use_data(basin, overwrite = TRUE)

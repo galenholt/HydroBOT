@@ -124,3 +124,14 @@ get_ewr_version <- function() {
   # Or
   # system.time(a <- system2("pip", "show py_ewr", stdout = TRUE))
 }
+
+#' Extract causal network from EWR tool
+#'
+#' @return list of EWR causal networks
+#' @export
+#'
+get_causal_ewr <- function() {
+  pdi <- reticulate::import("py_ewr.data_inputs")
+  gce <- pdi$get_causal_ewr()
+  return(gce)
+}
