@@ -4,7 +4,8 @@
 #' [prep_ewr_agg()] (though can be made more general once we have other
 #' modules), [make_edges()] and [multi_aggregate()]. Particularly useful if we
 #' want to pass parameters as strings from a config before anything is read in,
-#' and parallelisation.
+#' and parallelisation (set a [future::plan()]). If parallel, be careful, it
+#' will return a MAX scenario for each scenario.
 #'
 #' @inheritParams multi_aggregate
 #' @inherit multi_aggregate params return
@@ -26,11 +27,17 @@
 #'   should include only the directory structure.  If `NULL`, does not save. If
 #'   `savepath = NULL` and `returnList = FALSE`, the function errors to avoid
 #'   wasting resources.
-#' @param extrameta list, extra information to include in saved metadata documentation for the run. Default NULL.
+#' @param extrameta list, extra information to include in saved metadata
+#'   documentation for the run. Default NULL.
 #' @param rparallel logical, default FALSE. If TRUE, parallelises over the
 #'   scenarios in hydro_dir using `furrr`. To use, install `furrr` and set a
 #'   [future::plan()] (likely `multisession` or `multicore`)
-#' @param par_recursive logical, default TRUE. If parallel, do we use the innermost level of directory containing EWR outputs (TRUE) or the next level in from datpath (FALSE)
+#' @param par_recursive logical, default TRUE. If parallel, do we use the
+#'   innermost level of directory containing EWR outputs (TRUE) or the next
+#'   level in from datpath (FALSE)
+#' @param savepar 'combine' (default) or 'each'. If parallel over scenarios,
+#'   should this combine the output (default) or save each scenario's
+#'   aggregation separately ('each')
 #' @param ... passed to [prep_ewr_agg()]
 #'
 #' @export
@@ -55,49 +62,11 @@ read_and_agg <- function(datpath,
                          extrameta = NULL,
                          rparallel = FALSE,
                          par_recursive = TRUE,
+                         savepar = 'combine',
                          ...) {
 
   if (!returnList & is.null(savepath)) {
     rlang::abort(message = "not returning output to disk or session. aborting to not use the resources.")
-  }
-
-  # Recurse over inner directories if parallel
-  if (rparallel) {
-    if (par_recursive) {
-      # Go all the way in (i.e. loop over every folder with a csv)
-      gfiles <- list.files(datpath, pattern = '.csv', full.names = TRUE, recursive = TRUE)
-      dps <- gsub("/[^/]+$",'', gfiles) |> unique()
-    } else {
-      # only first level
-      dps <- list.dirs(datpath, recursive = FALSE)
-    }
-
-    names(dps) <- gsub(paste0(datpath, '/'),'', dps)
-    aggout <- safe_imap(dps, \(x, y) read_and_agg(x,
-                                               type = type,
-                                               geopath = geopath,
-                                               causalpath = causalpath,
-                                               groupers = groupers,
-                                               group_until = group_until,
-                                               aggCols = aggCols,
-                                               aggsequence = aggsequence,
-                                               funsequence = funsequence,
-                                               saveintermediate = saveintermediate,
-                                               namehistory = namehistory,
-                                               keepAllPolys = keepAllPolys,
-                                               failmissing = failmissing,
-                                               auto_ewr_PU = auto_ewr_PU,
-                                               pseudo_spatial = pseudo_spatial,
-                                               returnList = returnList,
-                                               savepath = file.path(savepath, y),
-                                               extrameta = extrameta,
-                                               rparallel = FALSE,
-                                               y, # so I can not write safe_map
-                                               ...),
-                        parallel = TRUE)
-    aggout <- purrr::list_transpose(aggout) |>
-      purrr::map(dplyr::bind_rows)
-    return(aggout)
   }
 
   # set up metadata placeholders to know if the run failed
@@ -125,57 +94,114 @@ read_and_agg <- function(datpath,
     }
   }
 
-  data <- prep_ewr_agg(datpath, type = type, geopath = geopath, whichcrs = 4283, ...)
+  # There's got to be a cleaner way to do this
+  # Recurse over inner directories if parallel
+  if (rparallel) {
+    if (par_recursive) {
+      # Go all the way in (i.e. loop over every folder with a csv)
+      gfiles <- list.files(datpath, pattern = '.csv', full.names = TRUE, recursive = TRUE)
+      dps <- gsub("/[^/]+$",'', gfiles) |> unique()
+    } else {
+      # only first level
+      dps <- list.dirs(datpath, recursive = FALSE)
+    }
 
-  # parse any character names for the spatial data, then character will be the themes
-  aggsequence <- purrr::map(aggsequence, parse_geo)
-  stepdim <- identify_dimension(aggsequence,
-                                causalpath)
+    names(dps) <- gsub(paste0(datpath, '/'),'', dps)
 
-  # multi_aggregate can handle the raw network just fine, but this saves re-calculating edges dfs each time.
-  edges <- make_edges(
-    dflist = causalpath,
-    fromtos = aggsequence[stepdim == 'theme']
-  )
+    if (savepar == 'each') {
+      spath <- rlang::expr(file.path(savepath, y))
+    } else if (savepar == 'combine') {
+      spath <- NULL
+    } else {
+      rlang::abort("Unacceptable value for savepar")
+    }
 
-  # be aggressive about parsing tidyselect into characters or expressions get
-  # lost in the stack
-  groupers <- selectcreator(rlang::enquo(groupers), data, failmissing)
-  aggCols <- selectcreator(rlang::enquo(aggCols), data, failmissing)
+    aggout <- safe_imap(dps, \(x, y) read_and_agg(x,
+                                                  type = type,
+                                                  geopath = geopath,
+                                                  causalpath = causalpath,
+                                                  groupers = groupers,
+                                                  group_until = group_until,
+                                                  aggCols = aggCols,
+                                                  aggsequence = aggsequence,
+                                                  funsequence = funsequence,
+                                                  saveintermediate = saveintermediate,
+                                                  namehistory = namehistory,
+                                                  keepAllPolys = keepAllPolys,
+                                                  failmissing = failmissing,
+                                                  auto_ewr_PU = auto_ewr_PU,
+                                                  pseudo_spatial = pseudo_spatial,
+                                                  returnList = returnList,
+                                                  savepath = eval(spath),
+                                                  extrameta = extrameta,
+                                                  rparallel = FALSE,
+                                                  add_max = ifelse(y == names(dps)[1], TRUE, FALSE),
+                                                  y, # so I can not write safe_map
+                                                  ...),
+                        parallel = TRUE)
 
-  # we need to handle different ways of getting `group_until`. The easiest way
-  # to do this is to do it here to make it standard, although it will also
-  # happen in multi-aggregate.
+    aggout <- purrr::list_transpose(aggout) |>
+      purrr::map(dplyr::bind_rows)
+    # return(aggout)
+  }
 
-  group_until <- parse_group_until(
-    group_until = group_until,
-    groupers = groupers,
-    aggsequence = aggsequence
-  )
+  if (!rparallel) {
+    data <- prep_ewr_agg(datpath, type = type, geopath = geopath, whichcrs = 4283, ...)
 
-  # Annoying how much of this is just pass-through arguments. Could use dots,
-  # but then would need to specify the prep_ewr_agg dots.
-  aggout <- multi_aggregate(data,
-    edges,
-    groupers = groupers,
-    group_until = group_until,
-    aggCols = aggCols,
-    aggsequence = aggsequence,
-    funsequence = funsequence,
-    saveintermediate = saveintermediate,
-    namehistory = namehistory,
-    keepAllPolys = keepAllPolys,
-    failmissing = failmissing,
-    auto_ewr_PU = auto_ewr_PU,
-    pseudo_spatial = pseudo_spatial
-  )
+    # parse any character names for the spatial data, then character will be the themes
+    aggsequence <- purrr::map(aggsequence, parse_geo)
+    stepdim <- identify_dimension(aggsequence,
+                                  causalpath)
+
+    # multi_aggregate can handle the raw network just fine, but this saves re-calculating edges dfs each time.
+    edges <- make_edges(
+      dflist = causalpath,
+      fromtos = aggsequence[stepdim == 'theme']
+    )
+
+    # be aggressive about parsing tidyselect into characters or expressions get
+    # lost in the stack
+    groupers <- selectcreator(rlang::enquo(groupers), data, failmissing)
+    aggCols <- selectcreator(rlang::enquo(aggCols), data, failmissing)
+
+    # we need to handle different ways of getting `group_until`. The easiest way
+    # to do this is to do it here to make it standard, although it will also
+    # happen in multi-aggregate.
+
+    group_until <- parse_group_until(
+      group_until = group_until,
+      groupers = groupers,
+      aggsequence = aggsequence
+    )
+
+    # Annoying how much of this is just pass-through arguments. Could use dots,
+    # but then would need to specify the prep_ewr_agg dots.
+    aggout <- multi_aggregate(data,
+                              edges,
+                              groupers = groupers,
+                              group_until = group_until,
+                              aggCols = aggCols,
+                              aggsequence = aggsequence,
+                              funsequence = funsequence,
+                              saveintermediate = saveintermediate,
+                              namehistory = namehistory,
+                              keepAllPolys = keepAllPolys,
+                              failmissing = failmissing,
+                              auto_ewr_PU = auto_ewr_PU,
+                              pseudo_spatial = pseudo_spatial
+    )
+  }
 
   # use RDS so can read it in to a different name.
   if (!is.null(savepath)) {
     if (!dir.exists(savepath)) {
       dir.create(savepath, recursive = TRUE)
     }
-    saveRDS(aggout, file.path(savepath, paste0(type, "_aggregated.rds")))
+    # save the output if sequential or if we want to save the combined parallel
+    if (!rparallel || savepar == 'combine') {
+      saveRDS(aggout, file.path(savepath, paste0(type, "_aggregated.rds")))
+    }
+
 
     char_aggsequence <- purrr::imap(aggsequence, parse_char)
     char_funsequence <- purrr::map(funsequence, parse_char_funs)

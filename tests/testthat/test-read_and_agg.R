@@ -629,6 +629,8 @@ test_that("parallel works", {
 
   dir.create(file.path(temp_parent_dir, 'aggout/parallel'), recursive = TRUE)
   dir.create(file.path(temp_parent_dir, 'aggout/parallel_par'), recursive = TRUE)
+  dir.create(file.path(temp_parent_dir, 'aggout/parallel_combine'), recursive = TRUE)
+  dir.create(file.path(temp_parent_dir, 'aggout/parallel_par_combine'), recursive = TRUE)
   dir.create(file.path(temp_parent_dir, 'aggout/sequential'), recursive = TRUE)
 
   spatagg_pt <- read_and_agg(
@@ -645,7 +647,8 @@ test_that("parallel works", {
     saveintermediate = TRUE,
     savepath = file.path(temp_parent_dir, 'aggout/parallel'),
     rparallel = TRUE,
-    par_recursive = TRUE
+    par_recursive = TRUE,
+    savepar = 'each'
   )
 
   spatagg_pf <- read_and_agg(
@@ -662,7 +665,8 @@ test_that("parallel works", {
     saveintermediate = TRUE,
     savepath = file.path(temp_parent_dir, 'aggout/parallel_par'),
     rparallel = TRUE,
-    par_recursive = FALSE
+    par_recursive = FALSE,
+    savepar = 'each'
   )
 
   spatagg_np <- read_and_agg(
@@ -682,10 +686,46 @@ test_that("parallel works", {
     par_recursive = FALSE
   )
 
+  spatagg_pt_c <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq_s_th_t,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    auto_ewr_PU = TRUE,
+    saveintermediate = TRUE,
+    savepath = file.path(temp_parent_dir, 'aggout/parallel_combine'),
+    rparallel = TRUE,
+    par_recursive = TRUE,
+    savepar = 'combine'
+  )
+
+  spatagg_pf_c <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq_s_th_t,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    auto_ewr_PU = TRUE,
+    saveintermediate = TRUE,
+    savepath = file.path(temp_parent_dir, 'aggout/parallel_par_combine'),
+    rparallel = TRUE,
+    par_recursive = FALSE,
+    savepar = 'combine'
+  )
+
   expect_equal(spatagg_np, spatagg_pf)
   expect_equal(spatagg_np, spatagg_pt)
 
-  # That saves one file per scenario, read them in and glue together to test.
+  # The `savepar = 'each'` saves one file per scenario, read them in and glue together to test.
   ptfiles <- list.files(file.path(temp_parent_dir, 'aggout/parallel'),
                         pattern = '.rds',
                         full.names = TRUE, recursive = TRUE)
@@ -700,13 +740,16 @@ test_that("parallel works", {
     purrr::list_transpose() |>
     purrr::map(dplyr::bind_rows)
 
-  # just read in the sequential
+  # just read in the sequential and the combineds
   read_np <- readRDS(file.path(temp_parent_dir, 'aggout/sequential', 'achievement_aggregated.rds'))
+  read_ptc <- readRDS(file.path(temp_parent_dir, 'aggout/parallel_combine', 'achievement_aggregated.rds'))
+  read_pfc <- readRDS(file.path(temp_parent_dir, 'aggout/parallel_par_combine', 'achievement_aggregated.rds'))
+
 
   expect_equal(spatagg_np, read_np)
   expect_equal(spatagg_pf, read_pf)
   expect_equal(spatagg_pt, read_pt)
+  expect_equal(spatagg_pf, read_pfc)
+  expect_equal(spatagg_pt, read_ptc)
 
-
-
-})
+  })
