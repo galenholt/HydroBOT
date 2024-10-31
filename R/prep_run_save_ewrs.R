@@ -112,6 +112,14 @@ prep_run_save_ewrs <- function(hydro_dir,
   outputType <- make_ewr_consistent(outputType)
   returnType <- make_ewr_consistent(returnType)
 
+  # python and R put ~ in different places
+  if (grepl('~', hydro_dir)) {
+    hydro_dir <- path.expand(hydro_dir)
+  }
+  if (grepl('~', output_parent_dir)) {
+    output_parent_dir <- path.expand(output_parent_dir)
+  }
+
   # get the paths to all the hydrographs. python used to need a list, and though
   # that's no longer true, it makes the now-required loops easier to use one in
   # R
@@ -232,7 +240,6 @@ prep_run_save_ewrs <- function(hydro_dir,
   # if (outer_parallel > 1) {
   #   nodeloops <- split(fulloop, cut(1:length(fulloop), nodes_wanted, labels = FALSE))
   # }
-  print(hydro_paths)
   ewr_out <- safe_imap(hydro_paths, ewrfun, retries = retries, parallel = rparallel)
 
   # save metadata immediately after processing so any errors in the returning don't prevent its creation.

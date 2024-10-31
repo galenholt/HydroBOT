@@ -61,7 +61,9 @@ safe_imap <- function(.x, .f, ..., retries = 0, parallel = FALSE) {
   }
 
   if (length(whicherrors) > 0) {
-    rlang::inform(glue::glue("The EWR tool has run, but the scenario(s) {names(whicherrors)} have failed and have been bypassed after {retries} retries."))
+    rlang::inform(c(glue::glue("The EWR tool has run, but the scenario(s) {names(whicherrors)} have failed and have been bypassed after {retries} retries."),
+                    "The first error is:"),
+                  glue::glue("{error_out[[1]]}"))
     full_results <- full_results[-orig_indices]
   }
 
