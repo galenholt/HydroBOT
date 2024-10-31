@@ -62,9 +62,8 @@ read_and_agg <- function(datpath,
                          extrameta = NULL,
                          rparallel = FALSE,
                          par_recursive = TRUE,
-                         savepar = 'combine',
+                         savepar = "combine",
                          ...) {
-
   if (!returnList & is.null(savepath)) {
     rlang::abort(message = "not returning output to disk or session. aborting to not use the resources.")
   }
@@ -99,46 +98,51 @@ read_and_agg <- function(datpath,
   if (rparallel) {
     if (par_recursive) {
       # Go all the way in (i.e. loop over every folder with a csv)
-      gfiles <- list.files(datpath, pattern = '.csv', full.names = TRUE, recursive = TRUE)
-      dps <- gsub("/[^/]+$",'', gfiles) |> unique()
+      gfiles <- list.files(datpath, pattern = ".csv", full.names = TRUE, recursive = TRUE)
+      dps <- gsub("/[^/]+$", "", gfiles) |> unique()
     } else {
       # only first level
       dps <- list.dirs(datpath, recursive = FALSE)
     }
 
-    names(dps) <- gsub(paste0(datpath, '/'),'', dps)
+    names(dps) <- gsub(paste0(datpath, "/"), "", dps)
 
-    if (savepar == 'each') {
+    # make cmd-check happy
+    y <- NULL
+
+    if (savepar == "each") {
       spath <- rlang::expr(file.path(savepath, y))
-    } else if (savepar == 'combine') {
+    } else if (savepar == "combine") {
       spath <- NULL
     } else {
       rlang::abort("Unacceptable value for savepar")
     }
 
     aggout <- safe_imap(dps, \(x, y) read_and_agg(x,
-                                                  type = type,
-                                                  geopath = geopath,
-                                                  causalpath = causalpath,
-                                                  groupers = groupers,
-                                                  group_until = group_until,
-                                                  aggCols = aggCols,
-                                                  aggsequence = aggsequence,
-                                                  funsequence = funsequence,
-                                                  saveintermediate = saveintermediate,
-                                                  namehistory = namehistory,
-                                                  keepAllPolys = keepAllPolys,
-                                                  failmissing = failmissing,
-                                                  auto_ewr_PU = auto_ewr_PU,
-                                                  pseudo_spatial = pseudo_spatial,
-                                                  returnList = returnList,
-                                                  savepath = eval(spath),
-                                                  extrameta = extrameta,
-                                                  rparallel = FALSE,
-                                                  add_max = ifelse(y == names(dps)[1], TRUE, FALSE),
-                                                  y, # so I can not write safe_map
-                                                  ...),
-                        parallel = TRUE)
+      type = type,
+      geopath = geopath,
+      causalpath = causalpath,
+      groupers = groupers,
+      group_until = group_until,
+      aggCols = aggCols,
+      aggsequence = aggsequence,
+      funsequence = funsequence,
+      saveintermediate = saveintermediate,
+      namehistory = namehistory,
+      keepAllPolys = keepAllPolys,
+      failmissing = failmissing,
+      auto_ewr_PU = auto_ewr_PU,
+      pseudo_spatial = pseudo_spatial,
+      returnList = returnList,
+      savepath = eval(spath),
+      extrameta = extrameta,
+      rparallel = FALSE,
+      add_max = ifelse(y == names(dps)[1], TRUE, FALSE),
+      y, # so I can not write safe_map
+      ...
+    ),
+    parallel = TRUE
+    )
 
     aggout <- purrr::list_transpose(aggout) |>
       purrr::map(dplyr::bind_rows)
@@ -150,13 +154,15 @@ read_and_agg <- function(datpath,
 
     # parse any character names for the spatial data, then character will be the themes
     aggsequence <- purrr::map(aggsequence, parse_geo)
-    stepdim <- identify_dimension(aggsequence,
-                                  causalpath)
+    stepdim <- identify_dimension(
+      aggsequence,
+      causalpath
+    )
 
     # multi_aggregate can handle the raw network just fine, but this saves re-calculating edges dfs each time.
     edges <- make_edges(
       dflist = causalpath,
-      fromtos = aggsequence[stepdim == 'theme']
+      fromtos = aggsequence[stepdim == "theme"]
     )
 
     # be aggressive about parsing tidyselect into characters or expressions get
@@ -177,18 +183,18 @@ read_and_agg <- function(datpath,
     # Annoying how much of this is just pass-through arguments. Could use dots,
     # but then would need to specify the prep_ewr_agg dots.
     aggout <- multi_aggregate(data,
-                              edges,
-                              groupers = groupers,
-                              group_until = group_until,
-                              aggCols = aggCols,
-                              aggsequence = aggsequence,
-                              funsequence = funsequence,
-                              saveintermediate = saveintermediate,
-                              namehistory = namehistory,
-                              keepAllPolys = keepAllPolys,
-                              failmissing = failmissing,
-                              auto_ewr_PU = auto_ewr_PU,
-                              pseudo_spatial = pseudo_spatial
+      edges,
+      groupers = groupers,
+      group_until = group_until,
+      aggCols = aggCols,
+      aggsequence = aggsequence,
+      funsequence = funsequence,
+      saveintermediate = saveintermediate,
+      namehistory = namehistory,
+      keepAllPolys = keepAllPolys,
+      failmissing = failmissing,
+      auto_ewr_PU = auto_ewr_PU,
+      pseudo_spatial = pseudo_spatial
     )
   }
 
@@ -198,7 +204,7 @@ read_and_agg <- function(datpath,
       dir.create(savepath, recursive = TRUE)
     }
     # save the output if sequential or if we want to save the combined parallel
-    if (!rparallel || savepar == 'combine') {
+    if (!rparallel || savepar == "combine") {
       saveRDS(aggout, file.path(savepath, paste0(type, "_aggregated.rds")))
     }
 
@@ -223,7 +229,7 @@ read_and_agg <- function(datpath,
       aggReturn = returnList,
       agg_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
       agg_status = TRUE,
-      agg_HydroBOT_version = as.character(utils::packageVersion('HydroBOT'))
+      agg_HydroBOT_version = as.character(utils::packageVersion("HydroBOT"))
     )
 
     # add any passed metadata info

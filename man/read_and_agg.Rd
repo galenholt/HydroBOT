@@ -25,6 +25,7 @@ read_and_agg(
   extrameta = NULL,
   rparallel = FALSE,
   par_recursive = TRUE,
+  savepar = "combine",
   ...
 )
 }
@@ -134,13 +135,20 @@ should include only the directory structure.  If \code{NULL}, does not save. If
 \code{savepath = NULL} and \code{returnList = FALSE}, the function errors to avoid
 wasting resources.}
 
-\item{extrameta}{list, extra information to include in saved metadata documentation for the run. Default NULL.}
+\item{extrameta}{list, extra information to include in saved metadata
+documentation for the run. Default NULL.}
 
 \item{rparallel}{logical, default FALSE. If TRUE, parallelises over the
 scenarios in hydro_dir using \code{furrr}. To use, install \code{furrr} and set a
 \code{\link[future:plan]{future::plan()}} (likely \code{multisession} or \code{multicore})}
 
-\item{par_recursive}{logical, default TRUE. If parallel, do we use the innermost level of directory containing EWR outputs (TRUE) or the next level in from datpath (FALSE)}
+\item{par_recursive}{logical, default TRUE. If parallel, do we use the
+innermost level of directory containing EWR outputs (TRUE) or the next
+level in from datpath (FALSE)}
+
+\item{savepar}{'combine' (default) or 'each'. If parallel over scenarios,
+should this combine the output (default) or save each scenario's
+aggregation separately ('each')}
 
 \item{...}{passed to \code{\link[=prep_ewr_agg]{prep_ewr_agg()}}}
 }
@@ -154,5 +162,6 @@ Allows passing only paths to data rather than objects. Wrapper over
 \code{\link[=prep_ewr_agg]{prep_ewr_agg()}} (though can be made more general once we have other
 modules), \code{\link[=make_edges]{make_edges()}} and \code{\link[=multi_aggregate]{multi_aggregate()}}. Particularly useful if we
 want to pass parameters as strings from a config before anything is read in,
-and parallelisation.
+and parallelisation (set a \code{\link[future:plan]{future::plan()}}). If parallel, be careful, it
+will return a MAX scenario for each scenario.
 }
