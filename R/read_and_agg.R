@@ -56,7 +56,10 @@ read_and_agg <- function(datpath,
                          rparallel = FALSE,
                          par_recursive = TRUE,
                          ...) {
-  # The ... pass gauge and scenario filters to `prep_ewr_agg`
+
+  if (!returnList & is.null(savepath)) {
+    rlang::abort(message = "not returning output to disk or session. aborting to not use the resources.")
+  }
 
   # Recurse over inner directories if parallel
   if (rparallel) {
@@ -68,6 +71,8 @@ read_and_agg <- function(datpath,
       # only first level
       dps <- list.dirs(datpath, recursive = FALSE)
     }
+
+    names(dps) <- gsub(paste0(datpath, '/'),'', dps)
     aggout <- safe_imap(dps, \(x, y) read_and_agg(x,
                                                type = type,
                                                geopath = geopath,
@@ -84,7 +89,7 @@ read_and_agg <- function(datpath,
                                                auto_ewr_PU = auto_ewr_PU,
                                                pseudo_spatial = pseudo_spatial,
                                                returnList = returnList,
-                                               savepath = savepath,
+                                               savepath = file.path(savepath, y),
                                                extrameta = extrameta,
                                                rparallel = FALSE,
                                                y, # so I can not write safe_map
@@ -93,11 +98,6 @@ read_and_agg <- function(datpath,
     aggout <- purrr::list_transpose(aggout) |>
       purrr::map(dplyr::bind_rows)
     return(aggout)
-  }
-
-
-  if (!returnList & is.null(savepath)) {
-    rlang::abort(message = "not returning output to disk or session. aborting to not use the resources.")
   }
 
   # set up metadata placeholders to know if the run failed

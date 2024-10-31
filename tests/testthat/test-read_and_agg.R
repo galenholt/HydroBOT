@@ -615,14 +615,21 @@ test_that("parallel works", {
   set_future_multi()
 
   # These mirror multi_aggregate, but make sure we're not introducing more issues here.
-  aggseq_s_th_t <- list(sdl_units = 'sdl_units',
-                        ewr_code = c('ewr_code_timing', 'ewr_code'),
-                        yrs = '2 years')
+  aggseq_s_th_t <- list(
+    sdl_units = 'sdl_units',
+    ewr_code = c('ewr_code_timing', 'ewr_code'),
+    yrs = '2 years'
+  )
+
   funseq <- list(
     "ArithmeticMean",
     "ArithmeticMean",
     "ArithmeticMean"
   )
+
+  dir.create(file.path(temp_parent_dir, 'aggout/parallel'), recursive = TRUE)
+  dir.create(file.path(temp_parent_dir, 'aggout/parallel_par'), recursive = TRUE)
+  dir.create(file.path(temp_parent_dir, 'aggout/sequential'), recursive = TRUE)
 
   spatagg_pt <- read_and_agg(
     datpath = ewr_results,
@@ -636,6 +643,7 @@ test_that("parallel works", {
     keepAllPolys = FALSE,
     auto_ewr_PU = TRUE,
     saveintermediate = TRUE,
+    savepath = file.path(temp_parent_dir, 'aggout/parallel'),
     rparallel = TRUE,
     par_recursive = TRUE
   )
@@ -652,6 +660,7 @@ test_that("parallel works", {
     keepAllPolys = FALSE,
     auto_ewr_PU = TRUE,
     saveintermediate = TRUE,
+    savepath = file.path(temp_parent_dir, 'aggout/parallel_par'),
     rparallel = TRUE,
     par_recursive = FALSE
   )
@@ -668,12 +677,36 @@ test_that("parallel works", {
     keepAllPolys = FALSE,
     auto_ewr_PU = TRUE,
     saveintermediate = TRUE,
-    rparallel = TRUE,
+    savepath = file.path(temp_parent_dir, 'aggout/sequential'),
+    rparallel = FALSE,
     par_recursive = FALSE
   )
 
   expect_equal(spatagg_np, spatagg_pf)
   expect_equal(spatagg_np, spatagg_pt)
+
+  # That saves one file per scenario, read them in and glue together to test.
+  ptfiles <- list.files(file.path(temp_parent_dir, 'aggout/parallel'),
+                        pattern = '.rds',
+                        full.names = TRUE, recursive = TRUE)
+  read_pt <- purrr::map(ptfiles, readRDS) |>
+    purrr::list_transpose() |>
+    purrr::map(dplyr::bind_rows)
+
+  pffiles <- list.files(file.path(temp_parent_dir, 'aggout/parallel'),
+                        pattern = '.rds',
+                        full.names = TRUE, recursive = TRUE)
+  read_pf <- purrr::map(pffiles, readRDS) |>
+    purrr::list_transpose() |>
+    purrr::map(dplyr::bind_rows)
+
+  # just read in the sequential
+  read_np <- readRDS(file.path(temp_parent_dir, 'aggout/sequential', 'achievement_aggregated.rds'))
+
+  expect_equal(spatagg_np, read_np)
+  expect_equal(spatagg_pf, read_pf)
+  expect_equal(spatagg_pt, read_pt)
+
 
 
 })
