@@ -8,7 +8,7 @@ message: 'To cite package "HydroBOT" in publications use:'
 type: software
 license: MIT
 title: 'HydroBOT: Toolkit For Flow-Dependent outcomes in the Murray-Darling Basin'
-version: 0.2.0.9018
+version: 0.2.0.9035
 abstract: Provides tools to assess responses to flows in the MDB. Wraps the EWR tool
   and provides ongoing modeling of ecological responses with causal networks, as well
   as analysis, synthesis and visualisation functionality targetted at scenario comparisons.
@@ -17,6 +17,9 @@ authors:
   given-names: Galen
   email: g.holt@deakin.edu.au
   orcid: https://orcid.org/0000-0002-7455-9275
+- family-names: Dwyer
+  given-names: Georgia
+  email: g.dwyer@deakin.edu.au
 contact:
 - family-names: Holt
   given-names: Galen
@@ -624,17 +627,6 @@ references:
   year: '2024'
   doi: 10.32614/CRAN.package.withr
 - type: software
-  title: git2r
-  abstract: 'git2r: Provides Access to Git Repositories'
-  notes: Suggests
-  url: https://docs.ropensci.org/git2r/
-  repository: https://CRAN.R-project.org/package=git2r
-  authors:
-  - family-names: file.
-    given-names: See AUTHORS
-  year: '2024'
-  doi: 10.32614/CRAN.package.git2r
-- type: software
   title: jsonlite
   abstract: 'jsonlite: A Simple and Robust JSON Parser and Generator for R'
   notes: Suggests
@@ -713,7 +705,7 @@ references:
   authors:
   - family-names: Campitelli
     given-names: Elio
-    email: elio.campitelli@cima.fcen.uba.ar
+    email: eliocampitelli@gmail.com
     orcid: https://orcid.org/0000-0002-7742-9230
   year: '2024'
   doi: 10.32614/CRAN.package.metR
