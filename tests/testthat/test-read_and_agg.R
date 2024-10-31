@@ -722,8 +722,11 @@ test_that("parallel works", {
     savepar = 'combine'
   )
 
-  expect_equal(spatagg_np, spatagg_pf)
-  expect_equal(spatagg_np, spatagg_pt)
+  # The scenarios get jumbled, but should be identical
+  expect_equal(spatagg_np$agg_input |> dplyr::arrange(scenario),
+               spatagg_pf$agg_input |> dplyr::arrange(scenario))
+  expect_equal(spatagg_np$agg_input |> dplyr::arrange(scenario),
+               spatagg_pt$agg_input |> dplyr::arrange(scenario))
 
   # The `savepar = 'each'` saves one file per scenario, read them in and glue together to test.
   ptfiles <- list.files(file.path(temp_parent_dir, 'aggout/parallel'),
