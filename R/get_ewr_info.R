@@ -133,5 +133,10 @@ get_ewr_version <- function() {
 get_causal_ewr <- function() {
   pdi <- reticulate::import("py_ewr.data_inputs")
   gce <- pdi$get_causal_ewr()
+  gce <- purrr::map(gce, tibble::as_tibble)
+  gce <- purrr::map(gce, \(x) {
+    attributes(x)$pandas.index <- NULL
+    return(x)
+  })
   return(gce)
 }

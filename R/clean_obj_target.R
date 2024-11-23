@@ -1,6 +1,6 @@
 #' Pair environmental objectives to various targets and objectives
 #'
-#' Bespoke function to clean up the current input data
+#' DEPRECATED- use [get_causal_ewr()].Bespoke function to clean up the current input data.
 #'
 #' @param ewrobjs `tibble` or `data.frame` of the EWR indicators paired to the environmental objectives. Should be the "long" output from `clean_ewr_obj`
 #' @param targetpath path to the table linking objectives to targets
@@ -20,6 +20,8 @@ clean_obj_target <- function(ewrobjs,
                               qcfiles,
                              saveout = FALSE,
                              outdir, savename) {
+  rlang::warn("ewr causals are now provided by py_ewr, obtain with `get_causal_ewr()`. This is provided for historical purposes but will likely be deprecated soon.")
+
 
   # This cuts to only a single row per planning unit/objective pair and drops the ewrs
   objpu <- ewrobjs |>

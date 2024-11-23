@@ -1,6 +1,6 @@
 #' Pair EWR indicators to environmental objectives
 #'
-#' Bespoke function to clean the EWR table and LTWP table, extract environmental objectives, and pair them. Will need to change or at least extensively retest if those datasets change
+#'  DEPRECATED- use [get_causal_ewr()]. Bespoke function to clean the EWR table and LTWP table, extract environmental objectives, and pair them. Will need to change or at least extensively retest if those datasets change
 #'
 #' @param ewrobjpath path to the ewr-obj mapping. Default 'ewrtool' just uses the version in the tool.
 #' @param gaugescale logical, whether to return data at the gauge scale by remapping from LTWPShortName to gauge (`TRUE`), or to just leave at the LTWPShortName (e.g. sdl unit) scale as NSW now defines the relationships (`FALSE`)
@@ -19,6 +19,7 @@ clean_ewr_obj <- function(ewrobjpath = 'ewrtool',
                           saveout = FALSE,
                           outdir, savename) {
 
+  rlang::warn("ewr causals are now provided by py_ewr, obtain with `get_causal_ewr()`. This is provided for historical purposes but will likely be deprecated soon.")
   if (ewrobjpath == 'ewrtool') {
     # the python in the EWR tool that gives `get_ewr_table` drops the columns we need, so get the sheet directly
     objective_mapping <- get_raw_ewrsheet() |>

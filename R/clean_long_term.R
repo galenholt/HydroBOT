@@ -1,6 +1,6 @@
 #' Process objective-long term target links
 #'
-#' Bespoke function to clean up the current input data
+#'  DEPRECATED- use [get_causal_ewr()]. Bespoke function to clean up the current input data
 #'
 #' @param yrpath path to the file with matched objectives and targets
 #' @param saveout logical. saves a file of the output as `outdir/savename_YearMonthDayHourMinute.csv`
@@ -16,6 +16,8 @@
 clean_long_term <- function(yrpath,
                             saveout = FALSE,
                             outdir, savename) {
+
+  rlang::warn("ewr causals are now provided by py_ewr, obtain with `get_causal_ewr()`. This is provided for historical purposes but will likely be deprecated soon.")
 
   # Need to know where this comes from
   obj2yrtargets <- readr::read_csv(yrpath, col_types = readr::cols())
