@@ -20,6 +20,7 @@ clean_ewr_obj <- function(ewrobjpath = 'ewrtool',
                           outdir, savename) {
 
   rlang::warn("ewr causals are now provided by py_ewr, obtain with `get_causal_ewr()`. This is provided for historical purposes but will likely be deprecated soon.")
+
   if (ewrobjpath == 'ewrtool') {
     # the python in the EWR tool that gives `get_ewr_table` drops the columns we need, so get the sheet directly
     objective_mapping <- get_raw_ewrsheet() |>

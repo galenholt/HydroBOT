@@ -6,6 +6,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/MDBAuth/HydroBOT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MDBAuth/HydroBOT/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/MDBAuth/HydroBOT/graph/badge.svg)](https://app.codecov.io/gh/MDBAuth/HydroBOT)
 <!-- badges: end -->
 
 This R package forms the core of the WERP climate adaptation toolkit,

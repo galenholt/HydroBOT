@@ -35,5 +35,5 @@ clean_obj_target(
 a \code{tibble} linking the \code{env_obj} to several different outcomes- \code{Specific_goal} (roughly species, but also things like refugia), \code{Objective} (bigger-picture, e.g. no loss of native fish species), and \code{Target} (Native Fish, Ecosystem Function, etc). At the Planning Unit scale.
 }
 \description{
-Bespoke function to clean up the current input data
+DEPRECATED- use \code{\link[=get_causal_ewr]{get_causal_ewr()}}.Bespoke function to clean up the current input data.
 }

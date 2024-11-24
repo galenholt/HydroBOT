@@ -15,7 +15,7 @@
 }
 }
 \source{
-various Long-Term Watering Plans and State-based tables.
+various Long-Term Watering Plans and State-based tables. Extracted from EWR tool (py_ewr) and reexported here.
 }
 \usage{
 causal_ewr
@@ -23,9 +23,8 @@ causal_ewr
 \description{
 List of dataframes specifying the causal relationships from environmental
 water requirements through the rest of the levels specified in Long-Term
-Watering Plans. Extracted and cleaned in
-\code{data_creation/causal_data_cleaning.qmd}, with definitions found and
-extracted from the EWR tool, NSW mapping to environmental objectives, and
-extraction of other levels from LTWPs.
+Watering Plans. Previously created in HydroBOT, now simply extracted from
+py_ewr (as of Nov 2024). May not remain here much longer, extracting the EWR
+tool version with \code{\link[=get_causal_ewr]{get_causal_ewr()}} is preferable.
 }
 \keyword{datasets}

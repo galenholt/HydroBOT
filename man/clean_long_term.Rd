@@ -24,5 +24,5 @@ clean_long_term(yrpath, saveout = FALSE, outdir, savename)
 a \code{tibble} with matching env_objs, Targets, Objectives, and the 5,10, and 20 year targets. No spatial information (gauge, planning unit)
 }
 \description{
-Bespoke function to clean up the current input data
+DEPRECATED- use \code{\link[=get_causal_ewr]{get_causal_ewr()}}. Bespoke function to clean up the current input data
 }

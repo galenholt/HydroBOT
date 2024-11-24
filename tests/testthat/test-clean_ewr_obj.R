@@ -10,11 +10,11 @@ test_that("no gaugescale produces expected output", {
     skip_if_no_file(ewrpath)
 
 
-  ewr2obj <- clean_ewr_obj(ewrobjpath = 'ewrtool',
+  expect_warning(ewr2obj <- clean_ewr_obj(ewrobjpath = 'ewrtool',
                            gaugescale = FALSE,
                            saveout = FALSE,
                            outdir = NULL,
-                           savename = NULL)
+                           savename = NULL))
 
   expect_s3_class(ewr2obj, 'tbl_df')
   expect_snapshot_value(names(ewr2obj), style = 'deparse')
@@ -31,11 +31,11 @@ test_that("gaugescale produces expected output", {
 
     skip_if_no_file(ewrpath)
 
-  ewr2obj <- clean_ewr_obj(ewrobjpath = 'ewrtool',
+  expect_warning(ewr2obj <- clean_ewr_obj(ewrobjpath = 'ewrtool',
                            gaugescale = TRUE,
                            saveout = FALSE,
                            outdir = NULL,
-                           savename = NULL)
+                           savename = NULL))
 
   expect_s3_class(ewr2obj, 'tbl_df')
   expect_snapshot_value(names(ewr2obj), style = 'deparse')

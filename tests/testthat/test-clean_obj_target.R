@@ -15,17 +15,17 @@ test_that("produces desired format for obj-target", {
   skip_if_no_file(qcs[1])
   skip_if_no_file(qcs[2])
 
-  ewr2obj <- clean_ewr_obj(ewrobjpath = 'ewrtool',
+  expect_warning(ewr2obj <- clean_ewr_obj(ewrobjpath = 'ewrtool',
                            saveout = FALSE,
                            outdir = NULL,
-                           savename = NULL)
+                           savename = NULL))
 
-  obj2target <- clean_obj_target(ewrobjs = ewr2obj,
+  expect_warning(obj2target <- clean_obj_target(ewrobjs = ewr2obj,
                                  targetpath = tarpath,
                                  qcfiles = qcs,
                                  saveout = FALSE,
                                  outdir = NULL,
-                                 savename = NULL)
+                                 savename = NULL))
 
   expect_equal(names(obj2target), c('PlanningUnitID', "planning_unit_name", 'LTWPShortName', 'env_obj',
                                     'Specific_goal', 'Objective', 'Target'))
@@ -45,18 +45,18 @@ test_that("above the planning unit scale", {
   skip_if_no_file(qcs[1])
   skip_if_no_file(qcs[2])
 
-  ewr2obj <- clean_ewr_obj(ewrobjpath = ewrpath,
+  expect_warning(ewr2obj <- clean_ewr_obj(ewrobjpath = ewrpath,
                            gaugescale = FALSE,
                            saveout = FALSE,
                            outdir = NULL,
-                           savename = NULL)
+                           savename = NULL))
 
-  obj2target <- clean_obj_target(ewrobjs = ewr2obj,
+  expect_warning(obj2target <- clean_obj_target(ewrobjs = ewr2obj,
                                  targetpath = tarpath,
                                  qcfiles = qcs,
                                  saveout = FALSE,
                                  outdir = NULL,
-                                 savename = NULL)
+                                 savename = NULL))
 
   expect_equal(names(obj2target), c('LTWPShortName', 'env_obj',
                                     'Specific_goal', 'Objective', 'Target'))

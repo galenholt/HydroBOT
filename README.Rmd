@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/MDBAuth/HydroBOT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MDBAuth/HydroBOT/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/MDBAuth/HydroBOT/graph/badge.svg)](https://app.codecov.io/gh/MDBAuth/HydroBOT)
 <!-- badges: end -->
 
 This R package forms the core of the WERP climate adaptation toolkit, ingesting hydrological scenarios representing historical or future climates or adaptation options, and processing those through various response models (currently [MDBA EWR tool](https://github.com/MDBAuth/EWR_tool), with intention to include other tools in future). Subsequent processing of outcomes along spatial, theme, and temporal axes are available or under development, as well as control over outputs and comparisons between scenarios. Causal networks defining relationships in the response models are included.

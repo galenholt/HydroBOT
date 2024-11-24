@@ -8,10 +8,10 @@ test_that("clean_long_term as expected", {
 
   skip_if_no_file(yrpath)
 
-  yrtarget <- clean_long_term(yrpath,
+  expect_warning(yrtarget <- clean_long_term(yrpath,
                               saveout = FALSE,
                               outdir = NULL,
-                              savename = NULL)
+                              savename = NULL))
 
   expect_equal(names(yrtarget), c('env_obj', 'Target', 'Target_Category',
                                   'Objective',

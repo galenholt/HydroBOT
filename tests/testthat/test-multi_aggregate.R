@@ -980,7 +980,7 @@ for (i in unique(gauge412005$planning_unit_name)) {
   ## and what happens to overflow if we pre-cut the sdls?
   # spatagg above gains an sdl (lower darling)
 
-  expect_equal(unique(spatagg$sdl_units$SWSDLName), c('Lower Darling', 'Lachlan', 'Murrumbidgee', 'Macquarie–Castlereagh'))
+  expect_equal(unique(spatagg$sdl_units$SWSDLName), c('Lachlan', 'Macquarie–Castlereagh'))
 
   # but if we pre-cut to the appropriate sdls, that should limit it.
   # *THIS SHOULD BE DONE BY USER*, since it is appropriate behaviour to do the intersection properly. but we want to make sure it works for the user.
@@ -1008,7 +1008,7 @@ for (i in unique(gauge412005$planning_unit_name)) {
                              pseudo_spatial = "planning_units"
   )
 
-  expect_equal(unique(spataggc$sdl_units$SWSDLName), c('Lachlan', 'Murrumbidgee', 'Macquarie–Castlereagh'))
+  expect_equal(unique(spataggc$sdl_units$SWSDLName), c('Lachlan', 'Macquarie–Castlereagh'))
 
   # check it works for group_until explicitly
   spatagg_g <- multi_aggregate(ewr_to_agg_timemean,
@@ -1072,7 +1072,7 @@ test_that("single functions at each step, called in different ways", {
   expect_equal(names(spatagg_c), c("agg_input", names(aggseq)))
   expect_type(spatagg_c, "list")
   expect_s3_class(spatagg_c[[length(spatagg_c)]], "sf")
-  expect_equal(nrow(spatagg_c$sdl_units), 252)
+  expect_equal(nrow(spatagg_c$sdl_units), 248)
   expect_equal(sum(is.na(spatagg_c$sdl_units)), 0)
 
   # bare
@@ -1110,7 +1110,7 @@ test_that("single functions at each step, called in different ways", {
   expect_equal(names(spatagg_b), c("agg_input", names(aggseq)))
   expect_type(spatagg_b, "list")
   expect_s3_class(spatagg_b[[length(spatagg_b)]], "sf")
-  expect_equal(nrow(spatagg_b$sdl_units), 252)
+  expect_equal(nrow(spatagg_b$sdl_units), 248)
   expect_equal(sum(is.na(spatagg_b$sdl_units)), 0)
 
   # list
@@ -1133,7 +1133,7 @@ test_that("single functions at each step, called in different ways", {
   expect_equal(names(spatagg_l), c("agg_input", names(aggseq)))
   expect_type(spatagg_l, "list")
   expect_s3_class(spatagg_l[[length(spatagg_l)]], "sf")
-  expect_equal(nrow(spatagg_l$sdl_units), 252)
+  expect_equal(nrow(spatagg_l$sdl_units), 248)
   expect_equal(sum(is.na(spatagg_l$sdl_units)), 0)
 })
 
@@ -1164,7 +1164,7 @@ test_that("multiple functions at each step", {
   expect_equal(names(spatagg_c), c("agg_input", names(aggseq)))
   expect_type(spatagg_c, "list")
   expect_s3_class(spatagg_c[[length(spatagg_c)]], "sf")
-  expect_equal(nrow(spatagg_c$sdl_units), 252)
+  expect_equal(nrow(spatagg_c$sdl_units), 248)
   expect_equal(ncol(spatagg_c$sdl_units), 15)
   expect_equal(sum(is.na(spatagg_c$sdl_units)), 0)
 
@@ -1190,7 +1190,7 @@ test_that("multiple functions at each step", {
   expect_equal(names(spatagg_b), c("agg_input", names(aggseq)))
   expect_type(spatagg_b, "list")
   expect_s3_class(spatagg_b[[length(spatagg_b)]], "sf")
-  expect_equal(nrow(spatagg_b$sdl_units), 252)
+  expect_equal(nrow(spatagg_b$sdl_units), 248)
   expect_equal(ncol(spatagg_c$sdl_units), 15)
   expect_equal(sum(is.na(spatagg_b$sdl_units)), 0)
 
@@ -1214,7 +1214,7 @@ test_that("multiple functions at each step", {
   expect_equal(names(spatagg_l), c("agg_input", names(aggseq)))
   expect_type(spatagg_l, "list")
   expect_s3_class(spatagg_l[[length(spatagg_l)]], "sf")
-  expect_equal(nrow(spatagg_l$sdl_units), 252)
+  expect_equal(nrow(spatagg_l$sdl_units), 248)
   expect_equal(ncol(spatagg_c$sdl_units), 15)
   expect_equal(sum(is.na(spatagg_l$sdl_units)), 0)
 })
@@ -1262,7 +1262,7 @@ test_that("mixed functions between steps", {
   expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
   expect_s3_class(spatagg[[length(spatagg)]], "sf")
-  expect_equal(nrow(spatagg$sdl_units), 252)
+  expect_equal(nrow(spatagg$sdl_units), 248)
   expect_equal(ncol(spatagg$sdl_units), 15)
   expect_equal(sum(is.na(spatagg$sdl_units)), 0)
 
@@ -1321,7 +1321,7 @@ test_that("mixed functions between steps", {
   expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
   expect_s3_class(spatagg[[length(spatagg)]], "sf")
-  expect_equal(nrow(spatagg$sdl_units), 252)
+  expect_equal(nrow(spatagg$sdl_units), 248)
   expect_equal(ncol(spatagg$sdl_units), 15)
   expect_equal(sum(is.na(spatagg$sdl_units)), 0)
 
@@ -1350,7 +1350,7 @@ test_that("mixed functions between steps", {
   # expect_equal(names(spatagg), c('agg_input', names(aggseq)))
   # expect_type(spatagg, 'list')
   # expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  # expect_equal(nrow(spatagg$sdl_units), 252)
+  # expect_equal(nrow(spatagg$sdl_units), 248)
   # expect_equal(ncol(spatagg$sdl_units), 15)
   # expect_equal(sum(is.na(spatagg$sdl_units)), 8)
 })
@@ -1399,7 +1399,7 @@ test_that("mixed functions between steps", {
   expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
   expect_s3_class(spatagg[[length(spatagg)]], "sf")
-  expect_equal(nrow(spatagg$sdl_units), 252)
+  expect_equal(nrow(spatagg$sdl_units), 248)
   expect_equal(ncol(spatagg$sdl_units), 15)
   expect_equal(sum(is.na(spatagg$sdl_units)), 0)
 
@@ -1458,7 +1458,7 @@ test_that("mixed functions between steps", {
   expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
   expect_s3_class(spatagg[[length(spatagg)]], "sf")
-  expect_equal(nrow(spatagg$sdl_units), 252)
+  expect_equal(nrow(spatagg$sdl_units), 248)
   expect_equal(ncol(spatagg$sdl_units), 15)
   expect_equal(sum(is.na(spatagg$sdl_units)), 0)
 
@@ -1487,7 +1487,7 @@ test_that("mixed functions between steps", {
   # expect_equal(names(spatagg), c('agg_input', names(aggseq)))
   # expect_type(spatagg, 'list')
   # expect_s3_class(spatagg[[length(spatagg)]], 'sf')
-  # expect_equal(nrow(spatagg$sdl_units), 252)
+  # expect_equal(nrow(spatagg$sdl_units), 248)
   # expect_equal(ncol(spatagg$sdl_units), 15)
   # expect_equal(sum(is.na(spatagg$sdl_units)), 8)
 })
@@ -1531,7 +1531,7 @@ test_that("mixed functions including quosures, singles, multiples, and character
   expect_equal(names(spatagg), c("agg_input", names(aggseq)))
   expect_type(spatagg, "list")
   expect_s3_class(spatagg[[length(spatagg)]], "sf")
-  expect_equal(nrow(spatagg$sdl_units), 252)
+  expect_equal(nrow(spatagg$sdl_units), 248)
   expect_equal(ncol(spatagg$sdl_units), 8)
   expect_equal(sum(is.na(spatagg$sdl_units)), 0)
   expect_equal(nrow(spatagg$target_5_year_2024), 300)
