@@ -128,6 +128,22 @@ any(duplicated(o2t))
 # The last sheet is not space-linked
 o2yt <- ced$obj2yrtarget |> dplyr::select(-1)
 
+# There are a number of typos, fix a few simple ones of double spaces, leading and trailing
+e2o <- e2o |>
+  dplyr::mutate(dplyr::across(dplyr::where(is.character), \(x) gsub('  ', ' ', x))) |>
+  dplyr::mutate(dplyr::across(dplyr::where(is.character), \(x) gsub('^ ', '', x))) |>
+  dplyr::mutate(dplyr::across(dplyr::where(is.character), \(x) gsub(' $', '', x)))
+
+o2t <- o2t |>
+  dplyr::mutate(dplyr::across(dplyr::where(is.character), \(x) gsub('  ', ' ', x))) |>
+  dplyr::mutate(dplyr::across(dplyr::where(is.character), \(x) gsub('^ ', '', x))) |>
+  dplyr::mutate(dplyr::across(dplyr::where(is.character), \(x) gsub(' $', '', x)))
+
+o2yt <- o2yt |>
+  dplyr::mutate(dplyr::across(dplyr::where(is.character), \(x) gsub('  ', ' ', x))) |>
+  dplyr::mutate(dplyr::across(dplyr::where(is.character), \(x) gsub('^ ', '', x))) |>
+  dplyr::mutate(dplyr::across(dplyr::where(is.character), \(x) gsub(' $', '', x)))
+
 # WRITE OUT DATA
 readr::write_csv(e2o, 'ewr2obj.csv', na = '', eol = '\r\n')
 readr::write_csv(o2t, 'obj2target.csv', na = '', eol = '\r\n')

@@ -1083,148 +1083,66 @@ test_that("nonspatial joins of spatial data at sdl unit", {
                              pseudo_spatial = "sdl_units"
   )
 
-  # Find some NA- delete
-  naexample <- spatagg$ewr_code |> dplyr::filter(scenario == 'base' & planning_unit_name == 'Muggabah Creek')
-  naobj <- spatagg$env_obj |> dplyr::filter(scenario == 'base' & planning_unit_name == 'Muggabah Creek')
+  # are any of these gauges outside the SWSDL? This data might not work to test this.
+  # sf::st_join(ewr_to_agg_timemean |> dplyr::distinct(gauge, geometry), sdl_units)
+  # dplyr::distinct(ewr_to_agg_timemean, gauge, geometry, SWSDLName)
 
-  relevantewrs <- causal_ewr$ewr2obj |>
-    dplyr::filter(ewr_code %in% naexample$ewr_code & planning_unit_name %in% naexample$planning_unit_name)
+  # I can alter the data though, and see if they end up in the name or the location.
 
-  naexample$ewr_code[!naexample$ewr_code %in% relevantewrs$ewr_code]
+  fakeewrs <- ewr_to_agg_timemean |>
+    dplyr::mutate(SWSDLName = dplyr::case_when(SWSDLName == 'Lachlan' ~ 'Broken',
+                                               SWSDLName == 'Macquarie-Castlereagh' ~ 'Goulburn'))
+  # Need to fake the causal too, or the links don't work
+  fakecausal <- causal_ewr
+  fakecausal[1:2] <- fakecausal[1:2] |>
+    purrr::map(\(x) x |>
+                 dplyr::mutate(SWSDLName = dplyr::case_when(SWSDLName == 'Lachlan' ~ 'Broken',
+                                                            SWSDLName == 'Macquarie-Castlereagh' ~ 'Goulburn')))
 
-
-
-  # stringr::str_flatten(names(spatagg), "', '")
-  expect_equal(names(spatagg), c('agg_input', names(aggseq)))
-  expect_s3_class(spatagg$planning_units, "sf")
-
-  # Check the values are actually right
-  funs_in_df <- spatagg$target_5_year_2024 |>
-    sf::st_drop_geometry() |>
-    dplyr::slice(1) |>
-    dplyr::select(tidyselect::starts_with('aggfun_')) |>
-    unlist()
-
-  aggs_in_df <- spatagg$target_5_year_2024 |>
-    sf::st_drop_geometry() |>
-    dplyr::slice(1) |>
-    dplyr::select(tidyselect::starts_with('aggLevel_')) |>
-    unlist()
-
-
-  expect_equal(unname(funs_in_df), unlist(funseq))
-  expect_equal(unname(aggs_in_df), names(aggseq))
-
-
-  ## This test doesn't cover some corner cases because the test data doesn't have any PUs with multiple gauges. But it does have multiple PUs per a couple gauges. So, it should have the same number of rows as the non-PU version, just differently indexed. And the ones from the same gauge should have the same value.
-  # for testing, in multi_aggregate after fromto_pair:
-  # fromto_pair |> dplyr::group_by(gauge) |> dplyr::reframe(gauge = unique(planning_unit_name))
-  # fromto_pair |> dplyr::group_by(gauge) |> dplyr::reframe(pun = unique(planning_unit_name))
-  expect_equal(nrow(spatagg$ewr_code), nrow(spatagg$planning_units))
-  # This is *very* specific to test data, so if that ever changes, this might too
-  gauge412005 <- spatagg$ewr_code |>
-    sf::st_drop_geometry() |>
-    dplyr::filter(scenario == 'base' & gauge == 412005) |>
-    dplyr::select(scenario, planning_unit_name, ewr_code, ewr_achieved) |>
-    dplyr::arrange(planning_unit_name, ewr_code, ewr_achieved)
-
-
-  for (i in unique(gauge412005$planning_unit_name)) {
-    pudf <- spatagg$planning_units |>
-      sf::st_drop_geometry() |>
-      dplyr::filter(scenario == 'base' & planning_unit_name == i) |>
-      dplyr::select(scenario, planning_unit_name, ewr_code, ewr_achieved) |>
-      dplyr::arrange(planning_unit_name, ewr_code, ewr_achieved)
-    expect_equal(gauge412005 |> dplyr::filter(planning_unit_name == i), pudf)
-  }
-
-  # testing the splitting up with higher levels
-
-  # get the PU in the PU level
-  puinpu <- spatagg$planning_units |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved, na.rm = T),
-                     .by = c(planning_unit_name, geometry))
-  # each planning unit should appear once (e.g. they are 1:1 with geometry)
-  expect_true(!any(duplicated(puinpu$planning_unit_name)))
-
-  # This helps see if there is any splitting- do any of the PU actually cross
-  # sdl boundaries? Yes, barely? Lower darling shows up in the sdls?
-  g2puplot <- ggplot2::ggplot() +
-    ggplot2::geom_sf(data = dplyr::filter(sdl_units, SWSDLName %in% unique(spatagg$sdl_units$SWSDLName))) +
-    ggplot2::geom_sf(
-      data = puinpu,
-      ggplot2::aes(fill = planning_unit_name)
-    ) +
-    ggplot2::geom_sf(data = ewr_to_agg_timemean |> dplyr::select(geometry) |> dplyr::distinct()) +
-    ggplot2::theme(legend.position = "bottom")
-
-  # to actually test the intersection (and correct areas), we need to test
-  # spatial_joiner, since those intersections won't be preserved
-  # post-aggregation. that's done in the spatial_joiner testing.
-
-  ## and what happens to overflow if we pre-cut the sdls?
-  # spatagg above gains an sdl (lower darling)
-
-  expect_equal(unique(spatagg$sdl_units$SWSDLName), c('Lachlan', 'Macquarie–Castlereagh'))
-
-  # but if we pre-cut to the appropriate sdls, that should limit it.
-  # *THIS SHOULD BE DONE BY USER*, since it is appropriate behaviour to do the intersection properly. but we want to make sure it works for the user.
-  aggseqc <- list(
-    ewr_code = c("ewr_code_timing", "ewr_code"),
-    planning_units = planning_units,
-    env_obj = c("ewr_code", "env_obj"),
-    sdl_units = dplyr::filter(sdl_units, SWSDLName %in% c('Lachlan', 'Murrumbidgee', 'Macquarie–Castlereagh')),
-    Specific_goal = c("env_obj", "Specific_goal"),
-    catchment = cewo_valleys,
-    Objective = c("Specific_goal", "Objective"),
-    mdb = basin,
-    target_5_year_2024 = c("Objective", "target_5_year_2024")
+  spatagg_wrongsdl <- fakeewrs |>
+  multi_aggregate(aggsequence = aggseq,
+                                      groupers = "scenario",
+                                      aggCols = "ewr_achieved",
+                                      funsequence = funseq,
+                                      causal_edges = fakecausal ,
+                                      saveintermediate = TRUE,
+                                      namehistory = FALSE,
+                                      auto_ewr_PU = TRUE,
+                                      pseudo_spatial = "sdl_units"
   )
 
-  spataggc <- multi_aggregate(ewr_to_agg_timemean,
-                              aggsequence = aggseqc,
-                              groupers = "scenario",
-                              aggCols = "ewr_achieved",
-                              funsequence = funseq,
-                              causal_edges = causal_ewr,
-                              saveintermediate = TRUE,
-                              namehistory = FALSE,
-                              auto_ewr_PU = TRUE,
-                              pseudo_spatial = "planning_units"
-  )
 
-  expect_equal(unique(spataggc$sdl_units$SWSDLName), c('Lachlan', 'Macquarie–Castlereagh'))
+  # Should throw a warning not to do this without auto_ewr_pu or pseudo-spatial.
+  # Put a group_until on since that will fix the theme and time aggs
+  expect_warning(spatagg_wrongsdl_spatial <- fakeewrs |>
+    multi_aggregate(aggsequence = aggseq,
+                    groupers = "scenario",
+                    aggCols = "ewr_achieved",
+                    funsequence = funseq,
+                    causal_edges = causal_ewr,
+                    saveintermediate = TRUE,
+                    namehistory = FALSE,
+                    auto_ewr_PU = FALSE,
+                    group_until = list(SWSDLName = 'sdl_units',
+                                       planning_unit_name = 'sdl_units',
+                                       gauge = is_notpoint),
+    ))
 
-  # check it works for group_until explicitly
-  spatagg_g <- multi_aggregate(ewr_to_agg_timemean,
-                               aggsequence = aggseqc,
-                               groupers = "scenario",
-                               aggCols = "ewr_achieved",
-                               group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint),
-                               funsequence = funseq,
-                               causal_edges = causal_ewr,
-                               saveintermediate = TRUE,
-                               namehistory = FALSE,
-                               pseudo_spatial = "planning_units"
-  )
+  # so, we should have real names in the first one (nonspatial),
+  expect_equal(unique(spatagg$sdl_units$SWSDLName),
+               c('Lachlan', 'Macquarie-Castlereagh'))
+  # fake names in the nonspatial with fake names
+  expect_equal(unique(spatagg_wrongsdl$sdl_units$SWSDLName),
+               c('Goulburn', 'Broken'))
+  # real names with spatial starting with fake names
+  expect_equal(unique(spatagg_wrongsdl_spatial$sdl_units$SWSDLName),
+               c('Lachlan', 'Macquarie-Castlereagh'))
 
-  # those should match
-  sortc <- spataggc$mdb |>
-    sf::st_drop_geometry() |>
-    dplyr::arrange(scenario, Objective, polyID, ewr_achieved)
+  # And, make sure we're retaining planning units
+  expect_true('planning_unit_name' %in% names(spatagg$ewr_code))
+  expect_true('planning_unit_name' %in% names(spatagg_wrongsdl$ewr_code))
+  expect_true('planning_unit_name' %in% names(spatagg_wrongsdl_spatial$ewr_code))
 
-  sortg <- spatagg_g$mdb |>
-    sf::st_drop_geometry() |>
-    dplyr::arrange(scenario, Objective, polyID, ewr_achieved)
-
-  expect_equal(sortc$ewr_achieved, sortg$ewr_achieved)
-
-
-
-  # Plots are useful for checking spatial outcomes
-  skip_on_os('linux')
-
-  vdiffr::expect_doppelganger("planning_unit_agg", g2puplot)
 })
 
 

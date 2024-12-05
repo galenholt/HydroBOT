@@ -196,7 +196,7 @@ theme_aggregate <- function(dat,
 
     rlang::inform(c(
       "!" = "Unmatched links in causal network",
-      "*" = glue::glue("From {from_theme} to {to_theme}") #,
+      "*" = glue::glue("{nrow(nacount)} from {from_theme} to {to_theme}") #,
       # groupinform # This was way too noisy.
     ))
 
