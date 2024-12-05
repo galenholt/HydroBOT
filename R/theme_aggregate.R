@@ -28,10 +28,11 @@
 #'   be more general
 #' @param auto_ewr_PU logical, default FALSE. If TRUE, automatically infers
 #'   whether this is an EWR dataset and has not yet been spatially aggregated.
-#'   If so, applies grouping by 'planning_unit_name'. The preferred solution is
-#'   to include it in `groupers` here (for on-off), or in [multi_aggregate()] to
-#'   use `group_until`. If none of those solutions happen, though, it aborts to
-#'   prevent incorrect pooling over planning units.
+#'   If so, applies grouping by 'planning_unit_name' and SWSDLName' since EWRs
+#'   are defined in those units. The preferred solution is to include it in
+#'   `groupers` here (for on-off), or in [multi_aggregate()] to use
+#'   `group_until`. If none of those solutions happen, though, it aborts to
+#'   prevent incorrect pooling over rows in different planning units and sdl units.
 #' @param ... passed to [general_aggregate()]
 #'
 #' @return a dataframe in the same format as read-in (sf or tibble), aggregated
@@ -135,23 +136,24 @@ theme_aggregate <- function(dat,
     # Infer EWR from presence in causal_ewr
     ewrnames <- purrr::map(HydroBOT::causal_ewr, names) |> unlist()
     isewr <- to_theme %in% ewrnames
-    if (isewr & !"planning_unit_name" %in% groupers) {
+    # ewrs are defined at the pu scale, so keep them, gauges, and sdl units until safe to drop
+    if (isewr & !("planning_unit_name" %in% groupers & "SWSDLName" %in% groupers)) {
       if (!auto_ewr_PU) {
         rlang::warn(c(
           "!" = "EWR outputs detected without `group_until`!",
-          "i" = "EWR outputs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
+          "i" = "EWR outputs should be grouped by `SWSDLName`, `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
           "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
           "i" = "Lower-level processing should include as `grouper` in `theme_aggregate()`"
         ))
       } else {
-        rlang::inform(c("EWR outputs auto-grouped!",
-          "i" = "EWRs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
+        rlang::inform(c("i" = "EWR outputs auto-grouped",
+          "*" = "EWRs should be grouped by `SWSDLName`, `planning_unit_name`, and `gauge` until aggregated to larger spatial areas.",
           "*" = "gauge is less important, since it has the geometry, but the gauge column will be lost otherwise.",
-          "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
-          "i" = "Lower-level processing handles by including as `grouper` in `theme_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."
+          "*" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
+          "*" = "Lower-level processing handles by including as `grouper` in `theme_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."
         ))
         # add gauge and plannng unit name if available.
-        groupers <- unique(c(groupers, intersect(c("gauge", "planning_unit_name"), names(causal_edges))))
+        groupers <- unique(c(groupers, intersect(c("gauge", "planning_unit_name", "SWSDLName"), names(causal_edges))))
       }
     }
   }
@@ -169,8 +171,11 @@ theme_aggregate <- function(dat,
       "Do you need to use `group_until`? Or is your network missing columns?"
     ))
   }
+
+  # Quiet down the joins
+  commonnames <- names(dat)[names(dat) %in% names(causal_edges)]
   pairdat <- dat |>
-    dplyr::left_join(causal_edges, relationship = "many-to-many")
+    dplyr::left_join(causal_edges, relationship = "many-to-many", by = commonnames)
 
 
   # Check for NA in the causal network
@@ -191,10 +196,8 @@ theme_aggregate <- function(dat,
 
     rlang::inform(c(
       "!" = "Unmatched links in causal network",
-      "*" = glue::glue("From {from_theme} to {to_theme}"),
-      glue::glue("{from_theme}s {nacount[,from_theme]}"),
-      glue::glue("{nacount[,'ntimes']} times each."),
-      groupinform
+      "*" = glue::glue("From {from_theme} to {to_theme}") #,
+      # groupinform # This was way too noisy.
     ))
 
     # Now delete the NA

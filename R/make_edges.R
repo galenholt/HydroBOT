@@ -54,17 +54,19 @@ make_edges <- function(dflist,
     dflist <- list(dflist)
   }
 
+  # This is all very EWR-specific.
   # Get names
   dfnames <- purrr::map(dflist, names)
   # Get whether each df has a gauge or planning unit column
   dfgauge <- unlist(purrr::map(dfnames, ~ "gauge" %in% .))
   dfpu <- unlist(purrr::map(dfnames, ~ "planning_unit_name" %in% .))
+  dfsdl <- unlist(purrr::map(dfnames, ~ "SWSDLName" %in% .))
 
   # We can use that to try to generate a matching gauge-pu if there wasn't one
   # passed
-  if (is.null(gaugeplanmatch) & any(dfgauge & dfpu)) {
-    gaugeplanmatch <- dflist[[which(dfgauge & dfpu)[1]]] |>
-      dplyr::select("gauge", "planning_unit_name") |>
+  if (is.null(gaugeplanmatch) & any(dfgauge & dfpu & dfsdl)) {
+    gaugeplanmatch <- dflist[[which(dfgauge & dfpu & dfsdl)[1]]] |>
+      dplyr::select("gauge", "planning_unit_name", "SWSDLName") |>
       dplyr::distinct()
   }
 
@@ -120,7 +122,7 @@ make_edges <- function(dflist,
       dplyr::filter(.data[[p[1]]] %in% filterlist$fromfilter) |>
       dplyr::filter(.data[[p[2]]] %in% filterlist$tofilter) |>
       dplyr::rename(from = p[1], to = p[2]) |>
-      dplyr::select(tidyselect::any_of(c("gauge", "planning_unit_name",
+      dplyr::select(tidyselect::any_of(c("gauge", "planning_unit_name", 'SWSDLName',
                                          extrasave, "from", "to", "color"))) |>
       dplyr::mutate(
         fromtype = p[1],

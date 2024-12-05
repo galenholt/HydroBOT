@@ -211,7 +211,7 @@ clean_ewr_requirements <- function() {
     cleanewrs()
 
   ewr_requirements <- ewr_requirements |>
-    dplyr::select('planning_unit_name', 'gauge',
+    dplyr::select('state', 'SWSDLName', 'planning_unit_name', 'gauge',
                   tidyselect::contains("ewr_code"),
                   tidyselect::starts_with('target_frequency'),
                   tidyselect::contains('interevent'))
@@ -287,10 +287,13 @@ nameclean <- function(charvec) {
     stringr::str_replace_all(pattern = "-", replacement = "") |>
     stringr::str_replace_all(pattern ='^_', replacement =  '')
 
+  # One-off particular fixes
   # sometimes the ewr names are ewr_code and sometimes just ewr
   cleannames[cleannames == "ewr" | cleannames == "Code" | cleannames == "code" |cleannames == "ewrCode"] <- "ewr_code"
   # the planning unit names (and IDs) keep getting changed and dropped, so they might be a few different things.
   cleannames[cleannames == "pu" | cleannames == "PlanningUnitName" | cleannames == "planning_unit"] <- "planning_unit_name"
+  # The SWSDLName needs to match the sdl_units (and legislation)
+  cleannames[cleannames == 's_w_s_d_l_name'] <- 'SWSDLName'
 
   return(cleannames)
 }
@@ -316,7 +319,8 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 
   # Join target frequencies to annualdf
   annualdf <- dplyr::left_join(annualdf, ewr_requirements,
-    by = c('ewr_code', 'ewr_code_timing', 'gauge', 'planning_unit_name'),
+    by = c('ewr_code', 'ewr_code_timing', 'gauge',
+           'planning_unit_name', 'state', 'SWSDLName'),
     relationship = "many-to-many"
   )
 
@@ -340,11 +344,11 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
                      .data$year) |>
       dplyr::mutate(frequency_occurred = roll_frequency(.data$event_years, year_roll),
                     interevent_occurred = roll_interevent(.data$event_years, year_roll),
-                    .by = c("scenario", "planning_unit_name",
+                    .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
                             "gauge", "ewr_code", "ewr_code_timing")) |>
       dplyr::mutate(ewr_achieved = .data$frequency_occurred >= .data$target_frequency,
                     interevent_achieved = .data$interevent_occurred <= .data$max_interevent,
-                    .by = c("scenario", "planning_unit_name",
+                    .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
                             "gauge", "ewr_code", "ewr_code_timing"))
 
   # change the logical to numeric to maintain generality with later functions
@@ -353,7 +357,8 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 
   annualdf <- annualdf |>
     dplyr::select('scenario', 'year', 'date', 'gauge',
-                  'planning_unit_name', 'ewr_code', 'ewr_code_timing',
+                  'planning_unit_name', 'state', 'SWSDLName',
+                  'ewr_code', 'ewr_code_timing',
                   'event_years', 'ewr_achieved',
                   'interevent_achieved')
 
@@ -525,13 +530,13 @@ maxInterevent <- function(x) {
 
 bind_max <- function(outdf) {
   MAX_scenario <- outdf |>
-    dplyr::select('gauge', 'planning_unit_name', 'ewr_code', 'ewr_code_timing') |>
+    dplyr::select('gauge', 'planning_unit_name', 'state', 'SWSDLName', 'ewr_code', 'ewr_code_timing') |>
     dplyr::distinct() |>
     dplyr::mutate(
       scenario = "MAX",
       ewr_achieved = 1
     ) |>
-    dplyr::select('scenario', 'gauge', 'planning_unit_name',
+    dplyr::select('scenario', 'gauge', 'planning_unit_name', 'state', 'SWSDLName',
                   'ewr_achieved', 'ewr_code', 'ewr_code_timing')
   outdf <- dplyr::bind_rows(outdf, MAX_scenario)
   return(outdf)

@@ -103,7 +103,7 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
 
   # join the data back on from the relevant polyIDs
   fromto_data <- from_data |>
-    dplyr::left_join(fromto_pair, by = "polyID_f", relationship = "many-to-many") |>
+    dplyr::left_join(fromto_pair, by = "polyID_f", relationship = "many-to-many")|>
     dplyr::left_join(to_data, by = "polyID_t", relationship = "many-to-many") |>
     dplyr::select(tidyselect::everything(), polyID = "polyID_t", -"polyID_f")
 
@@ -159,9 +159,12 @@ pseudo_spatial_joiner <- function(from_geo, to_geo, prefix) {
     }
   }
 
+  commonnames <- names(from_geo)[names(from_geo) %in% names(to_geo)]
+  commonnames <- commonnames[commonnames != 'geometry']
   fromto_pair <- dplyr::left_join(
     sf::st_drop_geometry(from_geo),
-    sf::st_drop_geometry(to_geo)
+    sf::st_drop_geometry(to_geo),
+    by = commonnames
   )
 
   return(fromto_pair)

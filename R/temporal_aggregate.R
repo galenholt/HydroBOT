@@ -98,23 +98,24 @@ temporal_aggregate <- function(dat,
     # Infer EWR from groupers
     ewrnames <- purrr::map(HydroBOT::causal_ewr, names) |> unlist()
     isewr <- any(groupers %in% ewrnames)
-    if (isewr & !"planning_unit_name" %in% groupers) {
+    # If ewr, we need to be grouping by both planning unit and SWSDLname until we're into polygons
+    if (isewr & !("planning_unit_name" %in% groupers & "SWSDLName" %in% groupers)) {
       if (!auto_ewr_PU) {
         rlang::warn(c(
           "!" = "EWR outputs detected without `group_until`!",
-          "i" = "EWR outputs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
+          "i" = "EWR outputs should be grouped by `SWSDLName`, `planning_unit_name`, and `gauge` until aggregated to larger spatial areas.",
           "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
           "i" = "Lower-level processing should include as `grouper` in `temporal_aggregate()`"
         ))
       } else {
-        rlang::inform(c("EWR outputs auto-grouped!",
-          "i" = "EWRs should be grouped by `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
+        rlang::inform(c("i" = "EWR outputs auto-grouped",
+          "*" = "EWRs should be grouped by `SWSDLName`, `planning_unit_name`, and `gauge` until aggregated to larger spatial areas.",
           "*" = "gauge is less important, since it has the geometry, but the gauge column will be lost otherwise.",
-          "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
-          "i" = "Lower-level processing handles by including as `grouper` in `temporal_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."
+          "*" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
+          "*" = "Lower-level processing handles by including as `grouper` in `temporal_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."
         ))
-        # add gauge and plannng unit name if available.
-        groupers <- unique(c(groupers, c("gauge", "planning_unit_name")))
+        # add gauge, planning unit, and SWSDL if available to prevent premature collapse.
+        groupers <- unique(c(groupers, c("gauge", "planning_unit_name", "SWSDLName")))
       }
     }
   }

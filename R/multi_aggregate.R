@@ -17,7 +17,7 @@
 #'   be all grouping columns *except* theme and spatial groupings. These are
 #'   both automatically added to `groupers` according to `aggsequence` before
 #'   passing to [general_aggregate()].
-#' @param group_until named list of groupers and the step to which they should
+#' @param group_until named list of groupers (column names) and the step to which they should
 #'   be retained. Default NA (retain all groupers for all steps). *FOR EWR USE,
 #'   best option is* `group_until = list(planning_unit_name = is_notpoint, gauge
 #'   = is_notpoint)`. This groups by planning unit and gauge until larger
@@ -48,15 +48,16 @@
 #'   to be wrapped in [rlang::quo()], e.g. `rlang::quo(list(wm =
 #'   ~weighted.mean(., w = area, na.rm = TRUE))`. And we can no longer mix
 #'   character and other forms in the same sub-list (single aggregation step).
-#' @param pseudo_spatial a character or numeric vector giving the names or
-#'   indices of aggsequence that should have 'psuedo-spatial' aggregation. This
-#'   is when we go from one spatial data level to another, but do the join and
-#'   aggregation with a non-spatial [dplyr::left_join()]. It is developed for
-#'   the EWR situation, where the incoming data is indexed to gauges and
-#'   planning units, but has gauge point geometry, and spatial joining to
-#'   planning units is not appropriate, because single gauges affect multiple
-#'   units. So it would join to the `planning_units` by name instead of
-#'   spatially, and then aggregate according to those units.
+#' @param pseudo_spatial a character or numeric vector giving the *names or
+#'   indices* (NOT the column names to join on) of aggsequence that should have
+#'   'psuedo-spatial' aggregation. This is when we go from one spatial data
+#'   level to another, but do the join and aggregation with a non-spatial
+#'   [dplyr::left_join()]. It is developed for the EWR situation, where the
+#'   incoming data is indexed to gauges, planning units, and sdl units, but has gauge point
+#'   geometry, and spatial joining to planning units or sdl is not appropriate, because
+#'   single gauges affect multiple units. So it would join to the
+#'   `planning_units` or `sdl_units` by column names instead of spatially, and then aggregate according
+#'   to those units.
 #' @param saveintermediate logical, default `FALSE`. * `FALSE` (the default):
 #'   Save only the final result as a tibble or sf * `TRUE`: Save every step of
 #'   the aggregation as a tibble or sf in a list
@@ -73,7 +74,9 @@
 #'   with the values in the new columns defining history.
 #' @param auto_ewr_PU logical, default `FALSE`. Auto-detect EWRs and enforce
 #'   appropriate theme and spatial scaling related to gauges and planning units,
-#'   as defined in [theme_aggregate()] and [spatial_aggregate()]. Specifically, if `TRUE`, this automatically manages the `group_until` and `pseudo_spatial` arguments.
+#'   as defined in [theme_aggregate()] and [spatial_aggregate()]. Specifically,
+#'   if `TRUE`, this automatically manages the `group_until` and
+#'   `pseudo_spatial` arguments.
 #'
 #' @return either a tibble or sf of aggregated values at the final level (if
 #'   `saveintermediate = FALSE`) or a list of tibbles or sfs with aggregated

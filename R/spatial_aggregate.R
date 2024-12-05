@@ -28,7 +28,7 @@
 #'   is `'spatial_'` instead of `'agg_'`.
 #' @param joinby character, default 'spatial' performs the expected spatial join using geometry, 'nonspatial' performs a [dplyr::left_join()] by common column names, typically as a result of calling [multi_aggregate()] with `pseudo_spatial = 'planning_units'`.
 #' @param auto_ewr_PU logical, default FALSE. If TRUE, automatically infers
-#'   whether this is an EWR dataset is undergoing gauge to planning unit aggregation.
+#'   whether this is an EWR dataset is undergoing gauge to sdl or planning unit aggregation.
 #'   If so, joins data non-spatially (sets `joinby = 'nonspatial'`). The preferred solution is
 #'   to use `joinby` in [spatial_aggregate()] or `pseudo_spatial` in [multi_aggregate()].
 #'   If none of those solutions happen, though, it aborts to
@@ -66,21 +66,22 @@ spatial_aggregate <- function(dat,
   # usually spatial join, but sometimes we want to do a traditional left join (e.g. EWR gauges to planning units)
 
   # and we might want to automate for EWRs (or at least catch)
+    # If we have a df with 'gauge', and we're trying to go to either planning_unit or sdl_unit
   isewrgaugepu <- any(grepl('ewr', names(dat))) &
     any(grepl('gauge', names(dat))) &
-    any(grepl('planning_unit_name', names(to_geo)))
+    any(grepl('planning_unit_name|SWSDLName', names(to_geo)))
 
   if (isewrgaugepu & joinby != 'nonspatial') {
     if (!auto_ewr_PU) {
-      rlang::warn(c("EWR gauge to planning units detected without `pseudo_spatial`!",
-                    "!" = "Gauges inform multiple PUs, and this will be lost.",
-                    "i" = "EWR outputs should be joined to `planning_unit_name` pseudo-spatially, not with a spatial join",
-                    "i" = "Preferred method of addressing this is with `pseudo_spatial = 'planning_units'` in `multi_aggregate()` or `read_and_agg()`.",
+      rlang::warn(c("EWR gauge to sdl units or planning units detected without `pseudo_spatial`!",
+                    "!" = "Gauges inform multiple SDLs and PUs; this will be lost.",
+                    "i" = "EWR outputs should be joined to `SWSDLName` (or `planning_unit_name`) pseudo-spatially, not with a spatial join",
+                    "i" = "Preferred method of addressing this is with `pseudo_spatial = 'sdl_units'` in `multi_aggregate()` or `read_and_agg()`.",
                     "i" = "Lower-level processing should include as `joinby = 'nonspatial'` in `spatial_aggregate()`"))
     } else {
-      rlang::inform(c("EWR gauge to planning units join automatically done pseudo-spatially.",
-                      "i" = "EWR outputs should be joined to `planning_unit_name` pseudo-spatially, not with a spatial join",
-                    "i" = "Preferred method of addressing this is with `pseudo_spatial = 'planning_units'` in `multi_aggregate()` or `read_and_agg()`.",
+      rlang::inform(c("EWR gauge to sdl units or planning units join automatically done pseudo-spatially.",
+                      "i" = "EWR outputs should be joined to `SWSDLName` (or `planning_unit_name`) pseudo-spatially, not with a spatial join",
+                    "i" = "Preferred method of addressing this is with `pseudo_spatial = 'sdl_units'` in `multi_aggregate()` or `read_and_agg()`.",
                     "i" = "Lower-level processing should include as `joinby = 'nonspatial'` in `spatial_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."))
       joinby = 'nonspatial'
     }
@@ -130,7 +131,8 @@ spatial_aggregate <- function(dat,
       # need to save for each combo of grouping variable
       allgroups <- fromto_pair |> dplyr::distinct(dplyr::across({{groupers}}))
       # combine
-      unusedPolys <- dplyr::cross_join(unusedPolys, allgroups)
+      commonnames <- names(unusedPolys)[names(unusedPolys) %in% names(allgroups)]
+      unusedPolys <- dplyr::cross_join(unusedPolys, allgroups, by = commonnames)
     }
 
   }
