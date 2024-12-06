@@ -28,7 +28,7 @@ test_that("summary works", {
   sumdat <- get_any_ewr_output(ewrpath, type = 'summary')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
-  namestring <- c('scenario', 'gauge', 'planning_unit_name',
+  namestring <- c('scenario', 'gauge', 'planning_unit_name', 'state', 'SWSDLName',
                   'ewr_code', 'multigauge', 'event_years',
                   'frequency', 'target_frequency', 'achievement_count',
                   'achievement_per_year', 'event_count', 'event_count_all',
@@ -50,7 +50,7 @@ test_that("yearly works", {
                   'total_event_days', 'total_event_days_achieved',
                   'max_event_days', 'max_rolling_events', 'max_rolling_achievement',
                   'missing_days', 'total_possible_days', 'ewr_code',
-                  'scenario', 'gauge', 'planning_unit_name', 'multigauge',
+                  'scenario', 'gauge', 'planning_unit_name', 'state', 'SWSDLName', 'multigauge',
                   'rolling_max_inter_event', 'rolling_max_inter_event_achieved', 'ewr_code_timing')
   expect_equal(names(ewrdat), namestring)
   # a couple critical checks of the bits we use
@@ -62,7 +62,7 @@ test_that("all_events works", {
   ewrdat <- get_any_ewr_output(ewrpath, type = 'all_events')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
-  namestring <- c('scenario', 'gauge', 'planning_unit_name', 'ewr_code',
+  namestring <- c('scenario', 'gauge', 'planning_unit_name', 'state', 'SWSDLName', 'ewr_code',
                   'water_year', 'start_date', 'end_date', 'event_duration',
                   'event_length', 'multigauge', 'ewr_code_timing')
   expect_equal(names(ewrdat), namestring)
@@ -77,7 +77,7 @@ test_that("all_successful_events works", {
   # stringr::str_flatten(names(sumdat), "', '")
   namestring <- c('scenario', 'gauge', 'planning_unit_name', 'ewr_code',
                   'water_year', 'start_date', 'end_date', 'event_duration',
-                  'event_length', 'multigauge', 'ewr_code_timing')
+                  'event_length', 'state', 'SWSDLName', 'multigauge', 'ewr_code_timing')
   expect_equal(names(ewrdat), namestring)
   # a couple critical checks of the bits we use
   expect_true(is.character(ewrdat$scenario))
@@ -104,7 +104,7 @@ test_that("assessment works", {
   assessed <- assess_ewr_achievement(yeardat, year_roll = 3)
 
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
-                                  'planning_unit_name', 'ewr_code',
+                                  'planning_unit_name', 'state', 'SWSDLName', 'ewr_code',
                                   'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
 })
 
@@ -113,7 +113,7 @@ test_that("making assessment tibble works", {
   assessed <- get_ewr_output(ewrpath)
 
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
-                                  'planning_unit_name', 'ewr_code',
+                                  'planning_unit_name', 'state', 'SWSDLName', 'ewr_code',
                                   'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
   expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
 })
@@ -123,7 +123,7 @@ test_that("year_roll is rolling correctly", {
   assessed <- get_ewr_output(ewrpath, year_roll = 3)
 
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
-                                  'planning_unit_name', 'ewr_code',
+                                  'planning_unit_name', 'state', 'SWSDLName', 'ewr_code',
                                   'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
   expect_equal(sum(is.na(assessed$ewr_achieved)), 1296)
 })
@@ -134,7 +134,7 @@ test_that("passing in a list from memory works", {
 
   ewrprepped <- get_ewr_output(ewr_out, type = 'achievement')
   expect_equal(names(ewrprepped), c('scenario', 'year', 'date', 'gauge',
-                                    'planning_unit_name', 'ewr_code',
+                                    'planning_unit_name', 'state', 'SWSDLName', 'ewr_code',
                                     'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
   expect_equal(sum(is.na(ewrprepped$planning_unit_name)), 0)
 })

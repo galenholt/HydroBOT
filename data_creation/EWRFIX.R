@@ -72,6 +72,8 @@ pusdlg |>
   dplyr::arrange(planning_unit_name, gauge)
 
 
+
+
 # There's an issue with naming the PUs
 ced[1:2] <- ced[1:2] |> purrr::map(\(x) {
   x$planning_unit_name[x$planning_unit_name == 'Border rivers'] <- 'Border Rivers and Moonie Long-term watering plan'
@@ -148,6 +150,38 @@ o2yt <- o2yt |>
 readr::write_csv(e2o, 'ewr2obj.csv', na = '', eol = '\r\n')
 readr::write_csv(o2t, 'obj2target.csv', na = '', eol = '\r\n')
 readr::write_csv(o2yt, 'obj2yrtarget.csv', na = '', eol = '\r\n')
+
+
+# Deal with EWR test files
+parsh <- readr::read_csv('../EWR_tool/py_ewr/parameter_metadata/parameter_sheet.csv', guess_max = 5000)
+updatenest <- readr::read_csv('../EWR_tool/unit_testing_files/MURRAY_MDBA_update_nest.csv', guess_max = 5000) |>
+  dplyr::mutate(Gauge = as.character(Gauge))
+
+updateqld <- readr::read_csv('../EWR_tool/unit_testing_files/qld_parameter_sheet.csv', guess_max = 5000) |>
+  dplyr::mutate(Gauge = as.character(Gauge))
+
+updatesa <- readr::read_csv('../EWR_tool/unit_testing_files/sa_parameter_sheet.csv', guess_max = 5000) |>
+  dplyr::mutate(Gauge = as.character(Gauge))
+
+updatevic <- readr::read_csv('../EWR_tool/unit_testing_files/vic_parameter_sheet.csv', guess_max = 5000) |>
+  dplyr::mutate(Gauge = as.character(Gauge))
+
+pusdlg_raw <- parsh |>
+  dplyr::select(PlanningUnitName, Gauge, State, SWSDLName) |>
+  dplyr::distinct()
+
+updatenest_sdl <- dplyr::left_join(updatenest, pusdlg_raw)
+updateqld_sdl <- dplyr::left_join(updateqld, pusdlg_raw)
+updatesa_sdl <- dplyr::left_join(updatesa, pusdlg_raw)
+updatevic_sdl <- dplyr::left_join(updatevic, pusdlg_raw)
+
+
+readr::write_csv(updatenest_sdl, '../EWR_tool/unit_testing_files/MURRAY_MDBA_update_nest.csv', na = '', eol = '\r\n')
+readr::write_csv(updateqld_sdl, '../EWR_tool/unit_testing_files/qld_parameter_sheet.csv', na = '', eol = '\r\n')
+readr::write_csv(updatesa_sdl, '../EWR_tool/unit_testing_files/sa_parameter_sheet.csv', na = '', eol = '\r\n')
+readr::write_csv(updatevic_sdl, '../EWR_tool/unit_testing_files/vic_parameter_sheet.csv', na = '', eol = '\r\n')
+
+
 
 # Old- worth exploring some of the issues with the networks --------------
 
