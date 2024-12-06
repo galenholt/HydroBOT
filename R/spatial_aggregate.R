@@ -71,17 +71,18 @@ spatial_aggregate <- function(dat,
 
   if (isewrgaugepu & joinby != "nonspatial") {
     if (!auto_ewr_PU) {
-      rlang::warn(c("EWR gauge to sdl units or planning units detected without `pseudo_spatial`!",
-        "!" = "Gauges inform multiple SDLs and PUs; this will be lost.",
-        "i" = "EWR outputs should be joined to `SWSDLName` (or `planning_unit_name`) pseudo-spatially, not with a spatial join",
-        "i" = "Preferred method of addressing this is with `pseudo_spatial = 'sdl_units'` in `multi_aggregate()` or `read_and_agg()`.",
+      rlang::warn(c("!", "EWR gauge to sdl units or planning units detected without `pseudo_spatial`!",
+        "i" = "Gauges inform multiple SDLs and PUs; this will be lost.",
+        "i" = "EWR outputs should be joined to `sdl_units` (or `planning_units`) pseudo-spatially (by column names), not with a spatial join",
+        "i" = "Best to explicitly use `pseudo_spatial = 'sdl_units'` in `multi_aggregate()` or `read_and_agg()`.",
         "i" = "Lower-level processing should include as `joinby = 'nonspatial'` in `spatial_aggregate()`"
       ))
     } else {
-      rlang::inform(c("EWR gauge to sdl units or planning units join automatically done pseudo-spatially.",
-        "i" = "EWR outputs should be joined to `SWSDLName` (or `planning_unit_name`) pseudo-spatially, not with a spatial join",
-        "i" = "Preferred method of addressing this is with `pseudo_spatial = 'sdl_units'` in `multi_aggregate()` or `read_and_agg()`.",
-        "i" = "Lower-level processing should include as `joinby = 'nonspatial'` in `spatial_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."
+      rlang::inform(c("i" = "EWR gauges joined to larger units pseudo-spatially.",
+                      "*" = "Done automatically because `auto_ewr_PU = TRUE`",
+                      "*" = "Non-spatial join needed because gauges may inform areas they are not within",
+        # "*" = "EWR outputs should be joined to `sdl_units` (or `planning_units`) pseudo-spatially (by column names), not with a spatial join",
+        "*" = "Best to explicitly use `pseudo_spatial = 'sdl_units'` in `multi_aggregate()` or `read_and_agg()`."
       ))
       joinby <- "nonspatial"
     }

@@ -142,15 +142,15 @@ theme_aggregate <- function(dat,
         rlang::warn(c(
           "!" = "EWR outputs detected without `group_until`!",
           "i" = "EWR outputs should be grouped by `SWSDLName`, `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
-          "i" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
+          "i" = "Best to explicitly use `group_until` in `multi_aggregate()` or `read_and_agg()`.",
           "i" = "Lower-level processing should include as `grouper` in `theme_aggregate()`"
         ))
       } else {
         rlang::inform(c("i" = "EWR outputs auto-grouped",
+                        "*" = "Done automatically because `auto_ewr_PU = TRUE`",
           "*" = "EWRs should be grouped by `SWSDLName`, `planning_unit_name`, and `gauge` until aggregated to larger spatial areas.",
-          "*" = "gauge is less important, since it has the geometry, but the gauge column will be lost otherwise.",
-          "*" = "Preferred method of addressing this is with `group_until` in `multi_aggregate()` or `read_and_agg()`.",
-          "*" = "Lower-level processing handles by including as `grouper` in `theme_aggregate()`, which is being done automatically because `auto_ewr_PU = TRUE`."
+          "*" = "Rows will collapse otherwise, silently aggregating over the wrong dimension",
+          "*" = "Best to explicitly use `group_until` in `multi_aggregate()` or `read_and_agg()`."
         ))
         # add gauge and plannng unit name if available.
         groupers <- unique(c(groupers, intersect(c("gauge", "planning_unit_name", "SWSDLName"), names(causal_edges))))
