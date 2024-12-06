@@ -132,8 +132,7 @@ spatial_aggregate <- function(dat,
       # need to save for each combo of grouping variable
       allgroups <- fromto_pair |> dplyr::distinct(dplyr::across({{ groupers }}))
       # combine
-      commonnames <- names(unusedPolys)[names(unusedPolys) %in% names(allgroups)]
-      unusedPolys <- dplyr::cross_join(unusedPolys, allgroups, by = commonnames)
+      unusedPolys <- dplyr::cross_join(unusedPolys, allgroups)
     }
   }
 
