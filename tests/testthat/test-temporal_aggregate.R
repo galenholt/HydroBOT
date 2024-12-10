@@ -10,7 +10,8 @@ test_that("full time works, nongeom", {
                            auto_ewr_PU = TRUE)
 
 
-  expect_equal(names(agged), c('scenario', 'gauge', 'ewr_code', 'planning_unit_name', 'temporal_mean_ewr_achieved'))
+  expect_equal(names(agged), c('scenario', 'gauge', 'ewr_code', 'planning_unit_name',
+                               'SWSDLName', 'temporal_mean_ewr_achieved'))
   expect_s3_class(agged, 'data.frame')
   expect_equal(nrow(agged), 356)
 })
@@ -28,7 +29,8 @@ test_that("time intervals work, nongeom", {
                               auto_ewr_PU = TRUE)
 
 
-  expect_equal(names(agged), c('scenario', 'gauge', 'ewr_code', 'planning_unit_name', 'temporal_mean_ewr_achieved', 'date'))
+  expect_equal(names(agged), c('scenario', 'gauge', 'ewr_code', 'planning_unit_name',
+                               'SWSDLName', 'temporal_mean_ewr_achieved', 'date'))
   expect_s3_class(agged, 'data.frame')
   expect_equal(nrow(agged), 890)
   expect_equal(sum(is.na(agged$date)), 89)
@@ -47,7 +49,9 @@ test_that("both above, sf", {
                               auto_ewr_PU = TRUE)
 
 
-  expect_equal(names(agged_sf_all), c('scenario', 'gauge', 'ewr_code', 'polyID', 'planning_unit_name', 'temporal_mean_ewr_achieved', 'geometry'))
+  expect_equal(names(agged_sf_all), c('scenario', 'gauge', 'ewr_code', 'polyID',
+                                      'planning_unit_name', 'SWSDLName',
+                                      'temporal_mean_ewr_achieved', 'geometry'))
   expect_s3_class(agged_sf_all, 'sf')
   expect_equal(nrow(agged_sf_all), 356)
 
@@ -62,7 +66,9 @@ test_that("both above, sf", {
                               auto_ewr_PU = TRUE)
 
 
-  expect_equal(names(agged_sf_t), c('scenario', 'gauge', 'ewr_code', 'polyID', 'planning_unit_name', 'temporal_mean_ewr_achieved', 'date', 'geometry'))
+  expect_equal(names(agged_sf_t), c('scenario', 'gauge', 'ewr_code', 'polyID',
+                                    'planning_unit_name', 'SWSDLName',
+                                    'temporal_mean_ewr_achieved', 'date', 'geometry'))
   expect_s3_class(agged_sf_t, 'sf')
   expect_equal(nrow(agged_sf_t), 890)
   expect_equal(sum(is.na(agged_sf_t$date)), 89)

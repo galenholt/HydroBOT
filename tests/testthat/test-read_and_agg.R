@@ -5,7 +5,8 @@ temp_parent_dir <- "_test_data"
 # create dir so building makes sense
 make_temp_hydro()
 
-# all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
+# all_interEvents is breaking in 1.0.6 EWR tool, so skip for now. We don't tend
+# to use it anyway
 
 ewroutlist <- list(
   "summary",
@@ -63,7 +64,8 @@ test_that("multi-step theme and spatial works", {
     aggsequence = aggseq,
     funsequence = funseq,
     keepAllPolys = FALSE,
-    auto_ewr_PU = TRUE
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units'
   )
 
   # stringr::str_flatten(names(spatagg), "', '")
@@ -129,7 +131,8 @@ test_that("multi-step theme-spatial-time", {
     "ArithmeticMean"
     )
 
-  spatagg_s_th_t <- read_and_agg(
+  # Warnings because we are spatailly moving to sdl units to test spatial agg
+  expect_warning(spatagg_s_th_t <- read_and_agg(
     datpath = ewr_results,
     type = "achievement",
     geopath = bom_basin_gauges,
@@ -138,10 +141,11 @@ test_that("multi-step theme-spatial-time", {
     aggCols = "ewr_achieved",
     aggsequence = aggseq_s_th_t,
     funsequence = funseq,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
     keepAllPolys = FALSE,
-    auto_ewr_PU = TRUE,
+    auto_ewr_PU = FALSE,
     saveintermediate = TRUE
-  )
+  ))
 
   # the sdl sheet should have all the dates and code_timings
   expect_snapshot_value(spatagg_s_th_t$sdl_units$date |> unique(), style = 'deparse')
@@ -158,7 +162,7 @@ test_that("multi-step theme-spatial-time", {
   expect_snapshot_value(spatagg_s_th_t$yrs$ewr_code |> unique(), style = 'deparse')
   expect_snapshot_value(spatagg_s_th_t$yrs$SWSDLID |> unique(), style = 'deparse')
 
-  spatagg_s_t_th <- read_and_agg(
+  expect_warning(spatagg_s_t_th <- read_and_agg(
     datpath = ewr_results,
     type = "achievement",
     geopath = bom_basin_gauges,
@@ -168,9 +172,10 @@ test_that("multi-step theme-spatial-time", {
     aggsequence = aggseq_s_t_th,
     funsequence = funseq,
     keepAllPolys = FALSE,
-    auto_ewr_PU = TRUE,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    auto_ewr_PU = FALSE,
     saveintermediate = TRUE
-  )
+  ))
 
   # the sdl sheet should have all the dates and code_timings
   expect_snapshot_value(spatagg_s_t_th$sdl_units$date |> unique(), style = 'deparse')
@@ -187,7 +192,7 @@ test_that("multi-step theme-spatial-time", {
   expect_snapshot_value(spatagg_s_t_th$ewr_code$ewr_code |> unique(), style = 'deparse')
   expect_snapshot_value(spatagg_s_t_th$ewr_code$SWSDLID |> unique(), style = 'deparse')
 
-  spatagg_th_s_t <- read_and_agg(
+  expect_warning(spatagg_th_s_t <- read_and_agg(
     datpath = ewr_results,
     type = "achievement",
     geopath = bom_basin_gauges,
@@ -197,9 +202,10 @@ test_that("multi-step theme-spatial-time", {
     aggsequence = aggseq_th_s_t,
     funsequence = funseq,
     keepAllPolys = FALSE,
-    auto_ewr_PU = TRUE,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    auto_ewr_PU = FALSE,
     saveintermediate = TRUE
-  )
+  ))
 
   # The ewr_code sheet should have ewr_codes, planning units (not sdls), and all dates
   expect_snapshot_value(spatagg_th_s_t$ewr_code$date |> unique(), style = 'deparse')
@@ -216,7 +222,7 @@ test_that("multi-step theme-spatial-time", {
   expect_snapshot_value(spatagg_th_s_t$yrs$ewr_code |> unique(), style = 'deparse')
   expect_snapshot_value(spatagg_th_s_t$yrs$SWSDLID |> unique(), style = 'deparse')
 
-  spatagg_th_t_s <- read_and_agg(
+  expect_warning(spatagg_th_t_s <- read_and_agg(
     datpath = ewr_results,
     type = "achievement",
     geopath = bom_basin_gauges,
@@ -226,9 +232,10 @@ test_that("multi-step theme-spatial-time", {
     aggsequence = aggseq_th_t_s,
     funsequence = funseq,
     keepAllPolys = FALSE,
-    auto_ewr_PU = TRUE,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    auto_ewr_PU = FALSE,
     saveintermediate = TRUE
-  )
+  ))
 
   # The ewr_code sheet should have ewr_codes, planning units (not sdls), and all dates
   expect_snapshot_value(spatagg_th_t_s$ewr_code$date |> unique(), style = 'deparse')
@@ -246,7 +253,7 @@ test_that("multi-step theme-spatial-time", {
   expect_snapshot_value(spatagg_th_t_s$sdl_units$SWSDLID |> unique(), style = 'deparse')
 
 
-  spatagg_t_s_th <- read_and_agg(
+  expect_warning(spatagg_t_s_th <- read_and_agg(
     datpath = ewr_results,
     type = "achievement",
     geopath = bom_basin_gauges,
@@ -256,9 +263,10 @@ test_that("multi-step theme-spatial-time", {
     aggsequence = aggseq_t_s_th,
     funsequence = funseq,
     keepAllPolys = FALSE,
-    auto_ewr_PU = TRUE,
+    auto_ewr_PU = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
     saveintermediate = TRUE
-  )
+  ))
 
   # The yrs sheet should have code_timing, planning units, and two-year intervals
   expect_snapshot_value(spatagg_t_s_th$yrs$date |> unique(), style = 'deparse')
@@ -276,7 +284,7 @@ test_that("multi-step theme-spatial-time", {
   expect_snapshot_value(spatagg_t_s_th$ewr_code$SWSDLID |> unique(), style = 'deparse')
 
 
-  spatagg_t_th_s <- read_and_agg(
+  expect_warning(spatagg_t_th_s <- read_and_agg(
     datpath = ewr_results,
     type = "achievement",
     geopath = bom_basin_gauges,
@@ -286,9 +294,10 @@ test_that("multi-step theme-spatial-time", {
     aggsequence = aggseq_t_th_s,
     funsequence = funseq,
     keepAllPolys = FALSE,
-    auto_ewr_PU = TRUE,
+    auto_ewr_PU = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
     saveintermediate = TRUE
-  )
+  ))
 
   # The yrs sheet should have code_timing, planning units, and two-year intervals
   expect_snapshot_value(spatagg_t_th_s$yrs$date |> unique(), style = 'deparse')
@@ -437,7 +446,7 @@ test_that("parsing geo and char work for aggsequence", {
   )
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, "sf")
-  expect_equal(nrow(spatagg), 1425)
+  expect_equal(nrow(spatagg), 1406)
 })
 
 test_that("parsing bare and char and rlang::quo for funsequence", {
@@ -486,7 +495,7 @@ test_that("parsing bare and char and rlang::quo for funsequence", {
   )
   expect_equal(names(spatagg), namestring)
   expect_s3_class(spatagg, "sf")
-  expect_equal(nrow(spatagg), 300)
+  expect_equal(nrow(spatagg), 296)
 })
 
 test_that("Various group_until formats work", {
@@ -530,7 +539,8 @@ test_that("Various group_until formats work", {
   )
 
   # Can we parse group_until into yaml if it's a named list?
-  spatagg <- read_and_agg(
+  # expect_warnings because of the desired non-spatial sdl
+  expect_warning(expect_warning(expect_warning(spatagg <- read_and_agg(
     datpath = ewr_results,
     type = "achievement",
     geopath = bom_basin_gauges,
@@ -542,14 +552,15 @@ test_that("Various group_until formats work", {
     funsequence = funseq,
     keepAllPolys = FALSE,
     savepath = file.path(temp_parent_dir, "aggregated")
-  )
+  ))))
 
   yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
   expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))
   expect_equal(yamout$auto_ewr_PU, FALSE)
 
   # Vector- this relies on multi_aggregate to make it a list
-  spatagg <- read_and_agg(
+  # expect_warnings because of the desired non-spatial sdl
+  expect_warning(expect_warning(expect_warning(spatagg <- read_and_agg(
     datpath = ewr_results,
     type = "achievement",
     geopath = bom_basin_gauges,
@@ -561,7 +572,7 @@ test_that("Various group_until formats work", {
     funsequence = funseq,
     keepAllPolys = FALSE,
     savepath = file.path(temp_parent_dir, "aggregated")
-  )
+  ))))
 
   yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
   expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))
@@ -570,7 +581,8 @@ test_that("Various group_until formats work", {
   # function. As with funsequence and agg sequence, these don't actually have
   # to be the same as the inputs, they just have to evaluate the same.- ie
   # characters instead of sf names
-  spatagg <- read_and_agg(
+  # expect_warnings because of the desired non-spatial sdl
+  expect_warning(expect_warning(expect_warning(spatagg <- read_and_agg(
     datpath = ewr_results,
     type = "achievement",
     geopath = bom_basin_gauges,
@@ -582,7 +594,7 @@ test_that("Various group_until formats work", {
     funsequence = funseq,
     keepAllPolys = FALSE,
     savepath = file.path(temp_parent_dir, "aggregated")
-  )
+  ))))
 
   yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
   expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))
@@ -590,7 +602,8 @@ test_that("Various group_until formats work", {
 
   # List, and numeric. This is what would get read from params. (though that could have character too.)
   # also drop it from groupers to check that that works
-  spatagg <- read_and_agg(
+  # expect_warnings because of the desired non-spatial sdl
+  expect_warning(expect_warning(expect_warning(spatagg <- read_and_agg(
     datpath = ewr_results,
     type = "achievement",
     geopath = bom_basin_gauges,
@@ -602,7 +615,7 @@ test_that("Various group_until formats work", {
     funsequence = funseq,
     keepAllPolys = FALSE,
     savepath = file.path(temp_parent_dir, "aggregated")
-  )
+  ))))
 
   yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
   expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))

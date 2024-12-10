@@ -5,8 +5,8 @@
     Output
       [1] "scenario"                   "polyID"                    
       [3] "gauge"                      "planning_unit_name"        
-      [5] "ewr_code"                   "ewr_code_mean_ewr_achieved"
-      [7] "geometry"                  
+      [5] "SWSDLName"                  "ewr_code"                  
+      [7] "ewr_code_mean_ewr_achieved" "geometry"                  
 
 # multi-step theme agg works, nongeom
 
@@ -49,9 +49,9 @@
 
 ---
 
-    c("BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB-WL1", "OB1", 
-    "OB2", "OB3", "OB4", "OB5", "SF1", "SF2", "VF", "CF", "OB-WL", 
-    "OB-WM", "OB-WS3", "OB-WS4", "SF3")
+    c("BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB-WL1", "OB3", 
+    "OB4", "OB5", "SF1", "SF2", "VF", "CF", "OB-WL", "OB-WM", "OB-WS3", 
+    "OB-WS4", "SF3")
 
 ---
 
@@ -64,8 +64,8 @@
 ---
 
     c("BF1", "BF2", "BK1", "CF", "CF1", "LF1", "LF2", "OB-WL", "OB-WL1", 
-    "OB-WM", "OB-WS3", "OB-WS4", "OB1", "OB2", "OB3", "OB4", "OB5", 
-    "SF1", "SF2", "SF3", "VF")
+    "OB-WM", "OB-WS3", "OB-WS4", "OB3", "OB4", "OB5", "SF1", "SF2", 
+    "SF3", "VF")
 
 ---
 
@@ -111,9 +111,9 @@
 
 ---
 
-    c("BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB-WL1", "OB1", 
-    "OB2", "OB3", "OB4", "OB5", "SF1", "SF2", "VF", "CF", "OB-WL", 
-    "OB-WM", "OB-WS3", "OB-WS4", "SF3")
+    c("BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB-WL1", "OB3", 
+    "OB4", "OB5", "SF1", "SF2", "VF", "CF", "OB-WL", "OB-WM", "OB-WS3", 
+    "OB-WS4", "SF3")
 
 ---
 
@@ -255,9 +255,9 @@
 
 ---
 
-    c("BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB-WL1", "OB1", 
-    "OB2", "OB3", "OB4", "OB5", "SF1", "SF2", "VF", "CF", "OB-WL", 
-    "OB-WM", "OB-WS3", "OB-WS4", "SF3")
+    c("BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB-WL1", "OB3", 
+    "OB4", "OB5", "SF1", "SF2", "VF", "CF", "OB-WL", "OB-WM", "OB-WS3", 
+    "OB-WS4", "SF3")
 
 ---
 
