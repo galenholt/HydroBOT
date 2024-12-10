@@ -7,7 +7,7 @@
 parse_group_until(group_until, groupers, aggsequence)
 }
 \arguments{
-\item{group_until}{named list of groupers and the step to which they should
+\item{group_until}{named list of groupers (column names) and the step to which they should
 be retained. Default NA (retain all groupers for all steps). \emph{FOR EWR USE,
 best option is} \code{group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint)}. This groups by planning unit and gauge until larger
 spatial grouping has happened. Leaving 'gauge' off is mathematically safe,

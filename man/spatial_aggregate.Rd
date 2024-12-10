@@ -76,7 +76,7 @@ is \code{'spatial_'} instead of \code{'agg_'}.}
 \item{joinby}{character, default 'spatial' performs the expected spatial join using geometry, 'nonspatial' performs a \code{\link[dplyr:mutate-joins]{dplyr::left_join()}} by common column names, typically as a result of calling \code{\link[=multi_aggregate]{multi_aggregate()}} with \code{pseudo_spatial = 'planning_units'}.}
 
 \item{auto_ewr_PU}{logical, default FALSE. If TRUE, automatically infers
-whether this is an EWR dataset is undergoing gauge to planning unit aggregation.
+whether this is an EWR dataset is undergoing gauge to sdl or planning unit aggregation.
 If so, joins data non-spatially (sets \code{joinby = 'nonspatial'}). The preferred solution is
 to use \code{joinby} in \code{\link[=spatial_aggregate]{spatial_aggregate()}} or \code{pseudo_spatial} in \code{\link[=multi_aggregate]{multi_aggregate()}}.
 If none of those solutions happen, though, it aborts to

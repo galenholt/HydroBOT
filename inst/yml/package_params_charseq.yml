@@ -56,6 +56,7 @@ auto_ewr_PU: FALSE
 agg_group_until:
   planning_unit_name: planning_units
   gauge: planning_units
+  SWSDLName: sdl_units
 
 agg_pseudo_spatial: planning_units
 

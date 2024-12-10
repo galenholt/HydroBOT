@@ -70,10 +70,11 @@ and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
 
 \item{auto_ewr_PU}{logical, default FALSE. If TRUE, automatically infers
 whether this is an EWR dataset and has not yet been spatially aggregated.
-If so, applies grouping by 'planning_unit_name'. The preferred solution is
-to include it in \code{groupers} here (for on-off), or in \code{\link[=multi_aggregate]{multi_aggregate()}} to
-use \code{group_until}. If none of those solutions happen, though, it aborts to
-prevent incorrect pooling over planning units.}
+If so, applies grouping by 'planning_unit_name' and SWSDLName' since EWRs
+are defined in those units. The preferred solution is to include it in
+\code{groupers} here (for on-off), or in \code{\link[=multi_aggregate]{multi_aggregate()}} to use
+\code{group_until}. If none of those solutions happen, though, it aborts to
+prevent incorrect pooling over rows in different planning units and sdl units.}
 
 \item{...}{passed to \code{\link[=general_aggregate]{general_aggregate()}}}
 }

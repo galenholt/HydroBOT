@@ -33,7 +33,7 @@ be all grouping columns \emph{except} theme and spatial groupings. These are
 both automatically added to \code{groupers} according to \code{aggsequence} before
 passing to \code{\link[=general_aggregate]{general_aggregate()}}.}
 
-\item{group_until}{named list of groupers and the step to which they should
+\item{group_until}{named list of groupers (column names) and the step to which they should
 be retained. Default NA (retain all groupers for all steps). \emph{FOR EWR USE,
 best option is} \code{group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint)}. This groups by planning unit and gauge until larger
 spatial grouping has happened. Leaving 'gauge' off is mathematically safe,
@@ -98,17 +98,20 @@ and silently drop those that don't. Similar to \code{tidyselect::all_of()} vs
 
 \item{auto_ewr_PU}{logical, default \code{FALSE}. Auto-detect EWRs and enforce
 appropriate theme and spatial scaling related to gauges and planning units,
-as defined in \code{\link[=theme_aggregate]{theme_aggregate()}} and \code{\link[=spatial_aggregate]{spatial_aggregate()}}. Specifically, if \code{TRUE}, this automatically manages the \code{group_until} and \code{pseudo_spatial} arguments.}
+as defined in \code{\link[=theme_aggregate]{theme_aggregate()}} and \code{\link[=spatial_aggregate]{spatial_aggregate()}}. Specifically,
+if \code{TRUE}, this automatically manages the \code{group_until} and
+\code{pseudo_spatial} arguments.}
 
-\item{pseudo_spatial}{a character or numeric vector giving the names or
-indices of aggsequence that should have 'psuedo-spatial' aggregation. This
-is when we go from one spatial data level to another, but do the join and
-aggregation with a non-spatial \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}. It is developed for
-the EWR situation, where the incoming data is indexed to gauges and
-planning units, but has gauge point geometry, and spatial joining to
-planning units is not appropriate, because single gauges affect multiple
-units. So it would join to the \code{planning_units} by name instead of
-spatially, and then aggregate according to those units.}
+\item{pseudo_spatial}{a character or numeric vector giving the \emph{names or
+indices} (NOT the column names to join on) of aggsequence that should have
+'psuedo-spatial' aggregation. This is when we go from one spatial data
+level to another, but do the join and aggregation with a non-spatial
+\code{\link[dplyr:mutate-joins]{dplyr::left_join()}}. It is developed for the EWR situation, where the
+incoming data is indexed to gauges, planning units, and sdl units, but has gauge point
+geometry, and spatial joining to planning units or sdl is not appropriate, because
+single gauges affect multiple units. So it would join to the
+\code{planning_units} or \code{sdl_units} by column names instead of spatially, and then aggregate according
+to those units.}
 }
 \value{
 either a tibble or sf of aggregated values at the final level (if
