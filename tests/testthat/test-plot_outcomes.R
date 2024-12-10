@@ -8,7 +8,10 @@ ewr_to_agg <- make_test_ewr_prepped()
 # Sets up the earlier approach with time-means that most tests were built for
 ewr_to_agg_timemean <- temporal_aggregate(ewr_to_agg,
                                           breaks = 'all_time',
-                                          groupers = c('scenario', 'gauge', 'planning_unit_name', 'ewr_code', 'ewr_code_timing', 'site'),
+                                          groupers = c('scenario', 'gauge',
+                                                       'planning_unit_name',
+                                                       'SWSDLName', 'ewr_code',
+                                                       'ewr_code_timing', 'site'),
                                           aggCols = 'ewr_achieved',
                                           funlist = 'ArithmeticMean',
                                           prefix = '') |>

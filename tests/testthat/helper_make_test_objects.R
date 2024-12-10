@@ -108,17 +108,17 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
     ps <- NULL
   }
 
-
-  agg_theme_space <- multi_aggregate(sumspat,
+  suppressWarnings(agg_theme_space <- multi_aggregate(sumspat,
                                      aggsequence = aggseq,
                                      groupers = c('scenario', 'planning_unit_name', 'gauge'),
-                                     group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint),
+                                     group_until = list(planning_unit_name = is_notpoint,
+                                                        gauge = is_notpoint, SWSDLName = is_notpoint),
                                      aggCols = 'ewr_achieved',
                                      funsequence = funseq,
                                      causal_edges = causal_ewr,
                                      namehistory = namehistory,
                                      pseudo_spatial = ps,
-                                     saveintermediate = TRUE)
+                                     saveintermediate = TRUE))
 
   return(agg_theme_space)
 }
