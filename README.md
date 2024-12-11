@@ -8,6 +8,7 @@
 [![R-CMD-check](https://github.com/MDBAuth/HydroBOT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MDBAuth/HydroBOT/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/MDBAuth/HydroBOT/graph/badge.svg)](https://app.codecov.io/gh/MDBAuth/HydroBOT)
+
 <!-- badges: end -->
 
 This R package forms the core of the WERP climate adaptation toolkit,
@@ -16,12 +17,14 @@ climates or adaptation options, and processing those through various
 response models (currently [MDBA EWR
 tool](https://github.com/MDBAuth/EWR_tool), with intention to include
 other tools in future). Subsequent processing of outcomes along spatial,
-theme, and temporal axes are available or under development, as well as
-control over outputs and comparisons between scenarios. Causal networks
-defining relationships in the response models are included.
+theme, and temporal axes are available, as well as control over outputs
+and comparisons between scenarios. Causal networks defining
+relationships in the response models are included, though in general the
+current versions should be obtained from the EWR tool directly with
+`get_causal_ewr()`.
 
 The [template repo](https://github.com/MDBAuth/toolkit_use) can be
-helpful for establishing project structure to use the toolkit and
+helpful for establishing project structure to use the HydroBOT and
 automating the setup process, particularly if you are on Linux or want
 to manage your python environments.
 
@@ -47,7 +50,7 @@ above doesn’t work.
 ### Python dependency
 
 To run, this needs a Python environment containing `py_ewr` (currently
-2.0.0). The package will manage that for you if you just start using it-
+2.3.0). The package will manage that for you if you just start using it-
 on first use, the package checks the environment and either uses an
 existing python environment or builds one with that dependency when the
 package is loaded.
@@ -58,14 +61,63 @@ python is desired.
 
 ## Use
 
-Can be run piecemeal or all at once, scripted. Point at a directory of
-hydrologic scenarios, and the toolkit will run them through the modules,
-aggregate the outputs, and present results, with control by the user
-through function arguments. See the
+HydroBOT can be run piecemeal or all at once, scripted. Point it at a
+directory of hydrologic scenarios, and HydroBOT will run them through
+the modules, aggregate the outputs, and present results, with control by
+the user through function arguments. Each stage builds a runnable set of
+parameter metadata based on function arguments for tracking provenance
+and reproducibility. Typical approaches use R scripts, Quarto notebooks,
+or automation on HPC or azure systems with yaml parameter files and
+shell/R scripts.
+
+See the
 [WERP_toolkit_demo](https://mdbauth.github.io/WERP_toolkit_demo/) for a
 full demonstration and the [template
 repo](https://github.com/MDBAuth/toolkit_use) for a bare-bones project
 structure.
+
+Using HydroBOT is typically a three-step process:
+
+1.  Running hydrographs through the EWR tool (or future modules) with
+    `prep_run_save_ewrs()`.
+
+    - Best practice has hydrographs in directories defined by scenarios,
+      so all hydrographs within a scenario can be run at once,
+      parallelised over scenarios.
+
+2.  Aggregating module outputs to larger theme, spatial, and temporal
+    scales with `read_and_agg()`
+
+    - `read_and_agg()` maintains dimensional safety over theme,
+      temporal, and spatial dimensions, avoiding the collapse over
+      unintended dimensions that is quite easy to miss if manually using
+      e.g. `dplyr::summarise()`.
+
+    - `read_and_agg()` (and wrapped functions for dimensional
+      aggregation) provide the ability to retain groupings and do
+      non-spatial joins of spatial data. This allows them to be
+      EWR-aware, and provide warnings and automation for best-practice
+      automation of EWR aggregation that does not collapse planning and
+      sdl units too soon and join gauges to them non-spatially. The
+      easiest way to use this is with `auto_ewr_PU = TRUE` .
+
+    - It is expected that `read_and_agg()` may be run several times for
+      a given analysis, with several different aggregation sequences, as
+      different sets may be needed for different questions, or iterative
+      production of results identifies better approaches.
+
+3.  Developing output products targeting the question of interest
+    (typically a scenario comparison) with `plot_outcomes()` and
+    `baseline_compare()`
+
+    - `plot_outcomes()` provides consistent processing and analysis of
+      input and output data, compared to manually building ggplots
+
+    - `plot_outcomes()` is theme, space, and time-aware, and so prevents
+      accidental overplotting or other losses of dimensional data.
+
+    - The return from `plot_outcomes()` is a ggplot object, which can
+      then be tweaked as usual.
 
 ## Developement
 
