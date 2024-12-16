@@ -9,7 +9,7 @@ packages = [{include = "HydroBOT"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-py-ewr = {path = "../EWR_tool"}
+py-ewr = "^2.3.1"
 
 [build-system]
 requires = ["poetry-core"]

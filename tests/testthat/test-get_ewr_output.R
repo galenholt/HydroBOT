@@ -88,7 +88,7 @@ test_that("all_successful_interEvents works", {
   ewrdat <- get_any_ewr_output(ewrpath, type = 'all_successful_interEvents')
   # The names as they exist
   # stringr::str_flatten(names(sumdat), "', '")
-  namestring <- c('scenario', 'gauge', 'planning_unit_name', 'ewr_code',
+  namestring <- c('scenario', 'gauge', 'planning_unit_name', 'state', 'SWSDLName', 'ewr_code',
                   'start_date', 'end_date', 'inter_event_length', 'ewr_code_timing')
   expect_equal(names(ewrdat), namestring)
   # a couple critical checks of the bits we use
