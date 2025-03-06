@@ -47,18 +47,18 @@
       "W-LF4",
       "OB-L1",
       "W-LF5",
+      "OB2-WHA",
       "LF6",
       "WL1",
       "WL2",
       "WL4",
       "LF5",
       "OB-S1",
-      "SF",
       "WP1",
       "WP2",
       "WP3",
       "WP4",
-      "ALT",
+      "ALT-CTF",
       "LLLF",
       "MLLF",
       "HLLF",
@@ -92,6 +92,7 @@
       "BF5",
       "dANA",
       "DR",
+      "DR-VLF",
       "FD1",
       "FR2",
       "NE",
@@ -114,7 +115,10 @@
       "FrL2",
       "FP4",
       "FP5",
-      "BF"
+      "BF-FD1",
+      "BF-FD2",
+      "SF-FD1",
+      "SF-FD2"
     ]
 
 # roll_frequency rolls correctly
