@@ -39,3 +39,4 @@ controller/__pycache__/
 *.gz
 /doc/
 /Meta/
+docs

@@ -14,7 +14,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'
 #' This does some directory setup and parsing, runs the EWR tool and, if asked,
 #' saves the output. If the output saves, it also auto-saves both yaml and json
-#' metadata files with all parameters needed to run this part of the toolkit
+#' metadata files with all parameters needed to run this part of HydroBOT
 #' with parameters. Scenario metadata is prepended, if found.
 #'
 #' By far the cleanest way for this to work is to have your input hydrographs in

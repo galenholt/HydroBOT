@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-This R package forms the core of the WERP climate adaptation toolkit, ingesting hydrological scenarios representing historical or future climates or adaptation options, and processing those through various response models (currently [MDBA EWR tool](https://github.com/MDBAuth/EWR_tool), with intention to include other tools in future). Subsequent processing of outcomes along spatial, theme, and temporal axes are available, as well as control over outputs and comparisons between scenarios. Causal networks defining relationships in the response models are included, though in general the current versions should be obtained from the EWR tool directly with `get_causal_ewr()`.
+This R package forms the core of the WERP climate adaptation toolkit (HydroBOT), ingesting hydrological scenarios representing historical or future climates or adaptation options, and processing those through various response models (currently [MDBA EWR tool](https://github.com/MDBAuth/EWR_tool), with intention to include other tools in future). Subsequent processing of outcomes along spatial, theme, and temporal axes are available, as well as control over outputs and comparisons between scenarios. Causal networks defining relationships in the response models are included, though in general the current versions should be obtained from the EWR tool directly with `get_causal_ewr()`.
 
 The [template repo](https://github.com/MDBAuth/toolkit_use) can be helpful for establishing project structure to use the HydroBOT and automating the setup process, particularly if you are on Linux or want to manage your python environments.
 

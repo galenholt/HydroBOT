@@ -278,7 +278,7 @@ test_that("csv per gauge works", {
   expect_snapshot(unique(ewr_out$summary$scenario))
   expect_snapshot(unique(ewr_out$all_events$scenario))
 
-  # I'm now controlling the scenario names in the toolkit, so this should work.
+  # I'm now controlling the scenario names in HydroBOT, so this should work.
 
   # Test it created the expected structure.
   # These still need to create a single output per input, or they overwrite
@@ -308,7 +308,7 @@ test_that("csv per gauge works for filenames", {
   #   dplyr::mutate(scenario = purrr::map_chr(scenario, \(x) stringr::str_split_1(x, "_")[1]))
   expect_snapshot(unique(ewr_out$summary$scenario))
 
-  # I'm now controlling the scenario names in the toolkit, so this should work.
+  # I'm now controlling the scenario names in HydroBOT, so this should work.
 
   # Test it created the expected structure
   realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)

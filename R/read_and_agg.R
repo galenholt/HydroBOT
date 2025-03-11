@@ -1,18 +1,18 @@
 #' Read in data and aggregate along theme and spatial dimensiont
 #'
-#' Allows passing only paths to data rather than objects. Wrapper over
-#' [prep_ewr_agg()] (though can be made more general once we have other
-#' modules), [make_edges()] and [multi_aggregate()]. Particularly useful if we
-#' want to pass parameters as strings from a config before anything is read in,
-#' and parallelisation (set a [future::plan()]). If parallel, be careful, it
-#' will return a MAX scenario for each scenario.
+#' Allows passing only paths to data rather than objects (though objects work as
+#' well for consistency). Wrapper over [prep_ewr_agg()] (though can be made more
+#' general once we have other modules), [make_edges()] and [multi_aggregate()].
+#' Particularly useful if we want to pass parameters as strings from a config
+#' before anything is read in, and parallelisation (set a [future::plan()]). If
+#' parallel, be careful, it will return a MAX scenario for each scenario.
 #'
 #' @inheritParams multi_aggregate
 #' @inherit multi_aggregate params return
 #'
-#' @param datpath path to indicator data. Currently needs to be EWR (same as
-#'   `ewrpath` argument in [prep_ewr_agg()]), but left more general here for
-#'   future
+#' @param datpath path to indicator data, or indicator data itself as a data
+#'   frame. Currently needs to be EWR (same as `ewrpath` argument in
+#'   [prep_ewr_agg()]), but left more general here for future
 #' @param type character of which type of EWR output (currently `'summary'`,
 #'   `'annual'`, or `'both'`). New values, e.g. `'all`' probably work but
 #'   untested.
@@ -38,7 +38,8 @@
 #' @param savepar 'combine' (default) or 'each'. If parallel over scenarios,
 #'   should this combine the output (default) or save each scenario's
 #'   aggregation separately ('each')
-#' @param ... passed to [prep_ewr_agg()]
+#' @param ... passed to [prep_ewr_agg()] and [get_ewr_output()], primarily
+#'   `gaugefilter`, `scenariofilter`, and `add_max`.
 #'
 #' @export
 #'
@@ -64,7 +65,7 @@ read_and_agg <- function(datpath,
                          par_recursive = TRUE,
                          savepar = "combine",
                          ...) {
-  if (!returnList & is.null(savepath)) {
+  if (!returnList && is.null(savepath)) {
     rlang::abort(message = "not returning output to disk or session. aborting to not use the resources.")
   }
 

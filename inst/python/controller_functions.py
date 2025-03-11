@@ -17,7 +17,7 @@ def clean_ewrs(ewr_results, scenario_name):
     # ewr_results['scenarioPath'] = ewr_results['scenario']
     
     # This assumes a naming convention of either scenarioname.csv or
-    # scenarioname_gauge.csv. The R portion of the toolkit cleans up the
+    # scenarioname_gauge.csv. The R portion of HydroBOT cleans up the
     # situation of scenarioname/gauge.csv, but that's best to avoid anyway 
     
     # I think this is a bad assumption, and we should let the user deal with

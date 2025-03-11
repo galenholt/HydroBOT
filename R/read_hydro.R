@@ -38,7 +38,7 @@ read_hydro_csv <- function(hydropath, scenariofilter, long) {
       rlang::abort(c("No hydrographs read.",
         "i" = glue::glue("{hll} hydrographs found in {hydropath}, but none meet scenariofilter."),
         "i" = "Are the scenariofilter values full scenario names?",
-        "i" = glue::glue("A common issue is that the toolkit will read these in as 'scenarioname_scenarioname' when they are files in folders with the same name. Try `scenariofilter = {stringr::str_c(scenariofilter, '_', scenariofilter)}`")
+        "i" = glue::glue("A common issue is that HydroBOT will read these in as 'scenarioname_scenarioname' when they are files in folders with the same name. Try `scenariofilter = {stringr::str_c(scenariofilter, '_', scenariofilter)}`")
       ))
     }
   }

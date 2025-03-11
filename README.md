@@ -71,7 +71,7 @@ or automation on HPC or azure systems with yaml parameter files and
 shell/R scripts.
 
 See the
-[WERP_toolkit_demo](https://mdbauth.github.io/WERP_toolkit_demo/) for a
+[HydroBOT_website](https://mdbauth.github.io/HydroBOT_website/) for a
 full demonstration and the [template
 repo](https://github.com/MDBAuth/toolkit_use) for a bare-bones project
 structure.
@@ -126,7 +126,7 @@ Using HydroBOT is typically a three-step process:
 ## Example
 
 See the
-[WERP_toolkit_demo](https://mdbauth.github.io/WERP_toolkit_demo/) for a
+[HydroBOT_website](https://mdbauth.github.io/HydroBOT_website/) for a
 full demonstration.
 
 ## Who do I talk to?

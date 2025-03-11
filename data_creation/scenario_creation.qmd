@@ -261,7 +261,7 @@ up4$value = up4$value * 4
 
 ### Smaller set
 
-I also want a very limited set of test data that runs faster through the EWR tool and the rest of the toolkit. It still needs to have \> 1 gauge in \> 1 catchment though. Let's do three gauges in two catchments, 5 years.
+I also want a very limited set of test data that runs faster through the EWR tool and the rest of HydroBOT. It still needs to have \> 1 gauge in \> 1 catchment though. Let's do three gauges in two catchments, 5 years.
 
 Which gauges?
 

@@ -1,4 +1,4 @@
-#' Run the toolkit through the aggregation step with a file of yaml parameters
+#' Run HydroBOT through the aggregation step with a file of yaml parameters
 #' or passing in yaml as characters.
 #'
 #' The plan is for this to make scripting easier, and be able to change single
@@ -18,12 +18,12 @@
 #' @param list_args list of arguments. Typically would come in from
 #'   parameterised quarto notebook, which pre-parses yaml into a list
 #'
-#' @return runs the toolkit, returns NULL invisibly, or the aggregated output if
+#' @return runs HydroBOT, returns NULL invisibly, or the aggregated output if
 #'   the params have `aggReturn: TRUE`
 #' @export
 #'
 
-run_toolkit_params <- function(yamlpath = NULL,
+run_hydrobot_params <- function(yamlpath = NULL,
                                passed_args = NULL,
                                list_args = NULL,
                                defaults = system.file("yml/default_params.yml", package = "HydroBOT")) {

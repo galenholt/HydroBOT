@@ -56,7 +56,7 @@ get_ewr_output <- function(dir, type = "achievement", year_roll = "best",
 
 #' Get the outputs from the EWR and clean them up
 #'
-#' *NOTE* this expects output from the EWRs to be processed through the toolkit
+#' *NOTE* this expects output from the EWRs to be processed through HydroBOT
 #' functions for cleaning and saving immediately after creation, which may
 #' change now that `py-ewr` has changed some things.
 #'

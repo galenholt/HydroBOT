@@ -6,7 +6,7 @@ temp_parent_dir <- "_test_data"
 
 test_that("parameter file works with params.R", {
   make_temp_hydro()
-  test <- run_toolkit_params(yamlpath = system.file("yml/package_params.yml",
+  test <- run_hydrobot_params(yamlpath = system.file("yml/package_params.yml",
     package = "HydroBOT"
   ))
 
@@ -16,7 +16,7 @@ test_that("parameter file works with params.R", {
 
 test_that("parameter file works with character aggregation", {
   make_temp_hydro()
-  test <- run_toolkit_params(yamlpath = system.file("yml/package_params_charseq.yml",
+  test <- run_hydrobot_params(yamlpath = system.file("yml/package_params_charseq.yml",
     package = "HydroBOT"
   ))
 
@@ -35,7 +35,7 @@ test_that("passing from command works", {
   make_temp_multifile()
 
   # The yaml here becomes a pain if it needs to pass more than one item.
-  test <- run_toolkit_params(
+  test <- run_hydrobot_params(
     yamlpath = system.file("yml/package_params.yml",
       package = "HydroBOT"
     ),
@@ -53,7 +53,7 @@ test_that("list args work", {
   make_temp_multifile()
 
   # The yaml here becomes a pain if it needs to pass more than one item.
-  test <- run_toolkit_params(
+  test <- run_hydrobot_params(
     yamlpath = system.file("yml/package_params.yml",
       package = "HydroBOT"
     ),
@@ -69,7 +69,7 @@ test_that("list args work", {
   class(qlist) <- "knit_param_list"
 
   # The yaml here becomes a pain if it needs to pass more than one item.
-  test2 <- run_toolkit_params(
+  test2 <- run_hydrobot_params(
     yamlpath = system.file("yml/package_params.yml",
       package = "HydroBOT"
     ),
@@ -83,12 +83,12 @@ test_that("list args work", {
 
 test_that("re-running from self-defined params works", {
   make_temp_hydro()
-  test <- run_toolkit_params(yamlpath = system.file("yml/package_params.yml",
+  test <- run_hydrobot_params(yamlpath = system.file("yml/package_params.yml",
     package = "HydroBOT"
   ))
 
   # now run that off the one it just created
-  test2 <- run_toolkit_params(yamlpath = file.path(
+  test2 <- run_hydrobot_params(yamlpath = file.path(
     temp_parent_dir,
     "aggregator_output",
     "agg_metadata.yml"
@@ -107,7 +107,7 @@ test_that("Single scenario among many, no access to the outer directory", {
   # Now, let's assume all we have is a path to the specific scenario
   scenario_path <- file.path(temp_hydro_dir, "base")
 
-  test <- run_toolkit_params(list_args = list(
+  test <- run_hydrobot_params(list_args = list(
     output_parent_dir = "_test_data/hydrographs/base",
     hydro_dir = "_test_data/hydrographs/base",
     aggregation_def = "yml/params.R"
@@ -141,7 +141,7 @@ test_that("Single scenario among many, no access to the outer directory, differe
 
   # The test here is whether we can send the `output_parent_dir` the same value as `hydro_dir` to put the output inside the hydro scenario
 
-  test <- run_toolkit_params(list_args = list(
+  test <- run_hydrobot_params(list_args = list(
     output_parent_dir = scenario_path,
     hydro_dir = scenario_path,
     aggregation_def = "yml/params.R"

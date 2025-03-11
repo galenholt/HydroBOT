@@ -27,7 +27,7 @@ get_any_ewr_output(dir, type, gaugefilter = NULL, scenariofilter = NULL)
 a tibble of EWR results if \code{type == "annual"} or \code{type == "summary"}. A named list of those tibbles if \code{type == "both"}
 }
 \description{
-\emph{NOTE} this expects output from the EWRs to be processed through the toolkit
+\emph{NOTE} this expects output from the EWRs to be processed through HydroBOT
 functions for cleaning and saving immediately after creation, which may
 change now that \code{py-ewr} has changed some things.
 }

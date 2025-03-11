@@ -123,7 +123,7 @@
 #' @format ## `planning_units` An `sf` object:
 #' \describe{
 #'   \item{LTWPShortName, PlanningUnitName, geometry}{The long-term watering plan area and planning unit name matching, to the extent possible, the EWR table. Geometry is polygons. Other columns for reference.}
-#'   \item{planning_unit_name}{same as PlanningUnitName, but matches toolkit naming instead of EWR naming, allowing easier joining to either}
+#'   \item{planning_unit_name}{same as PlanningUnitName, but matches HydroBOT naming instead of EWR naming, allowing easier joining to either}
 #' }
 #' @source
 #' MDBA Environmental Assets and Functions Database

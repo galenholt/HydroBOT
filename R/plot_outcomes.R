@@ -1,4 +1,4 @@
-#' Standardized plot functions for toolkit.
+#' Standardized plot functions for HydroBOT.
 #'
 #' Provides a common interface to plotting of an `outcome_col`, which may be
 #' plotted on y or fill/color or both. Handles consistent data preparation steps
@@ -293,7 +293,7 @@ plot_outcomes <- function(outdf,
         color = color_lab,
         fill = color_lab
       ) +
-      theme_werp_toolkit()
+      theme_hydrobot()
 
     if (!is.null(facet_row) & !is.null(facet_col)) {
       outcome_plot <- outcome_plot +
@@ -342,7 +342,7 @@ plot_outcomes <- function(outdf,
         y = NULL,
         x = NULL
       ) +
-      theme_werp_toolkit()
+      theme_hydrobot()
   }
 
   if (plot_type %in% c("heatmap", "contour")) {
@@ -385,7 +385,7 @@ plot_outcomes <- function(outdf,
         x = x_lab,
         fill = paste0(outcome_lab, prepped$ylab_append)
       ) +
-      theme_werp_toolkit()
+      theme_hydrobot()
 
     # Facetting would sure be better all at once if it worked for maps.
     if (!is.null(facet_row) & !is.null(facet_col)) {

@@ -86,7 +86,7 @@ Incorporation of other themes as they come online can follow a similar process, 
 
 ### Structure
 
-This is a demonstration notebook for what this code does. It is likely that when we're actually running the toolkit, we'll want to run all of this automatically. That may be less likely with the causal network than with the pieces in the direct flow from hydrology to comparison, but should be possible by either writing a wrapper function to do what's in here and calling that from whatever the previous step is or calling this notebook itself as a script, though that's clunkier.
+This is a demonstration notebook for what this code does. It is likely that when we're actually running HydroBOT, we'll want to run all of this automatically. That may be less likely with the causal network than with the pieces in the direct flow from hydrology to comparison, but should be possible by either writing a wrapper function to do what's in here and calling that from whatever the previous step is or calling this notebook itself as a script, though that's clunkier.
 
 ### Data information
 

@@ -3,7 +3,7 @@
 #' This reads in the EWR results given a path and `type` (summary or annual),
 #' and pairs them to their geographic information
 #'
-#' @param ewrpath path to the EWR results output by the EWR tool (with toolkit
+#' @param ewrpath path to the EWR results output by the EWR tool (with HydroBOT
 #'   modifications to format)
 #' @param type character, one of:
 #'  * 'summary',
@@ -15,7 +15,7 @@
 #' @param geopath path to the file with gauge locations in lat/long (assumes BOM
 #'   currently)
 #' @param whichcrs desired crs for the output
-#' @param ... passes `gaugefilter` and `scenariofilter` to [get_ewr_output()].
+#' @param ... passes `gaugefilter`, `scenariofilter`, and `add_max` to [get_ewr_output()].
 #'   Particularly useful for only processing some of the data at a time (e.g. in
 #'   parallel)
 #'

@@ -7,7 +7,7 @@
 prep_ewr_agg(ewrpath, type = "achievement", geopath, whichcrs = 4283, ...)
 }
 \arguments{
-\item{ewrpath}{path to the EWR results output by the EWR tool (with toolkit
+\item{ewrpath}{path to the EWR results output by the EWR tool (with HydroBOT
 modifications to format)}
 
 \item{type}{character, one of:
@@ -25,7 +25,7 @@ currently)}
 
 \item{whichcrs}{desired crs for the output}
 
-\item{...}{passes \code{gaugefilter} and \code{scenariofilter} to \code{\link[=get_ewr_output]{get_ewr_output()}}.
+\item{...}{passes \code{gaugefilter}, \code{scenariofilter}, and \code{add_max} to \code{\link[=get_ewr_output]{get_ewr_output()}}.
 Particularly useful for only processing some of the data at a time (e.g. in
 parallel)}
 }

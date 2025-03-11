@@ -153,7 +153,8 @@ level in from datpath (FALSE)}
 should this combine the output (default) or save each scenario's
 aggregation separately ('each')}
 
-\item{...}{passed to \code{\link[=prep_ewr_agg]{prep_ewr_agg()}}}
+\item{...}{passed to \code{\link[=prep_ewr_agg]{prep_ewr_agg()}} and \code{\link[=get_ewr_output]{get_ewr_output()}}, primarily
+\code{gaugefilter}, \code{scenariofilter}, and \code{add_max}.}
 }
 \value{
 either a tibble or sf of aggregated values at the final level (if

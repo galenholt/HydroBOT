@@ -105,14 +105,14 @@ temporal_aggregate <- function(dat,
           "!" = "EWR outputs detected without `group_until`!",
           "i" = "EWR outputs should be grouped by `SWSDLName`, `planning_unit_name`, and `gauge` until aggregated to larger spatial areas.",
           "i" = "Best to explicitly use `group_until` in `multi_aggregate()` or `read_and_agg()`.",
-          "i" = "Lower-level processing should include as `grouper` in `temporal_aggregate()`"
+          "i" = "Lower-level processing should include as `grouper` in `temporal_aggregate()`\n"
         ))
       } else {
         rlang::inform(c("i" = "EWR outputs auto-grouped",
                         "*" = "Done automatically because `auto_ewr_PU = TRUE`",
           "*" = "EWRs should be grouped by `SWSDLName`, `planning_unit_name`, and `gauge` until aggregated to larger spatial areas.",
           "*" = "Rows will collapse otherwise, silently aggregating over the wrong dimension",
-          "*" = "Best to explicitly use `group_until` in `multi_aggregate()` or `read_and_agg()`."
+          "*" = "Best to explicitly use `group_until` in `multi_aggregate()` or `read_and_agg()`.\n"
         ))
         # add gauge, planning unit, and SWSDL if available to prevent premature collapse.
         groupers <- unique(c(groupers, c("gauge", "planning_unit_name", "SWSDLName")))

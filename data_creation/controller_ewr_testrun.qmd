@@ -48,7 +48,7 @@ Use the `testsmall/` directory for development. 6 gauges in 2 catchments.
 
 ```{r}
 # 'testsmall' is 5 years and two gauges, fast for testing the ewr tool
-# 'testscenarios' is 10 years and 40+ gauges, slower but better for testing whole toolkit, especially aggregation
+# 'testscenarios' is 10 years and 40+ gauges, slower but better for testing all of HydroBOT, especially aggregation
 # hydro_dir = os.path.join(repo, 'demo_data', 'testsmall')
 
 hydro_dir = file.path("inst/extdata/testsmall/hydrographs")

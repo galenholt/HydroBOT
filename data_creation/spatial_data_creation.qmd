@@ -347,7 +347,7 @@ duplicate_plan2 <- planning_units |>
 duplicate_plan2
 ```
 
-Let's make the columns that do match have the same name. We also want a planning_unit_name column to match the cleaned names the toolkit uses. That's a bit silly, but it will be good to be able to join to ewrs or toolkit outputs.
+Let's make the columns that do match have the same name. We also want a planning_unit_name column to match the cleaned names HydroBOT uses. That's a bit silly, but it will be good to be able to join to ewrs or HydroBOT outputs.
 
 ```{r}
 planning_units <- planning_units |> 
@@ -474,7 +474,7 @@ ggplot(cewo_valleys) +
 
 ## River lines (geofabric)
 
-The toolkit does not (at present) use river lines for processing, but they are very useful for visualisation.
+HydroBOT does not (at present) use river lines for processing, but they are very useful for visualisation.
 
 ```{r}
 data_load('downloaded/SH_Network_GDB', 

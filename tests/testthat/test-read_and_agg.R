@@ -26,7 +26,7 @@ ewr_out <- prep_run_save_ewrs(
 
 ewr_results <- file.path(temp_parent_dir, "module_output", "EWR")
 
-# Saving tends to get tested in run_toolkit_params, which is kind of silly, but doing it both places seems silly too
+# Saving tends to get tested in run_hydrobot_params, which is kind of silly, but doing it both places seems silly too
 
 test_that("multi-step theme and spatial works", {
 

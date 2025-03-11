@@ -102,7 +102,7 @@ a list of dataframe(s) if \code{returnType} is not 'none', otherwise, NULL
 \description{
 This does some directory setup and parsing, runs the EWR tool and, if asked,
 saves the output. If the output saves, it also auto-saves both yaml and json
-metadata files with all parameters needed to run this part of the toolkit
+metadata files with all parameters needed to run this part of HydroBOT
 with parameters. Scenario metadata is prepended, if found.
 }
 \details{

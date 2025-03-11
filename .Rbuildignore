@@ -25,3 +25,6 @@ developer.md
 python_test_script.py
 ^CITATION\.cff$
 ^codecov\.yml$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

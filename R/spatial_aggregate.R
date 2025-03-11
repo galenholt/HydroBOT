@@ -75,14 +75,14 @@ spatial_aggregate <- function(dat,
         "i" = "Gauges inform multiple SDLs and PUs; this will be lost.",
         "i" = "EWR outputs should be joined to `sdl_units` (or `planning_units`) pseudo-spatially (by column names), not with a spatial join",
         "i" = "Best to explicitly use `pseudo_spatial = 'sdl_units'` in `multi_aggregate()` or `read_and_agg()`.",
-        "i" = "Lower-level processing should include as `joinby = 'nonspatial'` in `spatial_aggregate()`"
+        "i" = "Lower-level processing should include as `joinby = 'nonspatial'` in `spatial_aggregate()`\n"
       ))
     } else {
       rlang::inform(c("i" = "EWR gauges joined to larger units pseudo-spatially.",
                       "*" = "Done automatically because `auto_ewr_PU = TRUE`",
                       "*" = "Non-spatial join needed because gauges may inform areas they are not within",
         # "*" = "EWR outputs should be joined to `sdl_units` (or `planning_units`) pseudo-spatially (by column names), not with a spatial join",
-        "*" = "Best to explicitly use `pseudo_spatial = 'sdl_units'` in `multi_aggregate()` or `read_and_agg()`."
+        "*" = "Best to explicitly use `pseudo_spatial = 'sdl_units'` in `multi_aggregate()` or `read_and_agg()`.\n"
       ))
       joinby <- "nonspatial"
     }

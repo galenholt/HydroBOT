@@ -143,14 +143,14 @@ theme_aggregate <- function(dat,
           "!" = "EWR outputs detected without `group_until`!",
           "i" = "EWR outputs should be grouped by `SWSDLName`, `planning_unit_name` and `gauge` until aggregated to larger spatial areas.",
           "i" = "Best to explicitly use `group_until` in `multi_aggregate()` or `read_and_agg()`.",
-          "i" = "Lower-level processing should include as `grouper` in `theme_aggregate()`"
+          "i" = "Lower-level processing should include as `grouper` in `theme_aggregate()`\n"
         ))
       } else {
         rlang::inform(c("i" = "EWR outputs auto-grouped",
                         "*" = "Done automatically because `auto_ewr_PU = TRUE`",
           "*" = "EWRs should be grouped by `SWSDLName`, `planning_unit_name`, and `gauge` until aggregated to larger spatial areas.",
           "*" = "Rows will collapse otherwise, silently aggregating over the wrong dimension",
-          "*" = "Best to explicitly use `group_until` in `multi_aggregate()` or `read_and_agg()`."
+          "*" = "Best to explicitly use `group_until` in `multi_aggregate()` or `read_and_agg()`\n."
         ))
         # add gauge and plannng unit name if available.
         groupers <- unique(c(groupers, intersect(c("gauge", "planning_unit_name", "SWSDLName"), names(causal_edges))))
@@ -196,7 +196,7 @@ theme_aggregate <- function(dat,
 
     rlang::inform(c(
       "!" = "Unmatched links in causal network",
-      "*" = glue::glue("{nrow(nacount)} from {from_theme} to {to_theme}") #,
+      "*" = glue::glue("{nrow(nacount)} from {from_theme} to {to_theme}\n") #,
       # groupinform # This was way too noisy.
     ))
 

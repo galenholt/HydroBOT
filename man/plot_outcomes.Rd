@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_outcomes.R
 \name{plot_outcomes}
 \alias{plot_outcomes}
-\title{Standardized plot functions for toolkit.}
+\title{Standardized plot functions for HydroBOT.}
 \usage{
 plot_outcomes(
   outdf,
