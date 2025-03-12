@@ -17,6 +17,7 @@ gauge2geo <- function(gaugedf, gaugelocs, whichcrs = 4283) {
   if(!inherits(gaugelocs, 'sf')) {
     if (grepl('*.csv', gaugelocs)) {filetype <- 'csv'}
     if (grepl('*.shp', gaugelocs)) {filetype <- 'shp'}
+    if (!grepl('\\.', gaugelocs)) {filetype <- 'object'}
 
     if (filetype == 'csv') {
       gaugelocs <- readr::read_csv(gaugelocs) |>
@@ -30,6 +31,10 @@ gauge2geo <- function(gaugedf, gaugelocs, whichcrs = 4283) {
 
     if (filetype == 'shp') {
       gaugelocs <- sf::read_sf(gaugelocs)
+    }
+
+    if (filetype == 'object') {
+      gaugelocs <- get(gaugelocs)
     }
 
   }

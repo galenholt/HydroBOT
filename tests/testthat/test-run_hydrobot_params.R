@@ -39,7 +39,7 @@ test_that("passing from command works", {
     yamlpath = system.file("yml/package_params.yml",
       package = "HydroBOT"
     ),
-    passed_args = "output_parent_dir: '_test_data'"
+    passed_args = "ewr:\n output_parent_dir: '_test_data'\naggregation:\n namehistory: TRUE"
   )
 
   # kind of silly- the main thing is that the above doesn't fail
@@ -108,9 +108,13 @@ test_that("Single scenario among many, no access to the outer directory", {
   scenario_path <- file.path(temp_hydro_dir, "base")
 
   test <- run_hydrobot_params(list_args = list(
+    ewr = list(
     output_parent_dir = "_test_data/hydrographs/base",
-    hydro_dir = "_test_data/hydrographs/base",
+    hydro_dir = "_test_data/hydrographs/base"
+    ),
+    aggregation = list(
     aggregation_def = "yml/params.R"
+    )
   ))
 
   # kind of silly- the main thing is that the above doesn't fail
@@ -142,9 +146,13 @@ test_that("Single scenario among many, no access to the outer directory, differe
   # The test here is whether we can send the `output_parent_dir` the same value as `hydro_dir` to put the output inside the hydro scenario
 
   test <- run_hydrobot_params(list_args = list(
-    output_parent_dir = scenario_path,
-    hydro_dir = scenario_path,
+    ewr = list(
+      output_parent_dir = scenario_path,
+    hydro_dir = scenario_path
+    ),
+    aggregation = list(
     aggregation_def = "yml/params.R"
+    )
   ))
 
   # kind of silly- the main thing is that the above doesn't fail

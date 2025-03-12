@@ -18,8 +18,7 @@
 #'   untested.
 #' @param geopath path to the file with gauge locations in lat/long (assumes BOM
 #'   currently), or an `sf` with gauge locations
-#' @param causalpath path to the causal relationships .rds file. Should
-#'   typically be created in `Causal networks`
+#' @param causalpath path to the causal relationships .rds file or the causal network list object or its name
 #' @param returnList default `TRUE`, whether to return the output to the current
 #'   session
 #' @param savepath default `NULL`, a path to save the output to. Note that this
@@ -67,6 +66,14 @@ read_and_agg <- function(datpath,
                          ...) {
   if (!returnList && is.null(savepath)) {
     rlang::abort(message = "not returning output to disk or session. aborting to not use the resources.")
+  }
+
+  # allow passing the causal network by name or path
+  if (is.character(causalpath) && !grepl('\\.', causalpath)) {
+      causalpath <- get(causalpath)
+    }
+  if (is.character(causalpath) && grepl('*.rds', causalpath)) {
+    causalpath <- readRDS(causalpath)
   }
 
   # set up metadata placeholders to know if the run failed
@@ -216,21 +223,21 @@ read_and_agg <- function(datpath,
     names(char_funsequence) <- names(char_aggsequence)
 
     agg_params <- list(
-      agg_input_path = datpath,
-      aggType = type,
-      agg_groups = groupers,
-      agg_group_until = group_until,
-      agg_pseudo_spatial = pseudo_spatial,
-      agg_var = aggCols,
-      aggregation_sequence = char_aggsequence,
-      aggregation_funsequence = char_funsequence,
+      datpath = datpath,
+      type = type,
+      groupers = groupers,
+      group_until = group_until,
+      pseudo_spatial = pseudo_spatial,
+      aggCols = aggCols,
+      aggsequence = char_aggsequence,
+      funsequence = char_funsequence,
       namehistory = namehistory,
       keepAllPolys = keepAllPolys,
       auto_ewr_PU = auto_ewr_PU,
-      aggReturn = returnList,
-      agg_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
-      agg_status = TRUE,
-      agg_HydroBOT_version = as.character(utils::packageVersion("HydroBOT"))
+      returnList = returnList,
+      finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
+      status = TRUE,
+      HydroBOT_version = as.character(utils::packageVersion("HydroBOT"))
     )
 
     # add any passed metadata info
@@ -247,7 +254,7 @@ read_and_agg <- function(datpath,
       ymlmods <- NULL
     }
 
-    yaml::write_yaml(c(ymlmods, agg_params),
+    yaml::write_yaml(utils::modifyList(ymlmods, list(aggregation = agg_params)),
       file = file.path(savepath, "agg_metadata.yml")
     )
 
@@ -259,7 +266,7 @@ read_and_agg <- function(datpath,
       } else {
         jsonmods <- NULL
       }
-      jsonlite::write_json(c(jsonmods, agg_params),
+      jsonlite::write_json(list(jsonmods$ewr, aggregation = agg_params),
         path = file.path(savepath, "agg_metadata.json")
       )
     } else {

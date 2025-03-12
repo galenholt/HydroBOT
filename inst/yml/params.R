@@ -1,6 +1,4 @@
-# parameters that involve R objects/syntax, and so cannot be set in a yaml/json params file (yet)
-
-# The goal is to slowly work on making these able to be referenced in params.yml or json
+# parameters that involve R objects/syntax can be set in R scripts, though that is less ideal
 
 # Aggregation sequence
 aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),

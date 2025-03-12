@@ -250,14 +250,14 @@ prep_run_save_ewrs <- function(hydro_dir,
     ewr_params <- list(
       output_parent_dir = output_parent_dir,
       hydro_dir = hydro_dir,
-      ewr_results = output_path,
+      output_path = output_path,
       model_format = model_format,
       outputType = outputType,
       returnType = returnType,
-      ewr_finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
-      ewr_status = TRUE,
+      finish_time = format(Sys.time(), digits = 0, usetz = TRUE),
+      status = TRUE,
       ewr_version = get_ewr_version(),
-      HydroBOT_version_at_EWR = as.character(utils::packageVersion('HydroBOT'))
+      HydroBOT_version = as.character(utils::packageVersion('HydroBOT'))
     )
 
     # add any passed metadata info
@@ -274,7 +274,7 @@ prep_run_save_ewrs <- function(hydro_dir,
       ymlscenes <- NULL
     }
 
-    yaml::write_yaml(c(ymlscenes, ewr_params),
+    yaml::write_yaml(list(scenarios = ymlscenes, ewr = ewr_params),
                      file = file.path(output_path, "ewr_metadata.yml")
     )
 

@@ -1,53 +1,56 @@
 # Those things defined as paths can be input as NULL to build a default project structure
 
-# Outer directory for project
-output_parent_dir: 'toolkit_project'
+# parameters for prep_run_save_ewr
+ewr:
+  # Hydrographs (expected to exist already)
+  hydro_dir: NULL
 
-# aggregation sequences defined in R- either NULL to define here or a path to a .R file
-aggregation_def: NULL
+  # Outer directory for project
+  output_parent_dir: 'HydroBOT_project'
 
-# These allow defining funs internally as lists. if aggregation_def is NULL, these need to have values and vice versa
-aggregation_sequence: NULL
+  # Model type
+  model_format: 'Standard time-series'
 
-aggregation_funsequence: NULL
+  # output and return - this is all currently supported
+  outputType:
+    - summary
+    - yearly
+    - all_events
+    - all_successful_events
+    - all_successful_interEvents
 
-# Preexisting data
-# Hydrographs (expected to exist already)
-hydro_dir: NULL
+  returnType: none
 
-# Generated data
-# Often the path the EWRs were saved to, but needs to be variable with more modules (will be created here in controller, read from here in aggregator)
-agg_input_path: NULL
+# parameters for read_and_agg
+aggregation:
 
-# outputs of aggregator. There may be multiple modules
-# NULL doesn't save it, but holds in memory.
-agg_results: NULL
+  # aggregation sequences defined in R- either NULL to define here or a path to a .R file
+  aggregation_def: NULL
 
-# Model type
-model_format: 'Standard time-series'
+  # Often the path the EWRs were saved to, but needs to be variable with more modules (will be created here in controller, read from here in aggregator)
+  datpath: NULL
 
-# Climate (deprecated as of py-ewr 2.1)
-climate: 'Standard - 1911 to 2018 climate categorisation'
+  # What to aggregate
+  type: achievement
 
-# output and return - this is all currently supported
-outputType:
-  - summary
-  - yearly
-  - all_events
-  - all_successful_events
-  - all_successful_interEvents
+  # needed gauge locations and causal networks
+  geopath: bom_basin_gauges
+  causalpath: causal_ewr
 
-returnType: none
+  groupers: scenario
+  aggCols: ewr_achieved
 
-# What to aggregate
-aggType: achievement
+  # These allow defining funs internally as lists. if aggregation_def is NULL, these need to have values and vice versa
+  aggsequence: NULL
+  funsequence: NULL
+  saveintermediate: TRUE
+  namehistory: FALSE
+  keepAllPolys: FALSE
+  auto_ewr_PU: TRUE
+  returnList: FALSE
 
-# Aggregation settings
-agg_groups: scenario
-agg_var: ewr_achieved
-aggReturn: FALSE
-namehistory: FALSE
-keepAllPolys: FALSE
-auto_ewr_PU: TRUE
 
-# we could expose more defaults in `prep_run_save_ewrs` to `param_runner`, but that's so open-ended let's wait.
+  # outputs of aggregator. There may be multiple modules
+  # NULL doesn't save it, but holds in memory.
+  savepath: NULL
+
