@@ -1,14 +1,14 @@
 [tool.poetry]
-name = "werp-toolkit"
+name = "hydrobot"
 version = "0.1.0"
 description = ""
 authors = ["Galen Holt <53928785+galenholt@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "HydroBOT"}]
+package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.9"
 py-ewr = "^2.3.7"
 
 [build-system]
