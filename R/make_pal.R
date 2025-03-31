@@ -71,10 +71,10 @@ make_pal <- function(levels, palette,
     # make the user do it right
     paltest <- grepl(palette, c(cnames, dnames), ignore.case = TRUE)
     if (any(paltest)) {
-      rlang::abort(glue::glue("Requested palette not present, likely because wrong case or missing letters.
+      rlang::abort(glue::glue("Requested palette {palette} not present, likely because wrong case or missing letters.
                    Try `{c(cnames, dnames)[which(paltest)]}`"))
     } else {
-      rlang::abort("Requested palette not available in paletteer")
+      rlang::abort(glue::glue("Requested palette {palette} not available in paletteer"))
     }
   }
 

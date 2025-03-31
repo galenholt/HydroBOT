@@ -167,10 +167,10 @@ grouped_colors <- function(df, pal_list,
       # make the user do it right
       paltest <- grepl(thispal, c(cnames, dnames), ignore.case = TRUE)
       if (any(paltest)) {
-        rlang::abort(glue::glue("Requested palette not present, likely because wrong case or missing letters.
+        rlang::abort(glue::glue("Requested palette {palette} not present, likely because wrong case or missing letters.
                    Try `{c(cnames, dnames)[which(paltest)]}`"))
       } else {
-        rlang::abort("Requested palette not available in paletteer")
+        rlang::abort(glue::glue("Requested palette {palette} not available in paletteer"))
       }
     }
   }
@@ -180,9 +180,9 @@ grouped_colors <- function(df, pal_list,
   dfcols <- dplyr::bind_cols(dfcols, color = as.character(colmap)) |>
     dplyr::select(-c("palname", "pallength", "palindex"))
 
-  # join back to the main data by the color column. Don't use a by, because the
-  # group is set wth {{}}
-  suppressMessages(df <- dplyr::left_join(df, dfcols))
+  # join back to the main data by the color column.
+  commonnames <- names(df)[names(df) %in% names(dfcols)]
+  df <- dplyr::left_join(df, dfcols, by = commonnames)
 
   return(df)
 }
