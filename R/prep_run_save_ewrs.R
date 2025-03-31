@@ -46,8 +46,8 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #' @param model_format see EWR tool. One of:
 #'  * 'Standard time-series': (default, among other things accepts a csv with a Date column followed by gauge columns, with _flow or _level appended to the gauge number)
 #'  * 'IQQM - netcdf': in development, finds all netcdf files in `hydro_dir`. Should also work when `hydro_dir` is a .zip with netcdfs inside
-#'  * 'IQQM - NSW 10,000 years': old default, works nearly the same as standard time-series, but no longer supported in EWR tool.
-#'  * 'Bigmod - MDBA'
+#'  * 'ten thousand year': old default (IQQM - NSW 10,000 years), works nearly the same as standard time-series
+#'  * 'All Bigmod': previously 'Bigmod - MDBA'
 #'  * 'Source - NSW (res.csv)'
 #' @param outputType list of strings or character vector defining what to save
 #'   to disk. One or more of:
@@ -125,6 +125,8 @@ prep_run_save_ewrs <- function(hydro_dir,
   # R
   if (is.null(scenarios)) {
     if (model_format %in% c("IQQM - NSW 10,000 years",
+                            "All Bigmod",
+                            "ten thousand year",
                             "Standard time-series",
                             "Bigmod - MDBA")) {
       filetype <- "csv"

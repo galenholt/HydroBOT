@@ -205,6 +205,11 @@ theme_aggregate <- function(dat,
       dplyr::filter(!is.na(.data[[to_theme]]))
   }
 
+  # Clean up groupers and aggCols from various formats and ensure only present
+  # columns are included.
+  groupers <- selectcreator(rlang::enquo(groupers), pairdat, failmissing)
+  aggCols <- selectcreator(rlang::enquo(aggCols), pairdat, failmissing)
+
   # The core aggregation function. the !! needs to happen here
   # because aggCols needs to be evaluated to a character vector, not passed in
   # as an object name. Annoying.

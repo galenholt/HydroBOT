@@ -48,7 +48,8 @@
 #'   lines/points for each environmental objective.
 #' @param pal_list list of palettes for defining colors for `colorset`. Should
 #'   be length of `colorgroups`
-#' @param pal_direction vector of length pal_list, either 1 (default) or -1 (reversed) direction of the palettes
+#' @param pal_direction vector of length pal_list, either 1 (default) or -1
+#'   (reversed) direction of the palettes
 #' @param sceneorder Default NULL, otherwise, character or factor giving the
 #'   order to present scenario levels
 #' @param scales facet scales, as in [ggplot2::facet_wrap()]. Default `scales =
@@ -58,8 +59,9 @@
 #'   [ggplot2::scale_y_continuous()] or [ggplot2::scale_fill_continuous()].
 #'   Default `transoutcome = 'identity'` just uses the data. Most common change
 #'   likely `transoutcome = 'log10`
-#' @param transy transformation of y-axis, *if the outcome is not y*. Default
-#'   `'identity'`. Ignored if outcome_col is on the y-axis
+#' @param transy transformation of y-axis, *if the outcome is not y*, when
+#'   `transoutcome` should be used. Default `'identity'`. Ignored if outcome_col
+#'   is on the y-axis, because `transoutcome` should be used.
 #' @param transx transformation for x axis as in
 #'   [ggplot2::scale_x_continuous()]. Default `transx = 'identity'` just uses
 #'   the data. Most common change likely `transx = 'log10`.
@@ -68,20 +70,21 @@
 #'   to change from stacked to dodged bars or jitter points. Can be character,
 #'   e.g. 'jitter' or a function, e.g. `ggplot2::position_jitter(width = 0.1,
 #'   height = 0)`
-#' @param map_outlinecolor color specification for the outline of filled areas on maps. Default 'grey35' seems to be the sf default. NA removes the outline.
+#' @param map_outlinecolor color specification for the outline of filled areas
+#'   on maps. Default 'grey35' seems to be the sf default. NA removes the
+#'   outline.
 #' @param base_list NULL (default) or named list of arguments to
 #'   [baseline_compare()];
 #'  * base_lev
 #'  * comp_fun
 #'  * group_cols
-#'   [plot_data_prep()] handles `zero_adjust`, and other arguments are inferred or
-#'   not supported
-#'   If `comp_fun` is 'difference' or 'relative', midpoint auto-set at 0 or 1
-#'   respectively unless otherwise specified with `setLimits`
+#'   [plot_data_prep()] handles `zero_adjust`, and other arguments are inferred
+#'   or not supported If `comp_fun` is 'difference' or 'relative', midpoint
+#'   auto-set at 0 or 1 respectively unless otherwise specified with `setLimits`
 #' @param smooth_arglist NULL (default) or limited list of arguments to
 #'   [ggplot2::geom_smooth()]. If NULL and x is quantitative, defaults to
-#'   straight lines. If just `list()`, it uses the defaults in [ggplot2::geom_smooth()].
-#'   Available arguments:
+#'   straight lines. If just `list()`, it uses the defaults in
+#'   [ggplot2::geom_smooth()]. Available arguments:
 #' * method
 #' * method.args
 #' * se

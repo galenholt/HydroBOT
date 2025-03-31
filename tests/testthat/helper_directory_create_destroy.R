@@ -3,8 +3,6 @@
 
 # single csvs, each with several gauges -----------------------------------
 
-
-
 make_temp_hydro <- function(testdir = '_test_data',
                             temp_hydro_dir = 'hydrographs',
                             orig_hydro_dir = system.file("extdata/testsmall/hydrographs", package = 'HydroBOT')) {

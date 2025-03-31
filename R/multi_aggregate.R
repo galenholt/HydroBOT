@@ -39,7 +39,7 @@
 #'   the names of the spatial levels to match the object, e.g. basin: basin.
 #' @param funsequence a list of aggregation functions to apply in the order to
 #'   apply them. Each list entry can be one value, e.g. a character or bare
-#'   name, or can be multiple if mulitiple aggregations should be done at that
+#'   name, or can be multiple if multiple aggregations should be done at that
 #'   step, e.g. `c('ArithmeticMean', 'LimitingFactor')`. The entries can also be
 #'   lists themselves, useful for passing functions with arguments, e.g `list(wm
 #'   = ~weighted.mean(., w = area, na.rm = TRUE))`. *Important:* as of `dplyr`

@@ -99,7 +99,6 @@ spatial_aggregate <- function(dat,
     #                                 by = joinby)
   }
 
-
   # Clean up groupers and aggCols from various formats and ensure only present
   # columns are included.
   groupers <- selectcreator(rlang::enquo(groupers), fromto_pair, failmissing)
