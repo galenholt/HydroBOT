@@ -30,11 +30,6 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
   # this assumes the history is in columns and not names. Relatively easy to
   # throw the parser on it if not though.
 
-  # Will likely need more work to handle list item names once spatial is involved.
-
-  # Filter to just the targets
-  agglist <- agglist[names(agglist) %in% targetlevels]
-
   # Could almost certainly be a purrr::map()
   # make CHECK happy
   i <- NULL
@@ -44,9 +39,6 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
                             # get the name of the nodelevel- the list is named
                             # by which group is aggregated into
                             thesenodes <- targetlevels[i]
-                            # The -1 is because agglist[1] is the raw data and so not
-                            # aggregated
-                            aggindex <- which(names(agglist) == thesenodes)-1
 
                             if (length(thesenodes) > 1) {
                               rlang::abort(glue::glue("Expect each node level to have one value,
@@ -56,21 +48,20 @@ extract_vals_causal <- function(agglist, whichaggs, valcol, targetlevels = names
                             # Filter to the right sort of aggregation
                             simpledf <- agglist[[thesenodes]]
 
-                            if (aggindex > 1) {
+                            # How many aggregations have happened at this point?
+                            numaggs <- max(grep('[1-9]', names(simpledf)[grepl('aggfun', names(simpledf))]))
+
                               # This bit needs to do ALL the n-1 aggs. Not a fan
                               # of the loop, but getting fancy with purr or
                               # pivots was losing history- ie it would get all
                               # ArithmeticMeans in stage 3 no matter what the
                               # previous stages were.
 
-                              for (j in 1:(aggindex)) {
+                              for (j in 1:(numaggs)) {
                                 aggcol <- paste0("aggfun_", as.character(j))
-                                colind <- which(names(simpledf) == aggcol)
                                 simpledf <- simpledf |>
                                   dplyr::filter(.data[[aggcol]] == whichaggs[[j]])
                               }
-
-                            }
 
                             # Get just the relevant columns- scenario, gauge, the aggregation units, and the values
                             # Don't assume scenario and gauge exist though
