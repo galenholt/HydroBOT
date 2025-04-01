@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_and_agg.R
 \name{read_and_agg}
 \alias{read_and_agg}
-\title{Read in data and aggregate along theme and spatial dimensiont}
+\title{Read in data and aggregate along theme and spatial dimension}
 \usage{
 read_and_agg(
   datpath,
@@ -26,23 +26,33 @@ read_and_agg(
   rparallel = FALSE,
   par_recursive = TRUE,
   savepar = "combine",
+  add_max = TRUE,
   ...
 )
 }
 \arguments{
-\item{datpath}{path to indicator data. Currently needs to be EWR (same as
-\code{ewrpath} argument in \code{\link[=prep_ewr_agg]{prep_ewr_agg()}}), but left more general here for
-future}
+\item{datpath}{path to indicator data, or indicator data itself as a data
+frame. Currently needs to be EWR (same as \code{ewrpath} argument in
+\code{\link[=read_and_geo]{read_and_geo()}}), but left more general here for future}
 
-\item{type}{character of which type of EWR output (currently \code{'summary'},
-\code{'annual'}, or \code{'both'}). New values, e.g. \verb{'all}' probably work but
-untested.}
+\item{type}{character, a grep for the files to choose. Two special cases:
+\itemize{
+\item 'achievement', calculates EWR achievement from 'yearly',
+\item 'everything', gets all files
+For the EWR tool, the direct options are
+\item 'summary',
+\item 'yearly',
+\item 'all_events',
+\item 'all_successful_events',
+\item 'all_interEvents',
+\item 'all_successful_interEvents'
+}}
 
-\item{geopath}{path to the file with gauge locations in lat/long (assumes BOM
-currently), or an \code{sf} with gauge locations}
+\item{geopath}{sf object with geographic locations matching a column in the data, or path to a csv with gauge locations in lat/long (assumes BOM
+currently) or a shapefile}
 
-\item{causalpath}{path to the causal relationships .rds file. Should
-typically be created in \verb{Causal networks}}
+\item{causalpath}{path to the causal relationships .rds file or the causal
+network list object or its name}
 
 \item{groupers}{as in \code{\link[=general_aggregate]{general_aggregate()}}, with the note that these should
 be all grouping columns \emph{except} theme and spatial groupings. These are
@@ -74,7 +84,7 @@ the names of the spatial levels to match the object, e.g. basin: basin.}
 
 \item{funsequence}{a list of aggregation functions to apply in the order to
 apply them. Each list entry can be one value, e.g. a character or bare
-name, or can be multiple if mulitiple aggregations should be done at that
+name, or can be multiple if multiple aggregations should be done at that
 step, e.g. \code{c('ArithmeticMean', 'LimitingFactor')}. The entries can also be
 lists themselves, useful for passing functions with arguments, e.g \code{list(wm = ~weighted.mean(., w = area, na.rm = TRUE))}. \emph{Important:} as of \code{dplyr}
 1.1, if these are anonymous functions that refer to data variables (like
@@ -153,8 +163,11 @@ level in from datpath (FALSE)}
 should this combine the output (default) or save each scenario's
 aggregation separately ('each')}
 
-\item{...}{passed to \code{\link[=prep_ewr_agg]{prep_ewr_agg()}} and \code{\link[=get_ewr_output]{get_ewr_output()}}, primarily
-\code{gaugefilter}, \code{scenariofilter}, and \code{add_max}.}
+\item{add_max, }{as in \code{\link[=read_and_geo]{read_and_geo()}} and \code{\link[=prep_ewr_output]{prep_ewr_output()}}, default TRUE.
+Add a 'MAX' scenario that passes all EWRs, usable as a reference}
+
+\item{...}{passed to \code{\link[=read_and_geo]{read_and_geo()}} and \code{\link[=prep_ewr_output]{prep_ewr_output()}}, primarily
+\code{gaugefilter}, \code{scenariofilter}.}
 }
 \value{
 either a tibble or sf of aggregated values at the final level (if
@@ -162,10 +175,9 @@ either a tibble or sf of aggregated values at the final level (if
 values at each step (\code{saveintermediate = TRUE})
 }
 \description{
-Allows passing only paths to data rather than objects. Wrapper over
-\code{\link[=prep_ewr_agg]{prep_ewr_agg()}} (though can be made more general once we have other
-modules), \code{\link[=make_edges]{make_edges()}} and \code{\link[=multi_aggregate]{multi_aggregate()}}. Particularly useful if we
-want to pass parameters as strings from a config before anything is read in,
-and parallelisation (set a \code{\link[future:plan]{future::plan()}}). If parallel, be careful, it
-will return a MAX scenario for each scenario.
+Allows passing only paths to data rather than objects (though objects work as
+well for consistency). Wrapper over \code{\link[=read_and_geo]{read_and_geo()}}, \code{\link[=make_edges]{make_edges()}} and
+\code{\link[=multi_aggregate]{multi_aggregate()}}. Particularly useful if we want to pass parameters as
+strings from a config before anything is read in, and parallelisation (set a
+\code{\link[future:plan]{future::plan()}}).
 }

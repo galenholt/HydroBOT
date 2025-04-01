@@ -47,8 +47,8 @@ but two typical cases:
 \itemize{
 \item 'Standard time-series': (default, among other things accepts a csv with a Date column followed by gauge columns, with _flow or _level appended to the gauge number)
 \item 'IQQM - netcdf': in development, finds all netcdf files in \code{hydro_dir}. Should also work when \code{hydro_dir} is a .zip with netcdfs inside
-\item 'IQQM - NSW 10,000 years': old default, works nearly the same as standard time-series, but no longer supported in EWR tool.
-\item 'Bigmod - MDBA'
+\item 'ten thousand year': old default (IQQM - NSW 10,000 years), works nearly the same as standard time-series
+\item 'All Bigmod': previously 'Bigmod - MDBA'
 \item 'Source - NSW (res.csv)'
 }}
 

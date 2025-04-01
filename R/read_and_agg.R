@@ -1,24 +1,20 @@
-#' Read in data and aggregate along theme and spatial dimensiont
+#' Read in data and aggregate along theme and spatial dimension
 #'
 #' Allows passing only paths to data rather than objects (though objects work as
-#' well for consistency). Wrapper over [prep_ewr_agg()] (though can be made more
-#' general once we have other modules), [make_edges()] and [multi_aggregate()].
-#' Particularly useful if we want to pass parameters as strings from a config
-#' before anything is read in, and parallelisation (set a [future::plan()]). If
-#' parallel, be careful, it will return a MAX scenario for each scenario.
+#' well for consistency). Wrapper over [read_and_geo()], [make_edges()] and
+#' [multi_aggregate()]. Particularly useful if we want to pass parameters as
+#' strings from a config before anything is read in, and parallelisation (set a
+#' [future::plan()]).
 #'
 #' @inheritParams multi_aggregate
+#' @inheritParams read_and_geo
 #' @inherit multi_aggregate params return
 #'
 #' @param datpath path to indicator data, or indicator data itself as a data
 #'   frame. Currently needs to be EWR (same as `ewrpath` argument in
-#'   [prep_ewr_agg()]), but left more general here for future
-#' @param type character of which type of EWR output (currently `'summary'`,
-#'   `'annual'`, or `'both'`). New values, e.g. `'all`' probably work but
-#'   untested.
-#' @param geopath path to the file with gauge locations in lat/long (assumes BOM
-#'   currently), or an `sf` with gauge locations
-#' @param causalpath path to the causal relationships .rds file or the causal network list object or its name
+#'   [read_and_geo()]), but left more general here for future
+#' @param causalpath path to the causal relationships .rds file or the causal
+#'   network list object or its name
 #' @param returnList default `TRUE`, whether to return the output to the current
 #'   session
 #' @param savepath default `NULL`, a path to save the output to. Note that this
@@ -37,8 +33,9 @@
 #' @param savepar 'combine' (default) or 'each'. If parallel over scenarios,
 #'   should this combine the output (default) or save each scenario's
 #'   aggregation separately ('each')
-#' @param add_max, as in [prep_ewr_agg()] and [get_ewr_output()], default TRUE. Add a 'MAX' scenario that passes all EWRs, usable as a reference
-#' @param ... passed to [prep_ewr_agg()] and [get_ewr_output()], primarily
+#' @param add_max, as in [read_and_geo()] and [prep_ewr_output()], default TRUE.
+#'   Add a 'MAX' scenario that passes all EWRs, usable as a reference
+#' @param ... passed to [read_and_geo()] and [prep_ewr_output()], primarily
 #'   `gaugefilter`, `scenariofilter`.
 #'
 #' @export
@@ -67,14 +64,17 @@ read_and_agg <- function(datpath,
                          add_max = TRUE,
                          ...) {
   if (!returnList && is.null(savepath)) {
-    rlang::abort(message = "not returning output to disk or session. aborting to not use the resources.")
+    rlang::abort(
+      message = "not returning output to disk or session.
+      aborting to not use the resources."
+      )
   }
 
   # allow passing the causal network by name or path
-  if (is.character(causalpath) && !grepl('\\.', causalpath)) {
-      causalpath <- get(causalpath)
-    }
-  if (is.character(causalpath) && grepl('*.rds', causalpath)) {
+  if (is.character(causalpath) && !grepl("\\.", causalpath)) {
+    causalpath <- get(causalpath)
+  }
+  if (is.character(causalpath) && grepl("*.rds", causalpath)) {
     causalpath <- readRDS(causalpath)
   }
 
@@ -108,7 +108,8 @@ read_and_agg <- function(datpath,
   if (rparallel) {
     if (par_recursive) {
       # Go all the way in (i.e. loop over every folder with a csv)
-      gfiles <- list.files(datpath, pattern = ".csv", full.names = TRUE, recursive = TRUE)
+      gfiles <- list.files(datpath, pattern = ".csv",
+                           full.names = TRUE, recursive = TRUE)
       dps <- gsub("/[^/]+$", "", gfiles) |> unique()
     } else {
       # only first level
@@ -149,7 +150,7 @@ read_and_agg <- function(datpath,
       rparallel = FALSE,
       # only want one max scenario
       add_max = ifelse(y == names(dps)[1] && add_max, TRUE, FALSE),
-      y, # so I can not write safe_map
+      # y = NULL, # so I can not write safe_map
       ...
     ),
     parallel = TRUE
@@ -161,16 +162,32 @@ read_and_agg <- function(datpath,
   }
 
   if (!rparallel) {
-    data <- prep_ewr_agg(datpath, type = type, geopath = geopath, whichcrs = 4283, ...)
+    if (type == "achievement") {
+      ewrflag <- TRUE
+      pull_type <- "yearly"
+    } else {
+      ewrflag <- FALSE
+      pull_type <- type
+    }
 
-    # parse any character names for the spatial data, then character will be the themes
+    data <- read_and_geo(datpath, type = pull_type,
+                         geopath = geopath, whichcrs = 4283, ...)
+
+    # Some EWR-specific cleaning
+    if (ewrflag) {
+      data <- prep_ewr_output(dat = data, type = type, add_max = add_max, ...)
+    }
+
+    # parse any character names for the spatial data, then character will be the
+    # themes
     aggsequence <- purrr::map(aggsequence, parse_geo)
     stepdim <- identify_dimension(
       aggsequence,
       causalpath
     )
 
-    # multi_aggregate can handle the raw network just fine, but this saves re-calculating edges dfs each time.
+    # multi_aggregate can handle the raw network just fine, but this saves
+    # re-calculating edges dfs each time.
     edges <- make_edges(
       dflist = causalpath,
       fromtos = aggsequence[stepdim == "theme"]
@@ -192,7 +209,7 @@ read_and_agg <- function(datpath,
     )
 
     # Annoying how much of this is just pass-through arguments. Could use dots,
-    # but then would need to specify the prep_ewr_agg dots.
+    # but then would need to specify the read_and_geo dots.
     aggout <- multi_aggregate(data,
       edges,
       groupers = groupers,
@@ -254,7 +271,7 @@ read_and_agg <- function(datpath,
       ymlmods <- file.path(datpath, ymlmodpath) |>
         yaml::read_yaml()
     } else {
-      ymlmods <- NULL
+      ymlmods <- list()
     }
 
     yaml::write_yaml(utils::modifyList(ymlmods, list(aggregation = agg_params)),

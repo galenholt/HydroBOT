@@ -27,7 +27,7 @@ make_test_ewr_output <- function(build_dirs = TRUE) {
 # prep the ewr so they look like what we'd use
 make_test_ewr_prepped <- function() {
   ewr <- make_test_ewr_output()
-  ewr_prepped <- prep_ewr_agg(ewr, geopath = bom_basin_gauges)
+  ewr_prepped <- read_and_geo(ewr, geopath = bom_basin_gauges)
 
   # check that works correctly
   ewrmaps <- ewr$summary |>

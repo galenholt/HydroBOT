@@ -62,10 +62,9 @@ and \code{overlay} limits for consistency.
 \item base_lev
 \item comp_fun
 \item group_cols
-\code{\link[=plot_data_prep]{plot_data_prep()}} handles \code{zero_adjust}, and other arguments are inferred or
-not supported
-If \code{comp_fun} is 'difference' or 'relative', midpoint auto-set at 0 or 1
-respectively unless otherwise specified with \code{setLimits}
+\code{\link[=plot_data_prep]{plot_data_prep()}} handles \code{zero_adjust}, and other arguments are inferred
+or not supported If \code{comp_fun} is 'difference' or 'relative', midpoint
+auto-set at 0 or 1 respectively unless otherwise specified with \code{setLimits}
 }}
 
 \item{uotype}{character, 'overlay', 'underlay', or 'internal' (default, it is

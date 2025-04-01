@@ -2,8 +2,8 @@
 % Please edit documentation in R/run_hydrobot_params.R
 \name{run_hydrobot_params}
 \alias{run_hydrobot_params}
-\title{Run HydroBOT through the aggregation step with a file of yaml parameters
-or passing in yaml as characters.}
+\title{Run HydroBOT through the aggregation step with a file of yaml parameters or
+passing in yaml as characters.}
 \usage{
 run_hydrobot_params(
   yamlpath = NULL,
@@ -19,12 +19,12 @@ want to be able to auto-run off the saved param metadata, the names of the
 spatial agg levels need to match the objects, e.g. basin: basin}
 
 \item{passed_args}{character, in yaml format, e.g. ""scenario_dir:
-'project_dir/hydrographs'". Likely possible to pass more than one, but
-complicated to get the yaml right. Suggest in that case modifying the
-params.yml}
+'project_dir/hydrographs'". Possible to pass more than one, but complicated
+to get the yaml right. Suggest in that case modifying the params.yml}
 
 \item{list_args}{list of arguments. Typically would come in from
-parameterised quarto notebook, which pre-parses yaml into a list}
+parameterised quarto notebook, which pre-parses yaml into a list, but could
+also be list(ewr = list(arg1 = x), aggregation = list(arg1 = y))}
 
 \item{defaults}{character, path to default set of yaml parameters, so the
 \code{yamlpath} file and \code{passed_args} only need to include those that are
@@ -35,6 +35,9 @@ runs HydroBOT, returns NULL invisibly, or the aggregated output if
 the params have \code{aggReturn: TRUE}
 }
 \description{
-The plan is for this to make scripting easier, and be able to change single
-simple parameters (e.g. directory) from command line or in other workflows
+The goal here is to make scripting easier, and be able to change single
+simple parameters (e.g. directory) from command line or in other workflows.
+\itemize{
+\item Needs lists with top-level \code{ewr} and \code{aggregation} items. Those should then be lists with items named as in function arguments for \code{\link[=prep_run_save_ewrs]{prep_run_save_ewrs()}} and \code{\link[=read_and_agg]{read_and_agg()}}, respectively.
+}
 }

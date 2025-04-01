@@ -45,8 +45,9 @@ likely \verb{transoutcome = 'log10}}
 \code{\link[ggplot2:scale_continuous]{ggplot2::scale_x_continuous()}}. Default \code{transx = 'identity'} just uses
 the data. Most common change likely \verb{transx = 'log10}.}
 
-\item{transy}{transformation of y-axis, \emph{if the outcome is not y}. Default
-\code{'identity'}. Ignored if outcome_col is on the y-axis}
+\item{transy}{transformation of y-axis, \emph{if the outcome is not y}, when
+\code{transoutcome} should be used. Default \code{'identity'}. Ignored if outcome_col
+is on the y-axis, because \code{transoutcome} should be used.}
 
 \item{contour_arglist}{default \code{NULL}
 \itemize{
@@ -79,10 +80,9 @@ and \code{overlay} limits for consistency.
 \item base_lev
 \item comp_fun
 \item group_cols
-\code{\link[=plot_data_prep]{plot_data_prep()}} handles \code{zero_adjust}, and other arguments are inferred or
-not supported
-If \code{comp_fun} is 'difference' or 'relative', midpoint auto-set at 0 or 1
-respectively unless otherwise specified with \code{setLimits}
+\code{\link[=plot_data_prep]{plot_data_prep()}} handles \code{zero_adjust}, and other arguments are inferred
+or not supported If \code{comp_fun} is 'difference' or 'relative', midpoint
+auto-set at 0 or 1 respectively unless otherwise specified with \code{setLimits}
 }}
 }
 \value{

@@ -1,15 +1,9 @@
 #' Make EWR results with achievement for ongoing use
 #'
+#' @inheritParams read_and_geo
+#'
 #' @param dir path to directory with the EWR output for all gauges and scenarios
 #' @param year_roll character 'best' or number, specific number of years to check assessment for. 'Best' uses 10-year windows if possible. 1 uses the NSW method.
-#' @param type character, one of:
-#'  * 'achievement' (default)- gets the yearly summarised to the period with calculated EWR achievement
-#'  * 'summary',
-#'  * 'yearly',
-#'  * 'all_events',
-#'  * 'all_successful_events',
-#'  * 'all_interEvents', # Does not work with current EWR tool
-#'  * 'all_successful_interEvents'
 #' @param gaugefilter subset of gauges, default NULL
 #' @param scenariofilter subset of scenarios, default NULL
 #' @param add_max logical, default TRUE. Add a 'MAX' scenario that passes all EWRs, usable as a reference
@@ -18,20 +12,19 @@
 #' @export
 #'
 
-get_ewr_output <- function(dir, type = "achievement", year_roll = "best",
+prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
                            gaugefilter = NULL, scenariofilter = NULL, add_max = TRUE) {
+
+  # assorted cleanup
+  dat <- suppressWarnings(cleanewrs(dat))
+
   if (type != "achievement") {
-    outdf <- get_any_ewr_output(dir, type = type,
-                                gaugefilter = gaugefilter,
-                                scenariofilter = scenariofilter)
+    outdf <- dat
   }
 
   if (type == "achievement") {
-    yeardat <- get_any_ewr_output(dir, type = "yearly",
-                                  gaugefilter = gaugefilter,
-                                  scenariofilter = scenariofilter)
 
-    yeardat <- clean_yearly(yeardat)
+    yeardat <- clean_yearly(dat)
 
     if (year_roll == "best") {
       year_roll <- ifelse(length(unique(yeardat$year)) >= 10, 10, 1)
@@ -50,106 +43,7 @@ get_ewr_output <- function(dir, type = "achievement", year_roll = "best",
   return(outdf)
 }
 
-
-
-
-
-#' Get the outputs from the EWR and clean them up
-#'
-#' *NOTE* this expects output from the EWRs to be processed through HydroBOT
-#' functions for cleaning and saving immediately after creation, which may
-#' change now that `py-ewr` has changed some things.
-#'
-#' @param dir path to directory with the EWR output for all gauges and scenarios
-#' @param type character, one of
-#'  * 'summary',
-#'  * 'yearly',
-#'  * 'all_events',
-#'  * 'all_successful_events',
-#'  * 'all_interEvents', # Does not work with current EWR tool
-#'  * 'all_successful_interEvents'
-#' @param gaugefilter character vector of gauge numbers to include. Default `NULL` includes all
-#' @param scenariofilter character vector of scenario names to include. Default `NULL` includes all
-#'
-#' @return a tibble of EWR results if `type == "annual"` or `type == "summary"`. A named list of those tibbles if `type == "both"`
-#' @export
-#'
-
-get_any_ewr_output <- function(dir, type,
-                               gaugefilter = NULL, scenariofilter = NULL) {
-  if (is.character(dir)) {
-    # assumes files are csvs.
-    gaugefiles <- list.files(dir,
-      pattern = ".csv",
-      full.names = TRUE, recursive = TRUE
-    )
-
-    # only get the relevant type of ewr output
-    if (type != "everything") {
-      relevantfiles <- gaugefiles[stringr::str_which(gaugefiles, pattern = type)]
-    }
-    if (type == "everything") {
-      relevantfiles <- gaugefiles
-    }
-
-
-    # cut to requested gauges or scenarios
-    if (!is.null(gaugefilter)) {
-      relevantfiles <- relevantfiles[stringr::str_which(relevantfiles,
-        pattern = stringr::str_flatten(gaugefilter, collapse = "|")
-      )]
-    }
-
-    if (!is.null(scenariofilter)) {
-      relevantfiles <- relevantfiles[stringr::str_which(relevantfiles,
-        pattern = stringr::str_flatten(scenariofilter, collapse = "|")
-      )]
-    }
-
-    # read into one df
-    # make CHECK happy
-    i <- NULL
-    ewrdata <- foreach::foreach(
-      i = relevantfiles,
-      .combine = dplyr::bind_rows
-    ) %do% {
-      # gauge needs to be character, but often looks numeric
-      temp <- readr::read_csv(i, col_types = readr::cols(
-        scenario = readr::col_character(),
-        gauge = readr::col_character()
-      ))
-    }
-  } else if (is.list(dir)) {
-    ewrdata <- dir[[type]]
-
-    if (!is.null(gaugefilter)) {
-      ewrdata <- ewrdata |> dplyr::filter(.data$gauge %in% gaugefilter)
-    }
-
-    if (!is.null(scenariofilter)) {
-      ewrdata <- ewrdata |> dplyr::filter(.data$scenario %in% scenariofilter)
-    }
-  }
-
-  # There are sometimes wholly-blank columns that are read as NA, but should be
-  # numeric. We can't pre-set them with readr because they may be in different
-  # places for different gauges
-  ewrdata <- ewrdata |>
-    dplyr::mutate(dplyr::across(tidyselect::where(is.logical), as.numeric)) |>
-    dplyr::mutate(
-      gauge = as.character(.data$gauge),
-      scenario = as.character(.data$scenario)
-    ) # belt and braces- this should never be anything else at this point
-
-  ewrdata <- suppressWarnings(cleanewrs(ewrdata))
-
-
-  return(ewrdata)
-}
-
-
 # Clean up the EWRs
-
 
 #' Clean up and standardise names and column types
 #'
@@ -163,20 +57,22 @@ get_any_ewr_output <- function(dir, type,
 
 cleanewrs <- function(ewrdf) {
 
-  names(ewrdf) <- nameclean(names(ewrdf))
-
   # Gauges should be characters
-  ewrdf$gauge <- as.character(ewrdf$gauge)
+  if ('gauge' %in% names(ewrdf)) {
+    ewrdf$gauge <- as.character(ewrdf$gauge)
+  }
 
-  ewrdf <- ewrdf |>
-    separate_ewr_codes()
+  if ('ewr_code' %in% names(ewrdf)) {
+    ewrdf <- ewrdf |>
+      separate_ewr_codes()
+  }
 
   return(ewrdf)
 }
 
 #' Additional cleanup specific to yearly EWR outputs.
 #'
-#' @param annualdf the result of [get_any_ewr_output()] with `type = 'yearly'`
+#' @param annualdf the result of [get_module_output()] for EWR data with `type = 'yearly'`
 #'
 #' @return tibble of the cleaned yearly EWR output
 #' @export
@@ -194,8 +90,6 @@ clean_yearly <- function(annualdf) {
     dplyr::mutate(dplyr::across(tidyselect::all_of(ewr_calc_cols),
                                 \(x) ifelse(date == min(date, na.rm = TRUE), NA, x)))
 
-
-
 }
 
 
@@ -207,8 +101,11 @@ clean_yearly <- function(annualdf) {
 clean_ewr_requirements <- function() {
   # Get the target frequencies and interevent durations
   ewr_requirements <- get_ewr_table() |>
-    tibble::tibble() |>
-    cleanewrs()
+    tibble::tibble()
+
+  names(ewr_requirements) <- nameclean(names(ewr_requirements))
+
+  ewr_requirements <- cleanewrs(ewr_requirements)
 
   ewr_requirements <- ewr_requirements |>
     dplyr::select('state', 'SWSDLName', 'planning_unit_name', 'gauge',
@@ -271,33 +168,6 @@ separate_ewr_codes <- function(df) {
 
   return(df)
 }
-
-#
-#' Helper to sort the names
-#'
-#' @param charvec vector of names
-#'
-#' @return a character vector
-
-nameclean <- function(charvec) {
-  cleannames <- charvec |>
-    stringr::str_replace_all("([A-Z])", "_\\1") |>
-    tolower() |>
-    stringr::str_replace_all(pattern = " ", replacement = "_") |>
-    stringr::str_replace_all(pattern = "-", replacement = "") |>
-    stringr::str_replace_all(pattern ='^_', replacement =  '')
-
-  # One-off particular fixes
-  # sometimes the ewr names are ewr_code and sometimes just ewr
-  cleannames[cleannames == "ewr" | cleannames == "Code" | cleannames == "code" |cleannames == "ewrCode"] <- "ewr_code"
-  # the planning unit names (and IDs) keep getting changed and dropped, so they might be a few different things.
-  cleannames[cleannames == "pu" | cleannames == "PlanningUnitName" | cleannames == "planning_unit"] <- "planning_unit_name"
-  # The SWSDLName needs to match the sdl_units (and legislation)
-  cleannames[cleannames == 's_w_s_d_l_name'] <- 'SWSDLName'
-
-  return(cleannames)
-}
-
 
 
 #' EWR logic test on incoming Annual EWRs

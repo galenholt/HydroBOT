@@ -38,7 +38,7 @@ To produce some rds files that make testing aggregation easier than having to al
 
 ### Save the output from ewr re-read in
 
-This is how the ewr output comes back in via `get_ewr_output` . Use rda files to maintain data names as is standard in R packages.
+This is how the ewr output comes back in via `prep_ewr_output` . Use rda files to maintain data names as is standard in R packages.
 
 The read-in does some cleaning, so save, read in, and then toss.
 
@@ -65,7 +65,7 @@ ewr_out = prep_run_save_ewrs(hydro_dir = hydro_dir,
 #| label: read in and save
 
 ewrpath <- file.path(project_dir, 'module_output', 'EWR')
-summary_ewr_output <- get_ewr_output(ewrpath, type = 'achievement')
+summary_ewr_output <- prep_ewr_output(ewrpath, type = 'achievement')
 
 usethis::use_data(summary_ewr_output, overwrite = params$REBUILD_DATA)
 
@@ -81,7 +81,7 @@ This is taken similar to the tests, with the addition of more appropriate weight
 **NOTE** the *first* aggregation into a spatial unit doesn't need to be area-weighted, because the thing being aggregated doesn't have area. After that, it does. It shouldn't *hurt* to use weighted.mean though, since it defaults to even weights. But there won't be an area column.
 
 ```{r}
-sumspat <- gauge2geo(summary_ewr_output,
+sumspat <- join_to_geo(summary_ewr_output,
                      gaugelocs = bom_basin_gauges)
 
 aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),

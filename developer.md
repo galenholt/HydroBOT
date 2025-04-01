@@ -52,10 +52,9 @@ Use [pyenv](https://github.com/pyenv/pyenv) to manage python versions. *Use the 
 Use [poetry](https://python-poetry.org/docs/) to build python environments. Set `poetry config virtualenvs.in-project true` to get the `.venv` in the right place.
 Use the `poetry.lock` to build the python environment with poetry. The needed python packages get auto-installed when *using* the package, but developers will need to maintain them here for dev.
 
-### Building data and HTML documentation
-Some of the data needs to be built, at least right now. And we'll always have the option to do that as the data changes. The easiest way to do it is to run `quarto render -P REBUILD_DATA:TRUE` from HydroBOT to rebuild all `.qmd`, `.rmd`, and `.md` files everywhere and rebuild the data. Leaving off the parameter (just `quarto render`) re-renders the project with the default of FALSE if we just want new HTML generated from the notebooks but not new data. Individual files can also be rendered, either with the CLI or the Render buttons in VS or Rstudio.
+## Parallelisation
 
-
+Parallelisation uses the {future} package, which passess needed functions etc into the parallelised parts. When developing though, it passes the *installed* versions, not any new changes made and loaded with `devtools::load_all()`. So to test parallelisation is working, you will need to install the package with the button in the build pane or `devtools::install()`. 
 
 
 # More detail if you hit trouble

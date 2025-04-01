@@ -40,7 +40,9 @@ the main data is points.
 \item{overlay_list}{as \code{underlay_list}, but first item might be named
 \verb{"overlay} or \code{"underover"}}
 
-\item{map_outlinecolor}{color specification for the outline of filled areas on maps. Default 'grey35' seems to be the sf default. NA removes the outline.}
+\item{map_outlinecolor}{color specification for the outline of filled areas
+on maps. Default 'grey35' seems to be the sf default. NA removes the
+outline.}
 
 \item{outcome_lab}{character, default \code{outcome_col}, allows changing label of
 the outcome_col (y-axis or color/fill)}
@@ -79,10 +81,9 @@ and \code{overlay} limits for consistency.
 \item base_lev
 \item comp_fun
 \item group_cols
-\code{\link[=plot_data_prep]{plot_data_prep()}} handles \code{zero_adjust}, and other arguments are inferred or
-not supported
-If \code{comp_fun} is 'difference' or 'relative', midpoint auto-set at 0 or 1
-respectively unless otherwise specified with \code{setLimits}
+\code{\link[=plot_data_prep]{plot_data_prep()}} handles \code{zero_adjust}, and other arguments are inferred
+or not supported If \code{comp_fun} is 'difference' or 'relative', midpoint
+auto-set at 0 or 1 respectively unless otherwise specified with \code{setLimits}
 }}
 }
 \value{

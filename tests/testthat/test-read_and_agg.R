@@ -555,8 +555,8 @@ test_that("Various group_until formats work", {
   ))))
 
   yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
-  expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))
-  expect_equal(yamout$auto_ewr_PU, FALSE)
+  expect_equal(yamout$aggregation$group_until, list(planning_unit_name = 4))
+  expect_equal(yamout$aggregation$auto_ewr_PU, FALSE)
 
   # Vector- this relies on multi_aggregate to make it a list
   # expect_warnings because of the desired non-spatial sdl
@@ -575,8 +575,8 @@ test_that("Various group_until formats work", {
   ))))
 
   yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
-  expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))
-  expect_equal(yamout$auto_ewr_PU, FALSE)
+  expect_equal(yamout$aggregation$group_until, list(planning_unit_name = 4))
+  expect_equal(yamout$aggregation$auto_ewr_PU, FALSE)
 
   # function. As with funsequence and agg sequence, these don't actually have
   # to be the same as the inputs, they just have to evaluate the same.- ie
@@ -597,8 +597,8 @@ test_that("Various group_until formats work", {
   ))))
 
   yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
-  expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))
-  expect_equal(yamout$auto_ewr_PU, FALSE)
+  expect_equal(yamout$aggregation$group_until, list(planning_unit_name = 4))
+  expect_equal(yamout$aggregation$auto_ewr_PU, FALSE)
 
   # List, and numeric. This is what would get read from params. (though that could have character too.)
   # also drop it from groupers to check that that works
@@ -618,8 +618,8 @@ test_that("Various group_until formats work", {
   ))))
 
   yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
-  expect_equal(yamout$agg_group_until, list(planning_unit_name = 4))
-  expect_equal(yamout$auto_ewr_PU, FALSE)
+  expect_equal(yamout$aggregation$group_until, list(planning_unit_name = 4))
+  expect_equal(yamout$aggregation$auto_ewr_PU, FALSE)
 })
 
 
@@ -769,3 +769,94 @@ test_that("parallel works", {
   expect_equal(spatagg_pt, read_ptc)
 
   })
+
+# Non-module data ------------------------------------------------------------
+
+test_that('non-module works', {
+
+  # Similar to multi_aggregate, but have saved out the dummy data there
+
+  # setup
+  austates <- readRDS(test_path("test_data", "austates.rds"))
+  all_aus <- readRDS(test_path("test_data", "all_aus.rds"))
+
+  # make a simple 'causal' network
+  state_theme <- tibble::tibble(theme1 = c("E", "F", "G", "H", "I", "J"),
+                                theme2 = c("vowel", "consonant", "consonant",
+                                           "consonant", "vowel", "consonant")) |>
+    list()
+
+  # This will aggregate into weeks, then to type, and then to the country.
+  ausseq <- list(
+    week = 'week',
+    theme2 = c('theme1', 'theme2'),
+    all_aus = all_aus
+  )
+
+  # just use mean, since there are no NA in the data.
+  ausfuns <- list(
+    week = 'mean',
+    type = 'mean',
+    all_aus = 'mean'
+  )
+
+  # Do the aggregation
+expect_warning(ausagg <- read_and_agg(
+  datpath = test_path("test_data", "module_output", "fake_module"),
+  type = "everything",
+  geopath = austates,
+  causalpath = state_theme,
+  groupers = "scenario",
+  aggCols = "value",
+    aggsequence = ausseq,
+  funsequence = ausfuns,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE
+))
+
+  weekcheck <- ausagg$week |>
+    dplyr::filter(theme1 == 'E') |>
+    plot_outcomes(
+      outcome_col = "value",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "value",
+      pal_list = list("scico::berlin"),
+      pal_direction = -1,
+      facet_col = "scenario",
+      facet_row = "date"
+    )
+
+  themecheck <- ausagg$theme2 |>
+    dplyr::filter(date == lubridate::ymd("2000-01-03")) |>
+    plot_outcomes(
+      outcome_col = "value",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "value",
+      pal_list = list("scico::berlin"),
+      pal_direction = -1,
+      facet_col = "scenario",
+      facet_row = "theme2"
+    )
+
+  spacecheck <- ausagg$all_aus |>
+    dplyr::filter(date == lubridate::ymd("2000-01-03")) |>
+    plot_outcomes(
+      outcome_col = "value",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "value",
+      pal_list = list("scico::berlin"),
+      pal_direction = -1,
+      facet_col = "scenario",
+      facet_row = "theme2"
+    )
+  vdiffr::expect_doppelganger("aus_weekcheck", weekcheck)
+  vdiffr::expect_doppelganger("aus_themecheck", themecheck)
+  vdiffr::expect_doppelganger("aus_spacecheck", spacecheck)
+})
+
