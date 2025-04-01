@@ -61,9 +61,15 @@ safe_imap <- function(.x, .f, ..., retries = 0, parallel = FALSE) {
   }
 
   if (length(whicherrors) > 0) {
-    rlang::inform(c(glue::glue("The EWR tool has run, but the scenario(s) {names(whicherrors)} have failed and have been bypassed after {retries} retries."),
-                    "The first error is:"),
-                  glue::glue("{error_out[[1]]}"))
+    if (!is.character(error_out[[1]])) {
+      error_out <- purrr::map(error_out, as.character)
+    }
+
+    rlang::inform(c(
+      glue::glue("The function {deparse(rlang::trace_back()$call[[1]][1])} has run, but the scenario(s) {names(whicherrors)} have failed and have been bypassed after {retries} retries."),
+                    "The first error is:",
+                  glue::glue("{error_out[[1]]}")
+      ))
     full_results <- full_results[-orig_indices]
   }
 

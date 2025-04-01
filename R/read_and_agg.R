@@ -37,8 +37,9 @@
 #' @param savepar 'combine' (default) or 'each'. If parallel over scenarios,
 #'   should this combine the output (default) or save each scenario's
 #'   aggregation separately ('each')
+#' @param add_max, as in [prep_ewr_agg()] and [get_ewr_output()], default TRUE. Add a 'MAX' scenario that passes all EWRs, usable as a reference
 #' @param ... passed to [prep_ewr_agg()] and [get_ewr_output()], primarily
-#'   `gaugefilter`, `scenariofilter`, and `add_max`.
+#'   `gaugefilter`, `scenariofilter`.
 #'
 #' @export
 #'
@@ -63,6 +64,7 @@ read_and_agg <- function(datpath,
                          rparallel = FALSE,
                          par_recursive = TRUE,
                          savepar = "combine",
+                         add_max = TRUE,
                          ...) {
   if (!returnList && is.null(savepath)) {
     rlang::abort(message = "not returning output to disk or session. aborting to not use the resources.")
@@ -145,7 +147,8 @@ read_and_agg <- function(datpath,
       savepath = eval(spath),
       extrameta = extrameta,
       rparallel = FALSE,
-      add_max = ifelse(y == names(dps)[1], TRUE, FALSE),
+      # only want one max scenario
+      add_max = ifelse(y == names(dps)[1] && add_max, TRUE, FALSE),
       y, # so I can not write safe_map
       ...
     ),
