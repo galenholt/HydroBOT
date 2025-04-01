@@ -2158,3 +2158,121 @@ test_that("Temporal", {
 
 
 })
+
+
+# Non-module data ------------------------------------------------------------
+
+test_that('non-module works' {
+
+  # setup
+  austates <- readRDS(test_path("test_data", "austates.rds"))
+  all_aus <- readRDS(test_path("test_data", "all_aus.rds"))
+
+  # add a date column
+  state_inputs <- austates |>
+    dplyr::mutate(date = lubridate::ymd('20000101'))
+
+  # add some values
+  withr::with_seed(17,
+                   state_inputs <- state_inputs |>
+                     dplyr::mutate(value = runif(nrow(state_inputs)))
+  )
+
+  withr::with_seed(17,
+                   # add some more days, each with different values
+                   state_inputs <- purrr::map(0:10,
+                                              \(x) dplyr::mutate(state_inputs,
+                                                                 date = date + x,
+                                                                 value = value * rnorm(nrow(state_inputs),
+                                                                                       mean = x, sd = x/2))) |>
+                     dplyr::bind_rows()
+                   )
+
+  # add a scenario column, each with different values
+  state_inputs <- purrr::imap(letters[1:4],
+                              \(x,y) dplyr::mutate(state_inputs,
+                                            scenario = x,
+                                            value = value + y)) |>
+    dplyr::bind_rows()
+
+  # add a theme-relevant column, each with different values
+  state_inputs <- purrr::imap(c("E", "F", "G", "H", "I", "J"),
+                              \(x,y) dplyr::mutate(state_inputs,
+                                                   theme1 = x,
+                                                   value = value + y)) |>
+    dplyr::bind_rows()
+
+  # make a simple 'causal' network
+  state_theme <- tibble::tibble(theme1 = c("E", "F", "G", "H", "I", "J"),
+                                theme2 = c("vowel", "consonant", "consonant",
+                                           "consonant", "vowel", "consonant")) |>
+    list()
+
+  # This will aggregate into weeks, then to type, and then to the country.
+  ausseq <- list(
+    week = 'week',
+    theme2 = c('theme1', 'theme2'),
+    all_aus = all_aus
+  )
+
+  # just use mean, since there are no NA in the data.
+  ausfuns <- list(
+    week = 'mean',
+    type = 'mean',
+    all_aus = 'mean'
+  )
+
+  # Do the aggregation
+  expect_warning(ausagg <-  multi_aggregate(
+    dat = state_inputs,
+    causal_edges = state_theme,
+    groupers = "scenario",
+    aggCols = "value",
+    aggsequence = ausseq,
+    funsequence = ausfuns,
+    namehistory = FALSE,
+    saveintermediate = TRUE
+  ))
+
+  weekcheck <- ausagg$week |>
+    dplyr::filter(theme1 == 'E') |>
+    plot_outcomes(
+      outcome_col = "value",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "value",
+      pal_list = list("scico::berlin"),
+      pal_direction = -1,
+      facet_col = "scenario",
+      facet_row = "date"
+    )
+
+  themecheck <- ausagg$theme2 |>
+    dplyr::filter(date == lubridate::ymd("2000-01-03")) |>
+    plot_outcomes(
+      outcome_col = "value",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "value",
+      pal_list = list("scico::berlin"),
+      pal_direction = -1,
+      facet_col = "scenario",
+      facet_row = "theme2"
+    )
+
+  spacecheck <- ausagg$all_aus |>
+    dplyr::filter(date == lubridate::ymd("2000-01-03")) |>
+    plot_outcomes(
+      outcome_col = "value",
+      plot_type = "map",
+      colorgroups = NULL,
+      colorset = "value",
+      pal_list = list("scico::berlin"),
+      pal_direction = -1,
+      facet_col = "scenario",
+      facet_row = "theme2"
+    )
+  vdiffr::expect_doppelganger("aus_weekcheck", weekcheck)
+  vdiffr::expect_doppelganger("aus_themecheck", themecheck)
+  vdiffr::expect_doppelganger("aus_spacecheck", spacecheck)
+  })
