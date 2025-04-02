@@ -27,13 +27,14 @@ make_test_ewr_output <- function(build_dirs = TRUE) {
 # prep the ewr so they look like what we'd use
 make_test_ewr_prepped <- function() {
   ewr <- make_test_ewr_output()
-  ewr_prepped <- read_and_geo(ewr, geopath = bom_basin_gauges)
+  ewr_prepped <- prep_ewr_output(ewr$yearly, type = 'achievement')
 
   # check that works correctly
   ewrmaps <- ewr$summary |>
-    dplyr::select(gauge, planningUnit) |>
+    prep_ewr_output(type = 'summary') |>
+    dplyr::select(gauge, planning_unit_name) |>
     dplyr::distinct() |>
-    dplyr::mutate(gaugexpu = paste0(gauge, '_', planningUnit))
+    dplyr::mutate(gaugexpu = paste0(gauge, '_', planning_unit_name))
 
   prepmaps <- ewr_prepped |>
     dplyr::select(gauge, planning_unit_name) |>
@@ -70,11 +71,9 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
                    'ArithmeticMean',
                    'SpatialWeightedMean',
                    "ArithmeticMean",
-                   list(wm = ~weighted.mean(., w = area,
-                                            na.rm = TRUE)),
+                   "SpatialWeightedMean",
                    'ArithmeticMean',
-                   list(wm = ~weighted.mean(., w = area,
-                                            na.rm = TRUE)),
+                   "SpatialWeightedMean",
                    'ArithmeticMean')
 
     ps <- "planning_units"

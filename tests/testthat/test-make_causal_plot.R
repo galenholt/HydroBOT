@@ -4,7 +4,8 @@ skip_on_os('linux')
 agg_theme_space <- make_test_agg(namehistory = FALSE)
 
 # the sequences used in make_test_agg
-aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+aggseq <- list(all_time = 'all_time',
+               ewr_code = c('ewr_code_timing', 'ewr_code'),
                planning_units = planning_units,
                env_obj =  c('ewr_code', "env_obj"),
                sdl_units = sdl_units,
@@ -14,25 +15,21 @@ aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                mdb = basin,
                target_5_year_2024 = c('Objective', 'target_5_year_2024'))
 
-funseq <- list('CompensatingFactor',
+funseq <- list('ArithmeticMean',
+               'CompensatingFactor',
+               'ArithmeticMean',
+               'ArithmeticMean',
                'SpatialWeightedMean',
-               'ArithmeticMean',
-               'ArithmeticMean',
                "ArithmeticMean",
-               list(wm = ~weighted.mean(., w = area,
-                                        na.rm = TRUE)),
+               "SpatialWeightedMean",
                'ArithmeticMean',
-               list(wm = ~weighted.mean(., w = area,
-                                        na.rm = TRUE)),
+               "SpatialWeightedMean",
                'ArithmeticMean')
 
 # extract theme steps
-themesteps <- purrr::map_lgl(aggseq, is.character)
+themesteps <- identify_dimension(aggseq, causal_ewr)
 
-
-themeseq <- aggseq[themesteps]
-
-themefuns <- funseq[themesteps]
+themeseq <- aggseq[themesteps == 'theme']
 
 ewr_edges <- make_edges(dflist = causal_ewr,
                         fromtos = themeseq[2:length(themeseq)],
@@ -44,9 +41,9 @@ nodes <- make_nodes(ewr_edges)
 valcol <- 'ewr_achieved'
 
 # Get the values for each node
-targetlevels <- names(themesteps)[themesteps]
+targetlevels <- names(aggseq)[themesteps == 'theme']
 
-aggvals <- extract_vals_causal(agg_theme_space, themefuns, valcol,
+aggvals <- extract_vals_causal(agg_theme_space, funseq, valcol,
                                targetlevels = targetlevels)
 
 # cut to relevant gauge (or no gauge for higher spatial levels)
@@ -55,8 +52,6 @@ gaugematch <-  st_intersects(bom_basin_gauges[bom_basin_gauges$gauge == '421001'
 
 aggvals <- aggvals[as.vector(gaugematch),] |>
   st_drop_geometry()
-# aggvals <- aggvals %>% dplyr::filter(gauge == '421001' | is.na(gauge)) %>%
-#   dplyr::select(-gauge)
 
 # join to the nodes
 nodes_with_vals <- nodes |>
