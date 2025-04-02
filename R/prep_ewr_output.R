@@ -15,6 +15,14 @@
 prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
                            gaugefilter = NULL, scenariofilter = NULL, add_max = TRUE) {
 
+  # some cleanup that lets this get used on its own if necessary
+  if ('eventYears' %in% names(dat)) {
+    names(dat) <- nameclean(names(dat))
+  }
+
+  if (!inherits(dat, 'sf')) {
+    dat <- join_to_geo(dat, bom_basin_gauges)
+  }
   # assorted cleanup
   dat <- suppressWarnings(cleanewrs(dat))
 

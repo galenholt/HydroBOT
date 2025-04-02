@@ -45,6 +45,17 @@ test_that("making assessment tibble works", {
   expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
 })
 
+test_that("making assessment tibble from in-memory ewr output works", {
+  # datain <- read_and_geo(ewrpath, type = 'yearly', geopath = bom_basin_gauges)
+  assessed <- ewr_out$yearly |>
+    prep_ewr_output()
+
+  expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
+                                  'planning_unit_name', 'state', 'SWSDLName', 'ewr_code',
+                                  'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved', 'geometry'))
+  expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
+})
+
 test_that("year_roll is rolling correctly", {
   # default is 1 if < 10, so have to set manually for the test data
   datain <- read_and_geo(ewrpath, type = 'yearly', geopath = bom_basin_gauges)
