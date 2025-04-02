@@ -8,7 +8,7 @@ ewr_to_agg_timemean <- temporal_aggregate(ewr_to_agg,
                                           groupers = c('scenario', 'gauge',
                                                        'planning_unit_name',
                                                        'SWSDLName', 'ewr_code',
-                                                       'ewr_code_timing', 'site'),
+                                                       'ewr_code_timing'),
                                           aggCols = 'ewr_achieved',
                                           funlist = 'ArithmeticMean',
                                           prefix = '') |>

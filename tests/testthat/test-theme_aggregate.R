@@ -8,8 +8,7 @@ ewr_to_agg_timemean <- temporal_aggregate(ewr_to_agg,
     "planning_unit_name",
     "SWSDLName",
     "ewr_code",
-    "ewr_code_timing",
-    "site"
+    "ewr_code_timing"
   ),
   aggCols = "ewr_achieved",
   funlist = "ArithmeticMean",
@@ -78,8 +77,9 @@ test_that("spatial input data works", {
   expect_s3_class(agged, "data.frame")
   expect_s3_class(agged, "sf")
 
-  # Not usually how geonames will be used, but it does work as a test
-  agged <- theme_aggregate(ewr_to_agg_timemean,
+  # Not usually how geonames will be used (it persists extra cols), but it does work as a test
+  agged <- theme_aggregate(ewr_to_agg_timemean |>
+                             dplyr::mutate(site = paste0(gauge, '_site')),
     from_theme = "ewr_code_timing",
     to_theme = "ewr_code",
     groupers = c("scenario", "gauge"),

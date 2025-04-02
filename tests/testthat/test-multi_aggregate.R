@@ -8,7 +8,7 @@ ewr_to_agg_timemean <- temporal_aggregate(ewr_to_agg,
                                            breaks = 'all_time',
                                            groupers = c('scenario',
                                                         'gauge', 'planning_unit_name', 'state', 'SWSDLName',
-                                                        'ewr_code', 'ewr_code_timing', 'site'),
+                                                        'ewr_code', 'ewr_code_timing'),
                                            aggCols = 'ewr_achieved',
                                            funlist = 'ArithmeticMean',
                                            prefix = '') |>
@@ -2162,7 +2162,7 @@ test_that("Temporal", {
 
 # Non-module data ------------------------------------------------------------
 
-test_that('non-module works' {
+test_that('non-module works', {
 
   # setup
   austates <- readRDS(test_path("test_data", "austates.rds"))
