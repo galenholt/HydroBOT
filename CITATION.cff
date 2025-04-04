@@ -8,7 +8,7 @@ message: 'To cite package "HydroBOT" in publications use:'
 type: software
 license: MIT
 title: 'HydroBOT: Toolkit For Flow-Dependent outcomes in the Murray-Darling Basin'
-version: 0.2.2.9007
+version: 0.2.2.9020
 abstract: Provides tools to assess responses to flows in the MDB. Wraps the EWR tool
   and provides ongoing modeling of ecological responses with causal networks, as well
   as analysis, synthesis and visualisation functionality targetted at scenario comparisons.
@@ -20,6 +20,7 @@ authors:
 - family-names: Dwyer
   given-names: Georgia
   email: g.dwyer@deakin.edu.au
+url: https://laughing-adventure-8jypg4z.pages.github.io/
 contact:
 - family-names: Holt
   given-names: Galen
@@ -292,13 +293,8 @@ references:
   authors:
   - family-names: Gagolewski
     given-names: Marek
+    email: marek@gagolewski.com
     orcid: https://orcid.org/0000-0003-0637-6028
-  - family-names: Tartanus
-    given-names: Bartek
-  - family-names: Unicode
-    given-names: others;
-  - name: Inc.
-  - name: others
   year: '2025'
   doi: 10.32614/CRAN.package.stringi
 - type: software
