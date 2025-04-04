@@ -11,10 +11,10 @@ coverage](https://codecov.io/gh/MDBAuth/HydroBOT/graph/badge.svg)](https://app.c
 
 <!-- badges: end -->
 
-This R package forms the core of the WERP climate adaptation toolkit,
-ingesting hydrological scenarios representing historical or future
-climates or adaptation options, and processing those through various
-response models (currently [MDBA EWR
+This R package forms the core of the WERP climate adaptation toolkit
+(HydroBOT), ingesting hydrological scenarios representing historical or
+future climates or adaptation options, and processing those through
+various response models (currently [MDBA EWR
 tool](https://github.com/MDBAuth/EWR_tool), with intention to include
 other tools in future). Subsequent processing of outcomes along spatial,
 theme, and temporal axes are available, as well as control over outputs
@@ -70,9 +70,9 @@ and reproducibility. Typical approaches use R scripts, Quarto notebooks,
 or automation on HPC or azure systems with yaml parameter files and
 shell/R scripts.
 
-See the
-[HydroBOT_website](https://mdbauth.github.io/HydroBOT_website/) for a
-full demonstration and the [template
+See the [HydroBOT documentation
+website](https://mdbauth.github.io/HydroBOT_website/) for a full
+demonstration and the [template
 repo](https://github.com/MDBAuth/toolkit_use) for a bare-bones project
 structure.
 
@@ -125,9 +125,8 @@ Using HydroBOT is typically a three-step process:
 
 ## Example
 
-See the
-[HydroBOT_website](https://mdbauth.github.io/HydroBOT_website/) for a
-full demonstration.
+See the [HydroBOT website](https://mdbauth.github.io/HydroBOT_website/)
+for a full demonstration.
 
 ## Who do I talk to?
 

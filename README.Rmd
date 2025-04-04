@@ -48,7 +48,7 @@ There are `poetry.lock` and `pyproject.toml` files in the repo that allow for de
 
 HydroBOT can be run piecemeal or all at once, scripted. Point it at a directory of hydrologic scenarios, and HydroBOT will run them through the modules, aggregate the outputs, and present results, with control by the user through function arguments. Each stage builds a runnable set of parameter metadata based on function arguments for tracking provenance and reproducibility. Typical approaches use R scripts, Quarto notebooks, or automation on HPC or azure systems with yaml parameter files and shell/R scripts.
 
-See the [WERP_toolkit_demo](https://mdbauth.github.io/WERP_toolkit_demo/) for a full demonstration and the [template repo](https://github.com/MDBAuth/toolkit_use) for a bare-bones project structure.
+See the [HydroBOT documentation website](https://mdbauth.github.io/HydroBOT_website/) for a full demonstration and the [template repo](https://github.com/MDBAuth/toolkit_use) for a bare-bones project structure.
 
 Using HydroBOT is typically a three-step process:
 
@@ -78,7 +78,7 @@ Using HydroBOT is typically a three-step process:
 
 ## Example
 
-See the [WERP_toolkit_demo](https://mdbauth.github.io/WERP_toolkit_demo/) for a full demonstration.
+See the [HydroBOT website](https://mdbauth.github.io/HydroBOT_website/) for a full demonstration.
 
 ## Who do I talk to?
 
