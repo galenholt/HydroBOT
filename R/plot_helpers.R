@@ -259,7 +259,11 @@ find_limits <- function(limcol, lims, trans, base_list) {
         lims <- exp(loglims)
       }
       if (!base_list$comp_fun %in% c('difference', 'relative')) {
-        new_lims <- NULL
+        if (length(limcol) == 2) {
+          new_lims <- limcol
+        } else {
+          new_lims <- NULL
+        }
       }
     }
   }
