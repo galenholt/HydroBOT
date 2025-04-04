@@ -23,6 +23,14 @@ relationships in the response models are included, though in general the
 current versions should be obtained from the EWR tool directly with
 `get_causal_ewr()`.
 
+<div id="doc_site" style="color: red">
+
+***See the [documentation
+website](https://mdbauth.github.io/HydroBOT_website/) for more
+installation instructions and examples.***
+
+</div>
+
 The [template repo](https://github.com/MDBAuth/toolkit_use) can be
 helpful for establishing project structure to use the HydroBOT and
 automating the setup process, particularly if you are on Linux or want
