@@ -1,6 +1,6 @@
 #' Pair EWR indicators to environmental objectives
 #'
-#'  DEPRECATED- use [get_causal_ewr()]. Bespoke function to clean the EWR table and LTWP table, extract environmental objectives, and pair them. Will need to change or at least extensively retest if those datasets change
+#'  Typically, use [get_causal_ewr()]. Bespoke function to clean the EWR table and LTWP table, extract environmental objectives, and pair them. Will need to change or at least extensively retest if those datasets change
 #'
 #' @param ewrobjpath path to the ewr-obj mapping. Default 'ewrtool' just uses the version in the tool.
 #' @param gaugescale logical, whether to return data at the gauge scale by remapping from LTWPShortName to gauge (`TRUE`), or to just leave at the LTWPShortName (e.g. sdl unit) scale as NSW now defines the relationships (`FALSE`)
@@ -12,28 +12,33 @@
 #' @param savename character for the filename to save. the date and time gets appended to avoid overwriting
 #'
 #' @return A `tibble` with columns for `LTWPShortName`, `ewr_code`, `ewr_code_timing`, and `env_obj` (if `gaugescale = FALSE`), and including `PlanningUnitID` and `gauge` if `gaugescale = TRUE`)
-#' @keywords internal
+#' @export
 clean_ewr_obj <- function(ewrobjpath = 'ewrtool',
                           gaugescale = TRUE,
                           saveout = FALSE,
                           outdir, savename) {
 
-  rlang::warn("ewr causals are now provided by py_ewr, obtain with `get_causal_ewr()`. This is provided for historical purposes but will likely be deprecated soon.")
+  rlang::inform("Typically we should use `causal_ewr` or obtain from py-ewr with `get_causal_ewr()`. `clean_ewr_obj()` is provided for certain handbuilding situations (typically beta-versions of causal networks).")
 
   if (ewrobjpath == 'ewrtool') {
     # the python in the EWR tool that gives `get_ewr_table` drops the columns we need, so get the sheet directly
-    objective_mapping <- get_raw_ewrsheet() |>
+    objective_mapping <- get_raw_ewrsheet()
+    names(objective_mapping) <- nameclean(names(objective_mapping))
+
+    objective_mapping <- objective_mapping |>
       cleanewrs() |>
       dplyr::select("planning_unit_name", "gauge", "ewr_code", "ewr_code_timing",
-                    "eco_objective_code", "high_level", "state",
+                    "env_obj", "high_level", "state",
                     LTWPShortName = "l_t_w_p_short_name")
 
     # we can't do a good job linking these yet, so make a few versions that will do the best we can.
     ewr2obj_embedded <- objective_mapping |>
       dplyr::select(-"high_level") |>
-      dplyr::mutate(env_obj = strsplit(.data$eco_objective_code, split = '_')) |>
+      dplyr::mutate(env_obj = strsplit(.data$env_obj, split = '_')) |>
       tidyr::unnest_longer(col = "env_obj") |>
-      dplyr::select(-"eco_objective_code")
+      dplyr::distinct(.data$planning_unit_name, .data$gauge, .data$ewr_code,
+                      .data$ewr_code_timing, .data$state, .data$l_t_w_p_short_name, .data$SWSDLName)
+
 
     ewr2obj <- ewr2obj_embedded |>
       dplyr::mutate(Target = dplyr::case_when(grepl('^NF', .data$env_obj) ~ "Native fish",
