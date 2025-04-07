@@ -12,3 +12,4 @@ ggplot
 \description{
 quick map of the gauges in the ewr tool
 }
+\keyword{internal}

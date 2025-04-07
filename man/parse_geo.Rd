@@ -24,3 +24,4 @@ Only length-1 entries in aggregation sequence are turned into dataframes. See
 \code{\link[=multi_aggregate]{multi_aggregate()}} for use. Intended to be used with \code{\link[purrr:map]{purrr::map()}} or
 similar.
 }
+\keyword{internal}

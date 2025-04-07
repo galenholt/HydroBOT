@@ -12,8 +12,7 @@
 #'
 #' @return a tibble of nodes with new attribute columns needed to control the
 #'   look in `DiagrammeR`
-#' @export
-#'
+#' @keywords internal
 node_plot_atts <- function(nodedf) {
   # The way I'm getting x is crude, and likely will fail once we have more
   # complex networks

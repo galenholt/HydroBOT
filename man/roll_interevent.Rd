@@ -19,3 +19,4 @@ numeric vector
 \description{
 Helper to get the rolling maximum interevent duration without clogging up the mutates
 }
+\keyword{internal}

@@ -21,3 +21,4 @@ length-2 limits (or NULL)
 \description{
 Very similar to \code{\link[=findlimits]{findlimits()}}, which has been deprecated
 }
+\keyword{internal}

@@ -2,3 +2,85 @@ url: https://laughing-adventure-8jypg4z.pages.github.io/
 template:
   bootstrap: 5
 
+reference:
+
+- title: "Primary functions"
+  contents:
+  - prep_run_save_ewrs
+  - read_and_agg
+  - run_hydrobot_params
+  - plot_outcomes
+
+- title: "Aggregator"
+- subtitle: "Multi-dimensional"
+  contents:
+  - read_and_agg
+  - multi_aggregate
+- subtitle: "Dimension handling"
+  contents:
+  - general_aggregate
+  - spatial_aggregate
+  - temporal_aggregate
+  - theme_aggregate
+- subtitle: "Built-in summary functions"
+  contents:
+  - matches('^[A-Z]')
+  - maxInterevent
+- subtitle: "Helpers"
+  contents:
+  - agg_names_to_cols
+  - identify_dimension
+  - is_notpoint
+  - is_point
+  - is_sf
+
+- title: "Plotting and comparer"
+  contents:
+  - plot_outcomes
+  - baseline_compare
+  - theme_hydrobot
+  - create_base
+  - difference
+  - relative
+  - oddsratio
+  - grouped_colors
+  - handle_palettes
+  - make_pal
+  - make_plot_table
+  - plot_data_prep
+  - plot_style_prep
+
+- title: "Causal networks"
+  contents:
+  - contains('causal')
+  - make_edges
+  - make_nodes
+  - find_related_nodes
+
+- title: "Provided Data"
+  contents:
+  - basin
+  - basin_rivers
+  - bom_basin_gauges
+  - causal_ewr
+  - cewo_valleys
+  - planning_units
+  - resource_plan_areas
+  - sdl_units
+
+- title: "Module helpers"
+  contents:
+  - read_hydro
+  - contains('ewr')
+  - get_iqqm_gauges
+  - get_module_output
+  - make_output_dir
+  - read_and_geo
+
+- title: "Sometimes helpful extras"
+  contents:
+  - check_missing_runs
+  - find_expected_files
+  - find_missing_runs
+  - find_scenario_paths
+  - safe_imap

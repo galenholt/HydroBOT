@@ -15,3 +15,4 @@ arglist
 \description{
 Clean up the sequences if they are provided in r scripts or otherwise
 }
+\keyword{internal}

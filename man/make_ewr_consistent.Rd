@@ -15,3 +15,4 @@ list of EWR types with standard names
 \description{
 handle some different naming conventions
 }
+\keyword{internal}

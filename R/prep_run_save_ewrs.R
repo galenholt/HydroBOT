@@ -318,7 +318,7 @@ prep_run_save_ewrs <- function(hydro_dir,
 #' @param ewr_out EWR output dataframe as returned directly from python to R
 #'
 #' @return tibble, cleaned EWR outputs
-#'
+#' @keywords internal
 clean_ewr_in_R <- function(ewr_out) {
   # some ewr outputs have list-columns, and sometimes within those columns are
   # python datetime objects. Why isn't reticulate translating them? One option
@@ -375,6 +375,7 @@ clean_ewr_in_R <- function(ewr_out) {
 #' @param typearg list of characters for the EWR types
 #'
 #' @return list of EWR types with standard names
+#' @keywords internal
 make_ewr_consistent <- function(typearg) {
   if (length(typearg) == 1 && typearg[[1]] == 'everything') {
     typearg <- list('summary',

@@ -51,32 +51,11 @@ get_raw_ewrsheet <- function() {
   return(rawsheet)
 }
 
-#' Check the ewr version.
-#'
-#' @return character, version number
-#'
-check_ewr_version <- function() {
-  pypkgs <- reticulate::py_list_packages()
-  ewrversion <- pypkgs$version[which(pypkgs$package == "py_ewr")]
-
-  if (length(ewrversion) == 0) {
-    rlang::inform("reticulate can't find version. Trying brute force")
-    path_to_pypkgs <- file.path(Sys.getenv("VIRTUAL_ENV"), "Lib/site-packages")
-    dirs <- list.files(path_to_pypkgs)
-    pyverdir <- dirs[grep("py_ewr-", dirs)]
-    # could get this from METADATA text file, but easier to just deal with the
-    # directory name
-    ewrversion <- stringr::str_remove_all(pyverdir, "py_ewr-") |>
-      stringr::str_remove_all(".dist-info")
-  }
-  return(ewrversion)
-}
-
 #' quick map of the gauges in the ewr tool
 #'
 #' @return ggplot
 #'
-
+#' @keywords internal
 map_ewr_gauges <- function() {
   ewrgauges <- get_ewr_gauges()
   gaugemap <- ggplot2::ggplot() +

@@ -12,3 +12,4 @@ get_data_agg(werp_plot)
 \description{
 The data aggregation extractor for make_plot_table
 }
+\keyword{internal}

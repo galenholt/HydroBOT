@@ -91,3 +91,4 @@ ggplot object
 \description{
 Make a heatmap
 }
+\keyword{internal}

@@ -19,3 +19,4 @@ an \code{sf} dataframe with gauge locations as points in the geometry
 \description{
 Typically used for EWR outputs, but anything with a \code{gauge} column with gauge numbers as characters will work.
 }
+\keyword{internal}

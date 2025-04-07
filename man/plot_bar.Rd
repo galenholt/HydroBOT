@@ -32,3 +32,4 @@ ggplot object
 \description{
 main function to make a standard bar plot with \code{\link[ggplot2:geom_bar]{ggplot2::geom_col()}}
 }
+\keyword{internal}

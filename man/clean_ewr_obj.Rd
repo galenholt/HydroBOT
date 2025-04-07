@@ -34,3 +34,4 @@ A \code{tibble} with columns for \code{LTWPShortName}, \code{ewr_code}, \code{ew
 \description{
 DEPRECATED- use \code{\link[=get_causal_ewr]{get_causal_ewr()}}. Bespoke function to clean the EWR table and LTWP table, extract environmental objectives, and pair them. Will need to change or at least extensively retest if those datasets change
 }
+\keyword{internal}

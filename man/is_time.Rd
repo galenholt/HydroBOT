@@ -16,3 +16,4 @@ Logical
 \description{
 Intended to be purrr-ed over from aggsequence
 }
+\keyword{internal}

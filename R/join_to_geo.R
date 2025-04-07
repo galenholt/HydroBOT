@@ -7,7 +7,7 @@
 #' @param whichcrs desired crs of the output. input crs assumed to be WGS84, EPSG 4326
 #'
 #' @return an `sf` dataframe with gauge locations as points in the geometry
-#' @export
+#' @keywords internal
 #'
 join_to_geo <- function(data_df, spatial_locs, whichcrs = 4283) {
   # assume since lat/long this is wgs84 but could be some other geodetic datum

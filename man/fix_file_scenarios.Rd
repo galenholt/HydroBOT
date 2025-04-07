@@ -25,3 +25,4 @@ not, filenames that have the scenario name in them with the gauge name. This
 function tests if there's an issue, tries to fix it and informs or warns the
 user to name files better
 }
+\keyword{internal}

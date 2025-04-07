@@ -12,8 +12,7 @@
 #' @param savename character for the filename to save. the date and time gets appended to avoid overwriting
 #'
 #' @return A `tibble` with columns for `LTWPShortName`, `ewr_code`, `ewr_code_timing`, and `env_obj` (if `gaugescale = FALSE`), and including `PlanningUnitID` and `gauge` if `gaugescale = TRUE`)
-#' @export
-
+#' @keywords internal
 clean_ewr_obj <- function(ewrobjpath = 'ewrtool',
                           gaugescale = TRUE,
                           saveout = FALSE,

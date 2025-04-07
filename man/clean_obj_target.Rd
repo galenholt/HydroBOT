@@ -37,3 +37,4 @@ a \code{tibble} linking the \code{env_obj} to several different outcomes- \code{
 \description{
 DEPRECATED- use \code{\link[=get_causal_ewr]{get_causal_ewr()}}.Bespoke function to clean up the current input data.
 }
+\keyword{internal}

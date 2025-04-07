@@ -16,3 +16,4 @@ character vector
 \description{
 Intended to be used with \code{\link[purrr:map]{purrr::map()}}.
 }
+\keyword{internal}

@@ -33,3 +33,4 @@ robust and general, relying on using \code{tidyselect} itself. Allows passing
 character vectors, bare names, or tidyselect syntax, provided this function
 is called at the right place in the call stack
 }
+\keyword{internal}

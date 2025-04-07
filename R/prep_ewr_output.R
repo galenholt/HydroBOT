@@ -32,7 +32,7 @@ prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
 
   if (type == "achievement") {
 
-    yeardat <- clean_yearly(dat)
+    yeardat <- clean_ewr_yearly(dat)
 
     if (year_roll == "best") {
       year_roll <- ifelse(length(unique(yeardat$year)) >= 10, 10, 1)
@@ -84,7 +84,7 @@ cleanewrs <- function(ewrdf) {
 #'
 #' @return tibble of the cleaned yearly EWR output
 #' @export
-clean_yearly <- function(annualdf) {
+clean_ewr_yearly <- function(annualdf) {
 
   # Dates break on the water/financial year.
   # and represent the start of the period- macq historic scenario: data starts - 1889-01-01 and the first EWR result is for 1888. confirms dates are the beginning, 2014 = 2014-2015
@@ -253,7 +253,7 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 #' @param pad_initial Allow calculating values in the first years < year_roll; roll the year_roll if possible, otherwise as much as possible. Note that this makes the 1:year_roll entries less smoothed.
 #' @param na.rm default FALSE, na action for the sums over lags- TRUE is tempting, but can cause fails for high thresholds when we don't actually know whether they're met, and so FALSE is more appropriate (keeps intermediates NA).
 #' @return numeric vector
-#' @export
+#' @keywords internal
 #'
 
 roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = FALSE) {
@@ -324,7 +324,7 @@ roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = FALSE) {
 #' @param pad_initial Allow calculating values in the first years < year_roll; roll the year_roll if possible, otherwise as much as possible. Note that this makes the 1:year_roll entries less smoothed.
 #'
 #' @return numeric vector
-#' @export
+#' @keywords internal
 #'
 
 roll_interevent <- function(x, year_roll, pad_initial = FALSE) {
@@ -403,9 +403,7 @@ maxInterevent <- function(x) {
 #' @param outdf #EWR summary output with pass fail results
 #'
 #' @return tibble with a MAX scenario added
-#' @export
-#'
-
+#' @keywords internal
 bind_max <- function(outdf) {
   MAX_scenario <- outdf |>
     dplyr::select('gauge', 'planning_unit_name', 'state', 'SWSDLName', 'ewr_code', 'ewr_code_timing') |>

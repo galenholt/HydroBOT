@@ -5,7 +5,7 @@
 #' @param colvec character vector of colors
 #'
 #' @return object of class colors
-#'
+#' @keywords internal
 as_colors <- function(colvec) {
   class(colvec) <- 'colors'
   return(colvec)

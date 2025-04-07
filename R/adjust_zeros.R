@@ -11,7 +11,7 @@
 #'   already is if `FALSE`
 #'
 #' @return dataframe with no zeros in `adjust_col`
-
+#' @keywords internal
 adjust_zeros <- function(data, adjust_col, amount, onlyzeros = FALSE) {
   # handle 'auto' adjustment
   if (grepl("auto", amount)) {

@@ -24,7 +24,7 @@ ewrpath <- file.path(temp_parent_dir, 'module_output', 'EWR')
 test_that("assessment works", {
   yeardat <- get_module_output(ewrpath, type = 'yearly')
   yeardat <- cleanewrs(yeardat)
-  yeardat <- clean_yearly(yeardat)
+  yeardat <- clean_ewr_yearly(yeardat)
 
   # use a 3-year roll since the data only has 5 years
   assessed <- assess_ewr_achievement(yeardat, year_roll = 3)

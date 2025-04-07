@@ -15,3 +15,4 @@ tibble with a MAX scenario added
 \description{
 Add max scenario
 }
+\keyword{internal}

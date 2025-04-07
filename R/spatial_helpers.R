@@ -10,7 +10,6 @@ vertcount <- function(polyg) {
     sum()
 }
 
-# Prep the to polygons
 add_polyID <- function(geosf, failduplicate = TRUE) {
   # Make unique IDs for  the polygons being aggregated into. They probably have
   # something unique, but this ensures it rather than assumes, and gives it a

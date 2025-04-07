@@ -15,3 +15,4 @@ object of class colors
 \description{
 This \emph{must} exist somewhere, because other packages make things with class 'colors', but when I c() to them it breaks.
 }
+\keyword{internal}

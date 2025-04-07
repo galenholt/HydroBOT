@@ -77,3 +77,4 @@ ggplot object composed of stacked maps according to underover_list
 This gets run once each for under and overlays. It is itself agnostic to
 whether it is under or over the 'main' plot.
 }
+\keyword{internal}

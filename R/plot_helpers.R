@@ -13,7 +13,7 @@
 #' @param pal_list as in [plot_outcomes()]
 #'
 #' @return character, one of 'colorobj', 'paletteer_c', 'paletteer_d', 'grouped', 'fixed' that help other functions know what to do wiht color/fill
-#'
+#' @keywords internal
 find_color_type <- function(pal_list) {
 
   # if it's a color object
@@ -191,7 +191,7 @@ handle_palettes <- function(ggobj, aes_type, pal_list, color_type,
 #' @param data the prepped data to be plotted
 #'
 #' @return TRUE if there's no overplotting, otherwise aborts
-#' @export
+#' @keywords internal
 #'
 
 test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col = NULL, y_col = NULL) {
@@ -235,7 +235,7 @@ test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col =
 #' @param trans transform if any
 #'
 #' @return length-2 limits (or NULL)
-#'
+#' @keywords internal
 find_limits <- function(limcol, lims, trans, base_list) {
   # If null, keep it that way
   if (is.null(lims)) {
@@ -307,112 +307,4 @@ find_limits <- function(limcol, lims, trans, base_list) {
   }
 
   return(new_lims)
-}
-
-
-
-# DEPRECATED --------------------------------------------------------------
-
-#' Finds limits for the color scale, accounting for prepped data and baselining.
-#'
-#' allows (by crude inference) centering diverging palettes with baseline
-#' comparisons This has been deprecated in favor of [find_limits()], though it
-#' was nice that this could be inserted into the function call directly, since
-#' it took the x as an argument.
-#'
-#' Previous use:
-#' `paletteer::scale_fill_paletteer_c(palette = pal_list[[1]], trans = transoutcome, limit = \(x) findlimits(x,lims = setLimits,base_list = base_list),direction = pal_direction)`
-#'
-#' @param x the default data range passed in by the palette
-#' @param lims desired limits. see `setLimits` in [plot_outcomes()]
-#' @param base_list as in [plot_outcomes()]
-#'
-#' @return length-2 limits
-#'
-
-findlimits <- function(x, lims, base_list) {
-
-  rlang::abort("findlimits deprecated for now, in favour of the seemingly more general find_limits")
-  # use defaults if lims is null or if its length is 1 (that is a midpoint, handled by findrescale)
-  if (is.null(lims)) {
-    newLimits = x
-  }
-
-  # use hard-set user-supplied limits
-  if (!is.null(lims) & length(lims) == 2) {
-    newLimits = lims
-  }
-
-  # If there are 1 or 3 lims, use the middle as a midpoint. This may override one end if the aren't symmetrical about the mid
-  if (!is.null(lims) & length(lims) %in% c(1, 3)) {
-    middown <- abs(lims[2]-lims[1])
-    middup <- abs(lims[3] - lims[2])
-    distfrommid <- max(middown, middup)
-
-    if (middown != middup) {
-      rlang::inform(glue::glue("Limits {lims} not symmetrical about the midpoint.
-                               ignoring the one with the smallest difference.
-                               Making them {distfrommid} up and down from the midpoint {lims[2]}."))
-    }
-
-
-    lower <- lims[2] - distfrommid
-    upper <- lims[2] + distfrommid
-    newLimits <- c(lower, upper)
-  }
-
-  return(newLimits)
-}
-
-#' Set the midpoint of the color/fill. DANGEROUS- DO NOT USE WITHOUT A LOT MORE TESTING
-#'
-#' @param x data
-#' @param lims the seLimits, see [plot_outcomes()]
-#' @param base_list see [plot_outcomes()]
-#' @param from passed argument, have to handle
-#' @param trans transoutcome, as in [plot_outcomes()]
-#'
-#' @return vector
-findrescale <- function(x,
-                        lims,
-                        base_list,
-                        # to = c(0,1),
-                        from = range(x, na.rm = TRUE),
-                        trans = 'identity') {
-
-  rlang::abort("findrescale should be a good solution, but it dangerously rescales the data if there are limits. Needs more thought to use properly")
-  # if lims is NULL, we arent' trying to set midpoint, so don't do anything
-  # *UNLESS* we're baselining.
-  # Other situations (baselining and having setlims), let the user override the
-  # baseline centering
-  if (is.null(lims)) {
-    if (is.null(base_list)) {
-      newrescaler <- scales::rescale(x)
-    }
-    if (!is.null(base_list)) {
-      if (base_list$comp_fun == 'difference') {
-        newrescaler <- scales::rescale_mid(x, mid = 0)
-      }
-      if (base_list$comp_fun == 'relative') {
-        newrescaler <- scales::rescale_mid(x, mid = rlang::exec(get(trans), 1))
-      }
-      if (!base_list$comp_fun %in% c('difference', 'relative')) {
-        newrescaler <- scales::rescale(x)
-      }
-    }
-
-  }
-
-  # use hard-set user-supplied midpoint
-  if (!is.null(lims) & length(lims) == 1) {
-    newrescaler <- scales::rescale_mid(x, mid = lims)
-  }
-
-  # If there are 3 lims, use the middle as a midpoint, but doing the midpoint
-  # this way happens in findLimits, so ignore here
-  if (!is.null(lims) & length(lims) != 1) {
-    newrescaler <- scales::rescale(x, to = c(0,1), from = from)
-  }
-
-  return(newrescaler)
 }

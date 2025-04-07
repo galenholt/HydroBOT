@@ -22,3 +22,4 @@ other attributes (see \code{DiagrammeR} documentation), and we'll likely also wa
 to set some of these (especially height and width) functionally (like we do
 with color)
 }
+\keyword{internal}

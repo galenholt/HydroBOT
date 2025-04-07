@@ -20,3 +20,4 @@ an sf on the scale of to_geo
 This is really just a left join that bypasses the geometry, and has some
 checks.
 }
+\keyword{internal}

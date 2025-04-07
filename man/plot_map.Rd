@@ -96,3 +96,4 @@ Plots a standard map, with potentially underlay and overlays, specified by
 across the layers. There are some inherent limitations about color/fill and
 points/polygons due to masking and use of multiple color/fill ramps
 }
+\keyword{internal}

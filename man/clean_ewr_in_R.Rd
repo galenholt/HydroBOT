@@ -15,3 +15,4 @@ tibble, cleaned EWR outputs
 \description{
 Clean up the EWR outputs so returns look like they do when read from csv. Mostly dateparsing from py objects
 }
+\keyword{internal}

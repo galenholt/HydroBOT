@@ -17,3 +17,4 @@ a named list of functions
 \description{
 Function cleanup to allow passing character, bare names, and list-formatted functions
 }
+\keyword{internal}

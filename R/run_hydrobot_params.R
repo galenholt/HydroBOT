@@ -150,7 +150,7 @@ run_hydrobot_params <- function(yamlpath = NULL,
 #'
 #' @param arglist list of arguments
 #'
-
+#' @keywords internal
 make_default_args <- function(arglist) {
   if (arglist$ewr$hydro_dir == "default" || is.null(arglist$ewr$hydro_dir)) {
     arglist$ewr$hydro_dir <- file.path(arglist$ewr$output_parent_dir, "hydrographs")
@@ -176,7 +176,7 @@ make_default_args <- function(arglist) {
 #'
 #' @param arglist list of arguments
 #'
-
+#' @keywords internal
 type_cleanup <- function(arglist) {
   if (!is.list(arglist$ewr$returnType)) {
     arglist$ewr$returnType <- as.list(arglist$ewr$returnType)
@@ -194,7 +194,7 @@ type_cleanup <- function(arglist) {
 #' @param arglist
 #'
 #' @returns arglist
-#'
+#' @keywords internal
 clean_sequences <- function(arglist) {
   # R file allows aggregation definition with R types and expressions. This is
   # the most general, but also requires extra files and makes handling metadata

@@ -104,7 +104,7 @@ get_module_output <- function(dir, type,
 #' @param charvec vector of names
 #'
 #' @return a character vector
-
+#' @keywords internal
 nameclean <- function(charvec) {
   cleannames <- charvec |>
     stringr::str_replace_all("([A-Z])", "_\\1") |>

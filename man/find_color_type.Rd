@@ -26,3 +26,4 @@ Does not automate other things like making the colors
 object from data and pal_list; not necessary and is fraught.
 }
 }
+\keyword{internal}

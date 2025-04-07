@@ -20,7 +20,7 @@
 #'   has the `area` calculated and added as a column. The geometry is dropped
 #'   for speed, and expected to add back in later with a `dplyr::left_join` to `to_geo`
 #'   after aggregation or other processing.
-#' @export
+#' @keywords internal
 #'
 
 spatial_joiner <- function(from_geo, to_geo, whichcrs) {
@@ -122,7 +122,7 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
 #'
 #' @return an sf on the scale of to_geo
 #'
-
+#' @keywords internal
 pseudo_spatial_joiner <- function(from_geo, to_geo, prefix) {
   from_geo <- from_geo |> dplyr::select(-tidyselect::any_of("polyID"))
 

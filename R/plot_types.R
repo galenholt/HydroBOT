@@ -7,9 +7,7 @@
 #' @param prepped prepared data from `plot_data_prep() |>  plot_style_prep()`
 #'
 #' @return ggplot object
-#' @export
-#'
-
+#' @keywords internal
 plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
                      position, transoutcome) {
   outcome_plot <- prepped$data |>
@@ -48,9 +46,7 @@ plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
 #'   be identified.
 #'
 #' @return ggplot object
-#' @export
-#'
-
+#' @keywords internal
 plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
                          position, transoutcome, transx,
                          smooth_arglist, xtype = "numeric") {
@@ -151,9 +147,7 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
 #' @param prepped prepared data from `plot_data_prep() |>  plot_style_prep()`
 #'
 #' @return ggplot object
-#' @export
-#'
-
+#' @keywords internal
 plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "grey35", outcome_lab,
                      facet_wrapper, facet_row, facet_col,
                      sceneorder, transoutcome, setLimits, base_list) {
@@ -313,9 +307,7 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "g
 #'   an item in 'underover_list'). Not used, except for compatibility
 #'
 #' @return ggplot object composed of stacked maps according to underover_list
-#' @export
-#'
-
+#' @keywords internal
 make_underover <- function(underover_list,
                            outcome_plot,
                            sceneorder,
@@ -501,9 +493,7 @@ make_underover <- function(underover_list,
 #'   covers several different date types). Determines how axes are handled
 #'
 #' @return ggplot object
-#' @export
-#'
-
+#' @keywords internal
 plot_heatmap <- function(prepped,
                          x_col, x_lab,
                          y_col, y_lab,

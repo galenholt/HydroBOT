@@ -12,3 +12,4 @@ type_cleanup(arglist)
 \description{
 Sometimes single values come in as characters instead of lists
 }
+\keyword{internal}

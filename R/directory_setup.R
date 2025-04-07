@@ -116,7 +116,7 @@ make_output_dir <- function(parent_dir,
 #'
 #' @return character vector of scenario names
 #'
-
+#' @keywords internal
 scenario_names_from_hydro <- function(hydro_dir) {
 
   # Remove files with extensions- we only want directories
@@ -152,7 +152,7 @@ scenario_names_from_hydro <- function(hydro_dir) {
 #' @param scenarios names of the scenarios, useful for cross-checking
 #'
 #' @return paths to hydrographs, possibly fixed
-#'
+#' @keywords internal
 
 fix_file_scenarios <- function(hydro_paths, scenarios) {
   # Do the split exactly like the ewr tool to make sure the scenarios will work

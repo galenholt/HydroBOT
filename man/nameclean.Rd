@@ -15,3 +15,4 @@ a character vector
 \description{
 Helper to sort the names
 }
+\keyword{internal}

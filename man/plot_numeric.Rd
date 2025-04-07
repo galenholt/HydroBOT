@@ -65,3 +65,4 @@ Often (but not always) this is used when scenario is defined numerically.
 Uses \code{\link[ggplot2:geom_path]{ggplot2::geom_line()}} or \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}. Takes a
 \code{smooth_arglist} argument to control that smoother
 }
+\keyword{internal}

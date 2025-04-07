@@ -22,3 +22,4 @@ c('ewr_code_timing', 'ewr_code'), sdl_units = sdl_units), parse_char)
 \description{
 Intended to be used with \code{\link[purrr:imap]{purrr::imap()}}.
 }
+\keyword{internal}

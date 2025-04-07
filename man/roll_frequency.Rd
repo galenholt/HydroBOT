@@ -21,3 +21,4 @@ numeric vector
 \description{
 Helper to get the frequency of occurrence without clogging up the mutates
 }
+\keyword{internal}

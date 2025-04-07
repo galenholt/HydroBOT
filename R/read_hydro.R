@@ -26,8 +26,7 @@ read_hydro <- function(hydropath, scenariofilter = NULL, long = TRUE, format = "
 #' @inheritParams read_hydro
 #'
 #' @return tibble of hydrographs
-#' @export
-#'
+#' @keywords internal
 read_hydro_csv <- function(hydropath, scenariofilter, long) {
   hydro_paths <- find_scenario_paths(hydropath, type = "csv")
 
@@ -75,7 +74,7 @@ read_hydro_csv <- function(hydropath, scenariofilter, long) {
 #' @inheritParams read_hydro
 #'
 #' @return tibble of hydrographs
-#' @export
+#' @keywords internal
 #'
 read_hydro_nc <- function(hydropath, scenariofilter, long, gaugemap) {
   rlang::check_installed(c("metR", "PCICt", "ncdf4"), reason = "reading netcdf hydrographs requires `metR`, which requires `PCICt`.")

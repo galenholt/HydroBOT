@@ -26,3 +26,4 @@ dataframe with no zeros in \code{adjust_col}
 \description{
 Adjust zeros to make relativizing, logging, etc smoother
 }
+\keyword{internal}

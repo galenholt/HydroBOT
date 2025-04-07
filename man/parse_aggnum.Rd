@@ -19,3 +19,4 @@ numeric index for each group_until
 Main function of parse_group_until, finds the index for different ways of
 specifying group_until
 }
+\keyword{internal}

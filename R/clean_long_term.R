@@ -11,8 +11,7 @@
 #'   * `'csv'`: saves a csv with the name `outdir/savename_YearMonthDayHourMinute.csv`
 #'
 #' @return a `tibble` with matching env_objs, Targets, Objectives, and the 5,10, and 20 year targets. No spatial information (gauge, planning unit)
-#' @export
-#'
+#' @keywords internal
 clean_long_term <- function(yrpath,
                             saveout = FALSE,
                             outdir, savename) {

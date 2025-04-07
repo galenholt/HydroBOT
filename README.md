@@ -46,6 +46,14 @@ Install the development version of HydroBOT from
 devtools::install_git("git@github.com:MDBAuth/HydroBOT.git", ref = 'master', force = TRUE, upgrade = 'ask', git = 'external')
 ```
 
+``` r
+library(HydroBOT)
+#> Loading required package: sf
+#> Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.3.1; sf_use_s2() is TRUE
+```
+
+<div id="install-note" style="color: gray">
+
 R uses a different Home directory than standard (typically
 `~/Documents`), and so if this fails, try to [set up SSH
 keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
@@ -55,17 +63,23 @@ There are slightly slicker ways to do it, but they don’t work well
 currently. See [developer docs](developer.md) for details or if the
 above doesn’t work.
 
+</div>
+
+<div id="py-install" style="color: gray">
+
 ### Python dependency
 
 To run, this needs a Python environment containing `py_ewr` (currently
-2.3.0). The package will manage that for you if you just start using it-
-on first use, the package checks the environment and either uses an
-existing python environment or builds one with that dependency when the
-package is loaded.
+py-ewr 2.3.7). The package will manage that for you if you just start
+using it- on first use, the package checks the environment and either
+uses an existing python environment or builds one with that dependency
+when the package is loaded.
 
 There are `poetry.lock` and `pyproject.toml` files in the repo that
 allow for dev work and building the venv manually if more control over
 python is desired.
+
+</div>
 
 ## Use
 
@@ -127,11 +141,129 @@ Using HydroBOT is typically a three-step process:
     - The return from `plot_outcomes()` is a ggplot object, which can
       then be tweaked as usual.
 
-## Developement
+## Example run
+
+A simple run of HydroBOT with the provided example data works as
+follows. See the [documentation
+website](https://mdbauth.github.io/HydroBOT_website) for much more
+detail.
+
+Any real run should think carefully about the aggregation and plotting
+decisions. For much more detail about setting up runs, see the
+[documentation](https://https://mdbauth.github.io/HydroBOT_website/workflows/workflow_overview).
+
+The path to the hydrographs
+
+``` r
+hydro_dir <- system.file("extdata/testsmall/hydrographs", package = "HydroBOT")
+```
+
+Run the EWR tool and return the output to memory, rather than saving for
+this small example. See
+[documentation](mdbauth.github.io/HydroBOT_website/controller/controller_overview)
+for more details
+
+``` r
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = hydro_dir,
+  output_parent_dir = tempdir(),
+  outputType = list("none"),
+  returnType = list("yearly")
+)
+```
+
+Set up the aggregation steps, see
+[documentation](https://mdbauth.github.io/HydroBOT_website/aggregator/aggregation_overview)
+for more detail.
+
+``` r
+aggseq <- list(
+  all_time = "all_time",
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  env_obj = c("ewr_code", "env_obj"),
+  sdl_units = sdl_units,
+  Target = c("env_obj", "Target"),
+  mdb = basin,
+  target_5_year_2024 = c("Target", "target_5_year_2024")
+)
+
+funseq <- list(
+  all_time = "ArithmeticMean",
+  ewr_code = "CompensatingFactor",
+  env_obj = "ArithmeticMean",
+  sdl_units = "ArithmeticMean",
+  Target = "ArithmeticMean",
+  mdb = "SpatialWeightedMean",
+  target_5_year_2024 = "ArithmeticMean"
+)
+```
+
+Do the multi-dimensional aggregation, again just returning to memory.
+
+``` r
+aggout <- read_and_agg(
+  datpath = ewr_out,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  auto_ewr_PU = TRUE,
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE
+)
+```
+
+A couple figures to check it worked, see
+[documentation](https://mdbauth.github.io/HydroBOT_website/comparer/comparer_overview)
+for more detail.
+
+``` r
+map_example <- aggout$Target |>
+  # dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    plot_type = "map",
+    colorset = "ewr_achieved",
+    pal_list = list("scico::lapaz"),
+    pal_direction = -1,
+    facet_col = "Target",
+    facet_row = "scenario",
+    sceneorder = c("down4", "base", "up4"),
+    underlay_list = "basin"
+  ) +
+  ggplot2::theme(legend.position = "bottom")
+
+map_example
+```
+
+<img src="man/figures/README-map-1.png" width="100%" />
+
+``` r
+catchcompare <- aggout$env_obj |>
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    colorset = "SWSDLName",
+    pal_list = list("calecopal::lake"),
+    sceneorder = c("down4", "base", "up4"),
+    position = "dodge"
+  )
+
+catchcompare
+```
+
+<img src="man/figures/README-bar-1.png" width="100%" />
+
+## Development
 
 [see developer page](developer.md)
 
-## Example
+## Further examples
 
 See the [HydroBOT website](https://mdbauth.github.io/HydroBOT_website/)
 for a full demonstration.

@@ -32,3 +32,4 @@ This ensures the polygons have the same crs, are valid, optimises the
 geometry while retaining the \code{polyID} from the \code{from_geo} as a grouper for
 further aggregation and later re-joining to the geometry
 }
+\keyword{internal}

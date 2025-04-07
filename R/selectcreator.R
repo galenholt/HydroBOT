@@ -21,7 +21,7 @@
 #'   `eval_select` returns a named integer vector giving column indices, but we
 #'   return only the names because in use the indices may not be stable
 #'   throughout the calling function(s)
-#' @export
+#' @keywords internal
 #'
 selectcreator <- function(selectvals, data, failmissing = TRUE) {
 

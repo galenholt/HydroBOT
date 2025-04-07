@@ -37,3 +37,4 @@ TRUE if there's no overplotting, otherwise aborts
 Fill in maps and heatmaps can silently plot multiple values on top of each
 other. THis checks data dimension to ensure only a single value is plotted
 }
+\keyword{internal}

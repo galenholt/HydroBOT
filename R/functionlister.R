@@ -4,7 +4,7 @@
 #' @param forcenames force-name the functions. Often used if the names don't auto-populate correctly
 #'
 #' @return a named list of functions
-#' @export
+#' @keywords internal
 #'
 functionlister <- function(funs, forcenames = NULL) {
 

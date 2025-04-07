@@ -110,6 +110,7 @@ agg_names_to_cols <-
 #'   No `examples` tag here because we don't export this
 #'   purrr::map(list(ewr_code = c('ewr_code_timing', 'ewr_code'), sdl_units =
 #'   "sdl_units"), parse_geo)
+#' @keywords internal
 parse_geo <- function(x) {
   if (length(x) == 1 & is.character(x)) {
     xg <- mget(x, inherits = TRUE, ifnotfound = x)
@@ -138,7 +139,7 @@ parse_geo <- function(x) {
 #'
 #'   No `examples` tag because we don't export this purrr::imap(list(ewr_code =
 #'   c('ewr_code_timing', 'ewr_code'), sdl_units = sdl_units), parse_char)
-#'
+#' @keywords internal
 parse_char <- function(x, idx) {
   if (inherits(x, "data.frame")) {
     return(idx)
@@ -155,7 +156,7 @@ parse_char <- function(x, idx) {
 #' @param x entry in funsequence, typically character, list, or quosure
 #'
 #' @return character vector
-#'
+#' @keywords internal
 parse_char_funs <- function(x) {
   if (rlang::is_quosure(x)) {
     # deparsing it removes the quo, so add it back
@@ -179,7 +180,7 @@ parse_char_funs <- function(x) {
 #' @inheritParams multi_aggregate
 #'
 #' @return a named list of the group_until groupers with numeric index.
-
+#' @keywords internal
 parse_group_until <- function(group_until, groupers, aggsequence) {
   # get indexing for group_until drops
   if (!is.list(group_until)) {
@@ -214,7 +215,7 @@ parse_group_until <- function(group_until, groupers, aggsequence) {
 #' @param aggsequence as in [multi_aggregate()]
 #'
 #' @return numeric index for each group_until
-#'
+#' @keywords internal
 parse_aggnum <- function(x, aggsequence) {
   # if na, make grouper persist (if we test a closure it `warn`s)
   if (!rlang::is_function(x) && is.na(x)) {
@@ -299,6 +300,7 @@ identify_dimension <- function(aggsequence, causal_edges) {
 #' @param causalnames names of the columns in a causal network
 #'
 #' @return logical
+#' @keywords internal
 is_theme <- function(x, causalnames) {
   all(inherits(x, "character") &
     length(x) == 2 &
@@ -313,6 +315,7 @@ is_theme <- function(x, causalnames) {
 #' @param x a list-item
 #'
 #' @return Logical
+#' @keywords internal
 is_time <- function(x) {
   if (all(inherits(x, "POSIXt") | inherits(x, "Date"))) {
     return(TRUE)

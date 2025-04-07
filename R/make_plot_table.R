@@ -16,7 +16,7 @@ make_plot_table <- function(werp_plot) {
 #' The data aggregation extractor for make_plot_table
 #'
 #' @inheritParams make_plot_table
-#'
+#' @keywords internal
 get_data_agg <- function(werp_plot) {
 
   # expects !namehistory. we could generate it wiht agg_names_to_cols, but then
