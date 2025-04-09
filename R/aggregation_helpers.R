@@ -36,9 +36,6 @@ agg_names_to_cols <-
       funsequence[!fs] <- names(unlist(funsequence[!fs]))
     }
 
-    # suppressWarnings probably a bad idea, but there's a lot of really
-    # pointless warnings that get thrown
-    suppressWarnings(
       aggincols <- aggdf |>
         tidyr::pivot_longer(tidyselect::ends_with(aggCols)) |>
         # This removes the aggregation level name ('ewr_code', 'catchment', etc)
@@ -69,11 +66,17 @@ agg_names_to_cols <-
             collapse = "|"
           )
         )) |>
-        tidyr::separate(
-          .data$alllevs,
-          into = paste0("aggLevel_", length(funsequence):1),
-          sep = "__"
-        ) |>
+        # need too_many = 'drop' because the last bit is the name of the
+        # aggregated column, e.g. '_ewr_achieved.
+        # use too_many = 'debug' to confirm if there are ever issues.
+        tidyr::separate_wider_delim(.data$alllevs,
+                                    delim = "__",
+                                    names = paste0("aggLevel_", length(funsequence):1),
+                                    too_many = 'drop') |>
+        # There's an issue with using separate_wider_* with sf. Could go back to
+        # deprecated `separate()` or re-sf the object. Neither is particularly
+        # satisfying
+        sf::st_as_sf() |>
         dplyr::select(-.data$name) |>
         # sf seems to be behind tidyverse, and needs characters here instead of bare
         # names. Both seem to work for normal df/tibbles
@@ -86,7 +89,6 @@ agg_names_to_cols <-
             1:length(funsequence)
           )))
         )
-    )
 
     return(aggincols)
   }
