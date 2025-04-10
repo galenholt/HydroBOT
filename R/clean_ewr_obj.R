@@ -13,12 +13,14 @@
 #'
 #' @return A `tibble` with columns for `LTWPShortName`, `ewr_code`, `ewr_code_timing`, and `env_obj` (if `gaugescale = FALSE`), and including `PlanningUnitID` and `gauge` if `gaugescale = TRUE`)
 #' @export
-clean_ewr_obj <- function(ewrobjpath = 'ewrtool',
+clean_ewr_obj <- function(ewrobjpath = 'ewrcausal',
                           gaugescale = TRUE,
                           saveout = FALSE,
                           outdir, savename) {
 
-  rlang::inform("Typically we should use `causal_ewr` or obtain from py-ewr with `get_causal_ewr()`. `clean_ewr_obj()` is provided for certain handbuilding situations (typically beta-versions of causal networks).")
+  rlang::warn(c('i' = "The new pattern is to obtain from py-ewr with `get_causal_ewr()`, which then cleans with `clean_ewr_causal()`.",
+                '!' = "MODIFY NETWORKS IN CLEAN_EWR_CAUSAL()",
+                "clean_ewr_obj()` is provided for certain handbuilding situations (typically beta-versions of causal networks)."))
 
   if (ewrobjpath == 'ewrtool') {
     # the python in the EWR tool that gives `get_ewr_table` drops the columns we need, so get the sheet directly

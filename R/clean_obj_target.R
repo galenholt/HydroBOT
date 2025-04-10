@@ -19,8 +19,9 @@ clean_obj_target <- function(ewrobjs,
                               qcfiles,
                              saveout = FALSE,
                              outdir, savename) {
-  rlang::warn("ewr causals are now provided by py_ewr, obtain with `get_causal_ewr()`. This is provided for historical purposes but will likely be deprecated soon.")
-
+  rlang::warn(c('i' = "The new pattern is to obtain from py-ewr with `get_causal_ewr()`, which then cleans with `clean_ewr_causal()`.",
+                '!' = "MODIFY NETWORKS IN CLEAN_EWR_CAUSAL()",
+                "clean_obj_target()` is provided for certain handbuilding situations (typically beta-versions of causal networks)."))
 
   # This cuts to only a single row per planning unit/objective pair and drops the ewrs
   objpu <- ewrobjs |>

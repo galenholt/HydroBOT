@@ -7,14 +7,14 @@
 get_ewr_gauges <- function() {
   ewrs_in_pyewr <- get_ewr_table()
   gauges_in_pyewr <- ewrs_in_pyewr |>
-    dplyr::select("Gauge", "PlanningUnitName", "LTWPShortName", "GaugeType") |>
+    dplyr::select("Gauge", "PlanningUnitName", "LTWPShortName", "SWSDLName", "GaugeType") |>
     dplyr::distinct() |>
     tibble::tibble()
 
-  names(gauges_in_pyewr) <- stringr::str_to_lower(names(gauges_in_pyewr))
+  names(gauges_in_pyewr) <- nameclean(names(gauges_in_pyewr))
 
   gauges_in_pyewr <- gauges_in_pyewr |>
-    dplyr::left_join(HydroBOT::bom_basin_gauges) |>
+    dplyr::left_join(HydroBOT::bom_basin_gauges, by = 'gauge') |>
     sf::st_as_sf()
 
   return(gauges_in_pyewr)
@@ -117,5 +117,7 @@ get_causal_ewr <- function() {
     attributes(x)$pandas.index <- NULL
     return(x)
   })
+
+  gce <- clean_ewr_causal(gce)
   return(gce)
 }

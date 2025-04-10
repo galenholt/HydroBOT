@@ -16,7 +16,9 @@ clean_long_term <- function(yrpath,
                             saveout = FALSE,
                             outdir, savename) {
 
-  rlang::warn("ewr causals are now provided by py_ewr, obtain with `get_causal_ewr()`. This is provided for historical purposes but will likely be deprecated soon.")
+  rlang::warn(c('i' = "The new pattern is to obtain from py-ewr with `get_causal_ewr()`, which then cleans with `clean_ewr_causal()`.",
+                '!' = "MODIFY NETWORKS IN CLEAN_EWR_CAUSAL()",
+                "clean_long_term()` is provided for certain handbuilding situations (typically beta-versions of causal networks)."))
 
   # Need to know where this comes from
   obj2yrtargets <- readr::read_csv(yrpath, col_types = readr::cols())
