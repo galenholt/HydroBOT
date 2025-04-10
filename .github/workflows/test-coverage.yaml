@@ -37,7 +37,7 @@ jobs:
           poetry-version: "main"
 
       - name: Cache Poetry virtualenv
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         id: cache
         with:
           path: ~/.virtualenvs
