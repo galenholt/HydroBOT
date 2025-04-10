@@ -90,10 +90,25 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
     # The conditional is annoying, but gives dramatic speedup because the
     # spatial indexing on x means putting the low-vertex set of polygons in x is
     # MUCH faster
+    # muffle the constant sf warnings about attributes being spatially constant
     if (toverts <= fromverts) {
-      suppressWarnings(fromto_pair <- sf::st_intersection(to_poly, from_poly))
+      fromto_pair <- withCallingHandlers(
+        warning = function(cnd) {
+          if ((grepl('attribute variables are assumed to be spatially constant', cnd$message))) {
+            rlang::cnd_muffle(cnd)
+          }
+        },
+        sf::st_intersection(to_poly, from_poly)
+      )
     } else {
-      suppressWarnings(fromto_pair <- sf::st_intersection(from_poly, to_poly))
+      fromto_pair <- withCallingHandlers(
+        warning = function(cnd) {
+          if ((grepl('attribute variables are assumed to be spatially constant', cnd$message))) {
+            rlang::cnd_muffle(cnd)
+          }
+        },
+        sf::st_intersection(from_poly, to_poly)
+      )
     }
 
     # calculate area and drop geometry

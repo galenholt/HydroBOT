@@ -17,8 +17,9 @@ ewr_to_agg_timemean <- temporal_aggregate(ewr_to_agg,
                                           prefix = '') |>
   dplyr::rename(ewr_achieved = ArithmeticMean_ewr_achieved)
 
-# use the noPU style that ignores planning units because it yields better tests (gauges as points over polygons, etc)
-agg_theme_space <- make_test_agg(namehistory = FALSE, style = 'noPU')
+# use the noPU style that ignores planning units because it yields better tests
+# (gauges as points over polygons, etc). Throws a warning though.
+expect_warning(agg_theme_space <- make_test_agg(namehistory = FALSE, style = 'noPU'))
 
 # create a quant description of scenarios
 scenarios <- tibble::tibble(scenario = c("base", "down4", "up4", 'MAX'), delta = c(1, 0.25, 4, Inf))
@@ -386,9 +387,10 @@ test_that("quant x", {
       smooth = TRUE
     )
 
+  # This will throw warnings too, but we're already skipping above
   vdiffr::expect_doppelganger(
     "smoothed_lines",
-    suppressWarnings(print(sdl_line_catchment_smooth))
+    print(sdl_line_catchment_smooth)
   )
 })
 
@@ -752,7 +754,15 @@ test_that("maps", {
   # done, but I don't want to change all the old tests (and they also check
   # backwards compatibility) check under and over, so make an over
   nonml <- dplyr::filter(sdl_units, !SWSDLName %in% unique(agg_theme_space$sdl_units$SWSDLName))
-  bbother <- suppressWarnings(sf::st_intersection(bom_basin_gauges, nonml))
+  # muffle the spatial warnings
+  bbother <- withCallingHandlers(
+    warning = function(cnd) {
+      if ((grepl('attribute variables are assumed to be spatially constant', cnd$message))) {
+        rlang::cnd_muffle(cnd)
+      }
+    },
+    sf::st_intersection(bom_basin_gauges, nonml)
+  )
 
 
   gauges_map_common_syntax <- env_obj_to_plot |>
@@ -832,9 +842,9 @@ test_that("maps", {
 
   skip("strange bug introduces NaN and Inf, but only when printed to vdiffr. Inspect manually")
   # It's unclear why, but just plotting the plot does *not* throw warnings, and
-  # does *not* have NaNs. But when it prints, it does. I can't find the bug, so
+  # does *not* have NaNs. But when it prints, it does. This seems to be a bug in vdiffr, so
   # for the moment checking that it works right in normal use by just having a
-  # bare object call, and suppressing warnings in the vdiffr. Changing the
+  # bare object call, skipping vdiffr. Changing the
   # filename seems to have fixed it so I've removed the expect_warning until it
   # crops back up. It's intermittent, so I'm really not sure what to do about
   # it. NOW it's *not* throwing the warning when wrapped in `expect_warning`,

@@ -31,12 +31,12 @@ clean_long_term <- function(yrpath,
     stringr::str_replace('Env_obj', 'env_obj')
 
   # clean up weird characters
-  suppressWarnings(obj2yrtargets <- obj2yrtargets |>
+  obj2yrtargets <- obj2yrtargets |>
                      dplyr::select(-c(.data$NodeType, .data$env_obj_main, .data$env_obj_number)) |> # Why was this here?
-                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringi::stri_enc_toascii(.))) |>
-                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'\032', '-'))) |>
+                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringi::stri_enc_toutf8(.))) |>
+                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'\xca', '-'))) |>
                      dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'-$', ''))) |>
-                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_squish(.))))
+                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_squish(.)))
 
   # now that we have multiple states, but a state on there.
   # save

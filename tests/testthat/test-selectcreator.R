@@ -72,7 +72,8 @@ test_that("passchar", {
 
 })
 
-# with another layer
+# with another layer- this triggers strange warnings as the stack gets deep with
+# rlang/tidyselect and so in general should be avoided.
 test_that("passtidy", {
 
   mta <- dummyouter(groups = tidyselect::starts_with('ge'),
@@ -95,3 +96,4 @@ test_that("passchar", {
   expect_equal(names(mta), c('gear', 'mpg'))
 
 })
+

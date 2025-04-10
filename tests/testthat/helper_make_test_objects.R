@@ -107,7 +107,7 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
     ps <- NULL
   }
 
-  suppressWarnings(agg_theme_space <- multi_aggregate(sumspat,
+  agg_theme_space <- multi_aggregate(sumspat,
                                      aggsequence = aggseq,
                                      groupers = c('scenario', 'planning_unit_name', 'gauge'),
                                      group_until = list(planning_unit_name = is_notpoint,
@@ -117,7 +117,7 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
                                      causal_edges = causal_ewr,
                                      namehistory = namehistory,
                                      pseudo_spatial = ps,
-                                     saveintermediate = TRUE))
+                                     saveintermediate = TRUE)
 
   return(agg_theme_space)
 }

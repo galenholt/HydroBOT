@@ -96,14 +96,23 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
   # character vector, and needs tidyselect::all_of( or tidyselect::any_of(
   # wrapping- see secondary conditional above
 
-  # The `suppressWarnings` here is because I get an interrupted promise
-  # evaluatation message if I ever touch selectvals or s1g after I set them to
-  # each other for the tidyselect case. I could probably work around it with a
-  # different order of operations, but the check whether it evals to character
-  # is necessary and does it.
-  suppressWarnings(s1g <- s1g |>
-                     tidyselect::eval_select(data, strict = failmissing) |>
-                     names())
+  # The calling handlers here is because with deep call stacks we get an
+  # interrupted promise evaluation message if we ever touch selectvals or s1g
+  # after they are set to each other for the tidyselect case. That's fine, so we
+  # can ignore, but want other warnings to pass through. We might be able to
+  # work around it with a different order of operations, but the check whether
+  # it evals to character is necessary and does it.
+  s1g <- withCallingHandlers(
+    warning = function(cnd) {
+      # rlang::inform(cnd$message)
+      if ((grepl('restarting interrupted promise evaluation|Using an external vector', cnd$message[1]))) {
+        rlang::cnd_muffle(cnd)
+      }
+    },
+    tidyselect::eval_select(s1g,
+                            data, strict = failmissing) |>
+      names()
+  )
 
   return(s1g)
 }

@@ -64,7 +64,6 @@ clean_obj_target <- function(ewrobjs,
 
   # THe provenance of these files is unknown. It doesn't make sense we
   # need to do this weird multi-level joining just to get the names?
-  # warnings suppressed because there's an annoying first column that gets a new name
   qc_fix <- readr::read_csv(qcfiles[1], col_types = readr::cols(), col_select = -1) |>
     dplyr::rename(Specific_goal = .data$Target.species,
            env_obj = .data$Env_obj) |>
@@ -75,8 +74,7 @@ clean_obj_target <- function(ewrobjs,
   qc_fix <- dplyr::left_join(qc_fix, PUs_names, by = "PU", relationship = 'many-to-many')
   #need to check with Renee - these are not objective specific but macquarie seem to be.
 
-  # This is crazy how much re-joining we're doing. Need to find where all this
-  # came from and just build it cleanly
+  # This is a lot of re-joining.Would be better to just build it cleanly originally, but the QC was by hand
   pu2ltwp <- objpu |>
     dplyr::select(-.data$env_obj) |>
     dplyr::distinct()
@@ -97,11 +95,11 @@ clean_obj_target <- function(ewrobjs,
                   .data$Objective, .data$Target, .data$state)
 
   # final cleanup of weird characters and dplyr::rename to standard
-  suppressWarnings(obj2target <- obj2target |>
-    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringi::stri_enc_toascii(.))) |>
-    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'\032', '-'))) |>
+  obj2target <- obj2target |>
+    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringi::stri_enc_toutf8(.))) |>
+    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'\xca', '-'))) |>
     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'-$', ''))) |>
-    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_squish(.))))
+    dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_squish(.)))
 
   obj2target <- obj2target |>
     dplyr::filter(!is.na(.data$env_obj)) |>

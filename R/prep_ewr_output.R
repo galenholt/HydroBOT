@@ -24,7 +24,7 @@ prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
     dat <- join_to_geo(dat, bom_basin_gauges)
   }
   # assorted cleanup
-  dat <- suppressWarnings(cleanewrs(dat))
+  dat <- cleanewrs(dat)
 
   if (type != "achievement") {
     outdf <- dat
