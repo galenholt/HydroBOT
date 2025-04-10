@@ -11,8 +11,12 @@ coverage](https://codecov.io/gh/MDBAuth/HydroBOT/graph/badge.svg)](https://app.c
 
 <!-- badges: end -->
 
-This R package forms the core of the WERP climate adaptation toolkit
-(HydroBOT), ingesting hydrological scenarios representing historical or
+This R package (HydroBOT) forms the core of the climate adaptation
+toolkit developed for the [climate adaptation
+theme](https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation)
+of the [*Murray–Darling Water and Environment Research
+Program*](https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program)*.*
+HydroBOT ingests hydrological scenarios representing historical or
 future climates or adaptation options, and processing those through
 various response models (currently [MDBA EWR
 tool](https://github.com/MDBAuth/EWR_tool), with intention to include
@@ -261,7 +265,7 @@ catchcompare
 
 ## Development
 
-[see developer page](developer.md)
+[See developer page](developer.md)
 
 ## Further examples
 
@@ -271,3 +275,14 @@ for a full demonstration.
 ## Who do I talk to?
 
 - Galen Holt, <g.holt@deakin.edu.au>
+
+## Acknowledgements
+
+HydroBOT was developed in the [climate adaptation
+theme](https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation)
+of the [Murray–Darling Water and Environment Research
+Program](https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program),
+a program of the [Murray-Darling Basin
+Authority](https://www.mdba.gov.au/). Collaboration with colleagues from
+Deakin University, CSIRO, and the MDBA were essential to its development
+and success.

@@ -69,7 +69,7 @@ agg_names_to_cols <-
         # need too_many = 'drop' because the last bit is the name of the
         # aggregated column, e.g. '_ewr_achieved.
         # use too_many = 'debug' to confirm if there are ever issues.
-        tidyr::separate_wider_delim(.data$alllevs,
+        tidyr::separate_wider_delim("alllevs",
                                     delim = "__",
                                     names = paste0("aggLevel_", length(funsequence):1),
                                     too_many = 'drop') |>
@@ -77,7 +77,7 @@ agg_names_to_cols <-
         # deprecated `separate()` or re-sf the object. Neither is particularly
         # satisfying
         sf::st_as_sf() |>
-        dplyr::select(-.data$name) |>
+        dplyr::select(-"name") |>
         # sf seems to be behind tidyverse, and needs characters here instead of bare
         # names. Both seem to work for normal df/tibbles
         tidyr::pivot_wider(names_from = "original", values_from = "value") |>

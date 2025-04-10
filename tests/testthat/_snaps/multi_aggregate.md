@@ -49,9 +49,9 @@
 
 ---
 
-    c("BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB-WL1", "OB3", 
-    "OB4", "OB5", "SF1", "SF2", "VF", "CF", "OB-WL", "OB-WM", "OB-WS3", 
-    "OB-WS4", "SF3")
+    c("BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB-WL1", "OB-WL3", 
+    "OB-WL4", "OB1", "OB2", "OB3", "OB4", "OB5", "SF1", "SF2", "VF", 
+    "CF", "OB-WL", "OB-WM", "OB-WS3", "OB-WS4", "SF3")
 
 ---
 
@@ -64,8 +64,8 @@
 ---
 
     c("BF1", "BF2", "BK1", "CF", "CF1", "LF1", "LF2", "OB-WL", "OB-WL1", 
-    "OB-WM", "OB-WS3", "OB-WS4", "OB3", "OB4", "OB5", "SF1", "SF2", 
-    "SF3", "VF")
+    "OB-WL3", "OB-WL4", "OB-WM", "OB-WS3", "OB-WS4", "OB1", "OB2", 
+    "OB3", "OB4", "OB5", "SF1", "SF2", "SF3", "VF")
 
 ---
 
@@ -111,9 +111,9 @@
 
 ---
 
-    c("BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB-WL1", "OB3", 
-    "OB4", "OB5", "SF1", "SF2", "VF", "CF", "OB-WL", "OB-WM", "OB-WS3", 
-    "OB-WS4", "SF3")
+    c("BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB-WL1", "OB-WL3", 
+    "OB-WL4", "OB1", "OB2", "OB3", "OB4", "OB5", "SF1", "SF2", "VF", 
+    "CF", "OB-WL", "OB-WM", "OB-WS3", "OB-WS4", "SF3")
 
 ---
 
@@ -255,9 +255,9 @@
 
 ---
 
-    c("BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB-WL1", "OB3", 
-    "OB4", "OB5", "SF1", "SF2", "VF", "CF", "OB-WL", "OB-WM", "OB-WS3", 
-    "OB-WS4", "SF3")
+    c("BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB-WL1", "OB-WL3", 
+    "OB-WL4", "OB1", "OB2", "OB3", "OB4", "OB5", "SF1", "SF2", "VF", 
+    "CF", "OB-WL", "OB-WM", "OB-WS3", "OB-WS4", "SF3")
 
 ---
 
@@ -289,14 +289,16 @@
 
 ---
 
-    c("OB-WL1", "BF1", "BF2", "BK1", "CF1", "LF1", "LF2", "OB3", 
-    "OB4", "OB5", "SF1", "SF2", "VF", "CF", "OB-WL", "OB-WM", "OB-WS3", 
-    "OB-WS4", "SF3")
+    c("OB-WL1", "OB-WL3", "OB-WL4", "OB2", "OB3", "OB4", "OB5", "BF1", 
+    "BF2", "BK1", "CF1", "LF1", "LF2", "SF1", "SF2", "VF", "OB1", 
+    "CF", "OB-WL", "OB-WM", "OB-WS3", "OB-WS4", "SF3")
 
 ---
 
-    c("Merrimajeel Creek", "Upper Lachlan River", "Baroona to Warren Weir", 
-    "Burrendong Dam to Baroona", "Marthaguy Creek")
+    c("Merrimajeel Creek", "Muggabah Creek", "Western Lachlan Watercourse inc. The Great Cumbung Swamp", 
+    "Upper Lachlan River", "Lachlan River - Lake Cargelligo to Willandra Weir", 
+    "Merrowie Creek", "Baroona to Warren Weir", "Burrendong Dam to Baroona", 
+    "Marthaguy Creek")
 
 ---
 
@@ -305,8 +307,8 @@
 ---
 
     c("BF1", "BF2", "BK1", "CF", "CF1", "LF1", "LF2", "OB-WL", "OB-WL1", 
-    "OB-WM", "OB-WS3", "OB-WS4", "OB3", "OB4", "OB5", "SF1", "SF2", 
-    "SF3", "VF")
+    "OB-WL3", "OB-WL4", "OB-WM", "OB-WS3", "OB-WS4", "OB1", "OB2", 
+    "OB3", "OB4", "OB5", "SF1", "SF2", "SF3", "VF")
 
 ---
 

@@ -34,7 +34,7 @@ clean_long_term <- function(yrpath,
 
   # clean up weird characters
   obj2yrtargets <- obj2yrtargets |>
-                     dplyr::select(-c(.data$NodeType, .data$env_obj_main, .data$env_obj_number)) |> # Why was this here?
+                     dplyr::select(-c('NodeType', 'env_obj_main', 'env_obj_number')) |> # Why was this here?
                      dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringi::stri_enc_toutf8(.))) |>
                      dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'\xca', '-'))) |>
                      dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'-$', ''))) |>
