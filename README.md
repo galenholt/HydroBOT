@@ -5,9 +5,9 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/MDBAuth/HydroBOT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MDBAuth/HydroBOT/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/galenholt/HydroBOT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/galenholt/HydroBOT/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/MDBAuth/HydroBOT/graph/badge.svg)](https://app.codecov.io/gh/MDBAuth/HydroBOT)
+coverage](https://codecov.io/gh/galenholt/HydroBOT/graph/badge.svg)](https://app.codecov.io/gh/MDBAuth/HydroBOT)
 
 <!-- badges: end -->
 
@@ -43,11 +43,12 @@ to manage your python environments.
 ## Installation
 
 Install the development version of HydroBOT from
-[GitHub](https://github.com/MDBAuth/HydroBOT) with
+[GitHub](https://github.com/galenholt/HydroBOT) with your favorite
+installer
 
 ``` r
 # install.packages("devtools")
-devtools::install_git("git@github.com:MDBAuth/HydroBOT.git", ref = 'master', force = TRUE, upgrade = 'ask', git = 'external')
+devtools::install_github("galenholt/HydroBOT.git")
 ```
 
 ``` r
@@ -56,28 +57,16 @@ library(HydroBOT)
 #> Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.3.1; sf_use_s2() is TRUE
 ```
 
-<div id="install-note" style="color: gray">
-
-R uses a different Home directory than standard (typically
-`~/Documents`), and so if this fails, try to [set up SSH
-keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
-in that location as well.
-
-There are slightly slicker ways to do it, but they don’t work well
-currently. See [developer docs](developer.md) for details or if the
-above doesn’t work.
-
-</div>
-
 <div id="py-install" style="color: gray">
 
 ### Python dependency
 
-To run, this needs a Python environment containing `py_ewr` (currently
-py-ewr 2.3.7). The package will manage that for you if you just start
-using it- on first use, the package checks the environment and either
-uses an existing python environment or builds one with that dependency
-when the package is loaded.
+To run the current built in EWR module, HydroBOT needs a Python
+environment containing `py_ewr` (currently py-ewr 2.3.7). The package
+will manage that for you if you just start using it- on first use, the
+package checks the environment and either uses an existing python
+environment or builds one with that dependency when the package is
+loaded.
 
 There are `poetry.lock` and `pyproject.toml` files in the repo that
 allow for dev work and building the venv manually if more control over
