@@ -2,7 +2,7 @@
 # CITATION file created with {cffr} R package
 # See also: https://docs.ropensci.org/cffr/
 # --------------------------------------------
- 
+
 cff-version: 1.2.0
 message: 'To cite package "HydroBOT" in publications use:'
 type: software
@@ -20,7 +20,7 @@ authors:
 - family-names: Dwyer
   given-names: Georgia
   email: g.dwyer@deakin.edu.au
-url: https://laughing-adventure-8jypg4z.pages.github.io/
+url: https://galenholt.github.io/HydroBOT/
 contact:
 - family-names: Holt
   given-names: Galen

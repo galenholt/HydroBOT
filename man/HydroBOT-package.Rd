@@ -11,7 +11,7 @@ Provides tools to assess responses to flows in the MDB. Wraps the EWR tool and p
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://laughing-adventure-8jypg4z.pages.github.io/}
+  \item \url{https://galenholt.github.io/HydroBOT/}
 }
 
 }
