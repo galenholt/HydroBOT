@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">HydroBOT</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2.9036</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2.9037</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,7 @@
 </div>
 <div class="section level2">
 <h2 id="parallelisation">Parallelisation<a class="anchor" aria-label="anchor" href="#parallelisation"></a></h2>
-<p>Parallelisation uses the {future} package, which passess needed functions etc into the parallelised parts. When developing though, it passes the <em>installed</em> versions, not any new changes made and loaded with <code>devtools::load_all()</code>. So to test parallelisation is working, you will need to install the package with the button in the build pane or <code>devtools::install()</code>.</p>
+<p>Parallelisation uses the {future} package, which passess needed functions etc into the parallelised parts. When developing though, it passes the <em>installed</em> versions, not any new changes made and loaded with <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code>. So to test parallelisation is working, you will need to install the package with the button in the build pane or <code><a href="https://devtools.r-lib.org/reference/install.html" class="external-link">devtools::install()</a></code>.</p>
 </div>
 </div>
 <div class="section level1">
@@ -182,10 +182,10 @@ IdentityFile  /home/azureuser/.ssh/[your key file name]</code></pre>
 </div>
 <div class="section level1">
 <h1 id="installing-the-package">Installing the package<a class="anchor" aria-label="anchor" href="#installing-the-package"></a></h1>
-<p>You should be able to install the development version of HydroBOT from <a href="https://github.com/MDBAuth/HydroBOT" class="external-link">GitHub</a> with <code>devtools::install_git</code>. For <code>devtools::install_git()</code> to work with SSH, there are two methods, depending on R version. The easiest is if R &lt; 4.3, in which case install the {git2r} package, and then if you have SSH keys set up, this will work:</p>
+<p>You should be able to install the development version of HydroBOT from <a href="https://github.com/MDBAuth/HydroBOT" class="external-link">GitHub</a> with <code><a href="https://remotes.r-lib.org/reference/install_git.html" class="external-link">devtools::install_git</a></code>. For <code><a href="https://remotes.r-lib.org/reference/install_git.html" class="external-link">devtools::install_git()</a></code> to work with SSH, there are two methods, depending on R version. The easiest is if R &lt; 4.3, in which case install the {git2r} package, and then if you have SSH keys set up, this will work:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools", "git2r")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_git</span><span class="op">(</span><span class="st">"git@github.com:MDBAuth/HydroBOT.git"</span>, ref <span class="op">=</span> <span class="st">'master'</span>, force <span class="op">=</span> <span class="cn">TRUE</span>, upgrade <span class="op">=</span> <span class="st">'ask'</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_git.html" class="external-link">install_git</a></span><span class="op">(</span><span class="st">"git@github.com:MDBAuth/HydroBOT.git"</span>, ref <span class="op">=</span> <span class="st">'master'</span>, force <span class="op">=</span> <span class="cn">TRUE</span>, upgrade <span class="op">=</span> <span class="st">'ask'</span><span class="op">)</span></span></code></pre></div>
 <p>If using R 4.3, the {git2r} package does not support ssh, and so you have to use external (system) git. That’s uglier, but more robust, and so is what is in the Readme. R uses a different Home directory than standard (typically <code>~/Documents</code>), and so for this to work, you need to <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent" class="external-link">set up SSH keys</a> in that location as well (e.g. in <code>~/Documents/.ssh/</code>) and <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account" class="external-link">connect them to github</a>.</p>
 <p>If all else fails, clone the repo locally, and install from there.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
