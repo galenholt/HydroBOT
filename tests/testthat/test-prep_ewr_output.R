@@ -13,7 +13,8 @@ ewroutlist <- list('summary',
                    'all_interEvents',
                    'all_successful_interEvents')
 
-ewr_out <- prep_run_save_ewrs(hydro_dir = file.path(temp_parent_dir, 'hydrographs'),
+ewr_out <- prep_run_save_ewrs(hydro_dir = file.path(temp_parent_dir,
+                                                    'hydrographs'),
                               output_parent_dir = temp_parent_dir,
                               outputType = ewroutlist,
                               returnType = ewroutlist)
@@ -30,8 +31,11 @@ test_that("assessment works", {
   assessed <- assess_ewr_achievement(yeardat, year_roll = 3)
 
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
-                                  'planning_unit_name', 'state', 'SWSDLName', 'ewr_code',
-                                  'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved'))
+                                  'planning_unit_name', 'state', 'SWSDLName',
+                                  'ewr_code',
+                                  'ewr_code_timing', 'event_years',
+                                  'frequency_achieved', 'interevent_achieved',
+                                  'ewr_achieved'))
 })
 
 
@@ -40,8 +44,11 @@ test_that("making assessment tibble works", {
   assessed <- prep_ewr_output(datain)
 
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
-                                  'planning_unit_name', 'state', 'SWSDLName', 'ewr_code',
-                                  'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved', 'geometry'))
+                                  'planning_unit_name', 'state', 'SWSDLName',
+                                  'ewr_code',
+                                  'ewr_code_timing', 'event_years',
+                                  'frequency_achieved', 'interevent_achieved',
+                                  'ewr_achieved', 'geometry'))
   expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
 })
 
@@ -51,8 +58,11 @@ test_that("making assessment tibble from in-memory ewr output works", {
     prep_ewr_output()
 
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
-                                  'planning_unit_name', 'state', 'SWSDLName', 'ewr_code',
-                                  'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved', 'geometry'))
+                                  'planning_unit_name', 'state', 'SWSDLName',
+                                  'ewr_code',
+                                  'ewr_code_timing', 'event_years',
+                                  'frequency_achieved', 'interevent_achieved',
+                                  'ewr_achieved', 'geometry'))
   expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
 })
 
@@ -63,9 +73,11 @@ test_that("year_roll is rolling correctly", {
   assessed <- prep_ewr_output(datain, year_roll = 3)
 
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
-                                  'planning_unit_name', 'state', 'SWSDLName', 'ewr_code',
+                                  'planning_unit_name', 'state', 'SWSDLName',
+                                  'ewr_code',
                                   'ewr_code_timing', 'event_years',
-                                  'ewr_achieved', 'interevent_achieved', 'geometry'))
+                                  'frequency_achieved', 'interevent_achieved',
+                                  'ewr_achieved', 'geometry'))
   expect_equal(sum(is.na(assessed$ewr_achieved)), 1296)
 })
 
@@ -75,8 +87,11 @@ test_that("passing in a list from memory works", {
   datain <- read_and_geo(ewrpath, type = 'yearly', geopath = bom_basin_gauges)
   ewrprepped <- prep_ewr_output(datain, type = 'achievement')
   expect_equal(names(ewrprepped), c('scenario', 'year', 'date', 'gauge',
-                                    'planning_unit_name', 'state', 'SWSDLName', 'ewr_code',
-                                    'ewr_code_timing', 'event_years', 'ewr_achieved', 'interevent_achieved', 'geometry'))
+                                    'planning_unit_name', 'state', 'SWSDLName',
+                                    'ewr_code',
+                                    'ewr_code_timing', 'event_years',
+                                    'frequency_achieved', 'interevent_achieved',
+                                    'ewr_achieved', 'geometry'))
   expect_equal(sum(is.na(ewrprepped$planning_unit_name)), 0)
 })
 

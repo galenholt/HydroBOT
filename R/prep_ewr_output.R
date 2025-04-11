@@ -224,21 +224,24 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
                     interevent_occurred = roll_interevent(.data$event_years, year_roll),
                     .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
                             "gauge", "ewr_code", "ewr_code_timing")) |>
-      dplyr::mutate(ewr_achieved = .data$frequency_occurred >= .data$target_frequency,
+      # We should split this off for model shapes
+      dplyr::mutate(frequency_achieved = .data$frequency_occurred >= .data$target_frequency,
                     interevent_achieved = .data$interevent_occurred <= .data$max_interevent,
+                    # both have to occur for the EWR to 'pass'
+                    ewr_achieved = frequency_achieved * interevent_achieved,
                     .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
                             "gauge", "ewr_code", "ewr_code_timing"))
 
   # change the logical to numeric to maintain generality with later functions
-  annualdf$ewr_achieved <- as.numeric(annualdf$ewr_achieved)
+  annualdf$frequency_achieved <- as.numeric(annualdf$frequency_achieved)
   annualdf$interevent_achieved <- as.numeric(annualdf$interevent_achieved)
 
   annualdf <- annualdf |>
     dplyr::select('scenario', 'year', 'date', 'gauge',
                   'planning_unit_name', 'state', 'SWSDLName',
                   'ewr_code', 'ewr_code_timing',
-                  'event_years', 'ewr_achieved',
-                  'interevent_achieved')
+                  'event_years', 'frequency_achieved',
+                  'interevent_achieved', 'ewr_achieved')
 
   return(annualdf)
 }
