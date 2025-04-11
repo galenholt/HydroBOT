@@ -221,12 +221,13 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
                      .data$gauge, .data$ewr_code, .data$ewr_code_timing,
                      .data$year) |>
       dplyr::mutate(frequency_occurred = roll_frequency(.data$event_years, year_roll),
-                    interevent_occurred = roll_interevent(.data$event_years, year_roll),
+                    # the interevents are highly variable (and often sub-yearly), so rolling by a certian number of years and the dataframe provides a rolling_achievement anyway
+                    # interevent_occurred = roll_interevent(.data$event_years, year_roll),
                     .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
                             "gauge", "ewr_code", "ewr_code_timing")) |>
       # We should split this off for model shapes
       dplyr::mutate(frequency_achieved = .data$frequency_occurred >= .data$target_frequency,
-                    interevent_achieved = .data$interevent_occurred <= .data$max_interevent,
+                    interevent_achieved = .data$rolling_max_inter_event_achieved,# .data$interevent_occurred <= .data$max_interevent,
                     # both have to occur for the EWR to 'pass'
                     ewr_achieved = frequency_achieved * interevent_achieved,
                     .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
