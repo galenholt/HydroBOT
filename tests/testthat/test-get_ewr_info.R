@@ -3,3 +3,8 @@ test_that("Causal returns", {
   expect_equal(names(causals), c('ewr2obj', 'obj2target', 'obj2yrtarget'))
   expect_s3_class(causals[[1]], 'tbl_df')
 })
+
+
+test_that("version works", {
+  ewrver <- get_ewr_version()
+})

@@ -96,8 +96,8 @@ get_iqqm_gauges <- function() {
 #' @export
 #'
 get_ewr_version <- function() {
-  b <- reticulate::import("pkg_resources")
-  ewrpk <- b$get_distribution("py_ewr")
+  b <- reticulate::import("importlib.metadata")
+  ewrpk <- b$version("py_ewr")
 
   return(as.character(ewrpk))
   # Or
