@@ -1,15 +1,25 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://galenholt.github.io/HydroBOT/404.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/LICENSE-text.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/LICENSE.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/authors.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/developer.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/index.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/LICENSE-text.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/LICENSE.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/ArithmeticMean.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/CompensatingFactor.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/GeometricMean.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/HydroBOT-package.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/LimitingFactor.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/Max.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/Min.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/NumberOfValues.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/SpatialWeightedMean.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/Sum.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/Variance.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/adjust_zeros.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/agg_names_to_cols.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/ArithmeticMean.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/assess_ewr_achievement.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/as_colors.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/assess_ewr_achievement.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/baseline_compare.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/basin.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/basin_rivers.html</loc></url>
@@ -19,7 +29,6 @@
 <url><loc>https://galenholt.github.io/HydroBOT/reference/causal_ewr.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/cewo_valleys.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/check_missing_runs.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/cleanewrs.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/clean_ewr_causal.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/clean_ewr_in_R.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/clean_ewr_obj.html</loc></url>
@@ -28,7 +37,7 @@
 <url><loc>https://galenholt.github.io/HydroBOT/reference/clean_long_term.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/clean_obj_target.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/clean_sequences.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/CompensatingFactor.html</loc></url>
+<url><loc>https://galenholt.github.io/HydroBOT/reference/cleanewrs.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/create_base.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/difference.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/extract_vals_causal.html</loc></url>
@@ -41,7 +50,6 @@
 <url><loc>https://galenholt.github.io/HydroBOT/reference/fix_file_scenarios.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/functionlister.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/general_aggregate.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/GeometricMean.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/get_causal_ewr.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/get_data_agg.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/get_ewr_gauges.html</loc></url>
@@ -51,7 +59,6 @@
 <url><loc>https://galenholt.github.io/HydroBOT/reference/get_module_output.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/grouped_colors.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/handle_palettes.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/HydroBOT-package.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/identify_dimension.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/index.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/is_notpoint.html</loc></url>
@@ -60,7 +67,6 @@
 <url><loc>https://galenholt.github.io/HydroBOT/reference/is_theme.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/is_time.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/join_to_geo.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/LimitingFactor.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/make_causal_plot.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/make_default_args.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/make_edges.html</loc></url>
@@ -71,13 +77,10 @@
 <url><loc>https://galenholt.github.io/HydroBOT/reference/make_plot_table.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/make_underover.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/map_ewr_gauges.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/Max.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/maxInterevent.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/Min.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/multi_aggregate.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/nameclean.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/node_plot_atts.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/NumberOfValues.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/oddsratio.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/parse_aggnum.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/parse_char.html</loc></url>
@@ -110,15 +113,12 @@
 <url><loc>https://galenholt.github.io/HydroBOT/reference/sdl_units.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/selectcreator.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/separate_ewr_codes.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/SpatialWeightedMean.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/spatial_aggregate.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/spatial_joiner.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/Sum.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/temporal_aggregate.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/test_overplotting.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/theme_aggregate.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/theme_hydrobot.html</loc></url>
 <url><loc>https://galenholt.github.io/HydroBOT/reference/type_cleanup.html</loc></url>
-<url><loc>https://galenholt.github.io/HydroBOT/reference/Variance.html</loc></url>
 </urlset>
 
