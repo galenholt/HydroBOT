@@ -61,6 +61,20 @@ ArithmeticMean <- function(x, na.rm = TRUE) {
   return(y)
 }
 
+#' Harmonic mean aggregation
+#'
+#' Finds the harmonic mean of the values
+#'
+#' @inheritParams CompensatingFactor
+#'
+#' @return summarised data
+#' @export
+#'
+HarmonicMean <- function(x, na.rm = TRUE) {
+  y <- 1/mean(1/x, na.rm = na.rm)
+  return(y)
+}
+
 #' Weighted mean by `area` column
 #'
 #' Finds the arithmetic mean weighted by the `area` column, which is auto-created in the spatial datasets.
@@ -75,7 +89,22 @@ SpatialWeightedMean <- function(x, na.rm = TRUE) {
   y <- stats::weighted.mean(x = x, w = .data$area, na.rm = na.rm)
 }
 
-#' Length aggregation
+#' Median
+#'
+#' Finds the median of the values. Lightweight wrapper of `medain` with `na.rm = TRUE` to match other functions.
+#'
+#' @inheritParams CompensatingFactor
+#'
+#' @return summarised data
+#' @export
+#'
+
+Median <- function(x, na.rm = TRUE) {
+  y <- median(x, na.rm = na.rm)
+  return(y)
+}
+
+#' Find number of items being aggregated
 #'
 #' Finds the number of values. Lightweight wrapper of `length` with removal of NA values to match other functions.
 #'

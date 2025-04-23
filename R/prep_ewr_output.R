@@ -150,12 +150,12 @@ separate_ewr_codes <- function(df) {
   # networks. This isnt' perfect, but it's much better than before
   basestring <- df$ewr_code |>
     # ewr returns the / as _
-    stringr::str_replace("/", "_") |>
-    # change the _ to - so we can split on _
-    stringr::str_replace("OB_W", "OB-W")
+    stringr::str_replace("/", "_")
 
   # Get a clean main EWR code (as best I can)
-  ewrpart <- basestring |>
+  ewrpart <- basestring  |>
+    # change the _ to - so we can split on _
+    stringr::str_replace("OB_W", "OB-W") |>
     # get the bit before the first _
     stringr::str_extract("^[^_]+") |>
     # some have the a,b,c, attached instead of separated
@@ -171,7 +171,7 @@ separate_ewr_codes <- function(df) {
   # put back on the df
   df$ewr_code <- ewrpart
   # The code_timing needs to actually be unique, i.e. _a shouldn't match to everything with an _a, but to the EWR code with _a.
-  df$ewr_code_timing <- paste0(ewrpart, '_', extrapart) |>
+  df$ewr_code_timing <- basestring |>
     gsub('_$', '', x = _)
 
   return(df)
