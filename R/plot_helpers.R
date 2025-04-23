@@ -227,8 +227,6 @@ test_overplotting <- function(data, facet_wrapper, facet_row, facet_col, x_col =
 
 #' Finds limits for y-axis and colors
 #'
-#' Very similar to [findlimits()], which has been deprecated
-#'
 #' @param limcol vector of the y-values, typically `sf::st_drop_geometry(prepped$data[prepped$outcome_col])`
 #' @param lims desired limits. see `setLimits` in [plot_outcomes()]
 #' @param base_list as in [plot_outcomes()]

@@ -16,26 +16,38 @@ clean_ewr_causal <- function(ewrnet, verbose = FALSE) {
 
   # don't modify in place so I can double check
   e2o <- ewrnet$ewr2obj |>
-    dplyr::mutate(env_obj = stringr::str_remove_all(env_obj, '\n'),
-                  env_obj = stringr::str_remove_all(env_obj, ' $')) |>
-    dplyr::mutate(Target = stringr::str_to_sentence(Target),
-                  Target = ifelse(grepl('Ecosystem functions', Target), 'Ecosystem function', Target),
-                  Target = ifelse(grepl('Q-NF', env_obj) & is.na(Target), 'Native fish', Target)) |>
+    dplyr::mutate(env_obj = stringr::str_remove_all(.data$env_obj, '\n'),
+                  env_obj = stringr::str_remove_all(.data$env_obj, ' $')) |>
+    dplyr::mutate(Target = stringr::str_to_sentence(.data$Target),
+                  Target = ifelse(grepl('Ecosystem functions', .data$Target),
+                                  'Ecosystem function', .data$Target),
+                  Target = ifelse(grepl('Q-NF', .data$env_obj) &
+                                    is.na(.data$Target),
+                                  'Native fish', .data$Target)) |>
     dplyr::distinct()
 
   o2t <- ewrnet$obj2target |>
-    dplyr::mutate(Target = ifelse(grepl('Ecosystem functions', Target), 'Ecosystem function', Target),
-                  Target = ifelse(grepl('Priority ecosystem function', Target), 'Ecosystem function', Target),
-                  Target = stringr::str_to_sentence(Target),
-                  Target = ifelse(grepl('Waterbird', Target), 'Waterbirds', Target),
-                  Target = ifelse(grepl('Q-NF', env_obj) & is.na(Target), 'Native fish', Target)
+    dplyr::mutate(Target = ifelse(grepl('Ecosystem functions', .data$Target),
+                                  'Ecosystem function', .data$Target),
+                  Target = ifelse(grepl('Priority ecosystem function',
+                                        .data$Target),
+                                  'Ecosystem function', .data$Target),
+                  Target = stringr::str_to_sentence(.data$Target),
+                  Target = ifelse(grepl('Waterbird', .data$Target), 'Waterbirds',
+                                  .data$Target),
+                  Target = ifelse(grepl('Q-NF', .data$env_obj) &
+                                    is.na(.data$Target),
+                                  'Native fish', .data$Target)
                   ) |>
     dplyr::distinct()
 
   o2yt <- ewrnet$obj2yrtarget |>
-    dplyr::mutate(Target = ifelse(grepl('Priority ecosystem function', Target), 'Ecosystem function', Target),
-                  Target = ifelse(grepl('Waterbird', Target), 'Waterbirds', Target),
-                  Target = ifelse(grepl('Q-NF', env_obj) & is.na(Target), 'Native fish', Target)
+    dplyr::mutate(Target = ifelse(grepl('Priority ecosystem function', .data$Target),
+                                  'Ecosystem function', .data$Target),
+                  Target = ifelse(grepl('Waterbird', .data$Target),
+                                  'Waterbirds', .data$Target),
+                  Target = ifelse(grepl('Q-NF', .data$env_obj) & is.na(.data$Target),
+                                  'Native fish', .data$Target)
     ) |>
     dplyr::distinct()
 

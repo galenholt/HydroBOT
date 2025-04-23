@@ -108,37 +108,12 @@ run_hydrobot_params <- function(yamlpath = NULL,
   # )
 
   # Aggregate
-  ewr_out <- rlang::exec(read_and_agg,
+  agg_out <- rlang::exec(read_and_agg,
                          !!!arglist$aggregation[names(arglist$aggregation) %in%
                                       names(formals(read_and_agg))])
-  # aggout <- read_and_agg(
-  #   datpath = arglist$aggregation$datpath,
-  #   type = arglist$aggType,
-  #   geopath = HydroBOT::bom_basin_gauges,
-  #   causalpath = HydroBOT::causal_ewr,
-  #   groupers = arglist$aggregation$groupers,
-  #   group_until = arglist$aggregation$group_until,
-  #   pseudo_spatial = arglist$aggregation$pseudo_spatial,
-  #   aggCols = arglist$agg_var,
-  #   aggsequence = aggseq,
-  #   funsequence = funseq,
-  #   saveintermediate = TRUE,
-  #   namehistory = arglist$namehistory,
-  #   keepAllPolys = arglist$keepAllPolys,
-  #   auto_ewr_PU = arglist$aggregation$auto_ewr_PU,
-  #   returnList = arglist$aggReturn,
-  #   savepath = arglist$aggregation$savepath,
-  #   extrameta = list(
-  #     agg_run_from_params = TRUE,
-  #     agg_param_default = defaults,
-  #     agg_param_yml = yamlpath,
-  #     agg_param_passed = passed_args,
-  #     agg_param_list = list_args
-  #   )
-  # )
 
   if (arglist$aggregation$returnList) {
-    return(aggout)
+    return(agg_out)
   } else {
     return(invisible())
   }

@@ -2,7 +2,7 @@
 #'
 #' @inheritParams read_and_geo
 #'
-#' @param dir path to directory with the EWR output for all gauges and scenarios
+#' @param dat EWR output dataframe (usually for all gauges and scenarios)
 #' @param year_roll character 'best' or number, specific number of years to check assessment for. 'Best' uses 10-year windows if possible. 1 uses the NSW method.
 #' @param gaugefilter subset of gauges, default NULL
 #' @param scenariofilter subset of scenarios, default NULL
@@ -21,7 +21,7 @@ prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
   }
 
   if (!inherits(dat, 'sf')) {
-    dat <- join_to_geo(dat, bom_basin_gauges)
+    dat <- join_to_geo(dat, HydroBOT::bom_basin_gauges)
   }
   # assorted cleanup
   dat <- cleanewrs(dat)
@@ -229,7 +229,7 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
       dplyr::mutate(frequency_achieved = .data$frequency_occurred >= .data$target_frequency,
                     interevent_achieved = .data$rolling_max_inter_event_achieved,# .data$interevent_occurred <= .data$max_interevent,
                     # both have to occur for the EWR to 'pass'
-                    ewr_achieved = frequency_achieved * interevent_achieved,
+                    ewr_achieved = .data$frequency_achieved * .data$interevent_achieved,
                     .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
                             "gauge", "ewr_code", "ewr_code_timing"))
 

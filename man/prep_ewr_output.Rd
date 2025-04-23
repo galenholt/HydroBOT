@@ -14,6 +14,8 @@ prep_ewr_output(
 )
 }
 \arguments{
+\item{dat}{EWR output dataframe (usually for all gauges and scenarios)}
+
 \item{type}{character, a grep for the files to choose. Two special cases:
 \itemize{
 \item 'achievement', calculates EWR achievement from 'yearly',
@@ -34,8 +36,6 @@ For the EWR tool, the direct options are
 \item{scenariofilter}{subset of scenarios, default NULL}
 
 \item{add_max}{logical, default TRUE. Add a 'MAX' scenario that passes all EWRs, usable as a reference}
-
-\item{dir}{path to directory with the EWR output for all gauges and scenarios}
 }
 \value{
 a tibble with ewr_achieved

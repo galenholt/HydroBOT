@@ -19,6 +19,6 @@ find_limits(limcol, lims, trans, base_list)
 length-2 limits (or NULL)
 }
 \description{
-Very similar to \code{\link[=findlimits]{findlimits()}}, which has been deprecated
+Finds limits for y-axis and colors
 }
 \keyword{internal}
