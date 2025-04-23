@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">HydroBOT</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2.9041</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2.9043</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,11 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
+<dl><dt id="arg-dat">dat<a class="anchor" aria-label="anchor" href="#arg-dat"></a></dt>
+<dd><p>EWR output dataframe (usually for all gauges and scenarios)</p></dd>
+
+
+<dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>character, a grep for the files to choose. Two special cases:</p><ul><li><p>'achievement', calculates EWR achievement from 'yearly',</p></li>
 <li><p>'everything', gets all files
 For the EWR tool, the direct options are</p></li>
@@ -78,10 +82,6 @@ For the EWR tool, the direct options are</p></li>
 
 <dt id="arg-add-max">add_max<a class="anchor" aria-label="anchor" href="#arg-add-max"></a></dt>
 <dd><p>logical, default TRUE. Add a 'MAX' scenario that passes all EWRs, usable as a reference</p></dd>
-
-
-<dt id="arg-dir">dir<a class="anchor" aria-label="anchor" href="#arg-dir"></a></dt>
-<dd><p>path to directory with the EWR output for all gauges and scenarios</p></dd>
 
 </dl></div>
     <div class="section level2">
