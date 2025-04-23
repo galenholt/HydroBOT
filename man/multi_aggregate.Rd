@@ -33,16 +33,18 @@ be all grouping columns \emph{except} theme and spatial groupings. These are
 both automatically added to \code{groupers} according to \code{aggsequence} before
 passing to \code{\link[=general_aggregate]{general_aggregate()}}.}
 
-\item{group_until}{named list of groupers (column names) and the step to which they should
-be retained. Default NA (retain all groupers for all steps). \emph{FOR EWR USE,
-best option is} \code{group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint)}. This groups by planning unit and gauge until larger
-spatial grouping has happened. Leaving 'gauge' off is mathematically safe,
-since the gauge geometry forces that grouping, but then the 'gauge' column
-gets dropped. Step can be an index, name, or a function that evaluates to
-TRUE or FALSE when run on the aggregation sequence. Named list does not
-need to contain all groupers, but if so, those that persist throughout
-should be given NA or numeric values longer than aggsequence. Vectors the
-length of groupers usually work, but are less-well supported.}
+\item{group_until}{named list of groupers (column names) and the step to
+which they should be retained. Default NA (retain all groupers for all
+steps). \emph{FOR EWR USE, best option is} \code{group_until = list(SWSDLName = 'sdl_units', planning_unit_name = 'sdl_units', gauge = is_notpoint)}. This
+groups by planning unit and gauge and planning unit until larger spatial
+grouping has happened, dealing with the issue of gauges reporting into
+multiple PUs and SDLs. Leaving 'gauge' off is mathematically safe, since
+the gauge geometry forces that grouping, but then the 'gauge' column gets
+dropped. Step can be an index, name, or a function that evaluates to TRUE
+or FALSE when run on the aggregation sequence. Named list does not need to
+contain all groupers, but if so, those that persist throughout should be
+given NA or numeric values longer than aggsequence. Vectors the length of
+groupers usually work, but are less-well supported.}
 
 \item{aggCols}{an expression for the columns to aggregate (the data columns).
 See \code{selectcreator} for formats}
@@ -107,11 +109,13 @@ indices} (NOT the column names to join on) of aggsequence that should have
 'psuedo-spatial' aggregation. This is when we go from one spatial data
 level to another, but do the join and aggregation with a non-spatial
 \code{\link[dplyr:mutate-joins]{dplyr::left_join()}}. It is developed for the EWR situation, where the
-incoming data is indexed to gauges, planning units, and sdl units, but has gauge point
-geometry, and spatial joining to planning units or sdl is not appropriate, because
-single gauges affect multiple units. So it would join to the
-\code{planning_units} or \code{sdl_units} by column names instead of spatially, and then aggregate according
-to those units.}
+incoming data is indexed to gauges, planning units, and sdl units, but has
+gauge point geometry, and spatial joining to planning units or sdl is not
+appropriate, because single gauges affect multiple units. So it would join
+to the \code{planning_units} or \code{sdl_units} by column names instead of
+spatially, and then aggregate according to those units. \emph{For EWR use,
+typically the best option is \code{pseudo_spatial = c('planning_units', 'sdl_units')}, with the grouping to sdls only pseudo because some planning
+units spill over sdl boundaries.}}
 }
 \value{
 either a tibble or sf of aggregated values at the final level (if

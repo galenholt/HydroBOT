@@ -100,7 +100,7 @@ SpatialWeightedMean <- function(x, na.rm = TRUE) {
 #'
 
 Median <- function(x, na.rm = TRUE) {
-  y <- median(x, na.rm = na.rm)
+  y <- stats::median(x, na.rm = na.rm)
   return(y)
 }
 

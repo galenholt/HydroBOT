@@ -17,17 +17,19 @@
 #'   be all grouping columns *except* theme and spatial groupings. These are
 #'   both automatically added to `groupers` according to `aggsequence` before
 #'   passing to [general_aggregate()].
-#' @param group_until named list of groupers (column names) and the step to which they should
-#'   be retained. Default NA (retain all groupers for all steps). *FOR EWR USE,
-#'   best option is* `group_until = list(planning_unit_name = is_notpoint, gauge
-#'   = is_notpoint)`. This groups by planning unit and gauge until larger
-#'   spatial grouping has happened. Leaving 'gauge' off is mathematically safe,
-#'   since the gauge geometry forces that grouping, but then the 'gauge' column
-#'   gets dropped. Step can be an index, name, or a function that evaluates to
-#'   TRUE or FALSE when run on the aggregation sequence. Named list does not
-#'   need to contain all groupers, but if so, those that persist throughout
-#'   should be given NA or numeric values longer than aggsequence. Vectors the
-#'   length of groupers usually work, but are less-well supported.
+#' @param group_until named list of groupers (column names) and the step to
+#'   which they should be retained. Default NA (retain all groupers for all
+#'   steps). *FOR EWR USE, best option is* `group_until = list(SWSDLName =
+#'   'sdl_units', planning_unit_name = 'sdl_units', gauge = is_notpoint)`. This
+#'   groups by planning unit and gauge and planning unit until larger spatial
+#'   grouping has happened, dealing with the issue of gauges reporting into
+#'   multiple PUs and SDLs. Leaving 'gauge' off is mathematically safe, since
+#'   the gauge geometry forces that grouping, but then the 'gauge' column gets
+#'   dropped. Step can be an index, name, or a function that evaluates to TRUE
+#'   or FALSE when run on the aggregation sequence. Named list does not need to
+#'   contain all groupers, but if so, those that persist throughout should be
+#'   given NA or numeric values longer than aggsequence. Vectors the length of
+#'   groupers usually work, but are less-well supported.
 #' @param aggsequence a named list of aggregation steps in the order to apply
 #'   them. Entries for theme aggregation should be character vectors- e.g. `name
 #'   = c('from_theme', 'to_theme')`. Entries for spatial aggregation should be
@@ -53,11 +55,14 @@
 #'   'psuedo-spatial' aggregation. This is when we go from one spatial data
 #'   level to another, but do the join and aggregation with a non-spatial
 #'   [dplyr::left_join()]. It is developed for the EWR situation, where the
-#'   incoming data is indexed to gauges, planning units, and sdl units, but has gauge point
-#'   geometry, and spatial joining to planning units or sdl is not appropriate, because
-#'   single gauges affect multiple units. So it would join to the
-#'   `planning_units` or `sdl_units` by column names instead of spatially, and then aggregate according
-#'   to those units.
+#'   incoming data is indexed to gauges, planning units, and sdl units, but has
+#'   gauge point geometry, and spatial joining to planning units or sdl is not
+#'   appropriate, because single gauges affect multiple units. So it would join
+#'   to the `planning_units` or `sdl_units` by column names instead of
+#'   spatially, and then aggregate according to those units. *For EWR use,
+#'   typically the best option is `pseudo_spatial = c('planning_units',
+#'   'sdl_units')`, with the grouping to sdls only pseudo because some planning
+#'   units spill over sdl boundaries.*
 #' @param saveintermediate logical, default `FALSE`. * `FALSE` (the default):
 #'   Save only the final result as a tibble or sf * `TRUE`: Save every step of
 #'   the aggregation as a tibble or sf in a list

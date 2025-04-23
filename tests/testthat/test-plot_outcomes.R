@@ -1,7 +1,7 @@
 # Should be a way to speed this bit up, the first happens again inside the second
 
-# Linux is slightly different than win/mac, so skip all of this
-skip_on_os('linux')
+# Linux and mac have slight vdiffr differences to windows, so skip all of this
+skip_on_os(c('linux', 'mac'))
 
 ewr_to_agg <- make_test_ewr_prepped()
 
