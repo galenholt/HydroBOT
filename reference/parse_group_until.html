@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">HydroBOT</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2.9043</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2.9044</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,16 +45,18 @@
 
 
 <dl><dt id="arg-group-until">group_until<a class="anchor" aria-label="anchor" href="#arg-group-until"></a></dt>
-<dd><p>named list of groupers (column names) and the step to which they should
-be retained. Default NA (retain all groupers for all steps). <em>FOR EWR USE,
-best option is</em> <code>group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint)</code>. This groups by planning unit and gauge until larger
-spatial grouping has happened. Leaving 'gauge' off is mathematically safe,
-since the gauge geometry forces that grouping, but then the 'gauge' column
-gets dropped. Step can be an index, name, or a function that evaluates to
-TRUE or FALSE when run on the aggregation sequence. Named list does not
-need to contain all groupers, but if so, those that persist throughout
-should be given NA or numeric values longer than aggsequence. Vectors the
-length of groupers usually work, but are less-well supported.</p></dd>
+<dd><p>named list of groupers (column names) and the step to
+which they should be retained. Default NA (retain all groupers for all
+steps). <em>FOR EWR USE, best option is</em> <code>group_until = list(SWSDLName = 'sdl_units', planning_unit_name = 'sdl_units', gauge = is_notpoint)</code>. This
+groups by planning unit and gauge and planning unit until larger spatial
+grouping has happened, dealing with the issue of gauges reporting into
+multiple PUs and SDLs. Leaving 'gauge' off is mathematically safe, since
+the gauge geometry forces that grouping, but then the 'gauge' column gets
+dropped. Step can be an index, name, or a function that evaluates to TRUE
+or FALSE when run on the aggregation sequence. Named list does not need to
+contain all groupers, but if so, those that persist throughout should be
+given NA or numeric values longer than aggsequence. Vectors the length of
+groupers usually work, but are less-well supported.</p></dd>
 
 
 <dt id="arg-groupers">groupers<a class="anchor" aria-label="anchor" href="#arg-groupers"></a></dt>
