@@ -2,7 +2,7 @@ pandoc: 3.1.11
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles: {}
-last_built: 2025-04-23T06:56Z
+last_built: 2025-04-29T10:58Z
 urls:
   reference: https://galenholt.github.io/HydroBOT/reference
   article: https://galenholt.github.io/HydroBOT/articles
