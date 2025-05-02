@@ -3,25 +3,16 @@
 #' *NOTE* Individual modules may need further bespoke processing, see [prep_ewr_output()].
 #'
 #' @param dir path to directory with the EWR output for all gauges and scenarios
-#' @param type character, a grep for the files to choose. Two special cases:
-#'  * 'achievement', calculates EWR achievement from 'yearly',
-#'  * 'everything', gets all files
-#'  For the EWR tool, the direct options are
-#'  * 'summary',
-#'  * 'yearly',
-#'  * 'all_events',
-#'  * 'all_successful_events',
-#'  * 'all_interEvents',
-#'  * 'all_successful_interEvents'
+#' @param type character, a grep for the files to choose. The special case 'everything' gets all files
 #' @param gaugefilter character vector of gauge numbers to include. Default `NULL` includes all
 #' @param scenariofilter character vector of scenario names to include. Default `NULL` includes all
-#'
+#' @param ... unused, absorbs extra args
 #' @return a tibble of module results
 #' @export
 #'
 
 get_module_output <- function(dir, type,
-                              gaugefilter = NULL, scenariofilter = NULL) {
+                              gaugefilter = NULL, scenariofilter = NULL, ...) {
   if (is.character(dir)) {
     # assumes files are csvs.
     gaugefiles <- list.files(dir,

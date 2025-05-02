@@ -15,6 +15,14 @@
 #'   [read_and_geo()]), but left more general here for future
 #' @param causalpath path to the causal relationships .rds file or the causal
 #'   network list object or its name
+#' @param prepfun a function that does any post-read and pre-aggregation
+#'   preparation of the module data. This is where mutates should go. Defaults
+#'   for EWR tool are included in HydroBOT (and [prep_ewr_output()] is the
+#'   default here), but users can supply their own.
+#' @param prepargs a list of arguments to `prepfun`. e.g. `list(type =
+#'   'achievement', add_max = FALSE)`. Setting `prepargs = list(type =
+#'   achievement')` and [read_and_agg(type = 'yearly')] is a better (more
+#'   general) way to declare that processing.
 #' @param returnList default `TRUE`, whether to return the output to the current
 #'   session
 #' @param savepath default `NULL`, a path to save the output to. Note that this
@@ -33,10 +41,8 @@
 #' @param savepar 'combine' (default) or 'each'. If parallel over scenarios,
 #'   should this combine the output (default) or save each scenario's
 #'   aggregation separately ('each')
-#' @param add_max, as in [read_and_geo()] and [prep_ewr_output()], default TRUE.
-#'   Add a 'MAX' scenario that passes all EWRs, usable as a reference
-#' @param ... passed to [read_and_geo()] and [prep_ewr_output()], primarily
-#'   `gaugefilter`, `scenariofilter`.
+#' @param ... passed to [read_and_geo()], primarily `gaugefilter`,
+#'   `scenariofilter`.
 #'
 #' @export
 #'
@@ -46,6 +52,8 @@ read_and_agg <- function(datpath,
                          causalpath,
                          groupers = "scenario",
                          group_until = rep(NA, length(groupers)),
+                         prepfun = 'prep_ewr_output',
+                         prepargs = list(),
                          aggCols,
                          aggsequence,
                          funsequence,
@@ -61,7 +69,6 @@ read_and_agg <- function(datpath,
                          rparallel = FALSE,
                          par_recursive = TRUE,
                          savepar = "combine",
-                         add_max = TRUE,
                          ...) {
   if (!returnList && is.null(savepath)) {
     rlang::abort(
@@ -135,6 +142,8 @@ read_and_agg <- function(datpath,
       causalpath = causalpath,
       groupers = groupers,
       group_until = group_until,
+      prepfun = prepfun,
+      prepargs = prepargs,
       aggCols = aggCols,
       aggsequence = aggsequence,
       funsequence = funsequence,
@@ -148,9 +157,7 @@ read_and_agg <- function(datpath,
       savepath = eval(spath),
       extrameta = extrameta,
       rparallel = FALSE,
-      # only want one max scenario
-      add_max = ifelse(y == names(dps)[1] && add_max, TRUE, FALSE),
-      # y = NULL, # so I can not write safe_map
+      par_iter = which(y == names(dps)), # so I can not write safe_map and helps manage add_max
       ...
     ),
     parallel = TRUE
@@ -162,21 +169,39 @@ read_and_agg <- function(datpath,
   }
 
   if (!rparallel) {
+    # Let some old defaults continue to work
     if (type == "achievement") {
-      ewrflag <- TRUE
       pull_type <- "yearly"
+      prepargs <- utils::modifyList(prepargs, list(type = type))
+      if (!is.null(list(...)$par_iter) && list(...)$par_iter > 1) {
+        prepargs <- utils::modifyList(prepargs, list(add_max = FALSE))
+      }
+      # this would be great, but too many testing issues
+      # lifecycle::deprecate_soft("0.2.3", "read_and_agg(type = 'should not use the special values achievement and interevents. Put them in `prepargs`')")
+    } else if (type == 'interevents') {
+      pull_type <- 'all_interEvents'
+      prepargs <- utils::modifyList(prepargs, list(type = type))
+      # lifecycle::deprecate_soft("0.2.3", "read_and_agg(type = 'should not use the special values achievement and interevents. Put them in `prepargs`')")
     } else {
-      ewrflag <- FALSE
       pull_type <- type
     }
 
     data <- read_and_geo(datpath, type = pull_type,
                          geopath = geopath, whichcrs = 4283, ...)
 
-    # Some EWR-specific cleaning
-    if (ewrflag) {
-      data <- prep_ewr_output(dat = data, type = type, add_max = add_max, ...)
+    # Run any data cleaning on input (including mutates)
+    # rlang::exec could handle bare functions or names, but I need to know the first arg
+    prepfun <- functionlister(prepfun)
+    if (length(prepfun) > 1) {
+      rlang::abort('Only one prep function possible.
+                   If need iterative prep, write a wrapper and pass that.')
     }
+    firstarg <- names(formals(prepfun[[1]])[1])
+    prepargs <- utils::modifyList(prepargs, list(f1 = data))
+    names(prepargs)[names(prepargs) == 'f1'] <- firstarg
+    data <- rlang::exec(prepfun[[1]],
+                        !!!prepargs)
+
 
     # parse any character names for the spatial data, then character will be the
     # themes

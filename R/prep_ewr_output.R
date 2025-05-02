@@ -3,17 +3,28 @@
 #' @inheritParams read_and_geo
 #'
 #' @param dat EWR output dataframe (usually for all gauges and scenarios)
+#' @param type as in [read_and_geo()], but with two special options:
+#'  * 'achievement', calculates EWR achievement from 'yearly',
+#'  * 'interevents', calculates some interevent values from all_interEvents
+#'  For the EWR tool, the direct options are
+#'  * 'summary',
+#'  * 'yearly',
+#'  * 'all_events',
+#'  * 'all_successful_events',
+#'  * 'all_interEvents',
+#'  * 'all_successful_interEvents'
 #' @param year_roll character 'best' or number, specific number of years to check assessment for. 'Best' uses 10-year windows if possible. 1 uses the NSW method.
 #' @param gaugefilter subset of gauges, default NULL
 #' @param scenariofilter subset of scenarios, default NULL
-#' @param add_max logical, default TRUE. Add a 'MAX' scenario that passes all EWRs, usable as a reference
+#' @param add_max logical, default TRUE only if `type = 'achievement'`. Add a 'MAX' scenario that passes all EWRs, usable as a reference
 #'
 #' @return a tibble with ewr_achieved
 #' @export
 #'
 
 prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
-                           gaugefilter = NULL, scenariofilter = NULL, add_max = TRUE) {
+                           gaugefilter = NULL, scenariofilter = NULL,
+                           add_max = ifelse(type == 'achievement', TRUE, FALSE)) {
 
   # some cleanup that lets this get used on its own if necessary
   if ('eventYears' %in% names(dat)) {
@@ -26,7 +37,7 @@ prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
   # assorted cleanup
   dat <- cleanewrs(dat)
 
-  if (type != "achievement") {
+  if (!type %in%  c("achievement", "interevents")) {
     outdf <- dat
   }
 
@@ -45,6 +56,16 @@ prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
     # add max
     if (add_max == TRUE) {
       outdf <- bind_max(outdf)
+    }
+  }
+
+  if (type == "interevents") {
+
+    # assess interevent calculations
+    outdf <- assess_ewr_interevents(dat)
+    # add max
+    if (add_max == TRUE) {
+      rlang::abort('add_max does not make sense for interevents. use `add_max = FALSE`')
     }
   }
 
@@ -245,6 +266,64 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
                   'interevent_achieved', 'ewr_achieved')
 
   return(annualdf)
+}
+
+#' Some calculations needed for aggregation of interevent statistics
+#'
+#' @param interdf the all_interEvents EWR output
+#'
+#' @returns dataframe with columns 'scenario', 'gauge', 'planning_unit_name',
+#'   'state', 'SWSDLName', 'ewr_code', 'start_date', 'inter_event_length',
+#'   'ewr_code_timing', 'max_interevent', 'exceedance_days' (realised - max),
+#'   'interevent_ratio' (realised / max), 'exceedance_ratio' (interevent_ratio -
+#'   1), 'exceedance' (binary; realised >= max), 'exceedance_only' (days above
+#'   max), 'days_in_exceeding (all realised if max passed)'
+#' @export
+#'
+assess_ewr_interevents <- function(interdf) {
+
+  # Need to get the ewr targets to check against
+  ewr_requirements <- clean_ewr_requirements()
+
+  # Join target frequencies to interdf
+  interdf <- dplyr::left_join(interdf, ewr_requirements,
+                               by = c('ewr_code', 'ewr_code_timing', 'gauge',
+                                      'planning_unit_name', 'state', 'SWSDLName'),
+                               relationship = "many-to-many"
+  )
+
+  # max_interevent in the parameter sheet (and so here) is yearly, but the
+  # interevents themselves are daily. EWR tool just *365, so I'll do the same
+
+  interdf <- interdf |>
+    dplyr::mutate(max_interevent = .data$max_interevent*365)
+
+  # calculate exceedance as the number of days, a ratio, and binary
+  # these are needed to implement the MDBA 'Interevent statistics' sheet.
+  interdf <- interdf |>
+    dplyr::mutate(
+      # there will be negatives here
+      exceedance_days = .data$inter_event_length - .data$max_interevent,
+      interevent_ratio = .data$inter_event_length / .data$max_interevent,
+      exceedance_ratio = .data$interevent_ratio - 1, # this is (interevent-max/max), ie how much exceedance is relative to the max.
+      # Binary- this says hitting the max days is a failure. That's what the sheet says.
+      exceedance = as.numeric(.data$exceedance_days >= 0),
+      # this isn't strictly necessary, but simplifies life a bit to have a
+      # version that is only the excesses.
+      exceedance_only = .data$exceedance_days * .data$exceedance,
+      # this is the total length in interevents that exceed (including pre-exceedance)
+      days_in_exceeding = .data$inter_event_length * .data$exceedance
+      #
+    )
+
+  # remove some unneeded cols
+  interdf <- interdf |>
+    # dropping end_date is potentially bad, but it simplifies temporal
+    # aggregation and we can always get it back with start_date +
+    # lubridate::days(inter_event_length)
+    dplyr::select(-'end_date', -tidyselect::contains('frequency'))
+
+  return(interdf)
 }
 
 

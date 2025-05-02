@@ -38,7 +38,7 @@ get_ewr_table <- function(type = "good") {
   if (type == "bad") {
     ewrs_in_pyewr <- ewrs_in_pyewr[[2]]
   }
-  return(ewrs_in_pyewr)
+  return(tibble::tibble(ewrs_in_pyewr))
 }
 
 get_raw_ewrsheet <- function() {

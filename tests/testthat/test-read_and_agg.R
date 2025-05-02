@@ -13,7 +13,7 @@ ewroutlist <- list(
   "yearly",
   "all_events",
   "all_successful_events",
-  # 'all_interEvents',
+  'all_interEvents',
   "all_successful_interEvents"
 )
 
@@ -25,8 +25,6 @@ ewr_out <- prep_run_save_ewrs(
 )
 
 ewr_results <- file.path(temp_parent_dir, "module_output", "EWR")
-
-# Saving tends to get tested in run_hydrobot_params, which is kind of silly, but doing it both places seems silly too
 
 test_that("multi-step theme and spatial works", {
 
@@ -60,6 +58,75 @@ test_that("multi-step theme and spatial works", {
     geopath = bom_basin_gauges,
     causalpath = causal_ewr,
     groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units'
+  )
+
+  # stringr::str_flatten(names(spatagg), "', '")
+  namestring <- c(
+    "scenario", 'date', "polyID", "target_5_year_2024",
+    "target_5_year_2024_ArithmeticMean_mdb_ArithmeticMean_Objective_ArithmeticMean_catchment_ArithmeticMean_Specific_goal_ArithmeticMean_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_ewr_achieved",
+    "OBJECTID", "DDIV_NAME", "AREA_HA", "SHAPE_AREA", "SHAPE_LEN",
+    "geometry"
+  )
+  expect_equal(names(spatagg), namestring)
+  expect_s3_class(spatagg, "sf")
+  expect_equal(nrow(spatagg), 1425)
+
+  # Plots are useful for checking spatial outcomes.
+  # There are a million targets. Pick one
+  target_5 <- spatagg |>
+    dplyr::filter(target_5_year_2024 == "Annual detection of species and life stages representative of the whole fish community through key fish passages in specified planning units")
+  g2sdl_plot <- ggplot2::ggplot() +
+    ggplot2::geom_sf(
+      data = target_5,
+      ggplot2::aes(fill = target_5_year_2024_ArithmeticMean_mdb_ArithmeticMean_Objective_ArithmeticMean_catchment_ArithmeticMean_Specific_goal_ArithmeticMean_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_ArithmeticMean_ewr_achieved)
+    ) +
+    # ggplot2::geom_sf(data = sumspat) +
+    ggplot2::facet_wrap(~scenario) +
+    ggplot2::theme(legend.position = "none")
+
+  vdiffr::expect_doppelganger("spatial-theme multi withreadin", g2sdl_plot)
+})
+
+test_that("passing in the prep function works", {
+
+  skip_on_os('linux')
+
+  aggseq <- list(
+    ewr_code = c("ewr_code_timing", "ewr_code"),
+    env_obj = c("ewr_code", "env_obj"),
+    sdl_units = sdl_units,
+    Specific_goal = c("env_obj", "Specific_goal"),
+    catchment = cewo_valleys,
+    Objective = c("Specific_goal", "Objective"),
+    mdb = basin,
+    target_5_year_2024 = c("Objective", "target_5_year_2024")
+  )
+
+  funseq <- list(
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean"
+  )
+
+  spatagg <- read_and_agg(
+    datpath = ewr_results,
+    type = "yearly",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    prepfun = 'prep_ewr_output',
+    prepargs = list(type = 'achievement'),
     aggCols = "ewr_achieved",
     aggsequence = aggseq,
     funsequence = funseq,
@@ -770,6 +837,163 @@ test_that("parallel works", {
 
   })
 
+
+# Interevents -------------------------------------------------------------
+
+
+test_that('exceedance works', {
+
+  # just do these over time for now.
+
+  # exceedance count
+
+  # what makes sense for this spatially or thematically? I guess still sums- how
+  # many interevents contributing to each group/sdl exceeded?
+  aggseq_mec <- list(
+    all_time = 'all_time',
+    sdl_units = sdl_units,
+    Target = c("ewr_code_timing", "Target")
+  )
+
+  funseq_mec <- list(
+    all_time = "Sum",
+    sdl_units = "Sum",
+    Target = "Sum"
+  )
+
+  mec <- read_and_agg(
+    datpath = ewr_results,
+    type = "all_interEvents",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    prepfun = 'prep_ewr_output',
+    prepargs = list(type = 'interevents'),
+    aggCols = "exceedance",
+    aggsequence = aggseq_mec,
+    funsequence = funseq_mec,
+    keepAllPolys = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units',
+    saveintermediate = TRUE
+  )
+
+  # stringr::str_flatten(names(spatagg), "', '")
+  namestring <- c(
+    'agg_input', 'all_time', 'sdl_units', 'Target'
+  )
+  expect_equal(names(mec), namestring)
+  expect_s3_class(mec$Target, "sf")
+  exceed_plot <- plot_outcomes(mec$Target,
+                outcome_col = "Target_Sum_sdl_units_Sum_all_time_Sum_exceedance",
+                plot_type = 'map',
+                colorset = "Target_Sum_sdl_units_Sum_all_time_Sum_exceedance",
+                facet_row = 'scenario',
+                facet_col = 'Target')
+
+  vdiffr::expect_doppelganger("exceed_plot", exceed_plot)
+})
+
+test_that('exceedance proportion', {
+
+  # just do these over time for now.
+
+  # what makes sense for this spatially or thematically?
+  # we shouldn't push the proportion up through, instead we should push the Sum and the N up and divide each time.
+  # What's the best way to do that?
+  # We could write a proportion function and do it three times
+    # If there's only one step, this would be easiest
+
+  proportion <- function(x) {
+    sum(x)/length(x)
+  }
+
+  agg1 <- list(all_time = 'all_time')
+  fun1 <- list(all_time = 'proportion')
+
+  mec1 <- read_and_agg(
+    datpath = ewr_results,
+    type = "all_interEvents",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = c("scenario", 'ewr_code_timing'),
+    prepfun = 'prep_ewr_output',
+    prepargs = list(type = 'interevents'),
+    aggCols = "exceedance",
+    aggsequence = agg1,
+    funsequence = fun1,
+    keepAllPolys = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units',
+    saveintermediate = TRUE,
+    namehistory = FALSE
+  )
+
+  # How to plot that?
+  ewrprops <- mec1$all_time |>
+    dplyr::mutate(unique_ewr = paste0(ewr_code_timing, planning_unit_name, gauge))
+
+  ewr_props <- plot_outcomes(ewrprops,
+                outcome_col = 'exceedance',
+                y_col = 'unique_ewr',
+                x_col = 'scenario',
+                colorset = 'exceedance',
+                plot_type = 'heatmap',
+                pal_list = 'grDevices::Viridis')
+  vdiffr::expect_doppelganger("ewr_props", ewr_props)
+
+
+  # We could get the Sum and the number of values in step 1. After that, summing
+  # the number of values gives the constituent number of values, so we can keep
+  # using just sum. Then we can proportion with a mutate at the end and do it
+  # across all levels at the same time.
+  aggseq_s <- list(
+    all_time = 'all_time',
+    sdl_units = sdl_units,
+    Target = c("ewr_code_timing", "Target")
+  )
+
+  funseq_s <- list(
+    all_time = c("Sum", 'NumberOfValues'),
+    sdl_units = "Sum",
+    Target = "Sum"
+  )
+
+  mec <- read_and_agg(
+    datpath = ewr_results,
+    type = "all_interEvents",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    prepfun = 'prep_ewr_output',
+    prepargs = list(type = 'interevents'),
+    aggCols = "exceedance",
+    aggsequence = aggseq_s,
+    funsequence = funseq_s,
+    keepAllPolys = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units',
+    saveintermediate = TRUE,
+    namehistory = FALSE
+  )
+
+  tarprop <- mec$Target |>
+    tidyr::pivot_wider(names_from = aggfun_1,
+                       values_from = exceedance) |>
+    dplyr::mutate(proportion = Sum/NumberOfValues)
+
+  exceed_prop_plot <- plot_outcomes(tarprop,
+                               outcome_col = "proportion",
+                               plot_type = 'map',
+                               colorset = "proportion",
+                               facet_row = 'scenario',
+                               facet_col = 'Target')
+
+  vdiffr::expect_doppelganger("exceed_prop_plot", exceed_prop_plot)
+
+
+})
+
 # Non-module data ------------------------------------------------------------
 
 test_that('non-module works', {
@@ -813,8 +1037,7 @@ expect_warning(ausagg <- read_and_agg(
   saveintermediate = TRUE,
   namehistory = FALSE,
   keepAllPolys = FALSE,
-  returnList = TRUE,
-  add_max = FALSE
+  returnList = TRUE
 ))
 
   weekcheck <- ausagg$week |>

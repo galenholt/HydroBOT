@@ -153,3 +153,31 @@ test_that("roll_frequency rolls correctly", {
   expect_snapshot_value(rolled_nairm, style = 'deparse')
 })
 
+test_that("interevents works", {
+  # inter_success <- get_module_output(ewrpath, type = 'all_successful_interEvents')
+  inter_all <- get_module_output(ewrpath, type = 'all_interEvents') |>
+    cleanewrs()
+
+  assessed <- assess_ewr_interevents(inter_all)
+
+  expect_equal(names(assessed), c('scenario', 'gauge', 'planning_unit_name',
+                                  'state', 'SWSDLName', 'ewr_code', 'start_date',
+                                  'inter_event_length', 'ewr_code_timing',
+                                  'max_interevent', 'exceedance_days',
+                                  'interevent_ratio', 'exceedance_ratio',
+                                  'exceedance', 'exceedance_only',
+                                  'days_in_exceeding'))
+
+  datain <- read_and_geo(ewrpath, type = 'all_interEvents',
+                         geopath = bom_basin_gauges)
+  fromtop <- prep_ewr_output(datain, type = 'interevents')
+
+  expect_equal(names(fromtop), c('scenario', 'gauge', 'planning_unit_name',
+                                  'state', 'SWSDLName', 'ewr_code', 'start_date',
+                                  'inter_event_length', 'site', 'owner', 'geometry',
+                                 'ewr_code_timing',
+                                  'max_interevent', 'exceedance_days',
+                                  'interevent_ratio', 'exceedance_ratio',
+                                  'exceedance', 'exceedance_only',
+                                  'days_in_exceeding'))
+})
