@@ -19,7 +19,7 @@ prep_ewr_output(
 \item{type}{as in \code{\link[=read_and_geo]{read_and_geo()}}, but with two special options:
 \itemize{
 \item 'achievement', calculates EWR achievement from 'yearly',
-\item 'interevents', calculates some interevent values from all_interEvents
+\item 'interevents', calculates some interevent values from all_interEvents or all_successful_interEvents
 For the EWR tool, the direct options are
 \item 'summary',
 \item 'yearly',

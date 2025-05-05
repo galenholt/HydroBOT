@@ -27,7 +27,7 @@ make_output_dir(
 \item 'yearly': outputs summarised to year
 \item 'all_events'
 \item 'all_successful_events'
-\item 'all_interEvents': currently fails in EWR tool, and so not supported
+\item 'all_interEvents'
 \item 'all_successful_interEvents'
 }}
 }

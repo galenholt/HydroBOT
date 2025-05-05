@@ -60,7 +60,7 @@ to disk. One or more of:
 \item 'yearly',
 \item 'all_events',
 \item 'all_successful_events',
-\item 'all_interEvents', # Does not work with EWR 2.0 tool
+\item 'all_interEvents'
 \item 'all_successful_interEvents'
 }}
 

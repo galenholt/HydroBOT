@@ -15,7 +15,7 @@ assess_ewr_achievement(
 \item{year_roll}{specific number of years to check assessment for}
 }
 \value{
-tibble reformatted and cleaned for ongoing analysis
+tibble with columns \code{scenario}, \code{year}, \code{date}, \code{gauge}, \code{planning_unit_name}, \code{state}, \code{SWSDLName}, \code{ewr_code}, \code{ewr_code_timing}, \code{event_years}, \code{frequency_achieved}, \code{interevent_achieved}, \code{ewr_achieved}
 }
 \description{
 This is the pass/fail test of whether the criteria (frequency and timing) of EWRs are met or not

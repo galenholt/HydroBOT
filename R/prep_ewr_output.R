@@ -160,7 +160,7 @@ clean_ewr_requirements <- function() {
 #'
 #' @param df a dataframe with an ewr_code column with raw ewr names (e.g. EWR outputs, causal mappings)
 #'
-#' @return a dataframe with a clean ewr_code column and an ewr_code_timing column with the extra stuff
+#' @return a tibble with a clean ewr_code column and an ewr_code_timing column with the extra stuff
 #' @export
 #'
 
@@ -206,7 +206,7 @@ separate_ewr_codes <- function(df) {
 #' @param annualdf incoming tibble of EWRs after read-in
 #' @param year_roll specific number of years to check assessment for
 #'
-#' @return tibble reformatted and cleaned for ongoing analysis
+#' @return tibble with columns `scenario`, `year`, `date`, `gauge`, `planning_unit_name`, `state`, `SWSDLName`, `ewr_code`, `ewr_code_timing`, `event_years`, `frequency_achieved`, `interevent_achieved`, `ewr_achieved`
 #' @export
 
 assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >= 10, 10, 1)) {
@@ -270,12 +270,12 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 #'
 #' @param interdf the all_interEvents or all_successful_interEvents EWR output
 #'
-#' @returns dataframe with columns 'scenario', 'gauge', 'planning_unit_name',
-#'   'state', 'SWSDLName', 'ewr_code', 'start_date', 'inter_event_length',
-#'   'ewr_code_timing', 'max_interevent', 'exceedance_days' (realised - max),
-#'   'interevent_ratio' (realised / max), 'exceedance_ratio' (interevent_ratio -
-#'   1), 'exceedance' (binary; realised >= max), 'exceedance_only' (days above
-#'   max), 'days_in_exceeding (all realised if max passed)'
+#' @return tibble with columns `scenario`, `gauge`, `planning_unit_name`,
+#'   `state`, `SWSDLName`, `ewr_code`, `start_date`, `inter_event_length`,
+#'   `ewr_code_timing`, `max_interevent`, `exceedance_days` (realised - max),
+#'   `interevent_ratio` (realised / max), `exceedance_ratio` (interevent_ratio -
+#'   1), `exceedance` (binary; realised >= max), `exceedance_only` (days above
+#'   max), `days_in_exceeding (all realised if max passed)`
 #' @export
 #'
 assess_ewr_interevents <- function(interdf) {
