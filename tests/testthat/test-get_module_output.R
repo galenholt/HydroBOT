@@ -4,8 +4,6 @@ temp_parent_dir <- '_test_data'
 # create dir so building makes sense
 make_temp_hydro()
 
-# all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
-
 ewroutlist <- list('summary',
                    'yearly',
                    'all_events',

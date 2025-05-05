@@ -3,7 +3,7 @@
 #' @param dat EWR output dataframe (usually for all gauges and scenarios)
 #' @param type as in [read_and_geo()], but with two special options:
 #'  * 'achievement', calculates EWR achievement from 'yearly',
-#'  * 'interevents', calculates some interevent values from all_interEvents
+#'  * 'interevents', calculates some interevent values from all_interEvents or all_successful_interEvents
 #'  For the EWR tool, the direct options are
 #'  * 'summary',
 #'  * 'yearly',
@@ -268,7 +268,7 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 
 #' Some calculations needed for aggregation of interevent statistics
 #'
-#' @param interdf the all_interEvents EWR output
+#' @param interdf the all_interEvents or all_successful_interEvents EWR output
 #'
 #' @returns dataframe with columns 'scenario', 'gauge', 'planning_unit_name',
 #'   'state', 'SWSDLName', 'ewr_code', 'start_date', 'inter_event_length',

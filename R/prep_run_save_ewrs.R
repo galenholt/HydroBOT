@@ -56,7 +56,7 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'  * 'yearly',
 #'  * 'all_events',
 #'  * 'all_successful_events',
-#'  * 'all_interEvents', # Does not work with EWR 2.0 tool
+#'  * 'all_interEvents'
 #'  * 'all_successful_interEvents'
 #' @param returnType list of strings or character vector defining what to return
 #'   to the active R session. Same options as `outputType`

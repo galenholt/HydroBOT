@@ -5,9 +5,6 @@ temp_parent_dir <- "_test_data"
 # create dir so building makes sense
 make_temp_hydro()
 
-# all_interEvents is breaking in 1.0.6 EWR tool, so skip for now. We don't tend
-# to use it anyway
-
 ewroutlist <- list(
   "summary",
   "yearly",
@@ -1105,6 +1102,80 @@ test_that('inclusive and exclusive ratios work', {
 
   vdiffr::expect_doppelganger("exclusive_plot", exclusive_plot)
 })
+
+
+test_that('manual prepfun', {
+  daydiff <- function(dat, dr = 'difference') {
+
+    # This bit isn't necessary, it just keeps some processing similar with the built-in EWR prep functions.
+    names(dat) <- HydroBOT:::nameclean(names(dat))
+    dat <- HydroBOT::cleanewrs(dat)
+    dat$date <- as.Date(paste0(as.character(dat$year), '-07-01'))
+
+
+    if (dr == 'difference') {
+      dat <- dat |>
+        dplyr::mutate(synthvals = total_event_days - event_length)
+    } else if (dr == 'ratio') {
+      dat <- dat |>
+        dplyr::mutate(synthvals = total_event_days / event_length)
+    } else {
+      rlang::abort('Bad dr argument')
+    }
+
+    return(dat)
+
+  }
+
+
+  aggseq_d <- list(
+    all_time = 'all_time',
+    sdl_units = sdl_units,
+    Target = c("ewr_code_timing", "Target")
+  )
+
+  funseq_d <- list(
+    all_time = "Sum",
+    sdl_units = "Sum",
+    Target = "Sum"
+  )
+
+  diffagg <- read_and_agg(
+    datpath = ewr_results,
+    type = "yearly",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    prepfun = daydiff,
+    prepargs = list(),
+    aggCols = "synthvals",
+    aggsequence = aggseq_d,
+    funsequence = funseq_d,
+    keepAllPolys = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units',
+                       gauge = is_notpoint,
+                       SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units',
+    saveintermediate = TRUE,
+    namehistory = FALSE
+  )
+
+  # stringr::str_flatten(names(spatagg), "', '")
+  namestring <- c(
+    'agg_input', 'all_time', 'sdl_units', 'Target'
+  )
+  expect_equal(names(diffagg), namestring)
+  expect_s3_class(diffagg$Target, "sf")
+  difman_plot <- plot_outcomes(diffagg$Target,
+                               outcome_col = "synthvals",
+                               plot_type = 'map',
+                               colorset = "synthvals",
+                               facet_row = 'scenario',
+                               facet_col = 'Target')
+
+  vdiffr::expect_doppelganger("difman_plot", difman_plot)
+})
+
 
 # Non-module data ------------------------------------------------------------
 

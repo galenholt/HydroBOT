@@ -155,6 +155,8 @@ test_that("roll_frequency rolls correctly", {
 
 test_that("interevents works", {
   # inter_success <- get_module_output(ewrpath, type = 'all_successful_interEvents')
+  # MDBA uses all_successful_interEvents (which is the interevent period between successful events, NOT 'successful' (i.e. lower than max) interevents.)
+  # The data structure is the same though.
   inter_all <- get_module_output(ewrpath, type = 'all_interEvents') |>
     cleanewrs()
 

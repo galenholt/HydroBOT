@@ -68,7 +68,7 @@ find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'direc
 #'  * 'yearly': outputs summarised to year
 #'  * 'all_events'
 #'  * 'all_successful_events'
-#'  * 'all_interEvents': currently fails in EWR tool, and so not supported
+#'  * 'all_interEvents'
 #'  * 'all_successful_interEvents'
 #'
 #' @return path to output directory

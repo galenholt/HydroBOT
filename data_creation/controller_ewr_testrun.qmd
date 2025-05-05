@@ -125,8 +125,6 @@ I expect all of this to change once we have a set data format.
 
 Now we run the ewr tool. Currently I have the test data in IQQM format, but if that changes for a particular run, we'll need to pass it in.
 
-**TODO** - How are we going to do the climate cats moving forward? - Which results do we want? - Currently summary, annual, all_events - but also all_interEvents, all_successful_events, all_successful_interEvents
-
 Will need to ask Martin what those do.
 
 ### Loop and save

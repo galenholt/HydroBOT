@@ -378,8 +378,6 @@ test_that("saving and returning works for all (or nearly all) ewr outputs", {
   # create dir so building makes sense
   make_temp_hydro()
 
-  # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
-
   ewroutlist <- list(
     "summary",
     "yearly",
@@ -447,8 +445,6 @@ test_that("zipped NETCDF saving and returning works for all (or nearly all) ewr 
     orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "HydroBOT")
   )
 
-  # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
-
   ewroutlist <- list(
     "summary",
     "yearly",
@@ -489,7 +485,7 @@ test_that("NETCDF saving and returning works in parallel", {
     orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = "HydroBOT")
   )
 
-  # all_interEvents is breaking in 1.0.6 EWR tool, so skip for now.
+
 
   ewroutlist <- list("summary")
 

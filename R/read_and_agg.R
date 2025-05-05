@@ -181,7 +181,7 @@ read_and_agg <- function(datpath,
       # this would be great, but too many testing issues
       # lifecycle::deprecate_soft("0.2.3", "read_and_agg(type = 'should not use the special values achievement and interevents. Put them in `prepargs`')")
     } else if (type == 'interevents') {
-      pull_type <- 'all_interEvents'
+      pull_type <- 'all_successful_interEvents'
       prepargs <- utils::modifyList(prepargs, list(type = type))
       # lifecycle::deprecate_soft("0.2.3", "read_and_agg(type = 'should not use the special values achievement and interevents. Put them in `prepargs`')")
     } else {
