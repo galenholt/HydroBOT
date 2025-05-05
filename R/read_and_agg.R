@@ -16,9 +16,11 @@
 #' @param causalpath path to the causal relationships .rds file or the causal
 #'   network list object or its name
 #' @param prepfun a function that does any post-read and pre-aggregation
-#'   preparation of the module data. This is where mutates should go. Defaults
-#'   for EWR tool are included in HydroBOT (and [prep_ewr_output()] is the
-#'   default here), but users can supply their own.
+#'   preparation of the module data. This is where mutates should go. If no data
+#'   transformation is needed, use [identity()]. That should be the default for
+#'   generality, but given the common use with the EWR tool, the defaults for
+#'   EWR tool are included in HydroBOT (and [prep_ewr_output()] is the default
+#'   here).
 #' @param prepargs a list of arguments to `prepfun`. e.g. `list(type =
 #'   'achievement', add_max = FALSE)`. Setting `prepargs = list(type =
 #'   achievement')` and [read_and_agg(type = 'yearly')] is a better (more

@@ -4,27 +4,18 @@
 \alias{get_module_output}
 \title{Get the outputs from modules and do minor cleaning}
 \usage{
-get_module_output(dir, type, gaugefilter = NULL, scenariofilter = NULL)
+get_module_output(dir, type, gaugefilter = NULL, scenariofilter = NULL, ...)
 }
 \arguments{
 \item{dir}{path to directory with the EWR output for all gauges and scenarios}
 
-\item{type}{character, a grep for the files to choose. Two special cases:
-\itemize{
-\item 'achievement', calculates EWR achievement from 'yearly',
-\item 'everything', gets all files
-For the EWR tool, the direct options are
-\item 'summary',
-\item 'yearly',
-\item 'all_events',
-\item 'all_successful_events',
-\item 'all_interEvents',
-\item 'all_successful_interEvents'
-}}
+\item{type}{character, a grep for the files to choose. The special case 'everything' gets all files}
 
 \item{gaugefilter}{character vector of gauge numbers to include. Default \code{NULL} includes all}
 
 \item{scenariofilter}{character vector of scenario names to include. Default \code{NULL} includes all}
+
+\item{...}{unused, absorbs extra args}
 }
 \value{
 a tibble of module results

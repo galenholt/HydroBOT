@@ -1,7 +1,5 @@
 #' Make EWR results with achievement for ongoing use
 #'
-#' @inheritParams read_and_geo
-#'
 #' @param dat EWR output dataframe (usually for all gauges and scenarios)
 #' @param type as in [read_and_geo()], but with two special options:
 #'  * 'achievement', calculates EWR achievement from 'yearly',

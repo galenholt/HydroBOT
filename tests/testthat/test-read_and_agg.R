@@ -908,26 +908,29 @@ test_that('exceedance proportion', {
     sum(x)/length(x)
   }
 
+  # for some reason I can't pass in the proportion function to the remote testing.
+  # Works fine running manually.
   agg1 <- list(all_time = 'all_time')
-  fun1 <- list(all_time = 'proportion')
+  fun1 <- list(list(proportion = ~Sum(.)/length(.)))
 
-  mec1 <- read_and_agg(
+  # use groupers instead of group_until here, though both work.
+  expect_warning(mec1 <- read_and_agg(
     datpath = ewr_results,
     type = "all_interEvents",
     geopath = bom_basin_gauges,
     causalpath = causal_ewr,
-    groupers = c("scenario", 'ewr_code_timing'),
+    groupers = c("scenario", 'ewr_code_timing',
+                 'planning_unit_name',
+                 'gauge', 'SWSDLName'),
     prepfun = 'prep_ewr_output',
     prepargs = list(type = 'interevents'),
     aggCols = "exceedance",
     aggsequence = agg1,
     funsequence = fun1,
     keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
-    pseudo_spatial = 'sdl_units',
     saveintermediate = TRUE,
     namehistory = FALSE
-  )
+  ))
 
   # How to plot that?
   ewrprops <- mec1$all_time |>
@@ -994,6 +997,115 @@ test_that('exceedance proportion', {
 
 })
 
+test_that('inclusive and exclusive ratios work', {
+
+  # just do these over time for now.
+
+  # inclusive ratio (days_in_exceeding/length)
+  # exclusive (exceedance_only/lenght)
+
+  # These are both sums, but then divided by the days (here 365*5, which I don't think is contained in the data anywhere.)
+  # we could do it with something like
+  # sumdiv <- function(x) {
+  #   Sum(x)/(365*5)
+  # }
+
+  # but we shouldn't push that up through the network. Instead, we should get
+  # the sums contributing to each level, and then divide. Just do that as a
+  # mutate afterwards. Alternatively, we could do the sumdiv at step 1 and then
+  # sum, but that is more contrived and I think less clear (and easier to mess
+  # up the math; it only works here because of the nature of the division and
+  # addition).
+
+  # I'll do one one way and one the other to test both.
+
+  aggseq_s <- list(
+    all_time = 'all_time',
+    sdl_units = sdl_units,
+    Target = c("ewr_code_timing", "Target")
+  )
+
+  funseq_s <- list(
+    all_time = "Sum",
+    sdl_units = "Sum",
+    Target = "Sum"
+  )
+
+  # for some reason I can't pass in the sumdiv function to the remote testing.
+  # Works fine running manually.
+  funseq_s2 <- list(
+    list(sumdiv = ~Sum(.)/(365*5)),
+    sdl_units = "Sum",
+    Target = "Sum"
+  )
+
+  imr <- read_and_agg(
+    datpath = ewr_results,
+    type = "all_interEvents",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    prepfun = 'prep_ewr_output',
+    prepargs = list(type = 'interevents'),
+    aggCols = "days_in_exceeding",
+    aggsequence = aggseq_s,
+    funsequence = funseq_s,
+    keepAllPolys = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units',
+                       gauge = is_notpoint,
+                       SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units',
+    saveintermediate = TRUE
+  ) |>
+    purrr::map(\(x) dplyr::mutate(x,
+                                  dplyr::across(dplyr::ends_with('exceeding'),
+                                                \(y) y/(365*5))))
+
+  # use the divide-first approach, and also stack history
+  emr <- read_and_agg(
+    datpath = ewr_results,
+    type = "all_interEvents",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    prepfun = 'prep_ewr_output',
+    prepargs = list(type = 'interevents'),
+    aggCols = "exceedance_only",
+    aggsequence = aggseq_s,
+    funsequence = funseq_s2,
+    keepAllPolys = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units',
+    saveintermediate = TRUE,
+    namehistory = FALSE
+  )
+
+  # stringr::str_flatten(names(spatagg), "', '")
+  namestring <- c(
+    'agg_input', 'all_time', 'sdl_units', 'Target'
+  )
+  expect_equal(names(imr), namestring)
+  expect_s3_class(imr$Target, "sf")
+
+  inclusive_plot <- plot_outcomes(imr$Target,
+                               outcome_col = "Target_Sum_sdl_units_Sum_all_time_Sum_days_in_exceeding",
+                               plot_type = 'map',
+                               colorset = "Target_Sum_sdl_units_Sum_all_time_Sum_days_in_exceeding",
+                               facet_row = 'scenario',
+                               facet_col = 'Target')
+
+  vdiffr::expect_doppelganger("inclusive_plot", inclusive_plot)
+
+  exclusive_plot <- plot_outcomes(emr$Target,
+                                  outcome_col = "exceedance_only",
+                                  plot_type = 'map',
+                                  colorset = "exceedance_only",
+                                  facet_row = 'scenario',
+                                  facet_col = 'Target')
+
+  vdiffr::expect_doppelganger("exclusive_plot", exclusive_plot)
+})
+
 # Non-module data ------------------------------------------------------------
 
 test_that('non-module works', {
@@ -1031,6 +1143,7 @@ expect_warning(ausagg <- read_and_agg(
   geopath = austates,
   causalpath = state_theme,
   groupers = "scenario",
+  prepfun = "identity",
   aggCols = "value",
     aggsequence = ausseq,
   funsequence = ausfuns,

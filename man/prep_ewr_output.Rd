@@ -10,16 +10,16 @@ prep_ewr_output(
   year_roll = "best",
   gaugefilter = NULL,
   scenariofilter = NULL,
-  add_max = TRUE
+  add_max = ifelse(type == "achievement", TRUE, FALSE)
 )
 }
 \arguments{
 \item{dat}{EWR output dataframe (usually for all gauges and scenarios)}
 
-\item{type}{character, a grep for the files to choose. Two special cases:
+\item{type}{as in \code{\link[=read_and_geo]{read_and_geo()}}, but with two special options:
 \itemize{
 \item 'achievement', calculates EWR achievement from 'yearly',
-\item 'everything', gets all files
+\item 'interevents', calculates some interevent values from all_interEvents
 For the EWR tool, the direct options are
 \item 'summary',
 \item 'yearly',
@@ -35,7 +35,7 @@ For the EWR tool, the direct options are
 
 \item{scenariofilter}{subset of scenarios, default NULL}
 
-\item{add_max}{logical, default TRUE. Add a 'MAX' scenario that passes all EWRs, usable as a reference}
+\item{add_max}{logical, default TRUE only if \code{type = 'achievement'}. Add a 'MAX' scenario that passes all EWRs, usable as a reference}
 }
 \value{
 a tibble with ewr_achieved

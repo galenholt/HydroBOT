@@ -4,31 +4,20 @@
 \alias{read_and_geo}
 \title{Prepare ewr results from the EWR tool for use in aggregation}
 \usage{
-read_and_geo(datapath, type = "achievement", geopath, whichcrs = 4283, ...)
+read_and_geo(datapath, type, geopath, whichcrs = 4283, ...)
 }
 \arguments{
 \item{datapath}{path to module results (Often EWR outputs with HydroBOT
 modifications to format)}
 
-\item{type}{character, a grep for the files to choose. Two special cases:
-\itemize{
-\item 'achievement', calculates EWR achievement from 'yearly',
-\item 'everything', gets all files
-For the EWR tool, the direct options are
-\item 'summary',
-\item 'yearly',
-\item 'all_events',
-\item 'all_successful_events',
-\item 'all_interEvents',
-\item 'all_successful_interEvents'
-}}
+\item{type}{character, a grep for the files to choose. The special case 'everything' gets all files}
 
 \item{geopath}{sf object with geographic locations matching a column in the data, or path to a csv with gauge locations in lat/long (assumes BOM
 currently) or a shapefile}
 
 \item{whichcrs}{desired crs for the output}
 
-\item{...}{passes \code{gaugefilter}, \code{scenariofilter}, and \code{add_max} to \code{\link[=prep_ewr_output]{prep_ewr_output()}}.
+\item{...}{passes \code{gaugefilter}, \code{scenariofilter} to \code{\link[=get_module_output]{get_module_output()}}.
 Particularly useful for only processing some of the data at a time (e.g. in
 parallel)}
 }

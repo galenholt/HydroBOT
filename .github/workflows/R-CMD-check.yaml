@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, galen_working]
   pull_request:
-    branches: [main, master]
+    branches: [main, master, galen_working]
 
 name: R-CMD-check
 
@@ -70,6 +70,8 @@ jobs:
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
       - name: Install dependencies
         run: poetry install --no-interaction
+
+      - name: Check dependencies
         run: poetry show
 
       # - name: Set up R

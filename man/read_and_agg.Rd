@@ -11,6 +11,8 @@ read_and_agg(
   causalpath,
   groupers = "scenario",
   group_until = rep(NA, length(groupers)),
+  prepfun = "prep_ewr_output",
+  prepargs = list(),
   aggCols,
   aggsequence,
   funsequence,
@@ -26,7 +28,6 @@ read_and_agg(
   rparallel = FALSE,
   par_recursive = TRUE,
   savepar = "combine",
-  add_max = TRUE,
   ...
 )
 }
@@ -35,18 +36,7 @@ read_and_agg(
 frame. Currently needs to be EWR (same as \code{ewrpath} argument in
 \code{\link[=read_and_geo]{read_and_geo()}}), but left more general here for future}
 
-\item{type}{character, a grep for the files to choose. Two special cases:
-\itemize{
-\item 'achievement', calculates EWR achievement from 'yearly',
-\item 'everything', gets all files
-For the EWR tool, the direct options are
-\item 'summary',
-\item 'yearly',
-\item 'all_events',
-\item 'all_successful_events',
-\item 'all_interEvents',
-\item 'all_successful_interEvents'
-}}
+\item{type}{character, a grep for the files to choose. The special case 'everything' gets all files}
 
 \item{geopath}{sf object with geographic locations matching a column in the data, or path to a csv with gauge locations in lat/long (assumes BOM
 currently) or a shapefile}
@@ -71,6 +61,16 @@ or FALSE when run on the aggregation sequence. Named list does not need to
 contain all groupers, but if so, those that persist throughout should be
 given NA or numeric values longer than aggsequence. Vectors the length of
 groupers usually work, but are less-well supported.}
+
+\item{prepfun}{a function that does any post-read and pre-aggregation
+preparation of the module data. This is where mutates should go. If no data
+transformation is needed, use \code{\link[=identity]{identity()}}. That should be the default for
+generality, but given the common use with the EWR tool, the defaults for
+EWR tool are included in HydroBOT (and \code{\link[=prep_ewr_output]{prep_ewr_output()}} is the default
+here).}
+
+\item{prepargs}{a list of arguments to \code{prepfun}. e.g. \code{list(type = 'achievement', add_max = FALSE)}. Setting \verb{prepargs = list(type = achievement')} and \link{read_and_agg(type = 'yearly')} is a better (more
+general) way to declare that processing.}
 
 \item{aggCols}{an expression for the columns to aggregate (the data columns).
 See \code{selectcreator} for formats}
@@ -167,11 +167,8 @@ level in from datpath (FALSE)}
 should this combine the output (default) or save each scenario's
 aggregation separately ('each')}
 
-\item{add_max, }{as in \code{\link[=read_and_geo]{read_and_geo()}} and \code{\link[=prep_ewr_output]{prep_ewr_output()}}, default TRUE.
-Add a 'MAX' scenario that passes all EWRs, usable as a reference}
-
-\item{...}{passed to \code{\link[=read_and_geo]{read_and_geo()}} and \code{\link[=prep_ewr_output]{prep_ewr_output()}}, primarily
-\code{gaugefilter}, \code{scenariofilter}.}
+\item{...}{passed to \code{\link[=read_and_geo]{read_and_geo()}}, primarily \code{gaugefilter},
+\code{scenariofilter}.}
 }
 \value{
 either a tibble or sf of aggregated values at the final level (if
