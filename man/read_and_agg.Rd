@@ -69,7 +69,7 @@ generality, but given the common use with the EWR tool, the defaults for
 EWR tool are included in HydroBOT (and \code{\link[=prep_ewr_output]{prep_ewr_output()}} is the default
 here).}
 
-\item{prepargs}{a list of arguments to \code{prepfun}. e.g. \code{list(type = 'achievement', add_max = FALSE)}. Setting \verb{prepargs = list(type = achievement')} and \link{read_and_agg(type = 'yearly')} is a better (more
+\item{prepargs}{a list of arguments to \code{prepfun}. e.g. \code{list(type = 'achievement', add_max = FALSE)}. Setting \verb{prepargs = list(type = achievement')} and \code{type = 'yearly'} is a better (more
 general) way to declare that processing.}
 
 \item{aggCols}{an expression for the columns to aggregate (the data columns).

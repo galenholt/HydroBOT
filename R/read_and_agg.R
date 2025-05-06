@@ -23,7 +23,7 @@
 #'   here).
 #' @param prepargs a list of arguments to `prepfun`. e.g. `list(type =
 #'   'achievement', add_max = FALSE)`. Setting `prepargs = list(type =
-#'   achievement')` and [read_and_agg(type = 'yearly')] is a better (more
+#'   achievement')` and `type = 'yearly'` is a better (more
 #'   general) way to declare that processing.
 #' @param returnList default `TRUE`, whether to return the output to the current
 #'   session
