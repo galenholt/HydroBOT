@@ -15,7 +15,7 @@ future::plan())."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">HydroBOT</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,6 +56,8 @@ strings from a config before anything is read in, and parallelisation (set a
 <span>  <span class="va">causalpath</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="st">"scenario"</span>,</span>
 <span>  group_until <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">groupers</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  prepfun <span class="op">=</span> <span class="st">"prep_ewr_output"</span>,</span>
+<span>  prepargs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">aggCols</span>,</span>
 <span>  <span class="va">aggsequence</span>,</span>
 <span>  <span class="va">funsequence</span>,</span>
@@ -71,7 +73,6 @@ strings from a config before anything is read in, and parallelisation (set a
 <span>  rparallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  par_recursive <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  savepar <span class="op">=</span> <span class="st">"combine"</span>,</span>
-<span>  add_max <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -87,16 +88,7 @@ frame. Currently needs to be EWR (same as <code>ewrpath</code> argument in
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>character, a grep for the files to choose. Two special cases:</p><ul><li><p>'achievement', calculates EWR achievement from 'yearly',</p></li>
-<li><p>'everything', gets all files
-For the EWR tool, the direct options are</p></li>
-<li><p>'summary',</p></li>
-<li><p>'yearly',</p></li>
-<li><p>'all_events',</p></li>
-<li><p>'all_successful_events',</p></li>
-<li><p>'all_interEvents',</p></li>
-<li><p>'all_successful_interEvents'</p></li>
-</ul></dd>
+<dd><p>character, a grep for the files to choose. The special case 'everything' gets all files</p></dd>
 
 
 <dt id="arg-geopath">geopath<a class="anchor" aria-label="anchor" href="#arg-geopath"></a></dt>
@@ -129,6 +121,20 @@ or FALSE when run on the aggregation sequence. Named list does not need to
 contain all groupers, but if so, those that persist throughout should be
 given NA or numeric values longer than aggsequence. Vectors the length of
 groupers usually work, but are less-well supported.</p></dd>
+
+
+<dt id="arg-prepfun">prepfun<a class="anchor" aria-label="anchor" href="#arg-prepfun"></a></dt>
+<dd><p>a function that does any post-read and pre-aggregation
+preparation of the module data. This is where mutates should go. If no data
+transformation is needed, use <code><a href="https://rdrr.io/r/base/identity.html" class="external-link">identity()</a></code>. That should be the default for
+generality, but given the common use with the EWR tool, the defaults for
+EWR tool are included in HydroBOT (and <code><a href="prep_ewr_output.html">prep_ewr_output()</a></code> is the default
+here).</p></dd>
+
+
+<dt id="arg-prepargs">prepargs<a class="anchor" aria-label="anchor" href="#arg-prepargs"></a></dt>
+<dd><p>a list of arguments to <code>prepfun</code>. e.g. <code>list(type = 'achievement', add_max = FALSE)</code>. Setting <code>prepargs = list(type = achievement')</code> and <code>type = 'yearly'</code> is a better (more
+general) way to declare that processing.</p></dd>
 
 
 <dt id="arg-aggcols">aggCols<a class="anchor" aria-label="anchor" href="#arg-aggcols"></a></dt>
@@ -254,14 +260,9 @@ should this combine the output (default) or save each scenario's
 aggregation separately ('each')</p></dd>
 
 
-<dt id="arg-add-max-">add_max, <a class="anchor" aria-label="anchor" href="#arg-add-max-"></a></dt>
-<dd><p>as in <code><a href="read_and_geo.html">read_and_geo()</a></code> and <code><a href="prep_ewr_output.html">prep_ewr_output()</a></code>, default TRUE.
-Add a 'MAX' scenario that passes all EWRs, usable as a reference</p></dd>
-
-
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>passed to <code><a href="read_and_geo.html">read_and_geo()</a></code> and <code><a href="prep_ewr_output.html">prep_ewr_output()</a></code>, primarily
-<code>gaugefilter</code>, <code>scenariofilter</code>.</p></dd>
+<dd><p>passed to <code><a href="read_and_geo.html">read_and_geo()</a></code>, primarily <code>gaugefilter</code>,
+<code>scenariofilter</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -280,7 +281,7 @@ values at each step (<code>saveintermediate = TRUE</code>)</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer></div>
