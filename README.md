@@ -6,8 +6,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/galenholt/HydroBOT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/galenholt/HydroBOT/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/galenholt/HydroBOT/graph/badge.svg)](https://app.codecov.io/gh/MDBAuth/HydroBOT)
+\[![Codecov test
+coverage](https://codecov.io/gh/galenholt/HydroBOT/graph/badge.svg)
 
 <!-- badges: end -->
 
