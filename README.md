@@ -35,10 +35,13 @@ installation instructions and examples.***
 
 </div>
 
-The [template repo](https://github.com/MDBAuth/toolkit_use) can be
-helpful for establishing project structure to use the HydroBOT and
-automating the setup process, particularly if you are on Linux or want
-to manage your python environments.
+There is a [template repo](https://github.com/MDBAuth/toolkit_use)
+available (contact authors) that can sometimes be helpful for
+establishing project structure to use the HydroBOT and automating the
+setup process, particularly if you are on Linux or want to manage your
+python environments. It is mostly useful for specific cases, e.g. Azure
+at MDBA or HPCs. In normal use, [start
+here](https://mdbauth.github.io/HydroBOT_website/getting_started.html)
 
 ## Installation
 
@@ -87,9 +90,7 @@ shell/R scripts.
 
 See the [HydroBOT documentation
 website](https://mdbauth.github.io/HydroBOT_website/) for a full
-demonstration and the [template
-repo](https://github.com/MDBAuth/toolkit_use) for a bare-bones project
-structure.
+demonstration.
 
 Using HydroBOT is typically a three-step process:
 

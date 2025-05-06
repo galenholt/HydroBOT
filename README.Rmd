@@ -27,7 +27,7 @@ This R package (HydroBOT) forms the core of the climate adaptation toolkit devel
 ***See the [documentation website](https://mdbauth.github.io/HydroBOT_website/) for more installation instructions and examples.***
 :::
 
-The [template repo](https://github.com/MDBAuth/toolkit_use) can be helpful for establishing project structure to use the HydroBOT and automating the setup process, particularly if you are on Linux or want to manage your python environments.
+There is a [template repo](https://github.com/MDBAuth/toolkit_use) available (contact authors) that can sometimes be helpful for establishing project structure to use the HydroBOT and automating the setup process, particularly if you are on Linux or want to manage your python environments. It is mostly useful for specific cases, e.g. Azure at MDBA or HPCs. In normal use, [start here](https://mdbauth.github.io/HydroBOT_website/getting_started.html)
 
 ## Installation
 
@@ -54,7 +54,7 @@ There are `poetry.lock` and `pyproject.toml` files in the repo that allow for de
 
 HydroBOT can be run piecemeal or all at once, scripted. Point it at a directory of hydrologic scenarios, and HydroBOT will run them through the modules, aggregate the outputs, and present results, with control by the user through function arguments. Each stage builds a runnable set of parameter metadata based on function arguments for tracking provenance and reproducibility. Typical approaches use R scripts, Quarto notebooks, or automation on HPC or azure systems with yaml parameter files and shell/R scripts.
 
-See the [HydroBOT documentation website](https://mdbauth.github.io/HydroBOT_website/) for a full demonstration and the [template repo](https://github.com/MDBAuth/toolkit_use) for a bare-bones project structure.
+See the [HydroBOT documentation website](https://mdbauth.github.io/HydroBOT_website/) for a full demonstration.
 
 Using HydroBOT is typically a three-step process:
 
