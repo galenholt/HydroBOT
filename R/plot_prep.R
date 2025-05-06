@@ -122,8 +122,8 @@ plot_style_prep <- function(prepped, colorset, colorgroups, pal_list, pal_direct
   # Warn about conflicts with outcome trans
   if (!is.null(prepped$outcome_col)) {
     if (!inherits(transoutcome, "trans") &&
-      transoutcome %in% c("log", "log10") &
-      any(prepped$data[[prepped$outcome_col]] == 0)) {
+      transoutcome %in% c("log", "log10") &&
+      any(prepped$data[[prepped$outcome_col]] == 0, na.rm = TRUE)) {
       rlang::warn(glue::glue("`transoutcome` takes logs, but data has
                            {sum(prepped$data[[prepped$outcome_col]] == 0)} zeros and
                            {sum(prepped$data[[prepped$outcome_col]] < 0)} less than 0,
