@@ -54,7 +54,7 @@ devtools::install_github("galenholt/HydroBOT.git")
 ``` r
 library(HydroBOT)
 #> Loading required package: sf
-#> Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.3.1; sf_use_s2() is TRUE
+#> Linking to GEOS 3.13.0, GDAL 3.10.1, PROJ 9.5.1; sf_use_s2() is TRUE
 ```
 
 <div id="py-install" style="color: gray">
@@ -62,8 +62,8 @@ library(HydroBOT)
 ### Python dependency
 
 To run the current built in EWR module, HydroBOT needs a Python
-environment containing `py_ewr` (currently py-ewr 2.3.7). The package
-will manage that for you if you just start using it- on first use, the
+environment containing `py_ewr` (currently 2.3.7). The package will
+manage that for you if you just start using it- on first use, the
 package checks the environment and either uses an existing python
 environment or builds one with that dependency when the package is
 loaded.
