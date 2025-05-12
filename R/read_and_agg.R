@@ -134,6 +134,7 @@ read_and_agg <- function(datpath,
       spath <- rlang::expr(file.path(savepath, y))
     } else if (savepar == "combine") {
       spath <- NULL
+      returnList <- TRUE
     } else {
       rlang::abort("Unacceptable value for savepar")
     }
@@ -175,9 +176,15 @@ read_and_agg <- function(datpath,
     if (type == "achievement") {
       pull_type <- "yearly"
       prepargs <- utils::modifyList(prepargs, list(type = type))
+      # make sure add_max gets passed
+      if (!is.null(list(...)$add_max)) {
+        prepargs <- utils::modifyList(prepargs, list(...)['add_max'])
+      }
+      # but not if we're parallel iterating
       if (!is.null(list(...)$par_iter) && list(...)$par_iter > 1) {
         prepargs <- utils::modifyList(prepargs, list(add_max = FALSE))
       }
+
       # this would be great, but too many testing issues
       # lifecycle::deprecate_soft("0.2.3", "read_and_agg(type = 'should not use the special values achievement and interevents. Put them in `prepargs`')")
     } else if (type == 'interevents') {

@@ -228,7 +228,8 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
     dplyr::mutate(event_years = ifelse(grepl('^CF', .data$ewr_code),
                                        1-.data$event_years, .data$event_years),
                   target_frequency = ifelse(grepl('^CF', .data$ewr_code),
-                                            100-.data$target_frequency, .data$target_frequency))
+                                            100-.data$target_frequency, .data$target_frequency),
+                  max_interevent = .data$max_interevent*365)
 
   # Frequency checks (ACHIEVEMENT test)
 
@@ -246,7 +247,8 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
                             "gauge", "ewr_code", "ewr_code_timing")) |>
       # We should split this off for model shapes
       dplyr::mutate(frequency_achieved = .data$frequency_occurred >= .data$target_frequency,
-                    interevent_achieved = .data$rolling_max_inter_event_achieved,# .data$interevent_occurred <= .data$max_interevent,
+                    # we could use interevent_achieved = .data$rolling_max_inter_event_achieved, but the following lets us specify the function later, and is what the EWR tool does internally
+                    interevent_achieved = as.numeric(.data$rolling_max_inter_event <= .data$max_interevent),
                     # both have to occur for the EWR to 'pass'
                     ewr_achieved = .data$frequency_achieved * .data$interevent_achieved,
                     .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
@@ -487,6 +489,7 @@ maxInterevent <- function(x) {
 #' @keywords internal
 bind_max <- function(outdf) {
   MAX_scenario <- outdf |>
+    sf::st_drop_geometry() |>
     dplyr::select('gauge', 'planning_unit_name', 'state', 'SWSDLName', 'ewr_code', 'ewr_code_timing') |>
     dplyr::distinct() |>
     dplyr::mutate(
@@ -494,7 +497,9 @@ bind_max <- function(outdf) {
       ewr_achieved = 1
     ) |>
     dplyr::select('scenario', 'gauge', 'planning_unit_name', 'state', 'SWSDLName',
-                  'ewr_achieved', 'ewr_code', 'ewr_code_timing')
+                  'ewr_achieved', 'ewr_code', 'ewr_code_timing') |>
+    join_to_geo(bom_basin_gauges)
+
   outdf <- dplyr::bind_rows(outdf, MAX_scenario)
   return(outdf)
 }

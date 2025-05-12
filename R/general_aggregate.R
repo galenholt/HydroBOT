@@ -121,7 +121,8 @@ general_aggregate <- function(data, groupers,
     }
     charfun <- stringr::str_remove_all(charfun, 'return\\([A-z]\\)')
     # FUNS2 <- eval(parse(text = charfun)) # base R
-    FUNS_quo <- rlang::eval_tidy(rlang::parse_expr(charfun)) # rlang claims to be faster?
+    # rlang claims to be faster?
+    FUNS_quo <- rlang::eval_tidy(rlang::parse_expr(charfun)) # nocov
 
     # go again
     data_agg <- data |>

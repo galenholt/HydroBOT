@@ -90,6 +90,69 @@ test_that("multi-step theme and spatial works", {
   vdiffr::expect_doppelganger("spatial-theme multi withreadin", g2sdl_plot)
 })
 
+test_that("add_max works", {
+  aggseq <- list(
+    ewr_code = c("ewr_code_timing", "ewr_code"),
+    env_obj = c("ewr_code", "env_obj"),
+    sdl_units = sdl_units,
+    Specific_goal = c("env_obj", "Specific_goal"),
+    catchment = cewo_valleys,
+    Objective = c("Specific_goal", "Objective"),
+    mdb = basin,
+    target_5_year_2024 = c("Objective", "target_5_year_2024")
+  )
+
+  funseq <- list(
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean",
+    "ArithmeticMean"
+  )
+
+  system.time(
+  spatagg <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units'
+  )
+  )
+
+  expect_equal(unique(spatagg$scenario), c('MAX', 'base', 'down4', 'up4'))
+
+  system.time(
+  spataggf <- read_and_agg(
+    datpath = ewr_results,
+    type = "achievement",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq,
+    funsequence = funseq,
+    keepAllPolys = FALSE,
+    add_max = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units'
+  )
+  )
+
+  expect_equal(unique(spataggf$scenario), c('base', 'down4', 'up4'))
+
+
+})
+
 test_that("passing in the prep function works", {
 
   skip_on_os('linux')
