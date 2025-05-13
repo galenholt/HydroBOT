@@ -66,7 +66,7 @@ jobs:
 
       # as per https://rstudio.github.io/reticulate/articles/package.html
       - run: |
-          library(mypackage)      # <-- declare requirements in .onLoad()
+          library(HydroBOT)      # <-- declare requirements in .onLoad()
           reticulate::py_config() # <-- resolves the ephemeral python environment
 
 
