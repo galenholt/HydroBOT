@@ -1,5 +1,5 @@
 .onLoad <- function(libname, pkgname) {
-  reticulate::py_require(pkgname)
+  reticulate::py_require('py-ewr')
 
   rlang::local_use_cli()
 

@@ -245,10 +245,15 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
                     # interevent_occurred = roll_interevent(.data$event_years, year_roll),
                     .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
                             "gauge", "ewr_code", "ewr_code_timing")) |>
-      # We should split this off for model shapes
-      dplyr::mutate(frequency_achieved = .data$frequency_occurred >= .data$target_frequency,
+      # Some EWRs are missing target frequencies and max interevents. Treat
+      # those as if those conditions don't exist (since they dont). Thus, if an
+      # event happens with no target, just pass it, and if there are no
+      # interevent conditions, pass the interevent
+      dplyr::mutate(frequency_achieved = ifelse(is.na(.data$target_frequency), .data$event_years,
+                                                .data$frequency_occurred >= .data$target_frequency),
                     # we could use interevent_achieved = .data$rolling_max_inter_event_achieved, but the following lets us specify the function later, and is what the EWR tool does internally
-                    interevent_achieved = as.numeric(.data$rolling_max_inter_event <= .data$max_interevent),
+                    interevent_achieved = ifelse(is.na(.data$max_interevent), 1,
+                                                 as.numeric(.data$rolling_max_inter_event <= .data$max_interevent)),
                     # both have to occur for the EWR to 'pass'
                     ewr_achieved = .data$frequency_achieved * .data$interevent_achieved,
                     .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
