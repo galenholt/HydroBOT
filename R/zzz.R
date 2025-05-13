@@ -1,5 +1,5 @@
 .onLoad <- function(libname, pkgname) {
-  reticulate::configure_environment(pkgname)
+  reticulate::py_require(pkgname)
 
   rlang::local_use_cli()
 
