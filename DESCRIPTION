@@ -1,6 +1,6 @@
 Package: HydroBOT
 Title: Toolkit For Flow-Dependent outcomes in the Murray-Darling Basin
-Version: 0.2.4.9004
+Version: 0.2.4.9005
 Authors@R: 
     c(person("Galen", "Holt", , "g.holt@deakin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7455-9275")),
@@ -57,5 +57,4 @@ Depends:
     R (>= 3.5),
     sf
 LazyData: true
-
 URL: https://galenholt.github.io/HydroBOT/
