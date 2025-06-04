@@ -23,7 +23,7 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = "werp") {
   # they should appear on the graph if they exist
   if (length(typeorder) == 1 && typeorder == "werp") {
     typeorder <- c(
-      "ewr_code", "env_obj", "Env_obj_main",
+      "ewr_code_timing", "ewr_code", "env_obj", "Env_obj_main",
       "Specific_goal", "Objective", "Target",
       "target_5_year_2024", "target_10_year_2029", "target_20_year_2039"
     )

@@ -45,7 +45,7 @@ clean_ewr_causal <- function(ewrnet, verbose = FALSE) {
     dplyr::filter(!env_obj %in% c("NF3.NF4", "NF4.NF5"))|>
     dplyr::bind_rows(Fix1_ewr2obj)
 
-  # capitalisation- should probably ggeneralise
+  # capitalisation- should probably generalize
   e2o <- e2o |>
     dplyr::mutate(env_obj = dplyr::case_when(env_obj == "NV2A" ~ "NV2a",
                                            env_obj ==  "NV4E" ~ "NV4e",
