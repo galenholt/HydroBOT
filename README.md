@@ -16,6 +16,9 @@ toolkit developed for the [climate adaptation
 theme](https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation)
 of the [*Murray–Darling Water and Environment Research
 Program*](https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program)*.*
+HydroBOT is described at [(Holt et
+al. 20205)](https://doi.org/10.1016/j.envsoft.2025.106579).
+
 HydroBOT ingests hydrological scenarios representing historical or
 future climates or adaptation options, and processing those through
 various response models (currently [MDBA EWR
@@ -276,3 +279,12 @@ a program of the [Murray-Darling Basin
 Authority](https://www.mdba.gov.au/). Collaboration with colleagues from
 Deakin University, CSIRO, and the MDBA were essential to its development
 and success.
+
+## Citing HydroBOT
+
+Please cite HydroBOT as
+
+Holt, Galen, Georgia Dwyer, David Robertson, Martin Job, and Rebecca E.
+Lester. 2025. *HydroBOT: An Integrated Toolkit for Assessment of
+Hydrology-Dependent Outcomes.* Environmental Modelling & Software, June,
+106579. <https://doi.org/10.1016/j.envsoft.2025.106579>.
