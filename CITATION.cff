@@ -7,6 +7,27 @@ cff-version: 1.2.0
 message: 'To cite package "HydroBOT" in publications use:'
 type: software
 license: MIT
+message: "If you use this software, please cite both the article from preferred-citation and the software itself."
+preferred-citation:
+  authors:
+    - family-names: Holt
+      given-names: Galen
+      email: g.holt@deakin.edu.au
+    - family-names: Dwyer
+      given-names: Georgia K.
+    - family-names: Robertson
+      given-names: David
+    - family-names: Job
+      given-names: Martin
+    - family-names: Lester
+      given-names: Rebecca E.
+  title: "HydroBOT: an integrated toolkit for assessment of hydrology-dependent outcomes"
+  doi: https://doi.org/10.1016/j.envsoft.2025.106579
+  type: article
+  year: 2025
+  journal: Environmental Modelling & Software
+
+
 title: 'HydroBOT: Toolkit For Flow-Dependent outcomes in the Murray-Darling Basin'
 version: 0.2.2.9025
 abstract: Provides tools to assess responses to flows in the MDB. Wraps the EWR tool
