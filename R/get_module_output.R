@@ -44,7 +44,7 @@ get_module_output <- function(dir, type,
 
     # read into one df
     # need to know if there's a 'gauge' col
-    isgauge <- 'gauge' %in% names(readr::spec_csv(relevantfiles[1])$cols)
+    isgauge <- any(grepl('^gauge$', names(readr::spec_csv(relevantfiles[1])$cols), ignore.case = T))
 
 
     # make CHECK happy

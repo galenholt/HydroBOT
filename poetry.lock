@@ -378,14 +378,14 @@ xml = ["lxml (>=4.6.3)"]
 
 [[package]]
 name = "py-ewr"
-version = "2.3.7"
+version = "2.4.1"
 description = "Environmental Water Requirement calculator"
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "py_ewr-2.3.7-py3-none-any.whl", hash = "sha256:2a829ac17b6c4d43861ee3a8c5bebf689a3313cd05c3ff9b22d095f55d6a567c"},
-    {file = "py_ewr-2.3.7.tar.gz", hash = "sha256:4d405128ff773f008a53bb5213e9d8193da6a98863f65fdabc3e158508367855"},
+    {file = "py_ewr-2.4.1-py3-none-any.whl", hash = "sha256:75cc6a97863d1f8efdb48e06f274c0a36b349ff52239215152611f4a6b754663"},
+    {file = "py_ewr-2.4.1.tar.gz", hash = "sha256:9f2f45c0c7aca96a732308ffb5383e8c846608009d68a8b74d8f1ab5b035fc98"},
 ]
 
 [package.dependencies]
