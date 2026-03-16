@@ -9,7 +9,7 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.9"
-py-ewr = "^2.3.7"
+py-ewr = {path = "../EWR_tool", develop = true}
 
 [build-system]
 requires = ["poetry-core"]

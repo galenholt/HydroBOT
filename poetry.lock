@@ -377,16 +377,14 @@ test = ["hypothesis (>=6.34.2)", "pytest (>=7.3.2)", "pytest-asyncio (>=0.17.0)"
 xml = ["lxml (>=4.6.3)"]
 
 [[package]]
-name = "py-ewr"
+name = "py_ewr"
 version = "2.4.1"
 description = "Environmental Water Requirement calculator"
 optional = false
 python-versions = "*"
 groups = ["main"]
-files = [
-    {file = "py_ewr-2.4.1-py3-none-any.whl", hash = "sha256:75cc6a97863d1f8efdb48e06f274c0a36b349ff52239215152611f4a6b754663"},
-    {file = "py_ewr-2.4.1.tar.gz", hash = "sha256:9f2f45c0c7aca96a732308ffb5383e8c846608009d68a8b74d8f1ab5b035fc98"},
-]
+files = []
+develop = true
 
 [package.dependencies]
 cachetools = ">5"
@@ -397,6 +395,10 @@ numpy = "<2"
 pandas = ">2"
 requests = ">2"
 xarray = "*"
+
+[package.source]
+type = "directory"
+url = "../EWR_tool"
 
 [[package]]
 name = "python-dateutil"
@@ -580,4 +582,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "e7ae434febe8a3fd1cfd008a587185075f017bd848a9a9fc384c985c49209933"
+content-hash = "8a32216eebcc7d60a533514953f889510a4bb1ec00ebfd8fcc8e471024159adc"
