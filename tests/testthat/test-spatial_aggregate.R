@@ -8,7 +8,7 @@ ewr_to_agg_timemean <- temporal_aggregate(ewr_to_agg,
                                           groupers = c('scenario', 'gauge',
                                                        'planning_unit_name',
                                                        'SWSDLName', 'ewr_code',
-                                                       'ewr_code_timing'),
+                                                       'ewr_code_main'),
                                           aggCols = 'ewr_achieved',
                                           funlist = 'ArithmeticMean',
                                           prefix = '') |>
@@ -28,7 +28,7 @@ test_that("gauge to poly works", {
                   'SWSDLID', 'StateID', 'SWSDLName', 'geometry')
   expect_equal(sort(names(spatagg)), sort(namestring))
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 8)
+  expect_equal(nrow(spatagg), length(unique(spatagg$scenario))*2)
 
   # Keeping the whole set of polys
   # Warning because this shouldn't be a spatial aggregation in typical use
@@ -87,7 +87,7 @@ test_that("poly to poly works", {
                   'ValleyName', 'ValleyID', 'ValleyCode', 'geometry')
   expect_equal(names(p2pagg), namestring)
   expect_s3_class(p2pagg, 'sf')
-  expect_equal(nrow(p2pagg), 28)
+  expect_equal(nrow(p2pagg), length(unique(p2pagg$scenario))*7)
 
   # Plots are useful for checking spatial outcomes
   g2sdl2cewo_plot <- ggplot2::ggplot() +
@@ -114,7 +114,7 @@ test_that("psuedo-spatial works", {
   namestring <- c('scenario', 'polyID', 'spatial_mean_ewr_achieved', 'PlanningUnitName', 'LTWPShortName', 'PU_Region', 'PU_Code', 'STATE', 'geometry', 'planning_unit_name')
   expect_equal(sort(names(spatagg)), sort(namestring))
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 36)
+  expect_equal(nrow(spatagg), length(unique(spatagg$scenario))*length(unique(spatagg$polyID)))
 
 
   # Fail if nothing in common
@@ -154,7 +154,7 @@ test_that("bare functions", {
   namestring <- c('scenario', 'polyID', 'spatial_mean_ewr_achieved', 'SWSDLID', 'StateID', 'SWSDLName', 'geometry')
   expect_equal(sort(names(spatagg)), sort(namestring))
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 8)
+  expect_equal(nrow(spatagg), length(unique(spatagg$scenario))*2)
 })
 
 test_that("list functions", {
@@ -169,7 +169,7 @@ test_that("list functions", {
   namestring <- sort(c('scenario', 'polyID', 'spatial_mean_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry'))
   expect_equal(sort(names(spatagg)), namestring)
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 8)
+  expect_equal(nrow(spatagg), length(unique(spatagg$scenario))*2)
 })
 
 test_that("multiple functions", {
@@ -186,7 +186,7 @@ test_that("multiple functions", {
                   'spatial_sd_ewr_achieved', 'SWSDLID', 'StateID', 'SWSDLName', 'geometry')
   expect_equal(sort(names(spatagg_c)), sort(namestring))
   expect_s3_class(spatagg_c, 'sf')
-  expect_equal(nrow(spatagg_c), 8)
+  expect_equal(nrow(spatagg_c), length(unique(spatagg_c$scenario))*2)
 
   # multiple bare names works if done in the call
   # Warning because this shouldn't be a spatial aggregation in typical use
@@ -200,7 +200,7 @@ test_that("multiple functions", {
                   'spatial_sd_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(sort(names(spatagg_b)), sort(namestring))
   expect_s3_class(spatagg_b, 'sf')
-  expect_equal(nrow(spatagg_b), 8)
+  expect_equal(nrow(spatagg_b), length(unique(spatagg_b$scenario))*2)
 
   # multiple bare names does not work if declared externally
   bare2 <- c(mean, sd)
@@ -221,7 +221,7 @@ test_that("multiple functions", {
 
   expect_equal(sort(names(spatagg_l)), sort(namestring))
   expect_s3_class(spatagg_l, 'sf')
-  expect_equal(nrow(spatagg_l), 8)
+  expect_equal(nrow(spatagg_l), length(unique(spatagg_l$scenario))*2)
 
   # # Should also work with other anonymous function, but only actually has once.
   # # list- typically specified outside the call
@@ -260,7 +260,7 @@ test_that("multiple functions", {
                    'spatial_wm_ewr_achieved', 'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(sort(names(spatagg_lw)), sort(namestringw))
   expect_s3_class(spatagg_lw, 'sf')
-  expect_equal(nrow(spatagg_lw), 8)
+  expect_equal(nrow(spatagg_lw), length(unique(spatagg_lw$scenario))*2)
 
 
   # Same, but keeping polys?
@@ -293,7 +293,15 @@ test_that("bare functions", {
                   'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(sort(names(spatagg)), sort(namestring))
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 116)
+
+  # Each ewr (unique to SWSDL) should have a row per scenario
+  unique_ewr <- ewr_to_agg_timemean |>
+    dplyr::filter(SWSDLName %in% spatagg$SWSDLName) |>
+    dplyr::mutate(unique_ewr = paste0(ewr_code, '_', SWSDLName)) |>
+    dplyr::distinct(unique_ewr) |>
+    dplyr::pull()
+
+  expect_equal(nrow(spatagg), length(unique_ewr)*length(unique(spatagg$scenario)))
 })
 
 test_that("bare names", {
@@ -308,7 +316,14 @@ test_that("bare names", {
                   'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(sort(names(spatagg)), sort(namestring))
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 116)
+  # Each ewr (unique to SWSDL) should have a row per scenario
+  unique_ewr <- ewr_to_agg_timemean |>
+    dplyr::filter(SWSDLName %in% spatagg$SWSDLName) |>
+    dplyr::mutate(unique_ewr = paste0(ewr_code, '_', SWSDLName)) |>
+    dplyr::distinct(unique_ewr) |>
+    dplyr::pull()
+
+  expect_equal(nrow(spatagg), length(unique_ewr)*length(unique(spatagg$scenario)))
 })
 
 test_that("tidyselect and mixed", {
@@ -325,7 +340,14 @@ test_that("tidyselect and mixed", {
                   'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(sort(names(spatagg)), sort(namestring))
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 116)
+  # Each ewr (unique to SWSDL) should have a row per scenario
+  unique_ewr <- ewr_to_agg_timemean |>
+    dplyr::filter(SWSDLName %in% spatagg$SWSDLName) |>
+    dplyr::mutate(unique_ewr = paste0(ewr_code, '_', SWSDLName)) |>
+    dplyr::distinct(unique_ewr) |>
+    dplyr::pull()
+
+  expect_equal(nrow(spatagg), length(unique_ewr)*length(unique(spatagg$scenario)))
 })
 
 # character vectors for groups and aggCols
@@ -352,7 +374,14 @@ test_that("failmissing", {
                   'SWSDLID', 'SWSDLName', 'StateID', 'geometry')
   expect_equal(sort(names(spatagg)), sort(namestring))
   expect_s3_class(spatagg, 'sf')
-  expect_equal(nrow(spatagg), 116)
+  # Each ewr (unique to SWSDL) should have a row per scenario
+  unique_ewr <- ewr_to_agg_timemean |>
+    dplyr::filter(SWSDLName %in% spatagg$SWSDLName) |>
+    dplyr::mutate(unique_ewr = paste0(ewr_code, '_', SWSDLName)) |>
+    dplyr::distinct(unique_ewr) |>
+    dplyr::pull()
+
+  expect_equal(nrow(spatagg), length(unique_ewr)*length(unique(spatagg$scenario)))
 })
 
 # todo --------------------------------------------------------------------
