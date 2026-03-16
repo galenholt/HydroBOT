@@ -78,7 +78,18 @@ test_that("year_roll is rolling correctly", {
                                   'ewr_code_timing', 'event_years',
                                   'frequency_achieved', 'interevent_achieved',
                                   'ewr_achieved', 'geometry'))
-  expect_equal(sum(is.na(assessed$ewr_achieved)), 1296)
+  # There should be three NA at the top of each unique EWR
+  expect_equal(sum(is.na(assessed$ewr_achieved)),
+               nrow(
+                 dplyr::distinct(
+                   dplyr::filter(
+                     dplyr::select(
+                       assessed, scenario, gauge, planning_unit_name, SWSDLName, ewr_code_timing
+                       ),
+                     scenario != 'MAX'
+                     )
+                   )
+                 )*3)
 })
 
 

@@ -111,6 +111,7 @@ nameclean <- function(charvec) {
   cleannames[cleannames == "pu" | cleannames == "PlanningUnitName" | cleannames == "planning_unit"] <- "planning_unit_name"
   # The SWSDLName needs to match the sdl_units (and legislation)
   cleannames[cleannames == 's_w_s_d_l_name'] <- 'SWSDLName'
+  cleannames[cleannames == 'l_t_w_p_short_name'] <- 'LTWPShortName'
 
   return(cleannames)
 }
