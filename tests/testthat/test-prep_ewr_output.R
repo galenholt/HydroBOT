@@ -33,7 +33,7 @@ test_that("assessment works", {
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
                                   'planning_unit_name', 'state', 'SWSDLName',
                                   'ewr_code',
-                                  'ewr_code_timing', 'event_years',
+                                  'ewr_code_main', 'event_years',
                                   'frequency_achieved', 'interevent_achieved',
                                   'ewr_achieved'))
 })
@@ -46,9 +46,9 @@ test_that("making assessment tibble works", {
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
                                   'planning_unit_name', 'state', 'SWSDLName',
                                   'ewr_code',
-                                  'ewr_code_timing', 'event_years',
+                                  'ewr_code_main', 'event_years',
                                   'frequency_achieved', 'interevent_achieved',
-                                  'ewr_achieved', 'geometry'))
+                                  'ewr_achieved', 'geometry', 'site', 'owner'))
   expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
 })
 
@@ -60,9 +60,9 @@ test_that("making assessment tibble from in-memory ewr output works", {
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
                                   'planning_unit_name', 'state', 'SWSDLName',
                                   'ewr_code',
-                                  'ewr_code_timing', 'event_years',
+                                  'ewr_code_main', 'event_years',
                                   'frequency_achieved', 'interevent_achieved',
-                                  'ewr_achieved', 'geometry'))
+                                  'ewr_achieved', 'geometry', 'site', 'owner'))
   expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
 })
 
@@ -75,16 +75,16 @@ test_that("year_roll is rolling correctly", {
   expect_equal(names(assessed), c('scenario', 'year', 'date', 'gauge',
                                   'planning_unit_name', 'state', 'SWSDLName',
                                   'ewr_code',
-                                  'ewr_code_timing', 'event_years',
+                                  'ewr_code_main', 'event_years',
                                   'frequency_achieved', 'interevent_achieved',
-                                  'ewr_achieved', 'geometry'))
+                                  'ewr_achieved', 'geometry', 'site', 'owner'))
   # There should be three NA at the top of each unique EWR
   expect_equal(sum(is.na(assessed$ewr_achieved)),
                nrow(
                  dplyr::distinct(
                    dplyr::filter(
                      dplyr::select(
-                       assessed, scenario, gauge, planning_unit_name, SWSDLName, ewr_code_timing
+                       assessed, scenario, gauge, planning_unit_name, SWSDLName, ewr_code
                        ),
                      scenario != 'MAX'
                      )
@@ -100,9 +100,9 @@ test_that("passing in a list from memory works", {
   expect_equal(names(ewrprepped), c('scenario', 'year', 'date', 'gauge',
                                     'planning_unit_name', 'state', 'SWSDLName',
                                     'ewr_code',
-                                    'ewr_code_timing', 'event_years',
+                                    'ewr_code_main', 'event_years',
                                     'frequency_achieved', 'interevent_achieved',
-                                    'ewr_achieved', 'geometry'))
+                                    'ewr_achieved', 'geometry', 'site', 'owner'))
   expect_equal(sum(is.na(ewrprepped$planning_unit_name)), 0)
 })
 
@@ -116,10 +116,9 @@ test_that("ewr_code separation works", {
 
   ewrsep <- separate_ewr_codes(et)
 
-  ues <- unique(ewrsep$ewr_code)
+  ues <- unique(ewrsep$ewr_code_main)
 
   expect_snapshot_value(as.list(ues))
-
 
 
   # causal straight from data-raw. This isn't ideal and might have to be skipped because it wont be available to data-raw
@@ -131,7 +130,7 @@ test_that("ewr_code separation works", {
       dplyr::distinct()
 
     causalsep <- separate_ewr_codes(causalewrs)
-    ucs <- unique(causalsep$ewr_code)
+    ucs <- unique(causalsep$ewr_code_main)
 
     ucs[!ucs %in% ues]
     expect_snapshot_value(as.list(ucs))
@@ -175,7 +174,7 @@ test_that("interevents works", {
 
   expect_equal(names(assessed), c('scenario', 'gauge', 'planning_unit_name',
                                   'state', 'SWSDLName', 'ewr_code', 'start_date',
-                                  'inter_event_length', 'ewr_code_timing',
+                                  'inter_event_length', 'ewr_code_main',
                                   'max_interevent', 'exceedance_days',
                                   'interevent_ratio', 'exceedance_ratio',
                                   'exceedance', 'exceedance_only',
@@ -188,7 +187,7 @@ test_that("interevents works", {
   expect_equal(names(fromtop), c('scenario', 'gauge', 'planning_unit_name',
                                   'state', 'SWSDLName', 'ewr_code', 'start_date',
                                   'inter_event_length', 'site', 'owner', 'geometry',
-                                 'ewr_code_timing',
+                                 'ewr_code_main',
                                   'max_interevent', 'exceedance_days',
                                   'interevent_ratio', 'exceedance_ratio',
                                   'exceedance', 'exceedance_only',
