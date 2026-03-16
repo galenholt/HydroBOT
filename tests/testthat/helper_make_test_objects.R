@@ -55,15 +55,14 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
   if (style == 'PU') {
     # Group_until and other sorts of agg tests are done separately in the relevant file tests
     aggseq <- list(all_time = 'all_time',
-                   ewr_code = c('ewr_code_timing', 'ewr_code'),
+                   ewr_code_main = c('ewr_code', 'ewr_code_main'),
                    planning_units = planning_units,
-                   env_obj =  c('ewr_code', "env_obj"),
+                   eco_objective =  c('ewr_code_main', "eco_objective"),
                    sdl_units = sdl_units,
-                   Specific_goal = c('env_obj', "Specific_goal"),
+                   objective_text = c('eco_objective', "objective_text"),
                    catchment = cewo_valleys,
-                   Objective = c('Specific_goal', 'Objective'),
-                   mdb = basin,
-                   target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+                   theme = c('objective_text', 'theme'),
+                   mdb = basin)
 
     funseq <- list('ArithmeticMean',
                    'CompensatingFactor',
@@ -73,8 +72,7 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
                    "ArithmeticMean",
                    "SpatialWeightedMean",
                    'ArithmeticMean',
-                   "SpatialWeightedMean",
-                   'ArithmeticMean')
+                   "SpatialWeightedMean")
 
     ps <- "planning_units"
   }
@@ -83,14 +81,13 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
   if (style == 'noPU') {
     # Group_until and other sorts of agg tests are done separately in the relevant file tests
     aggseq <- list(all_time = 'all_time',
-                   ewr_code = c('ewr_code_timing', 'ewr_code'),
-                   env_obj =  c('ewr_code', "env_obj"),
+                   ewr_code_main = c('ewr_code', 'ewr_code_main'),
+                   eco_objective =  c('ewr_code_main', "eco_objective"),
                    sdl_units = sdl_units,
-                   Specific_goal = c('env_obj', "Specific_goal"),
+                   objective_text = c('eco_objective', "objective_text"),
                    catchment = cewo_valleys,
-                   Objective = c('Specific_goal', 'Objective'),
-                   mdb = basin,
-                   target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+                   theme = c('objective_text', 'theme'),
+                   mdb = basin)
 
     funseq <- list('ArithmeticMean',
                    'CompensatingFactor',
@@ -101,8 +98,7 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
                                             na.rm = TRUE)),
                    'ArithmeticMean',
                    list(wm = ~weighted.mean(., w = area,
-                                            na.rm = TRUE)),
-                   'ArithmeticMean')
+                                            na.rm = TRUE)))
     # no pseudo_spatial argument herea
     ps <- NULL
   }
