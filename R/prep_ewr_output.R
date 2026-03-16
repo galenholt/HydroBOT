@@ -14,7 +14,7 @@
 #' @param year_roll character 'best' or number, specific number of years to check assessment for. 'Best' uses 10-year windows if possible. 1 uses the NSW method.
 #' @param gaugefilter subset of gauges, default NULL
 #' @param scenariofilter subset of scenarios, default NULL
-#' @param add_max logical, default TRUE only if `type = 'achievement'`. Add a 'MAX' scenario that passes all EWRs, usable as a reference
+#' @param add_max logical, default FALSE. Add a 'MAX' scenario that passes all EWRs, usable as a reference, but often causes problems. Usually better to just calculate it post-hoc
 #'
 #' @return a tibble with ewr_achieved
 #' @export
@@ -22,7 +22,7 @@
 
 prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
                            gaugefilter = NULL, scenariofilter = NULL,
-                           add_max = ifelse(type == 'achievement', TRUE, FALSE)) {
+                           add_max = FALSE) {
 
   # some cleanup that lets this get used on its own if necessary
   if ('eventYears' %in% names(dat)) {
@@ -52,7 +52,7 @@ prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
     # assess achievement
     outdf <- assess_ewr_achievement(yeardat, year_roll = year_roll)
     # add max
-    if (add_max == TRUE) {
+    if (add_max) {
       outdf <- bind_max(outdf)
     }
   }
@@ -62,7 +62,7 @@ prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
     # assess interevent calculations
     outdf <- assess_ewr_interevents(dat)
     # add max
-    if (add_max == TRUE) {
+    if (add_max) {
       rlang::abort('add_max does not make sense for interevents. use `add_max = FALSE`')
     }
   }

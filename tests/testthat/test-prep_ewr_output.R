@@ -48,7 +48,7 @@ test_that("making assessment tibble works", {
                                   'ewr_code',
                                   'ewr_code_main', 'event_years',
                                   'frequency_achieved', 'interevent_achieved',
-                                  'ewr_achieved', 'geometry', 'site', 'owner'))
+                                  'ewr_achieved', 'geometry'))
   expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
 })
 
@@ -62,7 +62,7 @@ test_that("making assessment tibble from in-memory ewr output works", {
                                   'ewr_code',
                                   'ewr_code_main', 'event_years',
                                   'frequency_achieved', 'interevent_achieved',
-                                  'ewr_achieved', 'geometry', 'site', 'owner'))
+                                  'ewr_achieved', 'geometry'))
   expect_equal(sum(is.na(assessed$planning_unit_name)), 0)
 })
 
@@ -77,7 +77,7 @@ test_that("year_roll is rolling correctly", {
                                   'ewr_code',
                                   'ewr_code_main', 'event_years',
                                   'frequency_achieved', 'interevent_achieved',
-                                  'ewr_achieved', 'geometry', 'site', 'owner'))
+                                  'ewr_achieved', 'geometry'))
   # There should be three NA at the top of each unique EWR
   expect_equal(sum(is.na(assessed$ewr_achieved)),
                nrow(
@@ -102,7 +102,7 @@ test_that("passing in a list from memory works", {
                                     'ewr_code',
                                     'ewr_code_main', 'event_years',
                                     'frequency_achieved', 'interevent_achieved',
-                                    'ewr_achieved', 'geometry', 'site', 'owner'))
+                                    'ewr_achieved', 'geometry'))
   expect_equal(sum(is.na(ewrprepped$planning_unit_name)), 0)
 })
 
@@ -138,7 +138,7 @@ test_that("ewr_code separation works", {
 
 test_that("making MAX scenario works", {
   datain <- read_and_geo(ewrpath, type = 'yearly', geopath = bom_basin_gauges)
-  assessed <- prep_ewr_output(datain)|>
+  assessed <- prep_ewr_output(datain, add_max = TRUE)|>
     dplyr::filter(scenario == "MAX")
   expect_equal(nrow(assessed)> 0,TRUE)
 })
@@ -186,7 +186,7 @@ test_that("interevents works", {
 
   expect_equal(names(fromtop), c('scenario', 'gauge', 'planning_unit_name',
                                   'state', 'SWSDLName', 'ewr_code', 'start_date',
-                                  'inter_event_length', 'site', 'owner', 'geometry',
+                                  'inter_event_length', 'geometry', 'site', 'owner',
                                  'ewr_code_main',
                                   'max_interevent', 'exceedance_days',
                                   'interevent_ratio', 'exceedance_ratio',
