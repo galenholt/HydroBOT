@@ -10,7 +10,7 @@ cleanewrs(ewrdf)
 \item{ewrdf}{ewr dataframe of any type}
 }
 \value{
-a tibble of EWR outputs with cleaned up names, separated ewr_code_timing, and gauges as characters
+a tibble of EWR outputs with cleaned up names, separated ewr_code_main, and gauges as characters
 }
 \description{
 The new format of the EWR output makes this much lighter than previously.

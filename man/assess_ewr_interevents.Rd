@@ -12,7 +12,7 @@ assess_ewr_interevents(interdf)
 \value{
 tibble with columns \code{scenario}, \code{gauge}, \code{planning_unit_name},
 \code{state}, \code{SWSDLName}, \code{ewr_code}, \code{start_date}, \code{inter_event_length},
-\code{ewr_code_timing}, \code{max_interevent}, \code{exceedance_days} (realised - max),
+\code{ewr_code_main}, \code{max_interevent}, \code{exceedance_days} (realised - max),
 \code{interevent_ratio} (realised / max), \code{exceedance_ratio} (interevent_ratio -
 1), \code{exceedance} (binary; realised >= max), \code{exceedance_only} (days above
 max), \verb{days_in_exceeding (all realised if max passed)}

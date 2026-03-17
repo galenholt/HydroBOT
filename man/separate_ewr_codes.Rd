@@ -10,7 +10,7 @@ separate_ewr_codes(df)
 \item{df}{a dataframe with an ewr_code column with raw ewr names (e.g. EWR outputs, causal mappings)}
 }
 \value{
-a tibble with a clean ewr_code column and an ewr_code_timing column with the extra stuff
+a tibble with a clean ewr_code_main column and an ewr_code column with the full EWR name
 }
 \description{
 This allows keeping the whole ewr table, the EWR outputs, and causal networks matched and standardized parsing.
