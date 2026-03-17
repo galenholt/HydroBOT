@@ -248,9 +248,9 @@ test_that("do different length gauge records break EWR", {
 
   # all_events gets sorted, but if we sort, should match
   ewa <- ewr_out$all_events |>
-    dplyr::arrange(scenario, gauge, pu, ewr)
+    dplyr::arrange(scenario, gauge, planningUnit, code)
   swa <- smoosh_out$all_events |>
-    dplyr::arrange(scenario, gauge, pu, ewr)
+    dplyr::arrange(scenario, gauge, planningUnit, code)
 
   expect_equal(ewa, swa)
 
