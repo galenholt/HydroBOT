@@ -2,6 +2,9 @@
 # really just consistency checks for the building of the causal networks, which
 # happens during the dev process and isn't part of the package per se
 
+# This is deprecated, but may arise from the dead later
+skip()
+
 ewrpath <- 'ewrtool' # system.file('data-raw/causal_networks/ewr_obj_codes_nsw/obj_codes_dec22.csv', package = 'HydroBOT')
 tarpath <- system.file('data-raw/causal_networks/unknown/Env_objectives_Target_species_nodes.csv', package = 'HydroBOT')
 

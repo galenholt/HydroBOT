@@ -2,6 +2,9 @@
 # really just consistency checks for the building of the causal networks, which
 # happens during the dev process and isn't part of the package per se
 
+# This is deprecated, but may arise from the dead later
+skip()
+
 # This is now where we get it with 'ewrtool'
 ewrpath <- '.venv/Lib/site-packages/py_ewr/parameter_metadata/parameter_sheet.csv' # system.file('data-raw/causal_networks/ewr_obj_codes_nsw/obj_codes_dec22.csv', package = 'HydroBOT')
 

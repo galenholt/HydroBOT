@@ -2,6 +2,9 @@
 # really just consistency checks for the building of the causal networks, which
 # happens during the dev process and isn't part of the package per se
 
+# This is deprecated, but may arise from the dead later
+skip()
+
 test_that("clean_long_term as expected", {
   yrpath <- system.file('data-raw/causal_networks/unknown/EObjYrTargets.csv',
                         package = 'HydroBOT')
