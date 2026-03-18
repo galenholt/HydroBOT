@@ -1,14 +1,13 @@
 test_that("group_until parser", {
   # basic usage
   aggseq <- list(
-    ewr_code = c("ewr_code_timing", "ewr_code"),
-    env_obj = c("ewr_code", "env_obj"),
+    ewr_code_main = c("ewr_code", "ewr_code_main"),
+    eco_objective = c("ewr_code_main", "eco_objective"),
     sdl_units = sdl_units,
-    Specific_goal = c("env_obj", "Specific_goal"),
+    objective_text = c("eco_objective", "objective_text"),
     catchment = cewo_valleys,
-    Objective = c("Specific_goal", "Objective"),
-    mdb = basin,
-    target_5_year_2024 = c("Objective", "target_5_year_2024")
+    theme = c("objective_text", "theme"),
+    mdb = basin
   )
 
 
