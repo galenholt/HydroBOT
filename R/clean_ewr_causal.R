@@ -42,10 +42,7 @@ clean_ewr_241 <- function(ewrnet) {
 
 #' Clean causal network for EWR tool 2.3.7 and thereabouts
 #'
-#' @param ewrnet
-#'
-#' @returns
-#' @export
+#' @param ewrnet a raw causal table to be cleaned
 #'
 #' @examples
 clean_ewr_237 <- function(ewrnet) {
