@@ -37,6 +37,8 @@ test_that("binary", {
     assessed <- control_achievement(datain, year_roll = 3,
                                     k_freq = Inf, k_inter = Inf, combo = pmean)
   })
+
+  expect_s3_class(assessed, 'tbl_df')
   # 0.16
 
 })
@@ -46,8 +48,11 @@ test_that("logistic", {
 
   system.time({
     assessed <- control_achievement(datain, year_roll = 3,
-                                    k_freq = 20, k_inter = 50, combo = 'pmean')
+                                    k_freq = 20, k_inter = 50, combo = pmean)
   })
+
+  expect_s3_class(assessed, 'tbl_df')
+
   # 0.16
 
 })
@@ -67,9 +72,14 @@ test_that("combos", {
 
   system.time({
     assessedgm <- control_achievement(datain, year_roll = 3,
-                                       k_freq = 20, k_inter = 50, combo = 'pgeomean')
+                                       k_freq = 20, k_inter = 50, combo = pgeomean)
   })
   # 0.16
+
+  expect_s3_class(assessedmin, 'tbl_df')
+  expect_s3_class(assessedmax, 'tbl_df')
+  expect_s3_class(assessedgm, 'tbl_df')
+
 
   # need another that gets a 2d normal with peak at 1,1
 })
@@ -96,6 +106,10 @@ test_that("linear", {
 
   max(assessed1$ewr_achieved, na.rm = T)
   max(assessed2$ewr_achieved, na.rm = T)
+
+  expect_s3_class(assessed1, 'tbl_df')
+  expect_s3_class(assessed2, 'tbl_df')
+
 })
 
 test_that('vectors', {
@@ -104,6 +118,11 @@ test_that('vectors', {
   vecx <- adjusted_logistic(x = 0:20, k = 20, threshold = 10, thresh_is = 'max')
 
   vecthresh <- adjusted_logistic(x = 0:20, k = 20, threshold = rep(10, 21), thresh_is = 'max')
+
+  expect_equal(length(novec), 1)
+  expect_equal(length(vecx), 21)
+  expect_equal(length(vecthresh), 21)
+
 
 
 })

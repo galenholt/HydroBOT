@@ -7,7 +7,7 @@
 clean_ewr_237(ewrnet)
 }
 \arguments{
-\item{ewrnet}{}
+\item{ewrnet}{a raw causal table to be cleaned}
 }
 \description{
 Clean causal network for EWR tool 2.3.7 and thereabouts

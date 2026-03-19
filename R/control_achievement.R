@@ -1,5 +1,7 @@
 #' An example of a `prepfun` for [read_and_agg()]
 #'
+#' *This should be considered a template, and does not have general functionality*
+#'
 #' @param dat
 #' @param year_roll
 #' @param k_freq
@@ -36,6 +38,8 @@ control_achievement <- function(dat, year_roll = 10, k_freq, k_inter, combo) {
 
 #' Example of a fairly complex function to prepare data pre-aggregation (as a `prepfun` argument to [read_and_agg()])
 #'
+#' *This should be considered a template, and does not have general functionality*
+#'
 #' @param annualdf
 #' @param year_roll
 #' @param k_freq
@@ -51,7 +55,7 @@ assess_ewr_flex <- function(annualdf, year_roll, k_freq, k_inter, combo) {
 
   # Join target frequencies to annualdf
   annualdf <- dplyr::left_join(annualdf, ewr_requirements,
-                               by = c('ewr_code', 'ewr_code_timing', 'gauge',
+                               by = c('ewr_code', 'ewr_code_main', 'gauge',
                                       'planning_unit_name', 'state', 'SWSDLName'),
                                relationship = "many-to-many"
   )
@@ -71,15 +75,15 @@ assess_ewr_flex <- function(annualdf, year_roll, k_freq, k_inter, combo) {
   # calculate number of event years, frequency, and EWR pass/fail at defined (year_roll) year rolling time frames.
   # cease to flows are the inverse of success.
   annualdf <- annualdf |>
-    # dplyr::group_by(scenario, planning_unit_name, gauge, ewr_code, ewr_code_timing) |>
+    # dplyr::group_by(scenario, planning_unit_name, gauge, ewr_code, ewr_code_main) |>
     dplyr::arrange(.data$scenario, .data$planning_unit_name,
-                   .data$gauge, .data$ewr_code, .data$ewr_code_timing,
+                   .data$gauge, .data$ewr_code, .data$ewr_code_main,
                    .data$year) |>
     dplyr::mutate(frequency_occurred = roll_frequency(.data$event_years, year_roll),
                   # the interevents are highly variable (and often sub-yearly),
                   # and there's already a rolling interevent col
                   .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
-                          "gauge", "ewr_code", "ewr_code_timing"))
+                          "gauge", "ewr_code", "ewr_code_main"))
 
   annualdf <- annualdf |>
     # dplyr::rowwise() |> # This will be slow, should I vectorise adjusted_logistic? probably.
@@ -103,7 +107,7 @@ assess_ewr_flex <- function(annualdf, year_roll, k_freq, k_inter, combo) {
   annualdf <- annualdf |>
     dplyr::select('scenario', 'year', 'date', 'gauge',
                   'planning_unit_name', 'state', 'SWSDLName',
-                  'ewr_code', 'ewr_code_timing',
+                  'ewr_code', 'ewr_code_main',
                   'event_years', 'frequency_achieved',
                   'interevent_achieved', 'ewr_achieved',
                   'k_freq', 'k_inter', 'combo'
