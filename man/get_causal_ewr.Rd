@@ -4,7 +4,7 @@
 \alias{get_causal_ewr}
 \title{Extract causal network from EWR tool}
 \usage{
-get_causal_ewr()
+get_causal_ewr(struct = "list")
 }
 \value{
 list of EWR causal networks

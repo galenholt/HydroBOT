@@ -1,9 +1,9 @@
 # Some simple edges and nodes
 edges <- make_edges(dflist = causal_ewr,
-                    fromtos = list(c('ewr_code', 'env_obj'),
-                                   c('env_obj', 'Specific_goal'),
-                                   c('Specific_goal', 'Target'),
-                                   c('env_obj', 'target_5_year_2024')),
+                    fromtos = list(c('ewr_code', 'ewr_code_main'),
+                                   c('ewr_code_main', 'eco_objective'),
+                                   c('eco_objective', 'objective_text'),
+                                   c('objective_text', 'theme')),
                     gaugefilter = '409025')
 nodes <- make_nodes(edges)
 
@@ -119,11 +119,11 @@ test_that("different palette per group", {
 
   skip_on_os('linux')
 
-  pal_list_c <- list(ewr_code = 'viridis::mako',
-                    env_obj = 'viridis::plasma',
-                    Specific_goal = 'scico::oslo',
-                    Target = 'scico::hawaii',
-                    target_5_year_2024 = 'scico::lisbon')
+  pal_list_c <- list(ewr_code_main = 'viridis::mako',
+                     eco_objective = 'viridis::plasma',
+                     objective_text = 'scico::oslo',
+                     theme = 'scico::hawaii',
+                     ewr_code = 'scico::lisbon')
 
   edgecols <- causal_colors_general(edges,
                                     pal_list = pal_list_c,

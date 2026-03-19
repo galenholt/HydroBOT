@@ -31,13 +31,18 @@ get_ewr_gauges <- function() {
 get_ewr_table <- function(type = "good") {
   pdi <- reticulate::import("py_ewr.data_inputs")
   ewrs_in_pyewr <- pdi$get_EWR_table()
-  names(ewrs_in_pyewr) <- c("good", "bad")
-  if (type == "good") {
-    ewrs_in_pyewr <- ewrs_in_pyewr[[1]]
+
+  # in older versions of the ewr tool, this was a list of 'good' and 'bad' ewr
+  # tables. Now it's just a table.
+  if (length(ewrs_in_pyewr)==2) {
+    if (type == "good") {
+      ewrs_in_pyewr <- ewrs_in_pyewr[[1]]
+    }
+    if (type == "bad") {
+      ewrs_in_pyewr <- ewrs_in_pyewr[[2]]
+    }
   }
-  if (type == "bad") {
-    ewrs_in_pyewr <- ewrs_in_pyewr[[2]]
-  }
+
   return(tibble::tibble(ewrs_in_pyewr))
 }
 
@@ -109,15 +114,48 @@ get_ewr_version <- function() {
 #' @return list of EWR causal networks
 #' @export
 #'
-get_causal_ewr <- function() {
+get_causal_ewr <- function(struct = 'list') {
   pdi <- reticulate::import("py_ewr.data_inputs")
-  gce <- pdi$get_causal_ewr()
-  gce <- purrr::map(gce, tibble::as_tibble)
-  gce <- purrr::map(gce, \(x) {
-    attributes(x)$pandas.index <- NULL
-    return(x)
-  })
+
+  ev <- get_ewr_version()
+  evm <- as.numeric(unlist(strsplit(ev, '\\.')))
+  if (evm[1] <= 2 & evm[2] < 4) {
+    gce <- pdi$get_causal_ewr()
+    gce <- purrr::map(gce, tibble::as_tibble)
+    gce <- purrr::map(gce, \(x) {
+      attributes(x)$pandas.index <- NULL
+      return(x)
+    })
+  } else {
+    # now it has a new name and is flat
+    gce <- tibble::tibble(pdi$get_obj_mapping())
+    attributes(gce)$pandas.index <- NULL
+  }
 
   gce <- clean_ewr_causal(gce)
+
+  # make a ewr_code_main column
+  gce <- separate_ewr_codes(gce)
+
+  if (struct == 'list') {
+    refcols <- c('planning_unit_name', 'LTWPShortName', 'SWSDLName', 'state', 'gauge')
+    # just return all pairwise combinations. Otherwise return flat.
+    causal_steps <- names(gce)[!names(gce) %in% refcols]
+
+    causal_list <- vector(mode = 'list')
+    for (i in seq_along(causal_steps[1:(length(causal_steps)-1)])) {
+      for (j in (i + 1):length(causal_steps)) {
+
+        causal_list[[paste0(causal_steps[i], '_to_', causal_steps[j])]] <- dplyr::distinct(gce[, c(refcols, causal_steps[i], causal_steps[j])])
+
+      }
+    }
+
+    # for common return val
+    gce <- causal_list
+  }
+
+
+
   return(gce)
 }

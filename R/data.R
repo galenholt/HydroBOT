@@ -68,8 +68,9 @@
 #' List of dataframes specifying the causal relationships from environmental
 #' water requirements through the rest of the levels specified in Long-Term
 #' Watering Plans. Previously created in HydroBOT, now simply extracted from
-#' py_ewr (as of Nov 2024). May not remain here much longer, extracting the EWR
-#' tool version with [get_causal_ewr()] is preferable.
+#' py_ewr (as of Nov 2024). Extracting the EWR tool version with
+#' [get_causal_ewr()] is preferable, and the version supplied here is likely to
+#' be identical to calling that function.
 #'
 #' @format ## `causal_ewr` A list of dataframes:
 #' \describe{
@@ -77,7 +78,8 @@
 #'   \item{obj2target}{Mapping from `env_obj` to `Specific_goal`, `Objective`, and `Target`, which are all defined at the PlanningUnit scale}
 #'   \item{obj2yrtarget}{Mapping defined without spatial reference from `env_obj` to `Target`, `Target_Category`, `Objective`, `target_5_year_2024`, `target_10_year_2029`, and `target_20_year_2039`}
 #' }
-#' @source various Long-Term Watering Plans and State-based tables. Extracted from EWR tool (py_ewr) and reexported here.
+#' @source various Long-Term Watering Plans and State-based tables. Extracted
+#'   from EWR tool (py_ewr) and reexported here.
 "causal_ewr"
 
 #' Catchments within the Murray-Darling Basin

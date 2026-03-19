@@ -5,15 +5,14 @@ agg_theme_space <- make_test_agg(namehistory = FALSE)
 
 # the sequences used in make_test_agg
 aggseq <- list(all_time = 'all_time',
-               ewr_code = c('ewr_code_timing', 'ewr_code'),
+               ewr_code_main = c('ewr_code_timing', 'ewr_code_main'),
                planning_units = planning_units,
-               env_obj =  c('ewr_code', "env_obj"),
+               eco_objective =  c('ewr_code', "eco_objective"),
                sdl_units = sdl_units,
-               Specific_goal = c('env_obj', "Specific_goal"),
+               objective_text = c('eco_objective', "objective_text"),
                catchment = cewo_valleys,
-               Objective = c('Specific_goal', 'Objective'),
-               mdb = basin,
-               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+               theme = c('objective_text', 'theme'),
+               mdb = basin)
 
 funseq <- list('ArithmeticMean',
                'CompensatingFactor',
@@ -23,8 +22,7 @@ funseq <- list('ArithmeticMean',
                "ArithmeticMean",
                "SpatialWeightedMean",
                'ArithmeticMean',
-               "SpatialWeightedMean",
-               'ArithmeticMean')
+               "SpatialWeightedMean")
 
 # extract theme steps
 themesteps <- identify_dimension(aggseq, causal_ewr)

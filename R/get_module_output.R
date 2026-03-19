@@ -44,7 +44,7 @@ get_module_output <- function(dir, type,
 
     # read into one df
     # need to know if there's a 'gauge' col
-    isgauge <- 'gauge' %in% names(readr::spec_csv(relevantfiles[1])$cols)
+    isgauge <- any(grepl('^gauge$', names(readr::spec_csv(relevantfiles[1])$cols), ignore.case = T))
 
 
     # make CHECK happy
@@ -111,6 +111,7 @@ nameclean <- function(charvec) {
   cleannames[cleannames == "pu" | cleannames == "PlanningUnitName" | cleannames == "planning_unit"] <- "planning_unit_name"
   # The SWSDLName needs to match the sdl_units (and legislation)
   cleannames[cleannames == 's_w_s_d_l_name'] <- 'SWSDLName'
+  cleannames[cleannames == 'l_t_w_p_short_name'] <- 'LTWPShortName'
 
   return(cleannames)
 }

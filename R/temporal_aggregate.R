@@ -15,7 +15,7 @@
 #'   [general_aggregate()]
 #' @param breaks breaks for the time groupings. default 'all_time' collapses
 #'   over the whole period, otherwise as in [base::cut.POSIXt()] (takes the
-#'   character options there, or time objects)
+#'   character options there, or time objects). *For EWR, dates come in as YYYY-07-01 (water year), so `breaks` can use water year breaks as well*
 #' @param timecol name of the column with time in it. Default 'infer' infers
 #'   which it is by looking for POSIXt or Date types.
 #' @param groupers as in [general_aggregate()], with the note that these should

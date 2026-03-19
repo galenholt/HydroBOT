@@ -147,6 +147,10 @@ prep_run_save_ewrs <- function(hydro_dir,
     }
   }
 
+  # catch entirely missing hydrographs
+  if (length(hydro_paths) == 0) {
+    rlang::abort(glue::glue("no hydrograph files detected in hydro_dir ({hydro_dir})."))
+  }
   # We need to check the files have unique names (and fix if not), since the EWR
   # tool makes them the 'scenario' column.
   # hydro_paths <- fix_file_scenarios(hydro_paths, scenarios)

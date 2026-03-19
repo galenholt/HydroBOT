@@ -27,7 +27,7 @@ function makes necessary adjustments to the data before calling
 
 \item{breaks}{breaks for the time groupings. default 'all_time' collapses
 over the whole period, otherwise as in \code{\link[base:cut.POSIXt]{base::cut.POSIXt()}} (takes the
-character options there, or time objects)}
+character options there, or time objects). \emph{For EWR, dates come in as YYYY-07-01 (water year), so \code{breaks} can use water year breaks as well}}
 
 \item{timecol}{name of the column with time in it. Default 'infer' infers
 which it is by looking for POSIXt or Date types.}

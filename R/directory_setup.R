@@ -84,6 +84,9 @@ make_output_dir <- function(parent_dir,
   output_path <- file.path(parent_dir, 'module_output', module_name, subdir)
 
   # if parent_dir is the scenario dir (we're in a single run), use `scenarios = ''` to not make a subdir
+  if (length(scenarios) == 0) {
+    scenarios = ''
+  }
   sceneout <- file.path(output_path, scenarios)
 
   # make the scenario directory if needed

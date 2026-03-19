@@ -10,7 +10,7 @@ prep_ewr_output(
   year_roll = "best",
   gaugefilter = NULL,
   scenariofilter = NULL,
-  add_max = ifelse(type == "achievement", TRUE, FALSE)
+  add_max = FALSE
 )
 }
 \arguments{
@@ -35,7 +35,7 @@ For the EWR tool, the direct options are
 
 \item{scenariofilter}{subset of scenarios, default NULL}
 
-\item{add_max}{logical, default TRUE only if \code{type = 'achievement'}. Add a 'MAX' scenario that passes all EWRs, usable as a reference}
+\item{add_max}{logical, default FALSE. Add a 'MAX' scenario that passes all EWRs, usable as a reference, but often causes problems. Usually better to just calculate it post-hoc}
 }
 \value{
 a tibble with ewr_achieved

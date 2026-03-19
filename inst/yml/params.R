@@ -1,15 +1,14 @@
 # parameters that involve R objects/syntax can be set in R scripts, though that is less ideal
 
 # Aggregation sequence
-aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+aggseq <- list(ewr_code_main = c('ewr_code', 'ewr_code_main'),
                planning_units = planning_units,
-               env_obj =  c('ewr_code', "env_obj"),
+               eco_objective =  c('ewr_code_main', "eco_objective"),
                sdl_units = sdl_units,
-               Specific_goal = c('env_obj', "Specific_goal"),
+               objective_text = c('eco_objective', "objective_text"),
                cewo_valleys = cewo_valleys,
-               Objective = c('Specific_goal', 'Objective'),
-               basin = basin,
-               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+               theme = c('objective_text', 'theme'),
+               basin = basin)
 
 # Functions for each aggregation
 funseq <- list('CompensatingFactor',
@@ -19,5 +18,4 @@ funseq <- list('CompensatingFactor',
                'ArithmeticMean',
                'SpatialWeightedMean',
                'ArithmeticMean',
-               'SpatialWeightedMean',
-               'ArithmeticMean')
+               'SpatialWeightedMean')
