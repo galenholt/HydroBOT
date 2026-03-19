@@ -2277,3 +2277,4 @@ test_that('non-module works', {
   vdiffr::expect_doppelganger("aus_themecheck", themecheck)
   vdiffr::expect_doppelganger("aus_spacecheck", spacecheck)
   })
+
