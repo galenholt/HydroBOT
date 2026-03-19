@@ -11,7 +11,7 @@ ewr_to_agg_timemean <- temporal_aggregate(ewr_to_agg,
                                           groupers = c('scenario', 'gauge',
                                                        'planning_unit_name',
                                                        'SWSDLName', 'ewr_code',
-                                                       'ewr_code_timing'),
+                                                       'ewr_code_main'),
                                           aggCols = 'ewr_achieved',
                                           funlist = 'ArithmeticMean',
                                           prefix = '') |>
@@ -25,21 +25,21 @@ expect_warning(agg_theme_space <- make_test_agg(namehistory = FALSE, style = 'no
 scenarios <- tibble::tibble(scenario = c("base", "down4", "up4", 'MAX'), delta = c(1, 0.25, 4, Inf))
 
 obj_sdl_to_plot <- agg_theme_space$sdl_units |>
-  dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
+  dplyr::mutate(env_group = stringr::str_extract(eco_objective, "^[A-Z]+")) |>
   dplyr::filter(!is.na(env_group)) |>
-  dplyr::arrange(env_group, env_obj) |>
+  dplyr::arrange(env_group, eco_objective) |>
   # and join the quant descriptions
   dplyr::left_join(scenarios, by = "scenario")
 
 basin_to_plot <- agg_theme_space$mdb |>
-  dplyr::filter(!is.na(Objective))
+  dplyr::filter(!is.na(theme))
 
 # now that we retain plannign units, we need to collapse them back out or the
 # maps fail. This isn't the best plan for real analysis, but is fine for testing
-env_obj_to_plot <- agg_theme_space$env_obj |>
+eco_objective_to_plot <- agg_theme_space$eco_objective |>
   dplyr::summarise(
     ewr_achieved = mean(ewr_achieved),
-    .by = c(scenario, gauge, env_obj, geometry)
+    .by = c(scenario, gauge, eco_objective, geometry)
   )
 
 
@@ -62,7 +62,7 @@ test_that("basin works with single color palette", {
 
   basin_plot <- plot_outcomes(basin_to_plot,
     outcome_col = "ewr_achieved",
-    colorset = "Objective",
+    colorset = "theme",
     pal_list = list("scico::oslo"),
     sceneorder = c("down4", "base", "up4")
   ) +
@@ -73,7 +73,7 @@ test_that("basin works with single color palette", {
   # flipping the pal_direction
   basin_plot_pd <- plot_outcomes(basin_to_plot,
                               outcome_col = "ewr_achieved",
-                              colorset = "Objective",
+                              colorset = "theme",
                               pal_list = list("scico::oslo"),
                               pal_direction = -1,
                               sceneorder = c("down4", "base", "up4")
@@ -87,7 +87,7 @@ test_that("a fixed color works (contrived)", {
 
   basin_plotred <- plot_outcomes(basin_to_plot,
     outcome_col = "ewr_achieved",
-    colorset = "Objective",
+    colorset = "theme",
     pal_list = "firebrick",
     sceneorder = c("down4", "base", "up4")
   ) +
@@ -112,7 +112,7 @@ test_that("multi-palette and facetting", {
     plot_outcomes(
       outcome_col = "ewr_achieved",
       colorgroups = "env_group",
-      colorset = "env_obj",
+      colorset = "eco_objective",
       pal_list = grouplist,
       facet_wrapper = "SWSDLName",
       sceneorder = c("down4", "base", "up4")
@@ -125,7 +125,7 @@ test_that("multi-palette and facetting", {
     plot_outcomes(
       outcome_col = "ewr_achieved",
       colorgroups = "env_group",
-      colorset = "env_obj",
+      colorset = "eco_objective",
       pal_list = grouplist,
       pal_direction = c(1,-1,1,-1,1,-1),
       facet_wrapper = "SWSDLName",
@@ -140,7 +140,7 @@ test_that("multi-palette and facetting", {
     plot_outcomes(
       outcome_col = "ewr_achieved",
       colorgroups = "env_group",
-      colorset = "env_obj",
+      colorset = "eco_objective",
       pal_list = grouplist,
       facet_col = "SWSDLName",
       facet_row = ".",
@@ -153,7 +153,7 @@ test_that("multi-palette and facetting", {
     plot_outcomes(
       outcome_col = "ewr_achieved",
       colorgroups = "env_group",
-      colorset = "env_obj",
+      colorset = "eco_objective",
       pal_list = grouplist,
       facet_row = "env_group",
       facet_col = "SWSDLName",
@@ -172,7 +172,7 @@ test_that("flipped", {
   sdl_plot <- obj_sdl_to_plot |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
-      x_col = "env_obj",
+      x_col = "eco_objective",
       colorgroups = NULL,
       colorset = "scenario",
       pal_list = scene_pal,
@@ -188,7 +188,7 @@ test_that("flipped", {
   sdl_plot_g <- obj_sdl_to_plot |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
-      x_col = "env_obj",
+      x_col = "eco_objective",
       colorgroups = "env_group",
       colorset = "scenario",
       pal_list = scene_pal,
@@ -259,7 +259,7 @@ test_that("quant x", {
     plot_outcomes(
       outcome_col = "ewr_achieved",
       x_col = "delta",
-      colorset = "env_obj",
+      colorset = "eco_objective",
       pal_list = list("scico::berlin"),
       facet_row = "SWSDLName",
       facet_col = "."
@@ -277,13 +277,13 @@ test_that("quant x", {
       transx = "log10",
       color_lab = "Environmental\ngroup",
       colorset = "env_group",
-      point_group = "env_obj",
+      point_group = "eco_objective",
       pal_list = obj_pal,
       facet_row = "SWSDLName",
       facet_col = ".",
       base_list = list(
         base_lev = "base", comp_fun = "difference",
-        group_cols = c("env_obj", "polyID")
+        group_cols = c("eco_objective", "polyID")
       )
     )
 
@@ -300,13 +300,13 @@ test_that("quant x", {
       transx = "log10",
       color_lab = "Catchment",
       colorset = "SWSDLName",
-      point_group = "env_obj",
+      point_group = "eco_objective",
       pal_list = list("RColorBrewer::Dark2"),
       facet_row = "env_group",
       facet_col = ".",
       base_list = list(
         base_lev = "base", comp_fun = "difference",
-        group_cols = c("env_obj", "polyID")
+        group_cols = c("eco_objective", "polyID")
       )
     )
   vdiffr::expect_doppelganger("line by catchment with obj groups", sdl_line_catchment)
@@ -382,7 +382,7 @@ test_that("quant x", {
       sceneorder = c("down4", "base", "up4"),
       base_list = list(
         base_lev = "base", comp_fun = "difference",
-        group_cols = c("env_obj", "polyID")
+        group_cols = c("eco_objective", "polyID")
       ),
       smooth = TRUE
     )
@@ -407,7 +407,7 @@ test_that("maps", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4")
     )
@@ -439,7 +439,7 @@ test_that("maps", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4")
     )
@@ -456,7 +456,7 @@ test_that("maps", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = list(underlay = basin, underlay_pal = "azure")
@@ -474,7 +474,7 @@ test_that("maps", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = list(
@@ -487,8 +487,8 @@ test_that("maps", {
   vdiffr::expect_doppelganger("sdl_valley_background_warn", sdl_valley_background_warn)
 
   # gauges as main focus
-  gauges_map <- env_obj_to_plot |>
-    dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
+  gauges_map <- eco_objective_to_plot |>
+    dplyr::filter(eco_objective == "NF1") |> # Need to reduce dimensionality
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "map",
@@ -496,7 +496,7 @@ test_that("maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
-      facet_row = "env_obj",
+      facet_row = "eco_objective",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = list(
         underlay = "basin",
@@ -508,8 +508,8 @@ test_that("maps", {
   vdiffr::expect_doppelganger("gauges_map", gauges_map)
 
   # gauges with filled underlay values
-  gauges_map_sdl <- env_obj_to_plot |> # for readability
-    dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
+  gauges_map_sdl <- eco_objective_to_plot |> # for readability
+    dplyr::filter(eco_objective == "NF1") |> # Need to reduce dimensionality
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "map",
@@ -518,7 +518,7 @@ test_that("maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
-      facet_row = "env_obj",
+      facet_row = "eco_objective",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = list(
         underlay = sdl_units,
@@ -534,8 +534,8 @@ test_that("maps", {
   # Test with a continuous variable too
   # Have to be careful with these though to not have the underlay overwhelm the main data- see the filtering.
   # Should be able to do that automatically
-  gauges_map_sdl_agg <- env_obj_to_plot |> # for readability
-    dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
+  gauges_map_sdl_agg <- eco_objective_to_plot |> # for readability
+    dplyr::filter(eco_objective == "NF1") |> # Need to reduce dimensionality
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "map",
@@ -543,10 +543,10 @@ test_that("maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
-      facet_row = "env_obj",
+      facet_row = "eco_objective",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = list(
-        underlay = dplyr::filter(obj_sdl_to_plot, env_obj == "NF1"),
+        underlay = dplyr::filter(obj_sdl_to_plot, eco_objective == "NF1"),
         underlay_ycol = "ewr_achieved",
         underlay_pal = "scico::oslo"
       )
@@ -556,8 +556,8 @@ test_that("maps", {
   vdiffr::expect_doppelganger("gauges_map_sdl_agg", gauges_map_sdl_agg)
 
   # that one would be good with two levels- basin and sdl
-  gauges_map_2_level <- env_obj_to_plot |> # for readability
-    dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
+  gauges_map_2_level <- eco_objective_to_plot |> # for readability
+    dplyr::filter(eco_objective == "NF1") |> # Need to reduce dimensionality
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "map",
@@ -565,7 +565,7 @@ test_that("maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
-      facet_row = "env_obj",
+      facet_row = "eco_objective",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = list(
         list(
@@ -573,7 +573,7 @@ test_that("maps", {
           underlay_pal = "cornsilk"
         ),
         list(
-          underlay = dplyr::filter(obj_sdl_to_plot, env_obj == "NF1"),
+          underlay = dplyr::filter(obj_sdl_to_plot, eco_objective == "NF1"),
           underlay_ycol = "ewr_achieved",
           underlay_pal = "scico::oslo"
         )
@@ -585,7 +585,7 @@ test_that("maps", {
 
   # include gauges- looks better without facetting
   sdl_gauges_all <- obj_sdl_to_plot |>
-    dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
+    dplyr::filter(eco_objective == "NF1") |> # Need to reduce dimensionality
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "map",
@@ -593,7 +593,7 @@ test_that("maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
-      facet_row = "env_obj",
+      facet_row = "eco_objective",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = "basin",
       overlay_list = list(overlay = "bom_basin_gauges", overlay_pal = "purple")
@@ -604,7 +604,7 @@ test_that("maps", {
 
   # clipped to the main data
   sdl_gauges_clip <- obj_sdl_to_plot |>
-    dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
+    dplyr::filter(eco_objective == "NF1") |> # Need to reduce dimensionality
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "map",
@@ -612,7 +612,7 @@ test_that("maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
-      facet_row = "env_obj",
+      facet_row = "eco_objective",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = "basin",
       overlay_list = list(
@@ -627,7 +627,7 @@ test_that("maps", {
 
   # with a meaningful palette- simple qualitative to start
   sdl_gauges_qual <- obj_sdl_to_plot |>
-    dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
+    dplyr::filter(eco_objective == "NF1") |> # Need to reduce dimensionality
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "map",
@@ -635,11 +635,11 @@ test_that("maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
-      facet_row = "env_obj",
+      facet_row = "eco_objective",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = "basin",
       overlay_list = list(
-        overlay = dplyr::filter(env_obj_to_plot, env_obj == "NF1"),
+        overlay = dplyr::filter(eco_objective_to_plot, eco_objective == "NF1"),
         overlay_pal = "ggsci::nrc_npg",
         overlay_ycol = "scenario",
         clip = TRUE
@@ -651,7 +651,7 @@ test_that("maps", {
 
   # with a meaningful palette- simple quantitative and an underlay
   sdl_gauges_quant <- obj_sdl_to_plot |>
-    dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
+    dplyr::filter(eco_objective == "NF1") |> # Need to reduce dimensionality
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "map",
@@ -659,11 +659,11 @@ test_that("maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
-      facet_row = "env_obj",
+      facet_row = "eco_objective",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = "basin",
       overlay_list = list(
-        overlay = dplyr::filter(env_obj_to_plot, env_obj == "NF1"),
+        overlay = dplyr::filter(eco_objective_to_plot, eco_objective == "NF1"),
         overlay_pal = "scico::oslo",
         overlay_ycol = "ewr_achieved",
         clip = TRUE
@@ -676,7 +676,7 @@ test_that("maps", {
 
   # Does it work for the basin?
   basin_map <- agg_theme_space$mdb |>
-    dplyr::filter(Objective %in% c(
+    dplyr::filter(theme %in% c(
       "Maintain water-dependent species richness",
       "Increase opportunities for colonial waterbird breeding*",
       "Support instream & floodplain productivity"
@@ -688,7 +688,7 @@ test_that("maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
-      facet_row = "Objective",
+      facet_row = "theme",
       sceneorder = c("down4", "base", "up4"),
       overlay_list = "bom_basin_gauges"
     ) +
@@ -698,7 +698,7 @@ test_that("maps", {
 
   # How about multi-overlays
   basin_map_multi <- agg_theme_space$mdb |>
-    dplyr::filter(Objective %in% c(
+    dplyr::filter(theme %in% c(
       "Maintain water-dependent species richness",
       "Increase opportunities for colonial waterbird breeding*",
       "Support instream & floodplain productivity"
@@ -710,12 +710,12 @@ test_that("maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
-      facet_row = "Objective",
+      facet_row = "theme",
       sceneorder = c("down4", "base", "up4"),
       overlay_list = list(
         list(overlay = "sdl_units", overlay_pal = NA),
         list(
-          overlay = dplyr::filter(env_obj_to_plot, env_obj == "NF1"),
+          overlay = dplyr::filter(eco_objective_to_plot, eco_objective == "NF1"),
           overlay_pal = "scico::oslo",
           overlay_ycol = "ewr_achieved"
         )
@@ -728,7 +728,7 @@ test_that("maps", {
 
   # How under- and overlays. nearly identical to above, but make sure palettes work with under
   sdl_gauges_quant_basinpal <- obj_sdl_to_plot |>
-    dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
+    dplyr::filter(eco_objective == "NF1") |> # Need to reduce dimensionality
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "map",
@@ -736,11 +736,11 @@ test_that("maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
-      facet_row = "env_obj",
+      facet_row = "eco_objective",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = list(underlay = "basin", underlay_pal = "azure"),
       overlay_list = list(
-        overlay = dplyr::filter(env_obj_to_plot, env_obj == "NF1"),
+        overlay = dplyr::filter(eco_objective_to_plot, eco_objective == "NF1"),
         overlay_pal = "scico::oslo",
         overlay_ycol = "ewr_achieved",
         clip = TRUE
@@ -765,8 +765,8 @@ test_that("maps", {
   )
 
 
-  gauges_map_common_syntax <- env_obj_to_plot |>
-    dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
+  gauges_map_common_syntax <- eco_objective_to_plot |>
+    dplyr::filter(eco_objective == "NF1") |> # Need to reduce dimensionality
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "map",
@@ -774,7 +774,7 @@ test_that("maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       facet_col = "scenario",
-      facet_row = "env_obj",
+      facet_row = "eco_objective",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = list(
         list(
@@ -782,7 +782,7 @@ test_that("maps", {
           pal_list = "cornsilk"
         ),
         list(
-          underover = dplyr::filter(obj_sdl_to_plot, env_obj == "NF1"),
+          underover = dplyr::filter(obj_sdl_to_plot, eco_objective == "NF1"),
           outcome_col = "ewr_achieved",
           pal_list = "scico::oslo"
         )
@@ -807,12 +807,12 @@ test_that("maps", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("ggthemes::Orange-Blue-White Diverging"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       base_list = list(
         base_lev = "base", comp_fun = "difference",
-        group_cols = c("env_obj", "polyID")
+        group_cols = c("eco_objective", "polyID")
       ), # Do I need to group_by polyID for the maps? Yes. should probably automate that.
       underlay_list = list(underlay = basin, underlay_pal = "azure")
     )
@@ -828,12 +828,12 @@ test_that("maps", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("ggthemes::Orange-Blue-White Diverging"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       base_list = list(
         base_lev = "base", comp_fun = "relative",
-        group_cols = c("env_obj", "polyID")
+        group_cols = c("eco_objective", "polyID")
       ),
       zero_adjust = "auto",
       transoutcome = "log10", # Do I need to group_by polyID for the maps? Yes. should probably automate that.
@@ -868,7 +868,7 @@ test_that("adding color to filled maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       map_outlinecolor = 'red',
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4")
     )
@@ -886,7 +886,7 @@ test_that("adding color to filled maps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
       map_outlinecolor = NA,
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       underlay_list = list(underlay = basin, pal_list = 'azure', map_outlinecolor = 'red')
@@ -902,7 +902,7 @@ test_that("setLimits works", {
   # Y-LIMITS
   basin_plot20 <- plot_outcomes(basin_to_plot,
     outcome_col = "ewr_achieved",
-    colorset = "Objective",
+    colorset = "theme",
     pal_list = list("scico::oslo"),
     sceneorder = c("down4", "base", "up4"),
     setLimits = c(0, 20)
@@ -913,7 +913,7 @@ test_that("setLimits works", {
 
   basin_plot10 <- plot_outcomes(basin_to_plot,
     outcome_col = "ewr_achieved",
-    colorset = "Objective",
+    colorset = "theme",
     pal_list = list("scico::oslo"),
     sceneorder = c("down4", "base", "up4"),
     setLimits = c(0, 10)
@@ -929,9 +929,9 @@ test_that("setLimits works", {
       outcome_col = "ewr_achieved",
       x_col = "delta",
       colorgroups = NULL,
-      colorset = "env_obj",
+      colorset = "eco_objective",
       pal_list = list("scico::berlin"),
-      point_group = "env_obj",
+      point_group = "eco_objective",
       facet_row = "SWSDLName",
       facet_col = ".",
       sceneorder = c("down4", "base", "up4"),
@@ -946,9 +946,9 @@ test_that("setLimits works", {
       outcome_col = "ewr_achieved",
       x_col = "delta",
       colorgroups = NULL,
-      colorset = "env_obj",
+      colorset = "eco_objective",
       pal_list = list("scico::berlin"),
-      point_group = "env_obj",
+      point_group = "eco_objective",
       facet_row = "SWSDLName",
       facet_col = ".",
       sceneorder = c("down4", "base", "up4"),
@@ -963,9 +963,9 @@ test_that("setLimits works", {
       outcome_col = "ewr_achieved",
       x_col = "delta",
       colorgroups = NULL,
-      colorset = "env_obj",
+      colorset = "eco_objective",
       pal_list = list("scico::berlin"),
-      point_group = "env_obj",
+      point_group = "eco_objective",
       facet_row = "SWSDLName",
       facet_col = ".",
       sceneorder = c("down4", "base", "up4"),
@@ -980,16 +980,16 @@ test_that("setLimits works", {
       outcome_col = "ewr_achieved",
       x_col = "delta",
       colorgroups = NULL,
-      colorset = "env_obj",
+      colorset = "eco_objective",
       pal_list = list("scico::berlin"),
-      point_group = "env_obj",
+      point_group = "eco_objective",
       facet_row = "SWSDLName",
       facet_col = ".",
       sceneorder = c("down4", "base", "up4"),
       base_list = list(
         base_lev = "base",
         comp_fun = "difference",
-        group_cols = c("env_obj", 'polyID')
+        group_cols = c("eco_objective", 'polyID')
       )
     )
 
@@ -1001,16 +1001,16 @@ test_that("setLimits works", {
       outcome_col = "ewr_achieved",
       x_col = "delta",
       colorgroups = NULL,
-      colorset = "env_obj",
+      colorset = "eco_objective",
       pal_list = list("scico::berlin"),
-      point_group = "env_obj",
+      point_group = "eco_objective",
       facet_row = "SWSDLName",
       facet_col = ".",
       sceneorder = c("down4", "base", "up4"),
       base_list = list(
         base_lev = "base",
         comp_fun = "relative",
-        group_cols = c("env_obj", 'polyID')
+        group_cols = c("eco_objective", 'polyID')
       ),
       zero_adjust = 'auto',
       transoutcome = 'log10'
@@ -1029,7 +1029,7 @@ test_that("setLimits works", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4")
     )
@@ -1043,7 +1043,7 @@ test_that("setLimits works", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       setLimits = c(0, 1)
@@ -1060,7 +1060,7 @@ test_that("setLimits works", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       setLimits = 0.25
@@ -1078,7 +1078,7 @@ test_that("setLimits works", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       setLimits = c(-1, 0, 1)
@@ -1095,13 +1095,13 @@ test_that("setLimits works", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       base_list = list(
         base_lev = "base",
         comp_fun = "difference",
-        group_cols = c("env_obj", 'polyID')
+        group_cols = c("eco_objective", 'polyID')
       )
     )
 
@@ -1115,13 +1115,13 @@ test_that("setLimits works", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       base_list = list(
         base_lev = "base",
         comp_fun = "relative",
-        group_cols = c("env_obj", 'polyID')
+        group_cols = c("eco_objective", 'polyID')
       ),
       zero_adjust = 'auto',
       transoutcome = 'log10'
@@ -1138,13 +1138,13 @@ test_that("setLimits works", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       base_list = list(
         base_lev = "base",
         comp_fun = "relative",
-        group_cols = c("env_obj", 'polyID')
+        group_cols = c("eco_objective", 'polyID')
       ),
       zero_adjust = 'auto',
       transoutcome = 'log10',
@@ -1160,10 +1160,10 @@ test_that("ewr works as in `plot_outcomes_bar`", {
 
   ewr_to_bar_data <- ewr_to_agg_timemean |>
     # just grab the first code_timing
-    dplyr::group_by(ewr_code, gauge, scenario) |>
+    dplyr::group_by(ewr_code_main, gauge, scenario) |>
     dplyr::slice(1) |>
     dplyr::ungroup() |>
-    dplyr::filter(ewr_code %in% c("BF1", "LF1", "OB5") &
+    dplyr::filter(ewr_code_main %in% c("BF1", "LF1", "OB5") &
       gauge %in% c("412002", "412005", "412038")) |>
     dplyr::mutate(ewr_achieved = as.numeric(ewr_achieved)) # logicals fail
 
@@ -1187,7 +1187,7 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
     x_col = "scenario",
     colorset = "scenario",
     pal_list = scene_pal,
-    facet_wrapper = "Objective",
+    facet_wrapper = "theme",
     sceneorder = c("down4", "base", "up4")
   )
 
@@ -1196,7 +1196,7 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
   basin_plot_L <- plot_outcomes(basin_to_plot,
     outcome_col = "ewr_achieved",
     outcome_lab = "Aggregated outcome",
-    facet_wrapper = "Objective",
+    facet_wrapper = "theme",
     colorset = "scenario",
     pal_list = scene_pal,
     sceneorder = c("down4", "base", "up4")
@@ -1625,12 +1625,12 @@ test_that("post-hoc label changes work", {
       colorgroups = NULL,
       colorset = "ewr_achieved",
       pal_list = list("scico::berlin"),
-      facet_col = "env_obj",
+      facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       setLimits = c(0, 2),
       overlay_list = list(
-        overlay = dplyr::filter(env_obj_to_plot, grepl("^EF", env_obj)),
+        overlay = dplyr::filter(eco_objective_to_plot, grepl("^EF", eco_objective)),
         overlay_pal = "scico::oslo",
         overlay_ycol = "ewr_achieved",
         clip = TRUE
