@@ -676,11 +676,6 @@ test_that("maps", {
 
   # Does it work for the basin?
   basin_map <- agg_theme_space$mdb |>
-    dplyr::filter(theme %in% c(
-      "Maintain water-dependent species richness",
-      "Increase opportunities for colonial waterbird breeding*",
-      "Support instream & floodplain productivity"
-    )) |> # Need to reduce dimensionality
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "map",
@@ -698,11 +693,6 @@ test_that("maps", {
 
   # How about multi-overlays
   basin_map_multi <- agg_theme_space$mdb |>
-    dplyr::filter(theme %in% c(
-      "Maintain water-dependent species richness",
-      "Increase opportunities for colonial waterbird breeding*",
-      "Support instream & floodplain productivity"
-    )) |> # Need to reduce dimensionality
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "map",

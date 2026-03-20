@@ -5,9 +5,9 @@ agg_theme_space <- make_test_agg(namehistory = FALSE)
 
 # the sequences used in make_test_agg
 aggseq <- list(all_time = 'all_time',
-               ewr_code_main = c('ewr_code_timing', 'ewr_code_main'),
+               ewr_code_main = c('ewr_code', 'ewr_code_main'),
                planning_units = planning_units,
-               eco_objective =  c('ewr_code', "eco_objective"),
+               eco_objective =  c('ewr_code_main', "eco_objective"),
                sdl_units = sdl_units,
                objective_text = c('eco_objective', "objective_text"),
                catchment = cewo_valleys,
@@ -53,7 +53,7 @@ aggvals <- aggvals[as.vector(gaugematch),] |>
 
 # join to the nodes
 nodes_with_vals <- nodes |>
-  dplyr::filter(NodeType != 'ewr_code_timing') |>
+  dplyr::filter(NodeType != 'ewr_code') |>
   dplyr::left_join(aggvals) |>
   dplyr::filter(!is.na(scenario))
 

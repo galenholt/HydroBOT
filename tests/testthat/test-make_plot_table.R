@@ -3,14 +3,14 @@ agg_theme_space <- make_test_agg(namehistory = FALSE)
 scenarios <- tibble::tibble(scenario = c("base", "down4", "up4"), delta = c(1, 0.25, 4))
 
 obj_sdl_to_plot <- agg_theme_space$sdl_units |>
-  dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
+  dplyr::mutate(env_group = stringr::str_extract(eco_objective, "^[A-Z]+")) |>
   dplyr::filter(!is.na(env_group)) |>
-  dplyr::arrange(env_group, env_obj) |>
+  dplyr::arrange(env_group, eco_objective) |>
   # and join the quant descriptions
   dplyr::left_join(scenarios, by = "scenario")
 
 basin_to_plot <- agg_theme_space$mdb |>
-  dplyr::filter(!is.na(Objective))
+  dplyr::filter(!is.na(theme))
 
 scene_pal <- make_pal(
   levels = unique(obj_sdl_to_plot$scenario),
@@ -21,7 +21,7 @@ test_that("werp plots work", {
 
   basin_plot <- plot_outcomes(basin_to_plot,
                               outcome_col = "ewr_achieved",
-                              colorset = "Objective",
+                              colorset = "theme",
                               pal_list = list("scico::oslo"),
                               sceneorder = c("down4", "base", "up4")
   ) +
@@ -34,7 +34,7 @@ test_that("werp plots work", {
   sdl_plot <- obj_sdl_to_plot |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
-      x_col = "env_obj",
+      x_col = "eco_objective",
       colorgroups = NULL,
       colorset = "scenario",
       pal_list = scene_pal,
