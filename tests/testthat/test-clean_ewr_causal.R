@@ -1,4 +1,4 @@
-test_that("2.4.1 cleans", {
+test_that("2.4 cleans", {
   ewr_causal <- get_causal_ewr(struct = 'df')
   et <- get_ewr_table()
 

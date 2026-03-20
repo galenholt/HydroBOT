@@ -1,8 +1,8 @@
 test_that("werp theme works", {
-  expect_equal(class(theme_hydrobot()), c('theme', 'gg'))
+  expect_equal(class(theme_hydrobot()), c('theme', "ggplot2::theme", 'gg', "S7_object"))
   # with some args
   expect_equal(
     class(theme_hydrobot(base_size = 15, legend.position = 'none')),
-    c('theme', 'gg')
+    c('theme', "ggplot2::theme", 'gg', "S7_object")
   )
 })

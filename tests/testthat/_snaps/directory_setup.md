@@ -3,9 +3,12 @@
     Code
       relative_part
     Output
-      [1] "extdata/testsmall/hydrographs/base/base.csv"  
-      [2] "extdata/testsmall/hydrographs/down4/down4.csv"
-      [3] "extdata/testsmall/hydrographs/up4/up4.csv"    
+                                                 base 
+        "extdata/testsmall/hydrographs/base/base.csv" 
+                                                down4 
+      "extdata/testsmall/hydrographs/down4/down4.csv" 
+                                                  up4 
+          "extdata/testsmall/hydrographs/up4/up4.csv" 
 
 # scenario paths and the name fixer works for multiple csvs in each
 

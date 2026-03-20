@@ -12,4 +12,6 @@ test_that("ewr table works", {
 
 test_that("version works", {
   ewrver <- get_ewr_version()
+
+  expect_type(ewrver, 'character')
 })

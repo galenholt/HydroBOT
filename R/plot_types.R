@@ -94,7 +94,7 @@ plot_numeric <- function(
     method = NULL,
     se = TRUE,
     method.args = NULL,
-    linewidth = NULL, # Odd that I have to set this.
+    # linewidth = NULL, # Odd that I have to set this.
     alpha = 0.4
   )
 
@@ -119,7 +119,7 @@ plot_numeric <- function(
         method = smooth_arglist$method,
         method.args = smooth_arglist$method.args,
         se = smooth_arglist$se,
-        linewidth = smooth_arglist$linewidth,
+        # linewidth = smooth_arglist$linewidth,
         alpha = smooth_arglist$alpha
       )
   }

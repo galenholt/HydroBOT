@@ -70,6 +70,24 @@ obj_pal <- make_pal(
   palette = "scico::berlin"
 )
 
+# There's an annoying facet issue with ggplot 4.0 that bubbles up warnings. I don't want to silence them deep in code, but need to silence them here for tests.
+
+muffle_empty_facets <- function(expr) {
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      msg <- conditionMessage(w)
+
+      if (grepl("no non-missing arguments to min; returning Inf", msg, fixed = TRUE) ||
+          grepl("no non-missing arguments to max; returning -Inf", msg, fixed = TRUE)) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
+}
+
+
+
 test_that("basin works with single color palette", {
   basin_plot <- plot_outcomes(
     basin_to_plot,
@@ -173,7 +191,13 @@ test_that("multi-palette and facetting", {
       sceneorder = c("down4", "base", "up4")
     )
 
-  vdiffr::expect_doppelganger("bar_basin_groupfacet_sdl", sdl_plot_factgroup)
+# This is kind of silly, and arises because of the
+    # new changes to ggplot 4 and no data in some
+    # facets.
+  muffle_empty_facets(
+  vdiffr::expect_doppelganger("bar_basin_groupfacet_sdl",
+                              sdl_plot_factgroup)
+  )
 })
 
 test_that("flipped", {
@@ -1335,7 +1359,7 @@ test_that("hydrographs", {
     facet_wrapper = "scenario"
   )
 
-  vdiffr::expect_doppelganger("hydroplot", hydplot)
+  vdiffr::expect_doppelganger("hydroplot_nc", hydplot_nc)
 
   # trans and freey
   hydplot_st <- plot_outcomes(

@@ -67,42 +67,50 @@ make_pal <- function(
     levels <- levels[!(levels %in% refvals)]
   }
 
-  if (palette %in% cnames) {
-    cols <- paletteer::paletteer_c(
-      palette,
-      length(levels),
-      direction = direction
-    )
-  } else if (palette %in% dnames) {
-    cols <- paletteer::paletteer_d(
-      palette,
-      length(levels),
-      direction = direction
-    )
+  # top is an edge case where if all colours are defined it fails when trying to draw a length-0 from paletter
+  if (length(levels) == 0 && length(refvals) == length(refcols)) {
+    nonrefcols <- NULL
+    nonrefs <- NULL
   } else {
-    # try to inform a bit- I could auto-set palettes this way, but I'd rather
-    # make the user do it right
-    paltest <- grepl(palette, c(cnames, dnames), ignore.case = TRUE)
-    if (any(paltest)) {
-      rlang::abort(glue::glue(
-        "Requested palette {palette} not present, likely because wrong case or missing letters.
-                   Try `{c(cnames, dnames)[which(paltest)]}`"
-      ))
+    if (palette %in% cnames) {
+      cols <- paletteer::paletteer_c(
+        palette,
+        length(levels),
+        direction = direction
+      )
+    } else if (palette %in% dnames) {
+      cols <- paletteer::paletteer_d(
+        palette,
+        length(levels),
+        direction = direction
+      )
     } else {
-      rlang::abort(glue::glue(
-        "Requested palette {palette} not available in paletteer"
-      ))
+      # try to inform a bit- I could auto-set palettes this way, but I'd rather
+      # make the user do it right
+      paltest <- grepl(palette, c(cnames, dnames), ignore.case = TRUE)
+      if (any(paltest)) {
+        rlang::abort(glue::glue(
+          "Requested palette {palette} not present, likely because wrong case or missing letters.
+                   Try `{c(cnames, dnames)[which(paltest)]}`"
+        ))
+      } else {
+        rlang::abort(glue::glue(
+          "Requested palette {palette} not available in paletteer"
+        ))
+      }
     }
+
+    if (returnUnref & includeRef) {
+      unref <- stats::setNames(cols, levels)
+    }
+
+    # delete the reference levels out of the vectors
+    whichlevs <- which(!(levels %in% refvals))
+    nonrefs <- levels[whichlevs]
+    nonrefcols <- cols[whichlevs]
   }
 
-  if (returnUnref & includeRef) {
-    unref <- stats::setNames(cols, levels)
-  }
 
-  # delete the reference levels out of the vectors
-  whichlevs <- which(!(levels %in% refvals))
-  nonrefs <- levels[whichlevs]
-  nonrefcols <- cols[whichlevs]
 
   namedcols <- stats::setNames(c(refcols, nonrefcols), c(refvals, nonrefs))
   class(namedcols) <- "colors"

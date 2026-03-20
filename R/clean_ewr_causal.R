@@ -9,8 +9,8 @@
 clean_ewr_causal <- function(ewrnet, verbose = FALSE) {
   if (grepl('2.3.7', get_ewr_version())) {
     clean_causal <- clean_ewr_237(ewrnet)
-  } else if (grepl('2.4.1', get_ewr_version())) {
-    clean_causal <- clean_ewr_241(ewrnet)
+  } else if (grepl('2.4', get_ewr_version())) {
+    clean_causal <- clean_ewr_24(ewrnet)
   } else {
     rlang::warn(c(
       "!" = "Cleanup code only available for causal network provided by py-ewr 2.3.7 or 2.4.1",
@@ -29,7 +29,7 @@ clean_ewr_causal <- function(ewrnet, verbose = FALSE) {
 }
 
 
-clean_ewr_241 <- function(ewrnet) {
+clean_ewr_24 <- function(ewrnet) {
   names(ewrnet) <- nameclean(names(ewrnet))
   clean_causal <- ewrnet |>
     dplyr::rename(

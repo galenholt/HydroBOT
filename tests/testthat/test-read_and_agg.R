@@ -239,7 +239,7 @@ test_that("passing in the prep function works", {
     ggplot2::facet_wrap(~scenario) +
     ggplot2::theme(legend.position = "none")
 
-  vdiffr::expect_doppelganger("spatial-theme multi withreadin", g2sdl_plot)
+  vdiffr::expect_doppelganger("spatial-theme multi with prep", g2sdl_plot)
 })
 
 
