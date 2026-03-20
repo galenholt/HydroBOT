@@ -129,37 +129,39 @@
 #' @return a ggplot stacked bar plot with standard formatting and data cleaning
 #' @export
 #'
-plot_outcomes <- function(outdf,
-                          outcome_col,
-                          outcome_lab = outcome_col,
-                          y_col = outcome_col,
-                          y_lab = y_col,
-                          x_col = "scenario",
-                          x_lab = x_col,
-                          colorset = "scenario",
-                          pal_list = "scico::berlin",
-                          pal_direction = rep(1, length(pal_list)),
-                          colorgroups = NULL,
-                          color_lab = ifelse(is.null(colorgroups), colorset, colorgroups),
-                          plot_type = "2d",
-                          facet_row = NULL,
-                          facet_col = NULL,
-                          facet_wrapper = NULL,
-                          point_group = NULL,
-                          sceneorder = NULL,
-                          scales = "fixed",
-                          transoutcome = "identity",
-                          transy = "identity",
-                          transx = "identity",
-                          zero_adjust = 0,
-                          position = "stack",
-                          map_outlinecolor = "grey35",
-                          base_list = NULL,
-                          smooth_arglist = NULL,
-                          underlay_list = NULL,
-                          overlay_list = NULL,
-                          contour_arglist = NULL,
-                          setLimits = NULL) {
+plot_outcomes <- function(
+  outdf,
+  outcome_col,
+  outcome_lab = outcome_col,
+  y_col = outcome_col,
+  y_lab = y_col,
+  x_col = "scenario",
+  x_lab = x_col,
+  colorset = "scenario",
+  pal_list = "scico::berlin",
+  pal_direction = rep(1, length(pal_list)),
+  colorgroups = NULL,
+  color_lab = ifelse(is.null(colorgroups), colorset, colorgroups),
+  plot_type = "2d",
+  facet_row = NULL,
+  facet_col = NULL,
+  facet_wrapper = NULL,
+  point_group = NULL,
+  sceneorder = NULL,
+  scales = "fixed",
+  transoutcome = "identity",
+  transy = "identity",
+  transx = "identity",
+  zero_adjust = 0,
+  position = "stack",
+  map_outlinecolor = "grey35",
+  base_list = NULL,
+  smooth_arglist = NULL,
+  underlay_list = NULL,
+  overlay_list = NULL,
+  contour_arglist = NULL,
+  setLimits = NULL
+) {
   ## Cleaning inputs
 
   if ((!is.null(facet_row) || !is.null(facet_col)) & !is.null(facet_wrapper)) {
@@ -178,7 +180,10 @@ plot_outcomes <- function(outdf,
   # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
   # Really want to shove this in plot_prep. Maybe I can now that it's in a list?
   if (!is.null(base_list)) {
-    if (is.function(base_list$comp_fun) || (is.list(base_list$comp_fun) & is.function(base_list$comp_fun[[1]]))) {
+    if (
+      is.function(base_list$comp_fun) ||
+        (is.list(base_list$comp_fun) & is.function(base_list$comp_fun[[1]]))
+    ) {
       base_list$comp_fun <- as.character(substitute(base_list$comp_fun))
       if (base_list$comp_fun[1] == "c") {
         base_list$comp_fun <- base_list$comp_fun[2:length(base_list$comp_fun)]
@@ -193,20 +198,24 @@ plot_outcomes <- function(outdf,
 
   if (!(plot_type %in% c("map", "heatmap", "network", "contour"))) {
     if (y_col != outcome_col) {
-      rlang::warn("y-axis in a 2-d plot should be the outcome. If you have a case where that isn't true, please raise an issue")
+      rlang::warn(
+        "y-axis in a 2-d plot should be the outcome. If you have a case where that isn't true, please raise an issue"
+      )
     }
   }
 
   if ((plot_type %in% c("map", "heatmap", "network", "contour"))) {
     if (colorset != outcome_col) {
-      rlang::warn("color/fill in a 3-d plot or network should be the outcome. If you have a case where that isn't true, please raise an issue")
+      rlang::warn(
+        "color/fill in a 3-d plot or network should be the outcome. If you have a case where that isn't true, please raise an issue"
+      )
     }
   }
 
-
   # Prep the data
   prepped <- plot_data_prep(
-    data = outdf, outcome_col = outcome_col,
+    data = outdf,
+    outcome_col = outcome_col,
     sceneorder = sceneorder,
     base_list = base_list,
     zero_adjust = zero_adjust
@@ -269,9 +278,12 @@ plot_outcomes <- function(outdf,
     # Qualitative x
     if (xtype == "qual") {
       outcome_plot <- plot_bar(
-        prepped = prepped, x_col = x_col,
-        x_lab = x_lab, outcome_lab = outcome_lab,
-        position = position, transoutcome = transoutcome
+        prepped = prepped,
+        x_col = x_col,
+        x_lab = x_lab,
+        outcome_lab = outcome_lab,
+        position = position,
+        transoutcome = transoutcome
       )
     }
 
@@ -302,7 +314,8 @@ plot_outcomes <- function(outdf,
       outcome_plot <- outcome_plot +
         # reformulate is (RHS, LHS) - so, backwards to how we think about
         # row-column indexing.
-        ggplot2::facet_grid(stats::reformulate(facet_col, facet_row),
+        ggplot2::facet_grid(
+          stats::reformulate(facet_col, facet_row),
           # Good in theory, but often too long and blocks the plot, so not using
           # labeller = ggplot2::label_wrap_gen(),
           scales = scales
@@ -311,7 +324,8 @@ plot_outcomes <- function(outdf,
 
     if (!is.null(facet_wrapper)) {
       outcome_plot <- outcome_plot +
-        ggplot2::facet_wrap(facet_wrapper,
+        ggplot2::facet_wrap(
+          facet_wrapper,
           # Good in theory, but often too long and blocks the plot, so not using
           # labeller = ggplot2::label_wrap_gen(),
           scales = scales
@@ -321,8 +335,10 @@ plot_outcomes <- function(outdf,
 
   if (plot_type == "map") {
     if (!inherits(pal_list, "colors") && length(pal_list) > 1) {
-      rlang::warn(glue::glue("using first palette for {outcome_col}.
-                             Splitting up palettes in maps needs more thought"))
+      rlang::warn(glue::glue(
+        "using first palette for {outcome_col}.
+                             Splitting up palettes in maps needs more thought"
+      ))
     }
 
     # need a lot of arguments here because we might need to fully build several
@@ -334,9 +350,12 @@ plot_outcomes <- function(outdf,
       map_outlinecolor = map_outlinecolor,
       outcome_lab = outcome_lab,
       facet_wrapper = facet_wrapper,
-      facet_row = facet_row, facet_col = facet_col,
-      sceneorder = sceneorder, transoutcome = transoutcome,
-      setLimits = setLimits, base_list = base_list
+      facet_row = facet_row,
+      facet_col = facet_col,
+      sceneorder = sceneorder,
+      transoutcome = transoutcome,
+      setLimits = setLimits,
+      base_list = base_list
     )
 
     # labels
@@ -350,8 +369,10 @@ plot_outcomes <- function(outdf,
 
   if (plot_type %in% c("heatmap", "contour")) {
     if (length(pal_list) > 1) {
-      rlang::warn(glue::glue("using first palette for {outcome_col}.
-                             Splitting up palettes in heatmaps needs more thought"))
+      rlang::warn(glue::glue(
+        "using first palette for {outcome_col}.
+                             Splitting up palettes in heatmaps needs more thought"
+      ))
     }
 
     # # unlike maps, these plots do not automatically break things up by
@@ -372,13 +393,19 @@ plot_outcomes <- function(outdf,
 
     outcome_plot <- plot_heatmap(
       prepped = prepped,
-      x_col = x_col, x_lab = x_lab,
-      y_col = y_col, y_lab = y_lab,
+      x_col = x_col,
+      x_lab = x_lab,
+      y_col = y_col,
+      y_lab = y_lab,
       outcome_lab = outcome_lab,
-      transoutcome = transoutcome, transx = transx, transy = transy,
+      transoutcome = transoutcome,
+      transx = transx,
+      transy = transy,
       contour_arglist = contour_arglist,
-      xtype = xtype, ytype = ytype,
-      setLimits = setLimits, base_list = base_list
+      xtype = xtype,
+      ytype = ytype,
+      setLimits = setLimits,
+      base_list = base_list
     )
 
     # labels
@@ -395,7 +422,8 @@ plot_outcomes <- function(outdf,
       outcome_plot <- outcome_plot +
         # reformulate is (RHS, LHS) - so, backwards to how we think about
         # row-column indexing.
-        ggplot2::facet_grid(stats::reformulate(facet_col, facet_row),
+        ggplot2::facet_grid(
+          stats::reformulate(facet_col, facet_row),
           # Good in theory, but often too long and blocks the plot, so not using
           # labeller = ggplot2::label_wrap_gen(),
           scales = scales
@@ -404,7 +432,8 @@ plot_outcomes <- function(outdf,
 
     if (!is.null(facet_wrapper)) {
       outcome_plot <- outcome_plot +
-        ggplot2::facet_wrap(facet_wrapper,
+        ggplot2::facet_wrap(
+          facet_wrapper,
           # Good in theory, but often too long and blocks the plot, so not using
           # labeller = ggplot2::label_wrap_gen(),
           scales = scales

@@ -30,65 +30,77 @@ agg_names_to_cols <-
 
     fs <- purrr::map_lgl(funsequence, is.character)
     if (any(!fs)) {
-      rlang::inform(c("Attempting to deparse lambda function in funsequence. ",
+      rlang::inform(c(
+        "Attempting to deparse lambda function in funsequence. ",
         "i" = "It is better to use named functions than lambdas in the funsequence, because they are more clearly defined and can be more easily known later."
       ))
       funsequence[!fs] <- names(unlist(funsequence[!fs]))
     }
 
-      aggincols <- aggdf |>
-        tidyr::pivot_longer(tidyselect::ends_with(aggCols)) |>
-        # This removes the aggregation level name ('ewr_code', 'catchment', etc)
-        dplyr::mutate(
-          allfuns = stringr::str_remove_all(
-            .data$name,
-            stringr::str_flatten(
-              stringr::str_c("(", unlist(aggsequence), ")"),
-              collapse = "|"
-            )
-          ),
-          allfuns = stringr::str_remove(.data$allfuns, "^_")
-        ) |>
-        tidyr::separate(
-          .data$allfuns,
-          into = paste0("aggfun_", length(funsequence):1),
-          sep = "__"
-        ) |>
-        tidyr::separate(
-          .data$aggfun_1,
-          into = c("aggfun_1", "original"),
-          sep = "_",
-          extra = "merge"
-        ) |>
-        dplyr::mutate(alllevs = stringr::str_remove_all(
+    aggincols <- aggdf |>
+      tidyr::pivot_longer(tidyselect::ends_with(aggCols)) |>
+      # This removes the aggregation level name ('ewr_code', 'catchment', etc)
+      dplyr::mutate(
+        allfuns = stringr::str_remove_all(
           .data$name,
-          stringr::str_flatten(stringr::str_c("(", unlist(funsequence), ")"),
+          stringr::str_flatten(
+            stringr::str_c("(", unlist(aggsequence), ")"),
             collapse = "|"
           )
-        )) |>
-        # need too_many = 'drop' because the last bit is the name of the
-        # aggregated column, e.g. '_ewr_achieved.
-        # use too_many = 'debug' to confirm if there are ever issues.
-        tidyr::separate_wider_delim("alllevs",
-                                    delim = "__",
-                                    names = paste0("aggLevel_", length(funsequence):1),
-                                    too_many = 'drop') |>
-        # There's an issue with using separate_wider_* with sf. Could go back to
-        # deprecated `separate()` or re-sf the object. Neither is particularly
-        # satisfying
-        sf::st_as_sf() |>
-        dplyr::select(-"name") |>
-        # sf seems to be behind tidyverse, and needs characters here instead of bare
-        # names. Both seem to work for normal df/tibbles
-        tidyr::pivot_wider(names_from = "original", values_from = "value") |>
-        dplyr::select(
-          !tidyselect::ends_with(stringr::str_c("_", as.character(
-            1:length(funsequence)
-          ))),
-          tidyselect::ends_with(stringr::str_c("_", as.character(
-            1:length(funsequence)
-          )))
+        ),
+        allfuns = stringr::str_remove(.data$allfuns, "^_")
+      ) |>
+      tidyr::separate(
+        .data$allfuns,
+        into = paste0("aggfun_", length(funsequence):1),
+        sep = "__"
+      ) |>
+      tidyr::separate(
+        .data$aggfun_1,
+        into = c("aggfun_1", "original"),
+        sep = "_",
+        extra = "merge"
+      ) |>
+      dplyr::mutate(
+        alllevs = stringr::str_remove_all(
+          .data$name,
+          stringr::str_flatten(
+            stringr::str_c("(", unlist(funsequence), ")"),
+            collapse = "|"
+          )
         )
+      ) |>
+      # need too_many = 'drop' because the last bit is the name of the
+      # aggregated column, e.g. '_ewr_achieved.
+      # use too_many = 'debug' to confirm if there are ever issues.
+      tidyr::separate_wider_delim(
+        "alllevs",
+        delim = "__",
+        names = paste0("aggLevel_", length(funsequence):1),
+        too_many = 'drop'
+      ) |>
+      # There's an issue with using separate_wider_* with sf. Could go back to
+      # deprecated `separate()` or re-sf the object. Neither is particularly
+      # satisfying
+      sf::st_as_sf() |>
+      dplyr::select(-"name") |>
+      # sf seems to be behind tidyverse, and needs characters here instead of bare
+      # names. Both seem to work for normal df/tibbles
+      tidyr::pivot_wider(names_from = "original", values_from = "value") |>
+      dplyr::select(
+        !tidyselect::ends_with(stringr::str_c(
+          "_",
+          as.character(
+            1:length(funsequence)
+          )
+        )),
+        tidyselect::ends_with(stringr::str_c(
+          "_",
+          as.character(
+            1:length(funsequence)
+          )
+        ))
+      )
 
     return(aggincols)
   }
@@ -190,21 +202,24 @@ parse_group_until <- function(group_until, groupers, aggsequence) {
     if (is.character(groupers) & length(group_until) == length(groupers)) {
       group_until <- as.list(group_until) |> stats::setNames(groupers)
     } else {
-      rlang::abort("group_until should always be a named list.
-      If used with types other than character or numeric, it *must* be.")
+      rlang::abort(
+        "group_until should always be a named list.
+      If used with types other than character or numeric, it *must* be."
+      )
     }
   }
 
   # Try a bit harder with the names; they fall off for unnamed vectors with
   # functions
-  if (is.null(names(group_until)) &
+  if (
+    is.null(names(group_until)) &
       length(group_until) == length(groupers) &
-      is.character(groupers)) {
+      is.character(groupers)
+  ) {
     names(group_until) <- groupers
   }
 
-  group_indices <- purrr::map(group_until,
-                              \(x) parse_aggnum(x, aggsequence)) |>
+  group_indices <- purrr::map(group_until, \(x) parse_aggnum(x, aggsequence)) |>
     purrr::discard(is.null)
 
   return(group_indices)
@@ -229,8 +244,10 @@ parse_aggnum <- function(x, aggsequence) {
     # if character, find the aggsequence name
     if (is.character(x)) {
       if (!x %in% names(aggsequence)) {
-        rlang::warn("not able to infer `group_until`, aggsequence names do not match.
-                    Retaining grouping until the end")
+        rlang::warn(
+          "not able to infer `group_until`, aggsequence names do not match.
+                    Retaining grouping until the end"
+        )
         gind <- length(aggsequence) + 1
       } else {
         gind <- which(names(aggsequence) == x)
@@ -264,7 +281,10 @@ identify_dimension <- function(aggsequence, causal_edges) {
 
     # If they're edges, they already have been lengthened
     if ("fromtype" %in% causalnames) {
-      causalnames <- c(unique(causal_edges$fromtype), unique(causal_edges$totype))
+      causalnames <- c(
+        unique(causal_edges$fromtype),
+        unique(causal_edges$totype)
+      )
     }
   } else {
     causalnames <- purrr::map(causal_edges, names) |> unlist()
@@ -280,8 +300,12 @@ identify_dimension <- function(aggsequence, causal_edges) {
   if (any(checkassign != 1)) {
     rlang::abort(c(
       "Cannot infer dimension of aggsequence.",
-      glue::glue("step(s) {names(checkassign)[checkassign > 1]} are assigned to multiple dimensions"),
-      glue::glue("step(s) {names(checkassign)[checkassign < 1]} are not assigned to any dimension")
+      glue::glue(
+        "step(s) {names(checkassign)[checkassign > 1]} are assigned to multiple dimensions"
+      ),
+      glue::glue(
+        "step(s) {names(checkassign)[checkassign < 1]} are not assigned to any dimension"
+      )
     ))
   }
 
@@ -304,9 +328,11 @@ identify_dimension <- function(aggsequence, causal_edges) {
 #' @return logical
 #' @keywords internal
 is_theme <- function(x, causalnames) {
-  all(inherits(x, "character") &
-    length(x) == 2 &
-    x %in% causalnames)
+  all(
+    inherits(x, "character") &
+      length(x) == 2 &
+      x %in% causalnames
+  )
 }
 
 #' Test whether a list-item is time, including using [base::cut.Date()]
@@ -321,9 +347,11 @@ is_theme <- function(x, causalnames) {
 is_time <- function(x) {
   if (all(inherits(x, "POSIXt") | inherits(x, "Date"))) {
     return(TRUE)
-  } else if (inherits(x, "character") &&
-    length(x) == 1 &&
-    grepl("sec|min|hour|day|DSTday|day|week|month|quarter|year|all_time", x)) {
+  } else if (
+    inherits(x, "character") &&
+      length(x) == 1 &&
+      grepl("sec|min|hour|day|DSTday|day|week|month|quarter|year|all_time", x)
+  ) {
     return(TRUE)
   } else {
     return(FALSE)

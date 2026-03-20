@@ -12,15 +12,19 @@ test_that("returns one result, no saving", {
   make_temp_hydro()
 
   # Test it didn't create anything since outputType = 'none'
-  start_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  start_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
 
   system.time(
-  ewr_out <- prep_run_save_ewrs(
-    hydro_dir = temp_hydro_dir,
-    output_parent_dir = temp_parent_dir,
-    outputType = list("none"),
-        returnType = list("summary")
-  )
+    ewr_out <- prep_run_save_ewrs(
+      hydro_dir = temp_hydro_dir,
+      output_parent_dir = temp_parent_dir,
+      outputType = list("none"),
+      returnType = list("summary")
+    )
   )
 
   expect_equal(length(ewr_out), 1)
@@ -30,7 +34,11 @@ test_that("returns one result, no saving", {
     c("base", "down4", "up4")
   )
   # Test it didn't create anything since outputType = 'none'
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
 
   expect_equal(start_structure, realised_structure)
 })
@@ -44,7 +52,7 @@ test_that("returns list", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("none"),
-        returnType = list("summary", "all")
+    returnType = list("summary", "all")
   )
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
@@ -61,25 +69,38 @@ test_that("complex dir structure", {
 
   dir.create(file.path(temp_hydro_dir, "S1"))
   dir.create(file.path(temp_hydro_dir, "S2"))
-  file.copy(file.path(temp_hydro_dir, "base"), file.path(temp_hydro_dir, "S1"), recursive = TRUE)
-  file.copy(file.path(temp_hydro_dir, "up4"), file.path(temp_hydro_dir, "S2"), recursive = TRUE)
+  file.copy(
+    file.path(temp_hydro_dir, "base"),
+    file.path(temp_hydro_dir, "S1"),
+    recursive = TRUE
+  )
+  file.copy(
+    file.path(temp_hydro_dir, "up4"),
+    file.path(temp_hydro_dir, "S2"),
+    recursive = TRUE
+  )
 
   ewr_out <- prep_run_save_ewrs(
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     # scenarios = c('S1', 'S2', 'S3'),
     outputType = list("summary", "all"),
-        returnType = list("summary", "all")
+    returnType = list("summary", "all")
   )
 
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
-  expect_true(all(unique(ewr_out$summary$scenario) %in%
-    c("base", "down4", "S1_base", "S2_up4", "up4")))
+  expect_true(all(
+    unique(ewr_out$summary$scenario) %in%
+      c("base", "down4", "S1_base", "S2_up4", "up4")
+  ))
 
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
   expect_snapshot(realised_structure)
-
 })
 
 test_that("complex dir structure, missings", {
@@ -88,8 +109,16 @@ test_that("complex dir structure, missings", {
 
   dir.create(file.path(temp_hydro_dir, "S1"))
   dir.create(file.path(temp_hydro_dir, "S2"))
-  file.copy(file.path(temp_hydro_dir, "base"), file.path(temp_hydro_dir, "S1"), recursive = TRUE)
-  file.copy(file.path(temp_hydro_dir, "up4"), file.path(temp_hydro_dir, "S2"), recursive = TRUE)
+  file.copy(
+    file.path(temp_hydro_dir, "base"),
+    file.path(temp_hydro_dir, "S1"),
+    recursive = TRUE
+  )
+  file.copy(
+    file.path(temp_hydro_dir, "up4"),
+    file.path(temp_hydro_dir, "S2"),
+    recursive = TRUE
+  )
 
   # Let's say I just want to get the S's
   ewr_out <- prep_run_save_ewrs(
@@ -97,35 +126,46 @@ test_that("complex dir structure, missings", {
     output_parent_dir = temp_parent_dir,
     file_search = 'S1|S2',
     outputType = list("summary", "all"),
-        returnType = list("summary", "all")
+    returnType = list("summary", "all")
   )
 
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
-  expect_true(all(unique(ewr_out$summary$scenario) %in%
-                    c("S1_base", "S2_up4")))
+  expect_true(all(
+    unique(ewr_out$summary$scenario) %in%
+      c("S1_base", "S2_up4")
+  ))
 
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
   expect_snapshot(realised_structure)
 
   # NOW, do all of them, but DO NOT RE-DO THE S's
-    # This is critical for continuing long runs
+  # This is critical for continuing long runs
   ewr_out2 <- prep_run_save_ewrs(
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     fill_missing = TRUE,
     outputType = list("summary", "all"),
-        returnType = list("summary", "all")
+    returnType = list("summary", "all")
   )
 
   # now we should have those files
-  realised_structure2 <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure2 <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
   expect_snapshot(realised_structure2)
 
   # but only have run the missing runs
-  expect_true(all(unique(ewr_out2$summary$scenario) %in%
-                    c("base", "down4", "up4")))
-
+  expect_true(all(
+    unique(ewr_out2$summary$scenario) %in%
+      c("base", "down4", "up4")
+  ))
 })
 
 
@@ -134,14 +174,18 @@ test_that("manual scenario naming", {
   make_temp_hydro()
 
   # The user would supply this
-  scenelist <- list(S1 = "base/base.csv", S2 = "down4/down4.csv", S3 = "up4/up4.csv")
+  scenelist <- list(
+    S1 = "base/base.csv",
+    S2 = "down4/down4.csv",
+    S3 = "up4/up4.csv"
+  )
 
   ewr_out <- prep_run_save_ewrs(
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     scenarios = scenelist,
     outputType = list("summary", "all"),
-        returnType = list("summary", "all")
+    returnType = list("summary", "all")
   )
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
@@ -150,9 +194,12 @@ test_that("manual scenario naming", {
     c("S1", "S2", "S3")
   )
 
-
   # Test it created the expected structure
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
   expect_snapshot(realised_structure)
 })
 
@@ -183,15 +230,12 @@ test_that("do different length gauge records break EWR", {
     }
     if ("421001" %in% names(tc)) {
       tc[lubridate::year(tc$Date) %in% c('2015', '2018', '2019'), 2] <- NA
-
     }
     if ("421004" %in% names(tc)) {
       tc[lubridate::year(tc$Date) %in% c('2015', '2016'), 2] <- NA
-
     }
     if ("421011" %in% names(tc)) {
       tc[lubridate::year(tc$Date) %in% c('2016', '2018'), 2] <- NA
-
     }
 
     # Glue together
@@ -224,26 +268,30 @@ test_that("do different length gauge records break EWR", {
   dir.create(file.path(temp_parent_dir, 'hydrosmoosh', 'up4'))
 
   write.csv(base, file.path(temp_parent_dir, 'hydrosmoosh', 'base', 'base.csv'))
-  write.csv(down4, file.path(temp_parent_dir, 'hydrosmoosh', 'down4', 'down4.csv'))
+  write.csv(
+    down4,
+    file.path(temp_parent_dir, 'hydrosmoosh', 'down4', 'down4.csv')
+  )
   write.csv(up4, file.path(temp_parent_dir, 'hydrosmoosh', 'up4', 'up4.csv'))
-
 
   ewr_out <- prep_run_save_ewrs(
     hydro_dir = temp_hydro_multi,
     output_parent_dir = temp_parent_dir,
     outputType = list("none"),
-        returnType = list("summary", "all")
+    returnType = list("summary", "all")
   )
 
   smoosh_out <- prep_run_save_ewrs(
     hydro_dir = file.path(temp_parent_dir, 'hydrosmoosh'),
     output_parent_dir = temp_parent_dir,
     outputType = list("none"),
-        returnType = list("summary", "all")
+    returnType = list("summary", "all")
   )
 
   # The separates have _gauge in scenario
-  ewr_out <- purrr::map(ewr_out, \(x) x |> dplyr::mutate(scenario = stringr::str_remove_all(scenario, '_.*')))
+  ewr_out <- purrr::map(ewr_out, \(x) {
+    x |> dplyr::mutate(scenario = stringr::str_remove_all(scenario, '_.*'))
+  })
   expect_equal(ewr_out$summary, smoosh_out$summary)
 
   # all_events gets sorted, but if we sort, should match
@@ -253,7 +301,6 @@ test_that("do different length gauge records break EWR", {
     dplyr::arrange(scenario, gauge, planningUnit, code)
 
   expect_equal(ewa, swa)
-
 })
 
 # Does the read-in and run work for singe gauges per csv?
@@ -266,7 +313,7 @@ test_that("csv per gauge works", {
     hydro_dir = temp_hydro_multi,
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-        returnType = list("summary", "all")
+    returnType = list("summary", "all")
   )
 
   expect_equal(length(ewr_out), 2)
@@ -282,7 +329,11 @@ test_that("csv per gauge works", {
 
   # Test it created the expected structure.
   # These still need to create a single output per input, or they overwrite
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
   expect_snapshot(realised_structure)
 })
 
@@ -297,7 +348,7 @@ test_that("csv per gauge works for filenames", {
     scenarios_from = 'file',
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-        returnType = list("summary", "all")
+    returnType = list("summary", "all")
   )
 
   expect_equal(length(ewr_out), 2)
@@ -311,7 +362,11 @@ test_that("csv per gauge works for filenames", {
   # I'm now controlling the scenario names in HydroBOT, so this should work.
 
   # Test it created the expected structure
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
   expect_snapshot(realised_structure)
 })
 
@@ -325,7 +380,7 @@ test_that("subset using file_search works", {
     file_search = '412', # half start with this, the other half with 421
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-        returnType = list("summary", "all")
+    returnType = list("summary", "all")
   )
 
   expect_equal(length(ewr_out), 2)
@@ -333,7 +388,6 @@ test_that("subset using file_search works", {
 
   # check we only have the three gauges
   expect_snapshot_value(unique(ewr_out$summary$gauge), style = 'deparse')
-
 })
 
 test_that("saving works for one", {
@@ -344,14 +398,18 @@ test_that("saving works for one", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("summary"),
-        returnType = list("summary")
+    returnType = list("summary")
   )
 
   expect_equal(length(ewr_out), 1)
   expect_equal(names(ewr_out), "summary")
 
   # Test it created the expected structure
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
   expect_snapshot(realised_structure)
 })
 
@@ -364,13 +422,17 @@ test_that("saving works with subdir", {
     output_parent_dir = temp_parent_dir,
     output_subdir = 'testsub',
     outputType = list("summary"),
-        returnType = list("summary")
+    returnType = list("summary")
   )
   expect_equal(length(ewr_out), 1)
   expect_equal(names(ewr_out), "summary")
 
   # Test it created the expected structure
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
   expect_snapshot(realised_structure)
 })
 
@@ -391,14 +453,18 @@ test_that("saving and returning works for all (or nearly all) ewr outputs", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = ewroutlist,
-        returnType = ewroutlist
+    returnType = ewroutlist
   )
 
   expect_equal(length(ewr_out), length(ewroutlist))
   expect_equal(names(ewr_out), unlist(ewroutlist))
 
   # Test it created the expected structure
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
   expect_snapshot(realised_structure)
 })
 
@@ -406,7 +472,10 @@ test_that("NETCDF saving and returning works for all (or nearly all) ewr outputs
   # create dir so building makes sense
   make_temp_hydro(
     temp_hydro_dir = "nchydros",
-    orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = "HydroBOT")
+    orig_hydro_dir = system.file(
+      "extdata/ncdfexample/nchydros",
+      package = "HydroBOT"
+    )
   )
 
   # all working as of 2.1.0
@@ -425,7 +494,7 @@ test_that("NETCDF saving and returning works for all (or nearly all) ewr outputs
     output_parent_dir = temp_parent_dir,
     model_format = "IQQM - netcdf",
     outputType = ewroutlist,
-        returnType = ewroutlist
+    returnType = ewroutlist
   )
 
   expect_equal(length(ewr_out), length(ewroutlist))
@@ -433,16 +502,22 @@ test_that("NETCDF saving and returning works for all (or nearly all) ewr outputs
   expect_equal(unique(ewr_out$summary$scenario), c("S1", "S2"))
 
   # Test it created the expected structure
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
   expect_snapshot(realised_structure)
-
 })
 
 test_that("zipped NETCDF saving and returning works for all (or nearly all) ewr outputs", {
   # create dir so building makes sense
   make_temp_zip(
     temp_hydro_dir = "hydrographs",
-    orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "HydroBOT")
+    orig_hydro_zip = system.file(
+      "extdata/ncdfexample/zipcdf.zip",
+      package = "HydroBOT"
+    )
   )
 
   ewroutlist <- list(
@@ -461,31 +536,34 @@ test_that("zipped NETCDF saving and returning works for all (or nearly all) ewr 
     file_search = 'Straight Node',
     scenarios_from = 'file',
     outputType = ewroutlist,
-        returnType = ewroutlist
+    returnType = ewroutlist
   )
-
 
   expect_equal(length(ewr_out), length(ewroutlist))
   expect_equal(names(ewr_out), unlist(ewroutlist))
   expect_equal(unique(ewr_out$summary$scenario), c("zipcdf_S1", "zipcdf_S2"))
 
   # Test it created the expected structure
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
 
   # ugly filepaths, but that's a consequence of the zip structure.
   # The hydrozipextract shouldn't be htere
   expect_snapshot(realised_structure)
-
 })
 
 test_that("NETCDF saving and returning works in parallel", {
   # create dir so building makes sense
   make_temp_hydro(
     temp_hydro_dir = "nchydros",
-    orig_hydro_dir = system.file("extdata/ncdfexample/nchydros", package = "HydroBOT")
+    orig_hydro_dir = system.file(
+      "extdata/ncdfexample/nchydros",
+      package = "HydroBOT"
+    )
   )
-
-
 
   ewroutlist <- list("summary")
 
@@ -494,7 +572,7 @@ test_that("NETCDF saving and returning works in parallel", {
     output_parent_dir = temp_parent_dir,
     model_format = "IQQM - netcdf",
     outputType = ewroutlist,
-        returnType = ewroutlist,
+    returnType = ewroutlist,
     rparallel = TRUE
   )
 
@@ -503,10 +581,13 @@ test_that("NETCDF saving and returning works in parallel", {
   expect_equal(unique(ewr_out$summary$scenario), c("S1", "S2"))
 
   # Test it created the expected structure
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
 
   expect_snapshot(realised_structure)
-
 })
 
 test_that("specifying *Type as character instead of list", {
@@ -520,13 +601,17 @@ test_that("specifying *Type as character instead of list", {
       "summary",
       "all"
     ),
-        returnType = c("summary", "all")
+    returnType = c("summary", "all")
   )
   expect_equal(length(ewr_out), 2)
   expect_equal(names(ewr_out), c("summary", "all_events"))
 
   # Test it created the expected structure
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
 
   expect_snapshot(realised_structure)
 })
@@ -542,14 +627,15 @@ test_that("Single scenario among many, with access to the outer directory", {
     hydro_dir = file.path(temp_hydro_dir, "base"),
     output_parent_dir = temp_parent_dir,
     outputType = list("summary"),
-        returnType = list("summary")
+    returnType = list("summary")
   )
-
-
 
   # Expect only the single output, not for all the scenarios
   expect_equal(
-    list.files(file.path(temp_parent_dir, "module_output", "EWR"), recursive = TRUE),
+    list.files(
+      file.path(temp_parent_dir, "module_output", "EWR"),
+      recursive = TRUE
+    ),
     c("base/summary_base.csv", "ewr_metadata.json", "ewr_metadata.yml")
   )
 
@@ -570,10 +656,8 @@ test_that("Single scenario among many, no access to the outer directory", {
     hydro_dir = scenario_path,
     output_parent_dir = scenario_path,
     outputType = list("summary"),
-        returnType = list("summary")
+    returnType = list("summary")
   )
-
-
 
   # Expect only the single output, not for all the scenarios
   realised_structure <- list.files(scenario_path, recursive = TRUE)
@@ -588,10 +672,12 @@ test_that("Single scenario among many, no access to the outer directory, differe
 
   # Now, let's assume all we have is a path to the specific scenario
 
-
   # make the results dir name not match the file name of the results. so now
   # this has hydrographs/results/base.csv instead of hydrographs/base/base.csv
-  file.rename(file.path(temp_hydro_dir, "base"), file.path(temp_hydro_dir, "results"))
+  file.rename(
+    file.path(temp_hydro_dir, "base"),
+    file.path(temp_hydro_dir, "results")
+  )
   scenario_path <- file.path(temp_hydro_dir, "results")
 
   # So far, assuming we can read and write to the outer 'hydrographs' directory, this is all standard.
@@ -601,10 +687,8 @@ test_that("Single scenario among many, no access to the outer directory, differe
     hydro_dir = scenario_path,
     output_parent_dir = scenario_path,
     outputType = list("summary"),
-        returnType = list("summary")
+    returnType = list("summary")
   )
-
-
 
   # Expect only the single output, not for all the scenarios
   realised_structure <- list.files(scenario_path, recursive = TRUE)
@@ -625,16 +709,19 @@ test_that("parallel works for two", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-        returnType = list("summary", "yearly"),
+    returnType = list("summary", "yearly"),
     rparallel = TRUE
   )
-
 
   expect_equal(length(ewr_out), 2)
   expect_equal(names(ewr_out), c("summary", "yearly"))
 
   # Test it created the expected structure
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
 
   expect_snapshot(realised_structure)
 })
@@ -650,7 +737,7 @@ test_that("parallel works for one", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("summary"),
-        returnType = list("summary"),
+    returnType = list("summary"),
     rparallel = TRUE
   )
 
@@ -658,7 +745,11 @@ test_that("parallel works for one", {
   expect_equal(names(ewr_out), "summary")
 
   # Test it created the expected structure
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
 
   expect_snapshot(realised_structure)
 })
@@ -673,41 +764,51 @@ test_that("parallel works for no return", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-        returnType = list("none"),
+    returnType = list("none"),
     rparallel = TRUE
   )
 
   expect_equal(length(ewr_out), 0)
 
   # Test it created the expected structure
-  realised_structure <- list.files(temp_parent_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    temp_parent_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
 
   expect_snapshot(realised_structure)
 })
 
 test_that("speed test", {
-  skip(message = "Speed test not really a test, just including to take advantage of setup")
+  skip(
+    message = "Speed test not really a test, just including to take advantage of setup"
+  )
   # print(future::plan())
 
   # create dir so building makes sense
   make_temp_hydro()
 
   # microbenchmark would be better, this is quick and dirty
-  tp <- system.time(ewr_out <- prep_run_save_ewrs(
-    hydro_dir = temp_hydro_dir,
-    output_parent_dir = temp_parent_dir,
-    outputType = list("summary", "yearly"),
-        returnType = list("summary", "yearly"),
-    rparallel = TRUE
-  ))
+  tp <- system.time(
+    ewr_out <- prep_run_save_ewrs(
+      hydro_dir = temp_hydro_dir,
+      output_parent_dir = temp_parent_dir,
+      outputType = list("summary", "yearly"),
+      returnType = list("summary", "yearly"),
+      rparallel = TRUE
+    )
+  )
 
-  ts <- system.time(ewr_out <- prep_run_save_ewrs(
-    hydro_dir = temp_hydro_dir,
-    output_parent_dir = temp_parent_dir,
-    outputType = list("summary", "yearly"),
-        returnType = list("summary", "yearly"),
-    rparallel = FALSE
-  ))
+  ts <- system.time(
+    ewr_out <- prep_run_save_ewrs(
+      hydro_dir = temp_hydro_dir,
+      output_parent_dir = temp_parent_dir,
+      outputType = list("summary", "yearly"),
+      returnType = list("summary", "yearly"),
+      rparallel = FALSE
+    )
+  )
   tp
   ts
 })
@@ -725,16 +826,14 @@ test_that("safety works", {
     hydro_dir = temp_hydro_dir,
     output_parent_dir = temp_parent_dir,
     outputType = list("none"),
-        returnType = list("summary", "all")
+    returnType = list("summary", "all")
   )
 
   expect_equal(length(ewr_out), 2)
   expect_true(all(c("summary", "all_events") %in% names(ewr_out)))
   expect_equal(
     unique(ewr_out$summary$scenario),
-    c("base",
-      "down4",
-      "up4")
+    c("base", "down4", "up4")
   )
 })
 
@@ -748,7 +847,7 @@ test_that("directory works for scenario naming with multiple files", {
     scenarios_from = 'directory',
     output_parent_dir = temp_parent_dir,
     outputType = list("summary", "yearly"),
-        returnType = list("summary", "all")
+    returnType = list("summary", "all")
   )
 
   # Does it return what we expect?
@@ -756,6 +855,9 @@ test_that("directory works for scenario naming with multiple files", {
   expect_snapshot(ewr_out$summary$gauge |> unique())
 
   # does it create the files we expect, in a way they read in as expected?
-  ewrsum <- get_module_output(file.path(temp_parent_dir, 'module_output', 'EWR'), type = 'summary')
+  ewrsum <- get_module_output(
+    file.path(temp_parent_dir, 'module_output', 'EWR'),
+    type = 'summary'
+  )
   expect_snapshot(table(ewrsum$scenario, ewrsum$gauge))
 })

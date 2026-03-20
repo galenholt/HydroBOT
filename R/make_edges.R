@@ -33,14 +33,16 @@
 #'   an `edgeorder` column for the order in which the edges were passed
 #'   (previously used for plotting, now deprecated).
 #' @export
-make_edges <- function(dflist,
-                       fromtos,
-                       fromfilter = NULL,
-                       tofilter = NULL,
-                       gaugefilter = NULL,
-                       pufilter = NULL,
-                       gaugeplanmatch = NULL,
-                       extrasave = NULL) {
+make_edges <- function(
+  dflist,
+  fromtos,
+  fromfilter = NULL,
+  tofilter = NULL,
+  gaugefilter = NULL,
+  pufilter = NULL,
+  gaugeplanmatch = NULL,
+  extrasave = NULL
+) {
   # Ideally gaugeplanmatch will be passed a canonical list. Otherwise this tries
   # to find one
 
@@ -70,67 +72,76 @@ make_edges <- function(dflist,
       dplyr::distinct()
   }
 
-
-
   # Go over each fromto pair, find their df and filter and bind
   # them all together
-
 
   # make CHECK happy
   p <- NULL
   counter <- 0
-  alledges <- foreach::foreach(p = fromtos, .combine = dplyr::bind_rows) %do% {
-    counter <- counter + 1
+  alledges <- foreach::foreach(p = fromtos, .combine = dplyr::bind_rows) %do%
+    {
+      counter <- counter + 1
 
-    # Find the right causal sheet
-    # If there are multiple sheets, use the first one (No obvious heuristic
-    # here, and the index is simpler than anything more complex.)
-    dfindex <- which(unlist(purrr::map(dfnames, ~ all(p %in% .))))[1]
+      # Find the right causal sheet
+      # If there are multiple sheets, use the first one (No obvious heuristic
+      # here, and the index is simpler than anything more complex.)
+      dfindex <- which(unlist(purrr::map(dfnames, ~ all(p %in% .))))[1]
 
-    if (is.na(dfindex)) {
-      rlang::abort(glue::glue("Cannot find causal relationship between {p[1]} and {p[2]}.
-                              This tends to be misspellings, but could also be mis-specification of the causal relationships"))
-    }
+      if (is.na(dfindex)) {
+        rlang::abort(glue::glue(
+          "Cannot find causal relationship between {p[1]} and {p[2]}.
+                              This tends to be misspellings, but could also be mis-specification of the causal relationships"
+        ))
+      }
 
-    thisdf <- dflist[[dfindex]]
+      thisdf <- dflist[[dfindex]]
 
-    # Get the filtering values- this is its own function because it has
-    # error-catching and cross-checks
-    filterlist <- filtergroups(thisdf,
-      fromcol = p[1], tocol = p[2],
-      fromfilter = fromfilter, tofilter = tofilter,
-      gaugefilter = gaugefilter, pufilter = pufilter,
-      gaugeplanmatch = gaugeplanmatch
-    )
+      # Get the filtering values- this is its own function because it has
+      # error-catching and cross-checks
+      filterlist <- filtergroups(
+        thisdf,
+        fromcol = p[1],
+        tocol = p[2],
+        fromfilter = fromfilter,
+        tofilter = tofilter,
+        gaugefilter = gaugefilter,
+        pufilter = pufilter,
+        gaugeplanmatch = gaugeplanmatch
+      )
 
+      # these ifs are annoying, needed to filter to the gauge and planning unit
+      # only if the columns exist
+      if (dfgauge[dfindex]) {
+        thisdf <- thisdf |>
+          dplyr::filter(.data$gauge %in% filterlist$gaugefilter)
+      }
 
+      if (dfpu[dfindex]) {
+        thisdf <- thisdf |>
+          dplyr::filter(.data$planning_unit_name %in% filterlist$pufilter)
+      }
 
-    # these ifs are annoying, needed to filter to the gauge and planning unit
-    # only if the columns exist
-    if (dfgauge[dfindex]) {
+      # we can assume the fromto exist
       thisdf <- thisdf |>
-        dplyr::filter(.data$gauge %in% filterlist$gaugefilter)
+        dplyr::filter(.data[[p[1]]] %in% filterlist$fromfilter) |>
+        dplyr::filter(.data[[p[2]]] %in% filterlist$tofilter) |>
+        dplyr::rename(from = p[1], to = p[2]) |>
+        dplyr::select(tidyselect::any_of(c(
+          "gauge",
+          "planning_unit_name",
+          'SWSDLName',
+          extrasave,
+          "from",
+          "to",
+          "color"
+        ))) |>
+        dplyr::mutate(
+          fromtype = p[1],
+          totype = p[2],
+          edgeorder = counter
+        ) |> # I was using this to set the nodeorder, but dropping that.
+        dplyr::distinct() # kill duplicates
     }
-
-    if (dfpu[dfindex]) {
-      thisdf <- thisdf |>
-        dplyr::filter(.data$planning_unit_name %in% filterlist$pufilter)
-    }
-
-    # we can assume the fromto exist
-    thisdf <- thisdf |>
-      dplyr::filter(.data[[p[1]]] %in% filterlist$fromfilter) |>
-      dplyr::filter(.data[[p[2]]] %in% filterlist$tofilter) |>
-      dplyr::rename(from = p[1], to = p[2]) |>
-      dplyr::select(tidyselect::any_of(c("gauge", "planning_unit_name", 'SWSDLName',
-                                         extrasave, "from", "to", "color"))) |>
-      dplyr::mutate(
-        fromtype = p[1],
-        totype = p[2],
-        edgeorder = counter
-      ) |> # I was using this to set the nodeorder, but dropping that.
-      dplyr::distinct() # kill duplicates
-  }
 
   return(alledges)
 }
@@ -139,13 +150,16 @@ make_edges <- function(dflist,
 # helper function to filter edge dfs. Primarily deals with nulls and
 # cross-checking and error-catching in the from-tos
 
-filtergroups <- function(edgedf,
-                         fromcol, tocol,
-                         fromfilter = NULL,
-                         tofilter = NULL,
-                         gaugefilter = NULL,
-                         pufilter = NULL,
-                         gaugeplanmatch = NULL) {
+filtergroups <- function(
+  edgedf,
+  fromcol,
+  tocol,
+  fromfilter = NULL,
+  tofilter = NULL,
+  gaugefilter = NULL,
+  pufilter = NULL,
+  gaugeplanmatch = NULL
+) {
   # These don't enforce column names, so use select to allow accepting a
   # character
   if (is.null(fromfilter)) {
@@ -183,7 +197,9 @@ filtergroups <- function(edgedf,
   # doesn't need to be nested
   if (is.null(gaugefilter) | is.null(pufilter)) {
     if (is.null(gaugeplanmatch)) {
-      warning("Unable to cross-check gauges and planning units, trusting the user they work together")
+      warning(
+        "Unable to cross-check gauges and planning units, trusting the user they work together"
+      )
     }
   }
 
@@ -204,7 +220,9 @@ filtergroups <- function(edgedf,
     # "you have chosen x out of y gauges within planning unit a, and gauge z
     # falls outside the selected planning units
     if (!(gtop & ptog)) {
-      warning("Filtering to requested gauges and planning units, but they do not fully match")
+      warning(
+        "Filtering to requested gauges and planning units, but they do not fully match"
+      )
     }
   } else if (is.null(gaugefilter) & is.null(pufilter)) {
     # if neither filter given, use all of both, if the columns exist

@@ -4,22 +4,27 @@ agg_theme_space <- make_test_agg(namehistory = FALSE)
 
 
 test_that("character sceneorder works", {
-
-
-  test_prep <- plot_data_prep(agg_theme_space$sdl_units, outcome_col = 'ewr_achieved',
-                         sceneorder = c('down4', 'base', 'up4'))
+  test_prep <- plot_data_prep(
+    agg_theme_space$sdl_units,
+    outcome_col = 'ewr_achieved',
+    sceneorder = c('down4', 'base', 'up4')
+  )
 
   expect_equal(levels(test_prep$data$scenario), c('down4', 'base', 'up4'))
 })
 
 test_that("factor sceneorder works", {
-  scenarios <- tibble::tibble(scenario = c('down4', 'base', 'up4'), delta = c(1, 0.25, 4))
+  scenarios <- tibble::tibble(
+    scenario = c('down4', 'base', 'up4'),
+    delta = c(1, 0.25, 4)
+  )
   sceneorder_f <- forcats::fct_reorder(scenarios$scenario, scenarios$delta)
 
-  test_prep <- plot_data_prep(agg_theme_space$sdl_units, outcome_col = 'ewr_achieved',
-                         sceneorder = sceneorder_f)
+  test_prep <- plot_data_prep(
+    agg_theme_space$sdl_units,
+    outcome_col = 'ewr_achieved',
+    sceneorder = sceneorder_f
+  )
 
   expect_equal(levels(test_prep$data$scenario), levels(sceneorder_f))
-
 })
-

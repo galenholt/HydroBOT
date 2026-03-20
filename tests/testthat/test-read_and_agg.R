@@ -24,7 +24,6 @@ ewr_out <- prep_run_save_ewrs(
 ewr_results <- file.path(temp_parent_dir, "module_output", "EWR")
 
 test_that("multi-step theme and spatial works", {
-
   skip_on_os('linux')
 
   aggseq <- list(
@@ -57,15 +56,26 @@ test_that("multi-step theme and spatial works", {
     aggsequence = aggseq,
     funsequence = funseq,
     keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    group_until = list(
+      planning_unit_name = 'sdl_units',
+      gauge = is_notpoint,
+      SWSDLName = 'sdl_units'
+    ),
     pseudo_spatial = 'sdl_units'
   )
 
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
-    "scenario", 'date', "polyID", "theme",
+    "scenario",
+    'date',
+    "polyID",
+    "theme",
     "mdb_ArithmeticMean_theme_ArithmeticMean_catchment_ArithmeticMean_objective_text_ArithmeticMean_sdl_units_ArithmeticMean_eco_objective_ArithmeticMean_ewr_code_main_ArithmeticMean_ewr_achieved",
-    "OBJECTID", "DDIV_NAME", "AREA_HA", "SHAPE_AREA", "SHAPE_LEN",
+    "OBJECTID",
+    "DDIV_NAME",
+    "AREA_HA",
+    "SHAPE_AREA",
+    "SHAPE_LEN",
     "geometry"
   )
   expect_equal(sort(names(spatagg)), sort(namestring))
@@ -77,7 +87,9 @@ test_that("multi-step theme and spatial works", {
   g2sdl_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(
       data = spatagg,
-      ggplot2::aes(fill = mdb_ArithmeticMean_theme_ArithmeticMean_catchment_ArithmeticMean_objective_text_ArithmeticMean_sdl_units_ArithmeticMean_eco_objective_ArithmeticMean_ewr_code_main_ArithmeticMean_ewr_achieved)
+      ggplot2::aes(
+        fill = mdb_ArithmeticMean_theme_ArithmeticMean_catchment_ArithmeticMean_objective_text_ArithmeticMean_sdl_units_ArithmeticMean_eco_objective_ArithmeticMean_ewr_code_main_ArithmeticMean_ewr_achieved
+      )
     ) +
     # ggplot2::geom_sf(data = sumspat) +
     ggplot2::facet_wrap(~scenario) +
@@ -108,47 +120,52 @@ test_that("add_max works", {
   )
 
   system.time(
-  spatagg <- read_and_agg(
-    datpath = ewr_results,
-    type = "achievement",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    aggCols = "ewr_achieved",
-    aggsequence = aggseq,
-    funsequence = funseq,
-    keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
-    pseudo_spatial = 'sdl_units',
-    add_max = TRUE
-  )
+    spatagg <- read_and_agg(
+      datpath = ewr_results,
+      type = "achievement",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = "scenario",
+      aggCols = "ewr_achieved",
+      aggsequence = aggseq,
+      funsequence = funseq,
+      keepAllPolys = FALSE,
+      group_until = list(
+        planning_unit_name = 'sdl_units',
+        gauge = is_notpoint,
+        SWSDLName = 'sdl_units'
+      ),
+      pseudo_spatial = 'sdl_units',
+      add_max = TRUE
+    )
   )
 
   expect_equal(unique(spatagg$scenario), c('MAX', 'base', 'down4', 'up4'))
 
   system.time(
-  spataggf <- read_and_agg(
-    datpath = ewr_results,
-    type = "achievement",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    aggCols = "ewr_achieved",
-    aggsequence = aggseq,
-    funsequence = funseq,
-    keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
-    pseudo_spatial = 'sdl_units'
-  )
+    spataggf <- read_and_agg(
+      datpath = ewr_results,
+      type = "achievement",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = "scenario",
+      aggCols = "ewr_achieved",
+      aggsequence = aggseq,
+      funsequence = funseq,
+      keepAllPolys = FALSE,
+      group_until = list(
+        planning_unit_name = 'sdl_units',
+        gauge = is_notpoint,
+        SWSDLName = 'sdl_units'
+      ),
+      pseudo_spatial = 'sdl_units'
+    )
   )
 
   expect_equal(unique(spataggf$scenario), c('base', 'down4', 'up4'))
-
-
 })
 
 test_that("passing in the prep function works", {
-
   skip_on_os('linux')
 
   aggseq <- list(
@@ -183,15 +200,26 @@ test_that("passing in the prep function works", {
     aggsequence = aggseq,
     funsequence = funseq,
     keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    group_until = list(
+      planning_unit_name = 'sdl_units',
+      gauge = is_notpoint,
+      SWSDLName = 'sdl_units'
+    ),
     pseudo_spatial = 'sdl_units'
   )
 
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
-    "scenario", 'date', "polyID", "theme",
+    "scenario",
+    'date',
+    "polyID",
+    "theme",
     "mdb_ArithmeticMean_theme_ArithmeticMean_catchment_ArithmeticMean_objective_text_ArithmeticMean_sdl_units_ArithmeticMean_eco_objective_ArithmeticMean_ewr_code_main_ArithmeticMean_ewr_achieved",
-    "OBJECTID", "DDIV_NAME", "AREA_HA", "SHAPE_AREA", "SHAPE_LEN",
+    "OBJECTID",
+    "DDIV_NAME",
+    "AREA_HA",
+    "SHAPE_AREA",
+    "SHAPE_LEN",
     "geometry"
   )
   expect_equal(sort(names(spatagg)), sort(namestring))
@@ -200,10 +228,12 @@ test_that("passing in the prep function works", {
 
   # Plots are useful for checking spatial outcomes.
   # There are a million targets. Pick one
- g2sdl_plot <- ggplot2::ggplot() +
+  g2sdl_plot <- ggplot2::ggplot() +
     ggplot2::geom_sf(
       data = spatagg,
-      ggplot2::aes(fill = mdb_ArithmeticMean_theme_ArithmeticMean_catchment_ArithmeticMean_objective_text_ArithmeticMean_sdl_units_ArithmeticMean_eco_objective_ArithmeticMean_ewr_code_main_ArithmeticMean_ewr_achieved)
+      ggplot2::aes(
+        fill = mdb_ArithmeticMean_theme_ArithmeticMean_catchment_ArithmeticMean_objective_text_ArithmeticMean_sdl_units_ArithmeticMean_eco_objective_ArithmeticMean_ewr_code_main_ArithmeticMean_ewr_achieved
+      )
     ) +
     # ggplot2::geom_sf(data = sumspat) +
     ggplot2::facet_wrap(~scenario) +
@@ -214,224 +244,409 @@ test_that("passing in the prep function works", {
 
 
 test_that("multi-step theme-spatial-time", {
-
   # These mirror multi_aggregate, but make sure we're not introducing more issues here.
-  aggseq_s_th_t <- list(sdl_units = 'sdl_units',
-                 ewr_code_main = c('ewr_code', 'ewr_code_main'),
-                 yrs = '2 years')
+  aggseq_s_th_t <- list(
+    sdl_units = 'sdl_units',
+    ewr_code_main = c('ewr_code', 'ewr_code_main'),
+    yrs = '2 years'
+  )
 
-  aggseq_s_t_th <- list(sdl_units = 'sdl_units',
-                        yrs = '2 years',
-                        ewr_code_main = c('ewr_code', 'ewr_code_main'))
+  aggseq_s_t_th <- list(
+    sdl_units = 'sdl_units',
+    yrs = '2 years',
+    ewr_code_main = c('ewr_code', 'ewr_code_main')
+  )
 
-  aggseq_th_s_t <- list(ewr_code_main = c('ewr_code', 'ewr_code_main'),
-                        sdl_units = 'sdl_units',
-                        yrs = '2 years')
+  aggseq_th_s_t <- list(
+    ewr_code_main = c('ewr_code', 'ewr_code_main'),
+    sdl_units = 'sdl_units',
+    yrs = '2 years'
+  )
 
-  aggseq_th_t_s <- list(ewr_code_main = c('ewr_code', 'ewr_code_main'),
-                        yrs = '2 years',
-                        sdl_units = 'sdl_units')
+  aggseq_th_t_s <- list(
+    ewr_code_main = c('ewr_code', 'ewr_code_main'),
+    yrs = '2 years',
+    sdl_units = 'sdl_units'
+  )
 
-  aggseq_t_s_th <- list(yrs = '2 years',
-                        sdl_units = 'sdl_units',
-                        ewr_code_main = c('ewr_code', 'ewr_code_main'))
+  aggseq_t_s_th <- list(
+    yrs = '2 years',
+    sdl_units = 'sdl_units',
+    ewr_code_main = c('ewr_code', 'ewr_code_main')
+  )
 
-  aggseq_t_th_s <- list(yrs = '2 years',
-                        ewr_code_main = c('ewr_code', 'ewr_code_main'),
-                        sdl_units = 'sdl_units')
-
-
+  aggseq_t_th_s <- list(
+    yrs = '2 years',
+    ewr_code_main = c('ewr_code', 'ewr_code_main'),
+    sdl_units = 'sdl_units'
+  )
 
   funseq <- list(
     "ArithmeticMean",
     "ArithmeticMean",
     "ArithmeticMean"
-    )
+  )
 
   # Warnings because we are spatailly moving to sdl units to test spatial agg
-  expect_warning(spatagg_s_th_t <- read_and_agg(
-    datpath = ewr_results,
-    type = "achievement",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    aggCols = "ewr_achieved",
-    aggsequence = aggseq_s_th_t,
-    funsequence = funseq,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
-    keepAllPolys = FALSE,
-    auto_ewr_PU = FALSE,
-    saveintermediate = TRUE
-  ))
+  expect_warning(
+    spatagg_s_th_t <- read_and_agg(
+      datpath = ewr_results,
+      type = "achievement",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = "scenario",
+      aggCols = "ewr_achieved",
+      aggsequence = aggseq_s_th_t,
+      funsequence = funseq,
+      group_until = list(
+        planning_unit_name = 'sdl_units',
+        gauge = is_notpoint,
+        SWSDLName = 'sdl_units'
+      ),
+      keepAllPolys = FALSE,
+      auto_ewr_PU = FALSE,
+      saveintermediate = TRUE
+    )
+  )
 
   # the sdl sheet should have all the dates and code_timings
-  expect_snapshot_value(spatagg_s_th_t$sdl_units$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_s_th_t$sdl_units$ewr_code |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_s_th_t$sdl_units$SWSDLID |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_s_th_t$sdl_units$date |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_s_th_t$sdl_units$ewr_code |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_s_th_t$sdl_units$SWSDLID |> unique(),
+    style = 'deparse'
+  )
 
   # The ewr_code sheet should have ewr_codes, sdls, and all dates
-  expect_snapshot_value(spatagg_s_th_t$ewr_code_main$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_s_th_t$ewr_code_main$ewr_code_main |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_s_th_t$ewr_code_main$SWSDLID |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_s_th_t$ewr_code_main$date |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_s_th_t$ewr_code_main$ewr_code_main |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_s_th_t$ewr_code_main$SWSDLID |> unique(),
+    style = 'deparse'
+  )
 
   # The yrs sheet should have ewr_codes, sdls, and two-year intervals
   expect_snapshot_value(spatagg_s_th_t$yrs$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_s_th_t$yrs$ewr_code_main |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_s_th_t$yrs$SWSDLID |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_s_th_t$yrs$ewr_code_main |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_s_th_t$yrs$SWSDLID |> unique(),
+    style = 'deparse'
+  )
 
-  expect_warning(spatagg_s_t_th <- read_and_agg(
-    datpath = ewr_results,
-    type = "achievement",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    aggCols = "ewr_achieved",
-    aggsequence = aggseq_s_t_th,
-    funsequence = funseq,
-    keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
-    auto_ewr_PU = FALSE,
-    saveintermediate = TRUE
-  ))
+  expect_warning(
+    spatagg_s_t_th <- read_and_agg(
+      datpath = ewr_results,
+      type = "achievement",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = "scenario",
+      aggCols = "ewr_achieved",
+      aggsequence = aggseq_s_t_th,
+      funsequence = funseq,
+      keepAllPolys = FALSE,
+      group_until = list(
+        planning_unit_name = 'sdl_units',
+        gauge = is_notpoint,
+        SWSDLName = 'sdl_units'
+      ),
+      auto_ewr_PU = FALSE,
+      saveintermediate = TRUE
+    )
+  )
 
   # the sdl sheet should have all the dates and code_timings
-  expect_snapshot_value(spatagg_s_t_th$sdl_units$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_s_t_th$sdl_units$ewr_code |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_s_t_th$sdl_units$SWSDLID |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_s_t_th$sdl_units$date |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_s_t_th$sdl_units$ewr_code |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_s_t_th$sdl_units$SWSDLID |> unique(),
+    style = 'deparse'
+  )
 
   # The yrs sheet should have code_timing, sdl, and two-year intervals
   expect_snapshot_value(spatagg_s_t_th$yrs$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_s_t_th$yrs$ewr_code |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_s_t_th$yrs$SWSDLID|> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_s_t_th$yrs$ewr_code |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_s_t_th$yrs$SWSDLID |> unique(),
+    style = 'deparse'
+  )
 
   # The ewr_code sheet should have ewr_codes, sdls, and 2-year
-  expect_snapshot_value(spatagg_s_t_th$ewr_code_main$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_s_t_th$ewr_code_main$ewr_code_main |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_s_t_th$ewr_code_main$SWSDLID |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_s_t_th$ewr_code_main$date |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_s_t_th$ewr_code_main$ewr_code_main |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_s_t_th$ewr_code_main$SWSDLID |> unique(),
+    style = 'deparse'
+  )
 
-  expect_warning(spatagg_th_s_t <- read_and_agg(
-    datpath = ewr_results,
-    type = "achievement",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    aggCols = "ewr_achieved",
-    aggsequence = aggseq_th_s_t,
-    funsequence = funseq,
-    keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
-    auto_ewr_PU = FALSE,
-    saveintermediate = TRUE
-  ))
+  expect_warning(
+    spatagg_th_s_t <- read_and_agg(
+      datpath = ewr_results,
+      type = "achievement",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = "scenario",
+      aggCols = "ewr_achieved",
+      aggsequence = aggseq_th_s_t,
+      funsequence = funseq,
+      keepAllPolys = FALSE,
+      group_until = list(
+        planning_unit_name = 'sdl_units',
+        gauge = is_notpoint,
+        SWSDLName = 'sdl_units'
+      ),
+      auto_ewr_PU = FALSE,
+      saveintermediate = TRUE
+    )
+  )
 
   # The ewr_code sheet should have ewr_codes, planning units (not sdls), and all dates
-  expect_snapshot_value(spatagg_th_s_t$ewr_code_main$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_th_s_t$ewr_code_main$ewr_code_main |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_th_s_t$ewr_code_main$planning_unit_name |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_th_s_t$ewr_code_main$date |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_th_s_t$ewr_code_main$ewr_code_main |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_th_s_t$ewr_code_main$planning_unit_name |> unique(),
+    style = 'deparse'
+  )
 
   # the sdl sheet should have all times and ewr_codes
-  expect_snapshot_value(spatagg_th_s_t$sdl_units$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_th_s_t$sdl_units$ewr_code_main |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_th_s_t$sdl_units$SWSDLID |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_th_s_t$sdl_units$date |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_th_s_t$sdl_units$ewr_code_main |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_th_s_t$sdl_units$SWSDLID |> unique(),
+    style = 'deparse'
+  )
 
   # The yrs sheet should have ewr_codes, sdls, and two-year intervals
   expect_snapshot_value(spatagg_th_s_t$yrs$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_th_s_t$yrs$ewr_code_main |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_th_s_t$yrs$SWSDLID |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_th_s_t$yrs$ewr_code_main |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_th_s_t$yrs$SWSDLID |> unique(),
+    style = 'deparse'
+  )
 
-  expect_warning(spatagg_th_t_s <- read_and_agg(
-    datpath = ewr_results,
-    type = "achievement",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    aggCols = "ewr_achieved",
-    aggsequence = aggseq_th_t_s,
-    funsequence = funseq,
-    keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
-    auto_ewr_PU = FALSE,
-    saveintermediate = TRUE
-  ))
+  expect_warning(
+    spatagg_th_t_s <- read_and_agg(
+      datpath = ewr_results,
+      type = "achievement",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = "scenario",
+      aggCols = "ewr_achieved",
+      aggsequence = aggseq_th_t_s,
+      funsequence = funseq,
+      keepAllPolys = FALSE,
+      group_until = list(
+        planning_unit_name = 'sdl_units',
+        gauge = is_notpoint,
+        SWSDLName = 'sdl_units'
+      ),
+      auto_ewr_PU = FALSE,
+      saveintermediate = TRUE
+    )
+  )
 
   # The ewr_code sheet should have ewr_codes, planning units (not sdls), and all dates
-  expect_snapshot_value(spatagg_th_t_s$ewr_code_main$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_th_t_s$ewr_code_main$ewr_code_main |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_th_t_s$ewr_code_main$planning_unit_name |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_th_t_s$ewr_code_main$date |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_th_t_s$ewr_code_main$ewr_code_main |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_th_t_s$ewr_code_main$planning_unit_name |> unique(),
+    style = 'deparse'
+  )
 
   # The yrs sheet should have ewr_codes, planning units, and two-year intervals
   expect_snapshot_value(spatagg_th_t_s$yrs$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_th_t_s$yrs$ewr_code_main |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_th_t_s$yrs$planning_unit_name |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_th_t_s$yrs$ewr_code_main |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_th_t_s$yrs$planning_unit_name |> unique(),
+    style = 'deparse'
+  )
 
   # the sdl sheet should have 2-year intervals and ewr_codes
-  expect_snapshot_value(spatagg_th_t_s$sdl_units$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_th_t_s$sdl_units$ewr_code_main |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_th_t_s$sdl_units$SWSDLID |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_th_t_s$sdl_units$date |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_th_t_s$sdl_units$ewr_code_main |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_th_t_s$sdl_units$SWSDLID |> unique(),
+    style = 'deparse'
+  )
 
-
-  expect_warning(spatagg_t_s_th <- read_and_agg(
-    datpath = ewr_results,
-    type = "achievement",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    aggCols = "ewr_achieved",
-    aggsequence = aggseq_t_s_th,
-    funsequence = funseq,
-    keepAllPolys = FALSE,
-    auto_ewr_PU = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
-    saveintermediate = TRUE
-  ))
+  expect_warning(
+    spatagg_t_s_th <- read_and_agg(
+      datpath = ewr_results,
+      type = "achievement",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = "scenario",
+      aggCols = "ewr_achieved",
+      aggsequence = aggseq_t_s_th,
+      funsequence = funseq,
+      keepAllPolys = FALSE,
+      auto_ewr_PU = FALSE,
+      group_until = list(
+        planning_unit_name = 'sdl_units',
+        gauge = is_notpoint,
+        SWSDLName = 'sdl_units'
+      ),
+      saveintermediate = TRUE
+    )
+  )
 
   # The yrs sheet should have code_timing, planning units, and two-year intervals
   expect_snapshot_value(spatagg_t_s_th$yrs$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_t_s_th$yrs$ewr_code |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_t_s_th$yrs$planning_unit_name |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_t_s_th$yrs$ewr_code |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_t_s_th$yrs$planning_unit_name |> unique(),
+    style = 'deparse'
+  )
 
   # the sdl sheet should have 2-year intervals and code_timing
-  expect_snapshot_value(spatagg_t_s_th$sdl_units$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_t_s_th$sdl_units$ewr_code |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_t_s_th$sdl_units$SWSDLID |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_t_s_th$sdl_units$date |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_t_s_th$sdl_units$ewr_code |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_t_s_th$sdl_units$SWSDLID |> unique(),
+    style = 'deparse'
+  )
 
   # The ewr_code sheet should have ewr_codes, sdls, and 2-year
-  expect_snapshot_value(spatagg_t_s_th$ewr_code_main$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_t_s_th$ewr_code_main$ewr_code_main |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_t_s_th$ewr_code_main$SWSDLID |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_t_s_th$ewr_code_main$date |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_t_s_th$ewr_code_main$ewr_code_main |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_t_s_th$ewr_code_main$SWSDLID |> unique(),
+    style = 'deparse'
+  )
 
-
-  expect_warning(spatagg_t_th_s <- read_and_agg(
-    datpath = ewr_results,
-    type = "achievement",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    aggCols = "ewr_achieved",
-    aggsequence = aggseq_t_th_s,
-    funsequence = funseq,
-    keepAllPolys = FALSE,
-    auto_ewr_PU = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
-    saveintermediate = TRUE
-  ))
+  expect_warning(
+    spatagg_t_th_s <- read_and_agg(
+      datpath = ewr_results,
+      type = "achievement",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = "scenario",
+      aggCols = "ewr_achieved",
+      aggsequence = aggseq_t_th_s,
+      funsequence = funseq,
+      keepAllPolys = FALSE,
+      auto_ewr_PU = FALSE,
+      group_until = list(
+        planning_unit_name = 'sdl_units',
+        gauge = is_notpoint,
+        SWSDLName = 'sdl_units'
+      ),
+      saveintermediate = TRUE
+    )
+  )
 
   # The yrs sheet should have code_timing, planning units, and two-year intervals
   expect_snapshot_value(spatagg_t_th_s$yrs$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_t_th_s$yrs$ewr_code |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_t_th_s$yrs$planning_unit_name |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_t_th_s$yrs$ewr_code |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_t_th_s$yrs$planning_unit_name |> unique(),
+    style = 'deparse'
+  )
 
   # The ewr_code sheet should have ewr_codes, planning_untois, and 2-year
-  expect_snapshot_value(spatagg_t_th_s$ewr_code_main$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_t_th_s$ewr_code_main$ewr_code_main |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_t_th_s$ewr_code_main$planning_unit_name |> unique(), style = 'deparse')
+  expect_snapshot_value(
+    spatagg_t_th_s$ewr_code_main$date |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_t_th_s$ewr_code_main$ewr_code_main |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_t_th_s$ewr_code_main$planning_unit_name |> unique(),
+    style = 'deparse'
+  )
 
   # the sdl sheet should have 2-year intervals and ewr_code
-  expect_snapshot_value(spatagg_t_th_s$sdl_units$date |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_t_th_s$sdl_units$ewr_code_main |> unique(), style = 'deparse')
-  expect_snapshot_value(spatagg_t_th_s$sdl_units$SWSDLID |> unique(), style = 'deparse')
-
-
+  expect_snapshot_value(
+    spatagg_t_th_s$sdl_units$date |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_t_th_s$sdl_units$ewr_code_main |> unique(),
+    style = 'deparse'
+  )
+  expect_snapshot_value(
+    spatagg_t_th_s$sdl_units$SWSDLID |> unique(),
+    style = 'deparse'
+  )
 })
 
 
@@ -491,10 +706,8 @@ test_that("nonspatial joins of spatial data (as in multi_agg)", {
     dplyr::select(tidyselect::starts_with('aggLevel_')) |>
     unlist()
 
-
   expect_equal(unname(funs_in_df), unlist(funseq))
   expect_equal(unname(aggs_in_df), names(aggseq))
-
 
   ## This test doesn't cover some corner cases because the test data doesn't have any PUs with multiple gauges. But it does have multiple PUs per a couple gauges. So, it should have the same number of rows as the non-PU version, just differently indexed. And the ones from the same gauge should have the same value.
   # for testing, in multi_aggregate after fromto_pair:
@@ -508,12 +721,16 @@ test_that("nonspatial joins of spatial data (as in multi_agg)", {
     dplyr::select(scenario, planning_unit_name, ewr_code_main, ewr_achieved) |>
     dplyr::arrange(planning_unit_name, ewr_code_main, ewr_achieved)
 
-
   for (i in unique(gauge412005$planning_unit_name)) {
     pudf <- spatagg$planning_units |>
       sf::st_drop_geometry() |>
       dplyr::filter(scenario == 'base' & planning_unit_name == i) |>
-      dplyr::select(scenario, planning_unit_name, ewr_code_main, ewr_achieved) |>
+      dplyr::select(
+        scenario,
+        planning_unit_name,
+        ewr_code_main,
+        ewr_achieved
+      ) |>
       dplyr::arrange(planning_unit_name, ewr_code_main, ewr_achieved)
     expect_equal(gauge412005 |> dplyr::filter(planning_unit_name == i), pudf)
   }
@@ -553,9 +770,16 @@ test_that("parsing geo and char work for aggsequence", {
 
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
-    "scenario", "date", "polyID", "theme",
+    "scenario",
+    "date",
+    "polyID",
+    "theme",
     "mdb_ArithmeticMean_theme_ArithmeticMean_objective_text_ArithmeticMean_sdl_units_ArithmeticMean_eco_objective_ArithmeticMean_ewr_code_main_ArithmeticMean_ewr_achieved",
-    "OBJECTID", "DDIV_NAME", "AREA_HA", "SHAPE_AREA", "SHAPE_LEN",
+    "OBJECTID",
+    "DDIV_NAME",
+    "AREA_HA",
+    "SHAPE_AREA",
+    "SHAPE_LEN",
     "geometry"
   )
   expect_equal(sort(names(spatagg)), sort(namestring))
@@ -599,9 +823,15 @@ test_that("parsing bare and char and rlang::quo for funsequence", {
 
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
-    "scenario", "polyID", "theme",
+    "scenario",
+    "polyID",
+    "theme",
     "mdb_wm_theme_ArithmeticMean_objective_text_mean_sdl_units_mean_eco_objective_ArithmeticMean_ewr_code_main_ArithmeticMean_all_time_ArithmeticMean_ewr_achieved",
-    "OBJECTID", "DDIV_NAME", "AREA_HA", "SHAPE_AREA", "SHAPE_LEN",
+    "OBJECTID",
+    "DDIV_NAME",
+    "AREA_HA",
+    "SHAPE_AREA",
+    "SHAPE_LEN",
     "geometry"
   )
   expect_equal(sort(names(spatagg)), sort(namestring))
@@ -649,41 +879,53 @@ test_that("Various group_until formats work", {
 
   # Can we parse group_until into yaml if it's a named list?
   # expect_warnings because of the desired non-spatial sdl
-  expect_warning(expect_warning(expect_warning(spatagg <- read_and_agg(
-    datpath = ewr_results,
-    type = "achievement",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = c("scenario", "planning_unit_name"),
-    group_until = list(planning_unit_name = "sdl_units"),
-    aggCols = "ewr_achieved",
-    aggsequence = aggseq,
-    funsequence = funseq,
-    keepAllPolys = FALSE,
-    savepath = file.path(temp_parent_dir, "aggregated")
-  ))))
+  expect_warning(expect_warning(expect_warning(
+    spatagg <- read_and_agg(
+      datpath = ewr_results,
+      type = "achievement",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = c("scenario", "planning_unit_name"),
+      group_until = list(planning_unit_name = "sdl_units"),
+      aggCols = "ewr_achieved",
+      aggsequence = aggseq,
+      funsequence = funseq,
+      keepAllPolys = FALSE,
+      savepath = file.path(temp_parent_dir, "aggregated")
+    )
+  )))
 
-  yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
+  yamout <- yaml::read_yaml(file.path(
+    temp_parent_dir,
+    "aggregated",
+    "agg_metadata.yml"
+  ))
   expect_equal(yamout$aggregation$group_until, list(planning_unit_name = 4))
   expect_equal(yamout$aggregation$auto_ewr_PU, FALSE)
 
   # Vector- this relies on multi_aggregate to make it a list
   # expect_warnings because of the desired non-spatial sdl
-  expect_warning(expect_warning(expect_warning(spatagg <- read_and_agg(
-    datpath = ewr_results,
-    type = "achievement",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = c("scenario", "planning_unit_name"),
-    group_until = c(NA, "sdl_units"),
-    aggCols = "ewr_achieved",
-    aggsequence = aggseq,
-    funsequence = funseq,
-    keepAllPolys = FALSE,
-    savepath = file.path(temp_parent_dir, "aggregated")
-  ))))
+  expect_warning(expect_warning(expect_warning(
+    spatagg <- read_and_agg(
+      datpath = ewr_results,
+      type = "achievement",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = c("scenario", "planning_unit_name"),
+      group_until = c(NA, "sdl_units"),
+      aggCols = "ewr_achieved",
+      aggsequence = aggseq,
+      funsequence = funseq,
+      keepAllPolys = FALSE,
+      savepath = file.path(temp_parent_dir, "aggregated")
+    )
+  )))
 
-  yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
+  yamout <- yaml::read_yaml(file.path(
+    temp_parent_dir,
+    "aggregated",
+    "agg_metadata.yml"
+  ))
   expect_equal(yamout$aggregation$group_until, list(planning_unit_name = 4))
   expect_equal(yamout$aggregation$auto_ewr_PU, FALSE)
 
@@ -691,49 +933,60 @@ test_that("Various group_until formats work", {
   # to be the same as the inputs, they just have to evaluate the same.- ie
   # characters instead of sf names
   # expect_warnings because of the desired non-spatial sdl
-  expect_warning(expect_warning(expect_warning(spatagg <- read_and_agg(
-    datpath = ewr_results,
-    type = "achievement",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = c("scenario", "planning_unit_name"),
-    group_until = c(NA, is_notpoint),
-    aggCols = "ewr_achieved",
-    aggsequence = aggseq,
-    funsequence = funseq,
-    keepAllPolys = FALSE,
-    savepath = file.path(temp_parent_dir, "aggregated")
-  ))))
+  expect_warning(expect_warning(expect_warning(
+    spatagg <- read_and_agg(
+      datpath = ewr_results,
+      type = "achievement",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = c("scenario", "planning_unit_name"),
+      group_until = c(NA, is_notpoint),
+      aggCols = "ewr_achieved",
+      aggsequence = aggseq,
+      funsequence = funseq,
+      keepAllPolys = FALSE,
+      savepath = file.path(temp_parent_dir, "aggregated")
+    )
+  )))
 
-  yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
+  yamout <- yaml::read_yaml(file.path(
+    temp_parent_dir,
+    "aggregated",
+    "agg_metadata.yml"
+  ))
   expect_equal(yamout$aggregation$group_until, list(planning_unit_name = 4))
   expect_equal(yamout$aggregation$auto_ewr_PU, FALSE)
 
   # List, and numeric. This is what would get read from params. (though that could have character too.)
   # also drop it from groupers to check that that works
   # expect_warnings because of the desired non-spatial sdl
-  expect_warning(expect_warning(expect_warning(spatagg <- read_and_agg(
-    datpath = ewr_results,
-    type = "achievement",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = c("scenario"),
-    group_until = list(planning_unit_name = 4),
-    aggCols = "ewr_achieved",
-    aggsequence = aggseq,
-    funsequence = funseq,
-    keepAllPolys = FALSE,
-    savepath = file.path(temp_parent_dir, "aggregated")
-  ))))
+  expect_warning(expect_warning(expect_warning(
+    spatagg <- read_and_agg(
+      datpath = ewr_results,
+      type = "achievement",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = c("scenario"),
+      group_until = list(planning_unit_name = 4),
+      aggCols = "ewr_achieved",
+      aggsequence = aggseq,
+      funsequence = funseq,
+      keepAllPolys = FALSE,
+      savepath = file.path(temp_parent_dir, "aggregated")
+    )
+  )))
 
-  yamout <- yaml::read_yaml(file.path(temp_parent_dir, "aggregated", "agg_metadata.yml"))
+  yamout <- yaml::read_yaml(file.path(
+    temp_parent_dir,
+    "aggregated",
+    "agg_metadata.yml"
+  ))
   expect_equal(yamout$aggregation$group_until, list(planning_unit_name = 4))
   expect_equal(yamout$aggregation$auto_ewr_PU, FALSE)
 })
 
 
 test_that("parallel works", {
-
   set_future_multi()
 
   # These mirror multi_aggregate, but make sure we're not introducing more issues here.
@@ -750,9 +1003,18 @@ test_that("parallel works", {
   )
 
   dir.create(file.path(temp_parent_dir, 'aggout/parallel'), recursive = TRUE)
-  dir.create(file.path(temp_parent_dir, 'aggout/parallel_par'), recursive = TRUE)
-  dir.create(file.path(temp_parent_dir, 'aggout/parallel_combine'), recursive = TRUE)
-  dir.create(file.path(temp_parent_dir, 'aggout/parallel_par_combine'), recursive = TRUE)
+  dir.create(
+    file.path(temp_parent_dir, 'aggout/parallel_par'),
+    recursive = TRUE
+  )
+  dir.create(
+    file.path(temp_parent_dir, 'aggout/parallel_combine'),
+    recursive = TRUE
+  )
+  dir.create(
+    file.path(temp_parent_dir, 'aggout/parallel_par_combine'),
+    recursive = TRUE
+  )
   dir.create(file.path(temp_parent_dir, 'aggout/sequential'), recursive = TRUE)
 
   spatagg_pt <- read_and_agg(
@@ -845,46 +1107,64 @@ test_that("parallel works", {
   )
 
   # The scenarios get jumbled, but should be identical
-  expect_equal(spatagg_np$agg_input |> dplyr::arrange(scenario),
-               spatagg_pf$agg_input |> dplyr::arrange(scenario))
-  expect_equal(spatagg_np$agg_input |> dplyr::arrange(scenario),
-               spatagg_pt$agg_input |> dplyr::arrange(scenario))
+  expect_equal(
+    spatagg_np$agg_input |> dplyr::arrange(scenario),
+    spatagg_pf$agg_input |> dplyr::arrange(scenario)
+  )
+  expect_equal(
+    spatagg_np$agg_input |> dplyr::arrange(scenario),
+    spatagg_pt$agg_input |> dplyr::arrange(scenario)
+  )
 
   # The `savepar = 'each'` saves one file per scenario, read them in and glue together to test.
-  ptfiles <- list.files(file.path(temp_parent_dir, 'aggout/parallel'),
-                        pattern = '.rds',
-                        full.names = TRUE, recursive = TRUE)
+  ptfiles <- list.files(
+    file.path(temp_parent_dir, 'aggout/parallel'),
+    pattern = '.rds',
+    full.names = TRUE,
+    recursive = TRUE
+  )
   read_pt <- purrr::map(ptfiles, readRDS) |>
     purrr::list_transpose() |>
     purrr::map(dplyr::bind_rows)
 
-  pffiles <- list.files(file.path(temp_parent_dir, 'aggout/parallel'),
-                        pattern = '.rds',
-                        full.names = TRUE, recursive = TRUE)
+  pffiles <- list.files(
+    file.path(temp_parent_dir, 'aggout/parallel'),
+    pattern = '.rds',
+    full.names = TRUE,
+    recursive = TRUE
+  )
   read_pf <- purrr::map(pffiles, readRDS) |>
     purrr::list_transpose() |>
     purrr::map(dplyr::bind_rows)
 
   # just read in the sequential and the combineds
-  read_np <- readRDS(file.path(temp_parent_dir, 'aggout/sequential', 'achievement_aggregated.rds'))
-  read_ptc <- readRDS(file.path(temp_parent_dir, 'aggout/parallel_combine', 'achievement_aggregated.rds'))
-  read_pfc <- readRDS(file.path(temp_parent_dir, 'aggout/parallel_par_combine', 'achievement_aggregated.rds'))
-
+  read_np <- readRDS(file.path(
+    temp_parent_dir,
+    'aggout/sequential',
+    'achievement_aggregated.rds'
+  ))
+  read_ptc <- readRDS(file.path(
+    temp_parent_dir,
+    'aggout/parallel_combine',
+    'achievement_aggregated.rds'
+  ))
+  read_pfc <- readRDS(file.path(
+    temp_parent_dir,
+    'aggout/parallel_par_combine',
+    'achievement_aggregated.rds'
+  ))
 
   expect_equal(spatagg_np, read_np)
   expect_equal(spatagg_pf, read_pf)
   expect_equal(spatagg_pt, read_pt)
   expect_equal(spatagg_pf, read_pfc)
   expect_equal(spatagg_pt, read_ptc)
-
-  })
+})
 
 
 # Interevents -------------------------------------------------------------
 
-
 test_that('exceedance works', {
-
   # just do these over time for now.
 
   # exceedance count
@@ -915,78 +1195,93 @@ test_that('exceedance works', {
     aggsequence = aggseq_mec,
     funsequence = funseq_mec,
     keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    group_until = list(
+      planning_unit_name = 'sdl_units',
+      gauge = is_notpoint,
+      SWSDLName = 'sdl_units'
+    ),
     pseudo_spatial = 'sdl_units',
     saveintermediate = TRUE
   )
 
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
-    'agg_input', 'all_time', 'sdl_units', 'theme'
+    'agg_input',
+    'all_time',
+    'sdl_units',
+    'theme'
   )
   expect_equal(names(mec), namestring)
   expect_s3_class(mec$theme, "sf")
-  exceed_plot <- plot_outcomes(mec$theme,
-                outcome_col = "theme_Sum_sdl_units_Sum_all_time_Sum_exceedance",
-                plot_type = 'map',
-                colorset = "theme_Sum_sdl_units_Sum_all_time_Sum_exceedance",
-                facet_row = 'scenario',
-                facet_col = 'theme')
+  exceed_plot <- plot_outcomes(
+    mec$theme,
+    outcome_col = "theme_Sum_sdl_units_Sum_all_time_Sum_exceedance",
+    plot_type = 'map',
+    colorset = "theme_Sum_sdl_units_Sum_all_time_Sum_exceedance",
+    facet_row = 'scenario',
+    facet_col = 'theme'
+  )
 
   vdiffr::expect_doppelganger("exceed_plot", exceed_plot)
 })
 
 test_that('exceedance proportion', {
-
   # just do these over time for now.
 
   # what makes sense for this spatially or thematically?
   # we shouldn't push the proportion up through, instead we should push the Sum and the N up and divide each time.
   # What's the best way to do that?
   # We could write a proportion function and do it three times
-    # If there's only one step, this would be easiest
+  # If there's only one step, this would be easiest
 
   proportion <- function(x) {
-    sum(x)/length(x)
+    sum(x) / length(x)
   }
 
   # for some reason I can't pass in the proportion function to the remote testing.
   # Works fine running manually.
   agg1 <- list(all_time = 'all_time')
-  fun1 <- list(list(proportion = ~Sum(.)/length(.)))
+  fun1 <- list(list(proportion = ~ Sum(.) / length(.)))
 
   # use groupers instead of group_until here, though both work.
-  expect_warning(mec1 <- read_and_agg(
-    datpath = ewr_results,
-    type = "all_interEvents",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = c("scenario", 'ewr_code',
-                 'planning_unit_name',
-                 'gauge', 'SWSDLName'),
-    prepfun = 'prep_ewr_output',
-    prepargs = list(type = 'interevents'),
-    aggCols = "exceedance",
-    aggsequence = agg1,
-    funsequence = fun1,
-    keepAllPolys = FALSE,
-    saveintermediate = TRUE,
-    namehistory = FALSE
-  ))
+  expect_warning(
+    mec1 <- read_and_agg(
+      datpath = ewr_results,
+      type = "all_interEvents",
+      geopath = bom_basin_gauges,
+      causalpath = causal_ewr,
+      groupers = c(
+        "scenario",
+        'ewr_code',
+        'planning_unit_name',
+        'gauge',
+        'SWSDLName'
+      ),
+      prepfun = 'prep_ewr_output',
+      prepargs = list(type = 'interevents'),
+      aggCols = "exceedance",
+      aggsequence = agg1,
+      funsequence = fun1,
+      keepAllPolys = FALSE,
+      saveintermediate = TRUE,
+      namehistory = FALSE
+    )
+  )
 
   # How to plot that?
   ewrprops <- mec1$all_time |>
     dplyr::mutate(unique_ewr = paste0(ewr_code, planning_unit_name, gauge))
 
-  ewr_props <- plot_outcomes(ewrprops,
-                outcome_col = 'exceedance',
-                y_col = 'unique_ewr',
-                x_col = 'scenario',
-                colorset = 'exceedance',
-                plot_type = 'heatmap',
-                pal_list = 'grDevices::Viridis')
+  ewr_props <- plot_outcomes(
+    ewrprops,
+    outcome_col = 'exceedance',
+    y_col = 'unique_ewr',
+    x_col = 'scenario',
+    colorset = 'exceedance',
+    plot_type = 'heatmap',
+    pal_list = 'grDevices::Viridis'
+  )
   vdiffr::expect_doppelganger("ewr_props", ewr_props)
-
 
   # We could get the Sum and the number of values in step 1. After that, summing
   # the number of values gives the constituent number of values, so we can keep
@@ -1016,31 +1311,33 @@ test_that('exceedance proportion', {
     aggsequence = aggseq_s,
     funsequence = funseq_s,
     keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    group_until = list(
+      planning_unit_name = 'sdl_units',
+      gauge = is_notpoint,
+      SWSDLName = 'sdl_units'
+    ),
     pseudo_spatial = 'sdl_units',
     saveintermediate = TRUE,
     namehistory = FALSE
   )
 
   tarprop <- mec$theme |>
-    tidyr::pivot_wider(names_from = aggfun_1,
-                       values_from = exceedance) |>
-    dplyr::mutate(proportion = Sum/NumberOfValues)
+    tidyr::pivot_wider(names_from = aggfun_1, values_from = exceedance) |>
+    dplyr::mutate(proportion = Sum / NumberOfValues)
 
-  exceed_prop_plot <- plot_outcomes(tarprop,
-                               outcome_col = "proportion",
-                               plot_type = 'map',
-                               colorset = "proportion",
-                               facet_row = 'scenario',
-                               facet_col = 'theme')
+  exceed_prop_plot <- plot_outcomes(
+    tarprop,
+    outcome_col = "proportion",
+    plot_type = 'map',
+    colorset = "proportion",
+    facet_row = 'scenario',
+    facet_col = 'theme'
+  )
 
   vdiffr::expect_doppelganger("exceed_prop_plot", exceed_prop_plot)
-
-
 })
 
 test_that('inclusive and exclusive ratios work', {
-
   # just do these over time for now.
 
   # inclusive ratio (days_in_exceeding/length)
@@ -1076,7 +1373,7 @@ test_that('inclusive and exclusive ratios work', {
   # for some reason I can't pass in the sumdiv function to the remote testing.
   # Works fine running manually.
   funseq_s2 <- list(
-    list(sumdiv = ~Sum(.)/(365*5)),
+    list(sumdiv = ~ Sum(.) / (365 * 5)),
     sdl_units = "Sum",
     theme = "Sum"
   )
@@ -1093,15 +1390,20 @@ test_that('inclusive and exclusive ratios work', {
     aggsequence = aggseq_s,
     funsequence = funseq_s,
     keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units',
-                       gauge = is_notpoint,
-                       SWSDLName = 'sdl_units'),
+    group_until = list(
+      planning_unit_name = 'sdl_units',
+      gauge = is_notpoint,
+      SWSDLName = 'sdl_units'
+    ),
     pseudo_spatial = 'sdl_units',
     saveintermediate = TRUE
   ) |>
-    purrr::map(\(x) dplyr::mutate(x,
-                                  dplyr::across(dplyr::ends_with('exceeding'),
-                                                \(y) y/(365*5))))
+    purrr::map(\(x) {
+      dplyr::mutate(
+        x,
+        dplyr::across(dplyr::ends_with('exceeding'), \(y) y / (365 * 5))
+      )
+    })
 
   # use the divide-first approach, and also stack history
   emr <- read_and_agg(
@@ -1116,7 +1418,11 @@ test_that('inclusive and exclusive ratios work', {
     aggsequence = aggseq_s,
     funsequence = funseq_s2,
     keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    group_until = list(
+      planning_unit_name = 'sdl_units',
+      gauge = is_notpoint,
+      SWSDLName = 'sdl_units'
+    ),
     pseudo_spatial = 'sdl_units',
     saveintermediate = TRUE,
     namehistory = FALSE
@@ -1124,26 +1430,33 @@ test_that('inclusive and exclusive ratios work', {
 
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
-    'agg_input', 'all_time', 'sdl_units', 'theme'
+    'agg_input',
+    'all_time',
+    'sdl_units',
+    'theme'
   )
   expect_equal(names(imr), namestring)
   expect_s3_class(imr$theme, "sf")
 
-  inclusive_plot <- plot_outcomes(imr$theme,
-                               outcome_col = "theme_Sum_sdl_units_Sum_all_time_Sum_days_in_exceeding",
-                               plot_type = 'map',
-                               colorset = "theme_Sum_sdl_units_Sum_all_time_Sum_days_in_exceeding",
-                               facet_row = 'scenario',
-                               facet_col = 'theme')
+  inclusive_plot <- plot_outcomes(
+    imr$theme,
+    outcome_col = "theme_Sum_sdl_units_Sum_all_time_Sum_days_in_exceeding",
+    plot_type = 'map',
+    colorset = "theme_Sum_sdl_units_Sum_all_time_Sum_days_in_exceeding",
+    facet_row = 'scenario',
+    facet_col = 'theme'
+  )
 
   vdiffr::expect_doppelganger("inclusive_plot", inclusive_plot)
 
-  exclusive_plot <- plot_outcomes(emr$theme,
-                                  outcome_col = "exceedance_only",
-                                  plot_type = 'map',
-                                  colorset = "exceedance_only",
-                                  facet_row = 'scenario',
-                                  facet_col = 'theme')
+  exclusive_plot <- plot_outcomes(
+    emr$theme,
+    outcome_col = "exceedance_only",
+    plot_type = 'map',
+    colorset = "exceedance_only",
+    facet_row = 'scenario',
+    facet_col = 'theme'
+  )
 
   vdiffr::expect_doppelganger("exclusive_plot", exclusive_plot)
 })
@@ -1151,12 +1464,10 @@ test_that('inclusive and exclusive ratios work', {
 
 test_that('manual prepfun', {
   daydiff <- function(dat, dr = 'difference') {
-
     # This bit isn't necessary, it just keeps some processing similar with the built-in EWR prep functions.
     names(dat) <- HydroBOT:::nameclean(names(dat))
     dat <- HydroBOT::cleanewrs(dat)
     dat$date <- as.Date(paste0(as.character(dat$year), '-07-01'))
-
 
     if (dr == 'difference') {
       dat <- dat |>
@@ -1169,9 +1480,7 @@ test_that('manual prepfun', {
     }
 
     return(dat)
-
   }
-
 
   aggseq_d <- list(
     all_time = 'all_time',
@@ -1197,9 +1506,11 @@ test_that('manual prepfun', {
     aggsequence = aggseq_d,
     funsequence = funseq_d,
     keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units',
-                       gauge = is_notpoint,
-                       SWSDLName = 'sdl_units'),
+    group_until = list(
+      planning_unit_name = 'sdl_units',
+      gauge = is_notpoint,
+      SWSDLName = 'sdl_units'
+    ),
     pseudo_spatial = 'sdl_units',
     saveintermediate = TRUE,
     namehistory = FALSE
@@ -1207,16 +1518,21 @@ test_that('manual prepfun', {
 
   # stringr::str_flatten(names(spatagg), "', '")
   namestring <- c(
-    'agg_input', 'all_time', 'sdl_units', 'theme'
+    'agg_input',
+    'all_time',
+    'sdl_units',
+    'theme'
   )
   expect_equal(names(diffagg), namestring)
   expect_s3_class(diffagg$theme, "sf")
-  difman_plot <- plot_outcomes(diffagg$theme,
-                               outcome_col = "synthvals",
-                               plot_type = 'map',
-                               colorset = "synthvals",
-                               facet_row = 'scenario',
-                               facet_col = 'theme')
+  difman_plot <- plot_outcomes(
+    diffagg$theme,
+    outcome_col = "synthvals",
+    plot_type = 'map',
+    colorset = "synthvals",
+    facet_row = 'scenario',
+    facet_col = 'theme'
+  )
 
   vdiffr::expect_doppelganger("difman_plot", difman_plot)
 })
@@ -1225,7 +1541,6 @@ test_that('manual prepfun', {
 # Non-module data ------------------------------------------------------------
 
 test_that('non-module works', {
-
   # Similar to multi_aggregate, but have saved out the dummy data there
 
   # setup
@@ -1233,9 +1548,17 @@ test_that('non-module works', {
   all_aus <- readRDS(test_path("test_data", "all_aus.rds"))
 
   # make a simple 'causal' network
-  state_theme <- tibble::tibble(theme1 = c("E", "F", "G", "H", "I", "J"),
-                                theme2 = c("vowel", "consonant", "consonant",
-                                           "consonant", "vowel", "consonant")) |>
+  state_theme <- tibble::tibble(
+    theme1 = c("E", "F", "G", "H", "I", "J"),
+    theme2 = c(
+      "vowel",
+      "consonant",
+      "consonant",
+      "consonant",
+      "vowel",
+      "consonant"
+    )
+  ) |>
     list()
 
   # This will aggregate into weeks, then to type, and then to the country.
@@ -1253,21 +1576,23 @@ test_that('non-module works', {
   )
 
   # Do the aggregation
-expect_warning(ausagg <- read_and_agg(
-  datpath = test_path("test_data", "module_output", "fake_module"),
-  type = "everything",
-  geopath = austates,
-  causalpath = state_theme,
-  groupers = "scenario",
-  prepfun = "identity",
-  aggCols = "value",
-    aggsequence = ausseq,
-  funsequence = ausfuns,
-  saveintermediate = TRUE,
-  namehistory = FALSE,
-  keepAllPolys = FALSE,
-  returnList = TRUE
-))
+  expect_warning(
+    ausagg <- read_and_agg(
+      datpath = test_path("test_data", "module_output", "fake_module"),
+      type = "everything",
+      geopath = austates,
+      causalpath = state_theme,
+      groupers = "scenario",
+      prepfun = "identity",
+      aggCols = "value",
+      aggsequence = ausseq,
+      funsequence = ausfuns,
+      saveintermediate = TRUE,
+      namehistory = FALSE,
+      keepAllPolys = FALSE,
+      returnList = TRUE
+    )
+  )
 
   weekcheck <- ausagg$week |>
     dplyr::filter(theme1 == 'E') |>
@@ -1311,4 +1636,3 @@ expect_warning(ausagg <- read_and_agg(
   vdiffr::expect_doppelganger("aus_themecheck", themecheck)
   vdiffr::expect_doppelganger("aus_spacecheck", spacecheck)
 })
-

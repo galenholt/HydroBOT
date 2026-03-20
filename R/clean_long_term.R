@@ -12,13 +12,12 @@
 #'
 #' @return a `tibble` with matching env_objs, Targets, Objectives, and the 5,10, and 20 year targets. No spatial information (gauge, planning unit)
 #' @keywords internal
-clean_long_term <- function(yrpath,
-                            saveout = FALSE,
-                            outdir, savename) {
-
-  rlang::warn(c('i' = "The new pattern is to obtain from py-ewr with `get_causal_ewr()`, which then cleans with `clean_ewr_causal()`.",
-                '!' = "MODIFY NETWORKS IN CLEAN_EWR_CAUSAL()",
-                "clean_long_term()` is provided for certain handbuilding situations (typically beta-versions of causal networks)."))
+clean_long_term <- function(yrpath, saveout = FALSE, outdir, savename) {
+  rlang::warn(c(
+    'i' = "The new pattern is to obtain from py-ewr with `get_causal_ewr()`, which then cleans with `clean_ewr_causal()`.",
+    '!' = "MODIFY NETWORKS IN CLEAN_EWR_CAUSAL()",
+    "clean_long_term()` is provided for certain handbuilding situations (typically beta-versions of causal networks)."
+  ))
 
   # Need to know where this comes from
   obj2yrtargets <- readr::read_csv(yrpath, col_types = readr::cols())
@@ -34,29 +33,39 @@ clean_long_term <- function(yrpath,
 
   # clean up weird characters
   obj2yrtargets <- obj2yrtargets |>
-                     dplyr::select(-c('NodeType', 'env_obj_main', 'env_obj_number')) |> # Why was this here?
-                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringi::stri_enc_toutf8(.))) |>
-                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'\xca', '-'))) |>
-                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_replace_all(.,'-$', ''))) |>
-                     dplyr::mutate(dplyr::across(tidyselect::where(is.character), ~stringr::str_squish(.)))
+    dplyr::select(-c('NodeType', 'env_obj_main', 'env_obj_number')) |> # Why was this here?
+    dplyr::mutate(dplyr::across(
+      tidyselect::where(is.character),
+      ~ stringi::stri_enc_toutf8(.)
+    )) |>
+    dplyr::mutate(dplyr::across(
+      tidyselect::where(is.character),
+      ~ stringr::str_replace_all(., '\xca', '-')
+    )) |>
+    dplyr::mutate(dplyr::across(
+      tidyselect::where(is.character),
+      ~ stringr::str_replace_all(., '-$', '')
+    )) |>
+    dplyr::mutate(dplyr::across(
+      tidyselect::where(is.character),
+      ~ stringr::str_squish(.)
+    ))
 
   # now that we have multiple states, but a state on there.
   # save
   if (saveout == 'r') {
-
     # Rdata for package structure
     saveRDS(obj2yrtargets, file = file.path(outdir, 'obj2yrtargets.rds'))
   } else if (saveout == 'csv') {
-
     # csv for other
-    readr::write_csv(obj2yrtargets,
-              file.path(outdir,
-                        paste0(savename,
-                               format(Sys.time(),
-                                      "%Y%m%d%H%M"),
-                               ".csv")))
+    readr::write_csv(
+      obj2yrtargets,
+      file.path(
+        outdir,
+        paste0(savename, format(Sys.time(), "%Y%m%d%H%M"), ".csv")
+      )
+    )
   }
-
 
   return(obj2yrtargets)
 }

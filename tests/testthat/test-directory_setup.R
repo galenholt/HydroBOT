@@ -22,11 +22,9 @@ test_that("scenario paths works for single csvs in each", {
 })
 
 test_that("scenario paths and the name fixer works for multiple csvs in each", {
-
   temp_hydro_multi <- '_test_data/hydrographs'
   # If needed, build the dir. This takes a while so don't tear it down, typically
-  make_temp_multifile(testdir = '_test_data',
-                      temp_hydro = 'hydrographs')
+  make_temp_multifile(testdir = '_test_data', temp_hydro = 'hydrographs')
 
   scenario_paths <- find_scenario_paths(temp_hydro_multi)
 
@@ -44,7 +42,6 @@ test_that("scenario paths and the name fixer works for multiple csvs in each", {
   scenario_paths <- find_scenario_paths(temp_hydro_multi)
 
   expect_snapshot(scenario_paths)
-
 })
 
 test_that('creating output dirs works with hydro_dir having all scenarios', {
@@ -57,13 +54,15 @@ test_that('creating output dirs works with hydro_dir having all scenarios', {
 
   outpath <- make_output_dir(parent_dir = project_dir, scenarios = scenarios)
 
-  realised_structure <- list.files(project_dir, recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    project_dir,
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
   expect_snapshot(realised_structure)
-
 })
 
 test_that('creating output dirs works with hydro_dir as a single scenario', {
-
   # Here, the outputs end up within the same folder as the hydrographs
 
   single_hydro_scenario <- '_test_data/hydrographs/base'
@@ -71,42 +70,55 @@ test_that('creating output dirs works with hydro_dir as a single scenario', {
 
   scenarios <- scenario_names_from_hydro(single_hydro_scenario)
 
-  outpath <- make_output_dir(parent_dir = single_hydro_scenario, scenarios = scenarios)
+  outpath <- make_output_dir(
+    parent_dir = single_hydro_scenario,
+    scenarios = scenarios
+  )
 
   # check the full structure of the parent tree to make sure we're not adding extra stuff elsewhere
-  realised_structure <- list.files('_test_data', recursive = TRUE, include.dirs = TRUE)
+  realised_structure <- list.files(
+    '_test_data',
+    recursive = TRUE,
+    include.dirs = TRUE
+  )
   expect_snapshot(realised_structure)
-
 })
 
 test_that("file_search works", {
-
   temp_hydro_multi <- '_test_data/hydrographs'
   # If needed, build the dir. This takes a while so don't tear it down, typically
-  make_temp_multifile(testdir = '_test_data',
-                      temp_hydro = 'hydrographs')
+  make_temp_multifile(testdir = '_test_data', temp_hydro = 'hydrographs')
 
-  scenario_paths <- find_scenario_paths(temp_hydro_multi, type = 'csv', file_search = '412')
+  scenario_paths <- find_scenario_paths(
+    temp_hydro_multi,
+    type = 'csv',
+    file_search = '412'
+  )
 
   # Should be a list
   expect_snapshot(scenario_paths)
 
   scenario_paths_all <- find_scenario_paths(temp_hydro_multi, type = 'csv')
 
-  expect_equal(length(scenario_paths)*2, length(scenario_paths_all))
-
+  expect_equal(length(scenario_paths) * 2, length(scenario_paths_all))
 })
 
 test_that("zip works", {
-
   # create dir so building makes sense
   make_temp_zip(
     temp_hydro_dir = "hydrographs",
-    orig_hydro_zip = system.file("extdata/ncdfexample/zipcdf.zip", package = "HydroBOT")
+    orig_hydro_zip = system.file(
+      "extdata/ncdfexample/zipcdf.zip",
+      package = "HydroBOT"
+    )
   )
 
   temp_hydro <- '_test_data/hydrographs'
-  scenario_paths <- find_scenario_paths(file.path(temp_hydro, 'zipcdf.zip'), type = 'nc', file_search = 'Straight Node')
+  scenario_paths <- find_scenario_paths(
+    file.path(temp_hydro, 'zipcdf.zip'),
+    type = 'nc',
+    file_search = 'Straight Node'
+  )
 
   expect_snapshot_value(scenario_paths, style = 'deparse')
 })

@@ -40,17 +40,19 @@
 #'   included
 #' @export
 #'
-theme_aggregate <- function(dat,
-                            from_theme,
-                            to_theme,
-                            groupers,
-                            aggCols,
-                            funlist,
-                            causal_edges,
-                            geonames = NULL,
-                            failmissing = TRUE,
-                            auto_ewr_PU = FALSE,
-                            ...) {
+theme_aggregate <- function(
+  dat,
+  from_theme,
+  to_theme,
+  groupers,
+  aggCols,
+  funlist,
+  causal_edges,
+  geonames = NULL,
+  failmissing = TRUE,
+  auto_ewr_PU = FALSE,
+  ...
+) {
   # Bare names get lost as we go down into further functions, so use characters
   # and throw an ugly conditional on to do that. It's extra ugly with multiple
   # bare names.
@@ -62,7 +64,9 @@ theme_aggregate <- function(dat,
   }
 
   # check time- this should come in from outside, but check here too
-  timecols <- purrr::map_lgl(dat, \(x) lubridate::is.Date(x) | lubridate::is.POSIXt(x))
+  timecols <- purrr::map_lgl(dat, \(x) {
+    lubridate::is.Date(x) | lubridate::is.POSIXt(x)
+  })
   if (any(timecols)) {
     timegroup <- names(dat)[which(timecols)]
   } else {
@@ -72,11 +76,12 @@ theme_aggregate <- function(dat,
   # Force time-aggregation to be explicit
   if (!is.null(timegroup) && !timegroup %in% groupers) {
     rlang::abort(c(
-      glue::glue("The time column {timegroup} is not included as a grouper for theme aggregation"),
+      glue::glue(
+        "The time column {timegroup} is not included as a grouper for theme aggregation"
+      ),
       "Aggregation must explicitly specify dimensions"
     ))
   }
-
 
   # including geometry in non-geometric
   # aggregates takes forever, drop and re-pair if present
@@ -115,11 +120,16 @@ theme_aggregate <- function(dat,
     dplyr::select(tidyselect::where(~ !all(is.na(.))))
 
   # check and dplyr::rename
-  if (length(unique(causal_edges$fromtype)) > 1 | length(unique(causal_edges$totype)) > 1) {
+  if (
+    length(unique(causal_edges$fromtype)) > 1 |
+      length(unique(causal_edges$totype)) > 1
+  ) {
     stop("trying to aggregate into multiple groupings")
   } else {
     names(causal_edges)[names(causal_edges) == "to"] <- causal_edges$totype[1]
-    names(causal_edges)[names(causal_edges) == "from"] <- causal_edges$fromtype[1]
+    names(causal_edges)[names(causal_edges) == "from"] <- causal_edges$fromtype[
+      1
+    ]
   }
 
   # EWRs are defined at gauges and planning units (often many-to-many, e.g.
@@ -137,7 +147,9 @@ theme_aggregate <- function(dat,
     ewrnames <- purrr::map(HydroBOT::causal_ewr, names) |> unlist()
     isewr <- to_theme %in% ewrnames
     # ewrs are defined at the pu scale, so keep them, gauges, and sdl units until safe to drop
-    if (isewr & !("planning_unit_name" %in% groupers & "SWSDLName" %in% groupers)) {
+    if (
+      isewr & !("planning_unit_name" %in% groupers & "SWSDLName" %in% groupers)
+    ) {
       if (!auto_ewr_PU) {
         rlang::warn(c(
           "!" = "EWR outputs detected without `group_until`!",
@@ -146,14 +158,21 @@ theme_aggregate <- function(dat,
           "i" = "Lower-level processing should include as `grouper` in `theme_aggregate()`\n"
         ))
       } else {
-        rlang::inform(c("i" = "EWR outputs auto-grouped",
-                        "*" = "Done automatically because `auto_ewr_PU = TRUE`",
+        rlang::inform(c(
+          "i" = "EWR outputs auto-grouped",
+          "*" = "Done automatically because `auto_ewr_PU = TRUE`",
           "*" = "EWRs should be grouped by `SWSDLName`, `planning_unit_name`, and `gauge` until aggregated to larger spatial areas.",
           "*" = "Rows will collapse otherwise, silently aggregating over the wrong dimension",
           "*" = "Best to explicitly use `group_until` in `multi_aggregate()` or `read_and_agg()`\n."
         ))
         # add gauge and plannng unit name if available.
-        groupers <- unique(c(groupers, intersect(c("gauge", "planning_unit_name", "SWSDLName"), names(causal_edges))))
+        groupers <- unique(c(
+          groupers,
+          intersect(
+            c("gauge", "planning_unit_name", "SWSDLName"),
+            names(causal_edges)
+          )
+        ))
       }
     }
   }
@@ -167,7 +186,9 @@ theme_aggregate <- function(dat,
       "Causal network does not have all groupers.",
       glue::glue("Joining {from_theme} to {to_theme}"),
       glue::glue("Groupers are {paste0(groupers, collapse = ', ')}."),
-      glue::glue("expect causal network to have {paste0(extragroups, collapse = ', ')}; it has {paste0(names(causal_edges), collapse = ', ')}."),
+      glue::glue(
+        "expect causal network to have {paste0(extragroups, collapse = ', ')}; it has {paste0(names(causal_edges), collapse = ', ')}."
+      ),
       "Do you need to use `group_until`? Or is your network missing columns?"
     ))
   }
@@ -175,8 +196,11 @@ theme_aggregate <- function(dat,
   # Quiet down the joins
   commonnames <- names(dat)[names(dat) %in% names(causal_edges)]
   pairdat <- dat |>
-    dplyr::left_join(causal_edges, relationship = "many-to-many", by = commonnames)
-
+    dplyr::left_join(
+      causal_edges,
+      relationship = "many-to-many",
+      by = commonnames
+    )
 
   # Check for NA in the causal network
   ergroups <- c(from_theme, groupers[groupers != "scenario"])
@@ -186,7 +210,11 @@ theme_aggregate <- function(dat,
     dplyr::distinct()
 
   if (nrow(napairs) > 0) {
-    nacount <- napairs |> dplyr::summarise(ntimes = dplyr::n(), .by = tidyselect::any_of(from_theme))
+    nacount <- napairs |>
+      dplyr::summarise(
+        ntimes = dplyr::n(),
+        .by = tidyselect::any_of(from_theme)
+      )
 
     if (ncol(napairs) > 1) {
       groupinform <- glue::glue("Groups with issues: {unique(napairs[2])}")
@@ -213,7 +241,8 @@ theme_aggregate <- function(dat,
   # The core aggregation function. the !! needs to happen here
   # because aggCols needs to be evaluated to a character vector, not passed in
   # as an object name. Annoying.
-  agged <- general_aggregate(pairdat,
+  agged <- general_aggregate(
+    pairdat,
     groupers = c(groupers, to_theme), # Group by the groupers plus the level we're grouping into
     aggCols = tidyselect::ends_with(!!aggCols),
     funlist = funlist,

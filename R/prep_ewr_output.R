@@ -20,10 +20,14 @@
 #' @export
 #'
 
-prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
-                           gaugefilter = NULL, scenariofilter = NULL,
-                           add_max = FALSE) {
-
+prep_ewr_output <- function(
+  dat,
+  type = "achievement",
+  year_roll = "best",
+  gaugefilter = NULL,
+  scenariofilter = NULL,
+  add_max = FALSE
+) {
   # some cleanup that lets this get used on its own if necessary
   if ('eventYears' %in% names(dat)) {
     names(dat) <- nameclean(names(dat))
@@ -35,12 +39,11 @@ prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
   # assorted cleanup
   dat <- cleanewrs(dat)
 
-  if (!type %in%  c("achievement", "interevents")) {
+  if (!type %in% c("achievement", "interevents")) {
     outdf <- dat
   }
 
   if (type == "achievement") {
-
     yeardat <- clean_ewr_yearly(dat)
 
     if (year_roll == "best") {
@@ -58,12 +61,13 @@ prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
   }
 
   if (type == "interevents") {
-
     # assess interevent calculations
     outdf <- assess_ewr_interevents(dat)
     # add max
     if (add_max) {
-      rlang::abort('add_max does not make sense for interevents. use `add_max = FALSE`')
+      rlang::abort(
+        'add_max does not make sense for interevents. use `add_max = FALSE`'
+      )
     }
   }
 
@@ -83,7 +87,6 @@ prep_ewr_output <- function(dat, type = "achievement", year_roll = "best",
 #'
 
 cleanewrs <- function(ewrdf) {
-
   # Gauges should be characters
   if ('gauge' %in% names(ewrdf)) {
     ewrdf$gauge <- as.character(ewrdf$gauge)
@@ -104,19 +107,34 @@ cleanewrs <- function(ewrdf) {
 #' @return tibble of the cleaned yearly EWR output
 #' @export
 clean_ewr_yearly <- function(annualdf) {
-
   # Dates break on the water/financial year.
   # and represent the start of the period- macq historic scenario: data starts - 1889-01-01 and the first EWR result is for 1888. confirms dates are the beginning, 2014 = 2014-2015
   annualdf$date <- as.Date(paste0(as.character(annualdf$year), '-07-01'))
 
   # The first year is untrustworthy due to how the EWR does its calculations. Make the returned values NA
 
-  ewr_calc_cols <- c('event_years', 'num_achieved', 'num_events', 'num_events_all', 'event_length', 'event_length_achieved', 'total_event_days', 'total_event_days_achieved', 'max_event_days', 'max_rolling_events', 'max_rolling_achievement', 'missing_days', 'total_possible_days', 'rolling_max_inter_event', 'rolling_max_inter_event_achieved')
+  ewr_calc_cols <- c(
+    'event_years',
+    'num_achieved',
+    'num_events',
+    'num_events_all',
+    'event_length',
+    'event_length_achieved',
+    'total_event_days',
+    'total_event_days_achieved',
+    'max_event_days',
+    'max_rolling_events',
+    'max_rolling_achievement',
+    'missing_days',
+    'total_possible_days',
+    'rolling_max_inter_event',
+    'rolling_max_inter_event_achieved'
+  )
 
   annualdf <- annualdf |>
-    dplyr::mutate(dplyr::across(tidyselect::all_of(ewr_calc_cols),
-                                \(x) ifelse(date == min(date, na.rm = TRUE), NA, x)))
-
+    dplyr::mutate(dplyr::across(tidyselect::all_of(ewr_calc_cols), \(x) {
+      ifelse(date == min(date, na.rm = TRUE), NA, x)
+    }))
 }
 
 
@@ -135,15 +153,22 @@ clean_ewr_requirements <- function() {
   ewr_requirements <- cleanewrs(ewr_requirements)
 
   ewr_requirements <- ewr_requirements |>
-    dplyr::select('state', 'SWSDLName', 'planning_unit_name', 'gauge',
-                  tidyselect::contains("ewr_code"),
-                  tidyselect::starts_with('target_frequency'),
-                  tidyselect::contains('interevent'))
+    dplyr::select(
+      'state',
+      'SWSDLName',
+      'planning_unit_name',
+      'gauge',
+      tidyselect::contains("ewr_code"),
+      tidyselect::starts_with('target_frequency'),
+      tidyselect::contains('interevent')
+    )
 
   # Target frequencies come in here as character.
   ewr_requirements <- ewr_requirements |>
-    dplyr::mutate(dplyr::across(tidyselect::starts_with('target'), as.numeric),
-                  dplyr::across(tidyselect::contains("interevent"), as.numeric))
+    dplyr::mutate(
+      dplyr::across(tidyselect::starts_with('target'), as.numeric),
+      dplyr::across(tidyselect::contains("interevent"), as.numeric)
+    )
 
   # we used to set NA to 0, but it's better practice to think about how to handle in the assessor.
 
@@ -169,7 +194,7 @@ separate_ewr_codes <- function(df) {
     stringr::str_replace("/", "_")
 
   # Get a clean main EWR code (as best I can)
-  ewrpart <- basestring  |>
+  ewrpart <- basestring |>
     # change the _ to - so we can split on _
     stringr::str_replace("OB_W", "OB-W") |>
     # get the bit before the first _
@@ -203,15 +228,25 @@ separate_ewr_codes <- function(df) {
 #' @return tibble with columns `scenario`, `year`, `date`, `gauge`, `planning_unit_name`, `state`, `SWSDLName`, `ewr_code`, `ewr_code_main`, `event_years`, `frequency_achieved`, `interevent_achieved`, `ewr_achieved`
 #' @export
 
-assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >= 10, 10, 1)) {
-
+assess_ewr_achievement <- function(
+  annualdf,
+  year_roll = ifelse(nrow(annualdf) >= 10, 10, 1)
+) {
   # Need to get the ewr targets to check against
   ewr_requirements <- clean_ewr_requirements()
 
   # Join target frequencies to annualdf
-  annualdf <- dplyr::left_join(annualdf, ewr_requirements,
-    by = c('ewr_code', 'ewr_code_main', 'gauge',
-           'planning_unit_name', 'state', 'SWSDLName'),
+  annualdf <- dplyr::left_join(
+    annualdf,
+    ewr_requirements,
+    by = c(
+      'ewr_code',
+      'ewr_code_main',
+      'gauge',
+      'planning_unit_name',
+      'state',
+      'SWSDLName'
+    ),
     relationship = "many-to-many"
   )
 
@@ -219,49 +254,96 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
   # This makes a 1 a good thing, like all the others.
   # we also have to flip the target frequency; e.g. previously had a target that said we needed to have less than 80% ceases, we now need to have more than 20% not-ceases
   annualdf <- annualdf |>
-    dplyr::mutate(event_years = ifelse(grepl('^CF', .data$ewr_code),
-                                       1-.data$event_years, .data$event_years),
-                  target_frequency = ifelse(grepl('^CF', .data$ewr_code),
-                                            100-.data$target_frequency, .data$target_frequency),
-                  max_interevent = .data$max_interevent*365)
+    dplyr::mutate(
+      event_years = ifelse(
+        grepl('^CF', .data$ewr_code),
+        1 - .data$event_years,
+        .data$event_years
+      ),
+      target_frequency = ifelse(
+        grepl('^CF', .data$ewr_code),
+        100 - .data$target_frequency,
+        .data$target_frequency
+      ),
+      max_interevent = .data$max_interevent * 365
+    )
 
   # Frequency checks (ACHIEVEMENT test)
 
-    # calculate number of event years, frequency, and EWR pass/fail at defined (year_roll) year rolling time frames.
-    # cease to flows are the inverse of success.
-    annualdf <- annualdf |>
-      dplyr::arrange(.data$scenario, .data$planning_unit_name,
-                     .data$gauge, .data$ewr_code, .data$ewr_code_main,
-                     .data$year) |>
-      dplyr::mutate(frequency_occurred = roll_frequency(.data$event_years, year_roll),
-                    # the interevents are highly variable (and often sub-yearly), so rolling by a certian number of years and the dataframe provides a rolling_achievement anyway
-                    # interevent_occurred = roll_interevent(.data$event_years, year_roll),
-                    .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
-                            "gauge", "ewr_code", "ewr_code_main")) |>
-      # Some EWRs are missing target frequencies and max interevents. Treat
-      # those as if those conditions don't exist (since they dont). Thus, if an
-      # event happens with no target, just pass it, and if there are no
-      # interevent conditions, pass the interevent
-      dplyr::mutate(frequency_achieved = ifelse(is.na(.data$target_frequency), .data$event_years,
-                                                .data$frequency_occurred >= .data$target_frequency),
-                    # we could use interevent_achieved = .data$rolling_max_inter_event_achieved, but the following lets us specify the function later, and is what the EWR tool does internally
-                    interevent_achieved = ifelse(is.na(.data$max_interevent), 1,
-                                                 as.numeric(.data$rolling_max_inter_event <= .data$max_interevent)),
-                    # both have to occur for the EWR to 'pass'
-                    ewr_achieved = .data$frequency_achieved * .data$interevent_achieved,
-                    .by = c("scenario", "planning_unit_name", 'state', 'SWSDLName',
-                            "gauge", "ewr_code", "ewr_code_main"))
+  # calculate number of event years, frequency, and EWR pass/fail at defined (year_roll) year rolling time frames.
+  # cease to flows are the inverse of success.
+  annualdf <- annualdf |>
+    dplyr::arrange(
+      .data$scenario,
+      .data$planning_unit_name,
+      .data$gauge,
+      .data$ewr_code,
+      .data$ewr_code_main,
+      .data$year
+    ) |>
+    dplyr::mutate(
+      frequency_occurred = roll_frequency(.data$event_years, year_roll),
+      # the interevents are highly variable (and often sub-yearly), so rolling by a certian number of years and the dataframe provides a rolling_achievement anyway
+      # interevent_occurred = roll_interevent(.data$event_years, year_roll),
+      .by = c(
+        "scenario",
+        "planning_unit_name",
+        'state',
+        'SWSDLName',
+        "gauge",
+        "ewr_code",
+        "ewr_code_main"
+      )
+    ) |>
+    # Some EWRs are missing target frequencies and max interevents. Treat
+    # those as if those conditions don't exist (since they dont). Thus, if an
+    # event happens with no target, just pass it, and if there are no
+    # interevent conditions, pass the interevent
+    dplyr::mutate(
+      frequency_achieved = ifelse(
+        is.na(.data$target_frequency),
+        .data$event_years,
+        .data$frequency_occurred >= .data$target_frequency
+      ),
+      # we could use interevent_achieved = .data$rolling_max_inter_event_achieved, but the following lets us specify the function later, and is what the EWR tool does internally
+      interevent_achieved = ifelse(
+        is.na(.data$max_interevent),
+        1,
+        as.numeric(.data$rolling_max_inter_event <= .data$max_interevent)
+      ),
+      # both have to occur for the EWR to 'pass'
+      ewr_achieved = .data$frequency_achieved * .data$interevent_achieved,
+      .by = c(
+        "scenario",
+        "planning_unit_name",
+        'state',
+        'SWSDLName',
+        "gauge",
+        "ewr_code",
+        "ewr_code_main"
+      )
+    )
 
   # change the logical to numeric to maintain generality with later functions
   annualdf$frequency_achieved <- as.numeric(annualdf$frequency_achieved)
   annualdf$interevent_achieved <- as.numeric(annualdf$interevent_achieved)
 
   annualdf <- annualdf |>
-    dplyr::select('scenario', 'year', 'date', 'gauge',
-                  'planning_unit_name', 'state', 'SWSDLName',
-                  'ewr_code', 'ewr_code_main',
-                  'event_years', 'frequency_achieved',
-                  'interevent_achieved', 'ewr_achieved')
+    dplyr::select(
+      'scenario',
+      'year',
+      'date',
+      'gauge',
+      'planning_unit_name',
+      'state',
+      'SWSDLName',
+      'ewr_code',
+      'ewr_code_main',
+      'event_years',
+      'frequency_achieved',
+      'interevent_achieved',
+      'ewr_achieved'
+    )
 
   return(annualdf)
 }
@@ -279,22 +361,29 @@ assess_ewr_achievement <- function(annualdf, year_roll = ifelse(nrow(annualdf) >
 #' @export
 #'
 assess_ewr_interevents <- function(interdf) {
-
   # Need to get the ewr targets to check against
   ewr_requirements <- clean_ewr_requirements()
 
   # Join target frequencies to interdf
-  interdf <- dplyr::left_join(interdf, ewr_requirements,
-                               by = c('ewr_code', 'ewr_code_main', 'gauge',
-                                      'planning_unit_name', 'state', 'SWSDLName'),
-                               relationship = "many-to-many"
+  interdf <- dplyr::left_join(
+    interdf,
+    ewr_requirements,
+    by = c(
+      'ewr_code',
+      'ewr_code_main',
+      'gauge',
+      'planning_unit_name',
+      'state',
+      'SWSDLName'
+    ),
+    relationship = "many-to-many"
   )
 
   # max_interevent in the parameter sheet (and so here) is yearly, but the
   # interevents themselves are daily. EWR tool just *365, so I'll do the same
 
   interdf <- interdf |>
-    dplyr::mutate(max_interevent = .data$max_interevent*365)
+    dplyr::mutate(max_interevent = .data$max_interevent * 365)
 
   # calculate exceedance as the number of days, a ratio, and binary
   # these are needed to implement the MDBA 'Interevent statistics' sheet.
@@ -325,7 +414,6 @@ assess_ewr_interevents <- function(interdf) {
 }
 
 
-
 #' Helper to get the frequency of occurrence without clogging up the mutates
 #'
 #'
@@ -338,11 +426,12 @@ assess_ewr_interevents <- function(interdf) {
 #'
 
 roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = FALSE) {
-
   if (pad_initial) {
     if (!na.rm) {
-      rlang::abort(c('Using `pad_initial = TRUE` and `na.rm = FALSE` is not logical.',
-                    'pad_initial requires estimating over subsets of the `year_roll` span, and so implies `na.rm = TRUE`.'))
+      rlang::abort(c(
+        'Using `pad_initial = TRUE` and `na.rm = FALSE` is not logical.',
+        'pad_initial requires estimating over subsets of the `year_roll` span, and so implies `na.rm = TRUE`.'
+      ))
     }
     x <- c(rep(NA, year_roll), x)
   }
@@ -376,21 +465,19 @@ roll_frequency <- function(x, year_roll, pad_initial = FALSE, na.rm = FALSE) {
       sumvec <- rowSums(lagmat)
     }
 
-
     # The way the rowsums works with na.rm = TRUE, we end up padding initial. Undo that if we don't want it
     if (!pad_initial) {
-      sumvec[1:(year_roll-1)] <- NA
+      sumvec[1:(year_roll - 1)] <- NA
     }
   }
 
+  # }
 
-   # }
-
-  freqvec <- (sumvec/year_roll)*100
+  freqvec <- (sumvec / year_roll) * 100
 
   if (pad_initial) {
     # cut off that pre-padding
-    freqvec <- freqvec[(year_roll+1):length(freqvec)]
+    freqvec <- freqvec[(year_roll + 1):length(freqvec)]
   }
 
   return(freqvec)
@@ -435,13 +522,13 @@ roll_interevent <- function(x, year_roll, pad_initial = FALSE) {
 
     # If there are zeros at the beginning, we get results. If we want to only return results for windows with full data, remove
     if (!pad_initial) {
-      inters[1:(year_roll-1)] <- NA
+      inters[1:(year_roll - 1)] <- NA
     }
   }
 
   if (pad_initial) {
     # cut off that pre-padding
-    inters <- inters[(year_roll+1):length(inters)]
+    inters <- inters[(year_roll + 1):length(inters)]
   }
 
   return(inters)
@@ -457,7 +544,6 @@ roll_interevent <- function(x, year_roll, pad_initial = FALSE) {
 #' @export
 #'
 maxInterevent <- function(x) {
-
   # Should be NA if all values are NA
   if (all(is.na(x))) {
     maxinter <- NA
@@ -488,14 +574,29 @@ maxInterevent <- function(x) {
 bind_max <- function(outdf) {
   MAX_scenario <- outdf |>
     sf::st_drop_geometry() |>
-    dplyr::select('gauge', 'planning_unit_name', 'state', 'SWSDLName', 'ewr_code', 'ewr_code_main') |>
+    dplyr::select(
+      'gauge',
+      'planning_unit_name',
+      'state',
+      'SWSDLName',
+      'ewr_code',
+      'ewr_code_main'
+    ) |>
     dplyr::distinct() |>
     dplyr::mutate(
       scenario = "MAX",
       ewr_achieved = 1
     ) |>
-    dplyr::select('scenario', 'gauge', 'planning_unit_name', 'state', 'SWSDLName',
-                  'ewr_achieved', 'ewr_code', 'ewr_code_main') |>
+    dplyr::select(
+      'scenario',
+      'gauge',
+      'planning_unit_name',
+      'state',
+      'SWSDLName',
+      'ewr_achieved',
+      'ewr_code',
+      'ewr_code_main'
+    ) |>
     join_to_geo(bom_basin_gauges)
 
   outdf <- dplyr::bind_rows(outdf, MAX_scenario)

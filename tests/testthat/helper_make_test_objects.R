@@ -2,7 +2,6 @@
 
 # EWR
 make_test_ewr_output <- function(build_dirs = TRUE) {
-
   # Set up some base directory structures
   temp_hydro_dir <- '_test_data/hydrographs'
   temp_parent_dir <- '_test_data'
@@ -10,17 +9,17 @@ make_test_ewr_output <- function(build_dirs = TRUE) {
   temp_hydro_multi <- '_test_data/hydrographs'
   temp_parent_multi <- '_test_data'
 
-
   if (build_dirs) {
     # create dir so building makes sense
     make_temp_hydro()
   }
 
-
-  ewr_out <- prep_run_save_ewrs(hydro_dir = temp_hydro_dir,
-                                output_parent_dir = temp_parent_dir,
-                                outputType = list('none'),
-                                returnType = list('summary', 'yearly'))
+  ewr_out <- prep_run_save_ewrs(
+    hydro_dir = temp_hydro_dir,
+    output_parent_dir = temp_parent_dir,
+    outputType = list('none'),
+    returnType = list('summary', 'yearly')
+  )
   return(ewr_out)
 }
 
@@ -41,8 +40,10 @@ make_test_ewr_prepped <- function() {
     dplyr::distinct() |>
     dplyr::mutate(gaugexpu = paste0(gauge, '_', planning_unit_name))
 
-  expect_true(all(ewrmaps$gaugexpu %in% prepmaps$gaugexpu) &
-                all(prepmaps$gaugexpu %in% ewrmaps$gaugexpu))
+  expect_true(
+    all(ewrmaps$gaugexpu %in% prepmaps$gaugexpu) &
+      all(prepmaps$gaugexpu %in% ewrmaps$gaugexpu)
+  )
 
   return(ewr_prepped)
 }
@@ -54,25 +55,29 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
   # Respects planning units, as in an analysis, but often worse for simple tests.
   if (style == 'PU') {
     # Group_until and other sorts of agg tests are done separately in the relevant file tests
-    aggseq <- list(all_time = 'all_time',
-                   ewr_code_main = c('ewr_code', 'ewr_code_main'),
-                   planning_units = planning_units,
-                   eco_objective =  c('ewr_code_main', "eco_objective"),
-                   sdl_units = sdl_units,
-                   objective_text = c('eco_objective', "objective_text"),
-                   catchment = cewo_valleys,
-                   theme = c('objective_text', 'theme'),
-                   mdb = basin)
+    aggseq <- list(
+      all_time = 'all_time',
+      ewr_code_main = c('ewr_code', 'ewr_code_main'),
+      planning_units = planning_units,
+      eco_objective = c('ewr_code_main', "eco_objective"),
+      sdl_units = sdl_units,
+      objective_text = c('eco_objective', "objective_text"),
+      catchment = cewo_valleys,
+      theme = c('objective_text', 'theme'),
+      mdb = basin
+    )
 
-    funseq <- list('ArithmeticMean',
-                   'CompensatingFactor',
-                   'ArithmeticMean',
-                   'ArithmeticMean',
-                   'SpatialWeightedMean',
-                   "ArithmeticMean",
-                   "SpatialWeightedMean",
-                   'ArithmeticMean',
-                   "SpatialWeightedMean")
+    funseq <- list(
+      'ArithmeticMean',
+      'CompensatingFactor',
+      'ArithmeticMean',
+      'ArithmeticMean',
+      'SpatialWeightedMean',
+      "ArithmeticMean",
+      "SpatialWeightedMean",
+      'ArithmeticMean',
+      "SpatialWeightedMean"
+    )
 
     ps <- "planning_units"
   }
@@ -80,42 +85,47 @@ make_test_agg <- function(namehistory = TRUE, style = 'PU') {
   # This ignores planning units, which yields much better data for testing plots, even if it's not what we would do in an analysis.
   if (style == 'noPU') {
     # Group_until and other sorts of agg tests are done separately in the relevant file tests
-    aggseq <- list(all_time = 'all_time',
-                   ewr_code_main = c('ewr_code', 'ewr_code_main'),
-                   eco_objective =  c('ewr_code_main', "eco_objective"),
-                   sdl_units = sdl_units,
-                   objective_text = c('eco_objective', "objective_text"),
-                   catchment = cewo_valleys,
-                   theme = c('objective_text', 'theme'),
-                   mdb = basin)
+    aggseq <- list(
+      all_time = 'all_time',
+      ewr_code_main = c('ewr_code', 'ewr_code_main'),
+      eco_objective = c('ewr_code_main', "eco_objective"),
+      sdl_units = sdl_units,
+      objective_text = c('eco_objective', "objective_text"),
+      catchment = cewo_valleys,
+      theme = c('objective_text', 'theme'),
+      mdb = basin
+    )
 
-    funseq <- list('ArithmeticMean',
-                   'CompensatingFactor',
-                   'ArithmeticMean',
-                   'ArithmeticMean',
-                   "ArithmeticMean",
-                   list(wm = ~weighted.mean(., w = area,
-                                            na.rm = TRUE)),
-                   'ArithmeticMean',
-                   list(wm = ~weighted.mean(., w = area,
-                                            na.rm = TRUE)))
+    funseq <- list(
+      'ArithmeticMean',
+      'CompensatingFactor',
+      'ArithmeticMean',
+      'ArithmeticMean',
+      "ArithmeticMean",
+      list(wm = ~ weighted.mean(., w = area, na.rm = TRUE)),
+      'ArithmeticMean',
+      list(wm = ~ weighted.mean(., w = area, na.rm = TRUE))
+    )
     # no pseudo_spatial argument herea
     ps <- NULL
   }
 
-  agg_theme_space <- multi_aggregate(sumspat,
-                                     aggsequence = aggseq,
-                                     groupers = c('scenario', 'planning_unit_name', 'gauge'),
-                                     group_until = list(planning_unit_name = is_notpoint,
-                                                        gauge = is_notpoint, SWSDLName = is_notpoint),
-                                     aggCols = 'ewr_achieved',
-                                     funsequence = funseq,
-                                     causal_edges = causal_ewr,
-                                     namehistory = namehistory,
-                                     pseudo_spatial = ps,
-                                     saveintermediate = TRUE)
+  agg_theme_space <- multi_aggregate(
+    sumspat,
+    aggsequence = aggseq,
+    groupers = c('scenario', 'planning_unit_name', 'gauge'),
+    group_until = list(
+      planning_unit_name = is_notpoint,
+      gauge = is_notpoint,
+      SWSDLName = is_notpoint
+    ),
+    aggCols = 'ewr_achieved',
+    funsequence = funseq,
+    causal_edges = causal_ewr,
+    namehistory = namehistory,
+    pseudo_spatial = ps,
+    saveintermediate = TRUE
+  )
 
   return(agg_theme_space)
 }
-
-

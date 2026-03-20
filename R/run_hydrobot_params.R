@@ -24,10 +24,12 @@
 #' @export
 #'
 
-run_hydrobot_params <- function(yamlpath = NULL,
-                               passed_args = NULL,
-                               list_args = NULL,
-                               defaults = system.file("yml/default_params.yml", package = "HydroBOT")) {
+run_hydrobot_params <- function(
+  yamlpath = NULL,
+  passed_args = NULL,
+  list_args = NULL,
+  defaults = system.file("yml/default_params.yml", package = "HydroBOT")
+) {
   # I could have a 'defaults' file and then a params that just changes some.
   # Maybe later. Might make a lot of sense if the only thing being passed in is
   # one value.
@@ -41,7 +43,6 @@ run_hydrobot_params <- function(yamlpath = NULL,
 
     arglist <- utils::modifyList(arglist, useryml)
   }
-
 
   # Allow user to pass yaml at the command line
   comargs <- yaml::yaml.load(passed_args)
@@ -61,7 +62,6 @@ run_hydrobot_params <- function(yamlpath = NULL,
     arglist <- utils::modifyList(arglist, list_args)
   }
 
-
   # deal with different ways to handle aggregation sequences
   arglist <- clean_sequences(arglist)
 
@@ -72,11 +72,15 @@ run_hydrobot_params <- function(yamlpath = NULL,
   arglist <- type_cleanup(arglist)
 
   # a simple EWR error catch (the aggregator does a more complete job internally)
-  if (grepl("ewr", arglist$ewr$output_parent_dir) &&
+  if (
+    grepl("ewr", arglist$ewr$output_parent_dir) &&
       is.null(arglist$aggregation$group_until) &&
       is.null(arglist$aggregation$pseudo_spatial) &&
-      !arglist$aggregation$auto_ewr_PU) {
-    rlang::warn(c("It appears that you're processing EWRs and not managing planning units with `auto_ewr_PU = TRUE` or with a combination of group_until and pseudo_spatial."))
+      !arglist$aggregation$auto_ewr_PU
+  ) {
+    rlang::warn(c(
+      "It appears that you're processing EWRs and not managing planning units with `auto_ewr_PU = TRUE` or with a combination of group_until and pseudo_spatial."
+    ))
   }
 
   # add extrameta, this is in common between the ewr and aggregation, only include in one to avoid duplication
@@ -89,16 +93,22 @@ run_hydrobot_params <- function(yamlpath = NULL,
   )
 
   if ('extrameta' %in% names(arglist$ewr)) {
-    arglist$ewr$extrameta <- utils::modifyList(arglist$ewr$extrameta,
-                                           paramextras)
+    arglist$ewr$extrameta <- utils::modifyList(
+      arglist$ewr$extrameta,
+      paramextras
+    )
   } else {
     arglist$ewr$extrameta <- paramextras
   }
 
   # Run EWR tool
-  ewr_out <- rlang::exec(prep_run_save_ewrs,
-                         !!!arglist$ewr[names(arglist$ewr) %in%
-                                      names(formals(prep_run_save_ewrs))])
+  ewr_out <- rlang::exec(
+    prep_run_save_ewrs,
+    !!!arglist$ewr[
+      names(arglist$ewr) %in%
+        names(formals(prep_run_save_ewrs))
+    ]
+  )
   # ewr_out <- prep_run_save_ewrs(
   #   hydro_dir = arglist$hydro_dir,
   #   output_parent_dir = arglist$output_parent_dir,
@@ -108,9 +118,13 @@ run_hydrobot_params <- function(yamlpath = NULL,
   # )
 
   # Aggregate
-  agg_out <- rlang::exec(read_and_agg,
-                         !!!arglist$aggregation[names(arglist$aggregation) %in%
-                                      names(formals(read_and_agg))])
+  agg_out <- rlang::exec(
+    read_and_agg,
+    !!!arglist$aggregation[
+      names(arglist$aggregation) %in%
+        names(formals(read_and_agg))
+    ]
+  )
 
   if (arglist$aggregation$returnList) {
     return(agg_out)
@@ -128,19 +142,38 @@ run_hydrobot_params <- function(yamlpath = NULL,
 #' @keywords internal
 make_default_args <- function(arglist) {
   if (arglist$ewr$hydro_dir == "default" || is.null(arglist$ewr$hydro_dir)) {
-    arglist$ewr$hydro_dir <- file.path(arglist$ewr$output_parent_dir, "hydrographs")
+    arglist$ewr$hydro_dir <- file.path(
+      arglist$ewr$output_parent_dir,
+      "hydrographs"
+    )
   }
 
-  if (arglist$aggregation$datpath == "default" || is.null(arglist$aggregation$datpath)) {
-    arglist$aggregation$datpath <- file.path(arglist$ewr$output_parent_dir, "module_output", "EWR")
+  if (
+    arglist$aggregation$datpath == "default" ||
+      is.null(arglist$aggregation$datpath)
+  ) {
+    arglist$aggregation$datpath <- file.path(
+      arglist$ewr$output_parent_dir,
+      "module_output",
+      "EWR"
+    )
   }
 
-  if (arglist$aggregation$savepath == "default" || is.null(arglist$aggregation$savepath)) {
-    arglist$aggregation$savepath <- file.path(arglist$ewr$output_parent_dir, "aggregator_output")
+  if (
+    arglist$aggregation$savepath == "default" ||
+      is.null(arglist$aggregation$savepath)
+  ) {
+    arglist$aggregation$savepath <- file.path(
+      arglist$ewr$output_parent_dir,
+      "aggregator_output"
+    )
   }
 
   if (is.null(arglist$aggregation$group_until)) {
-    arglist$aggregation$group_until <- rep(NA, length(arglist$aggregation$groupers))
+    arglist$aggregation$group_until <- rep(
+      NA,
+      length(arglist$aggregation$groupers)
+    )
   }
 
   return(arglist)
@@ -177,18 +210,29 @@ clean_sequences <- function(arglist) {
   if (!is.null(arglist$aggregation$aggregation_def)) {
     if (file.exists(arglist$aggregation$aggregation_def)) {
       source(arglist$aggregation$aggregation_def, local = TRUE)
-    } else if (file.exists(file.path("inst", arglist$aggregation$aggregation_def))) {
-      source(file.path("inst", arglist$aggregation$aggregation_def), local = TRUE)
+    } else if (
+      file.exists(file.path("inst", arglist$aggregation$aggregation_def))
+    ) {
+      source(
+        file.path("inst", arglist$aggregation$aggregation_def),
+        local = TRUE
+      )
     } else {
-      rlang::abort(glue::glue("requested parameter R file {arglist$aggregation$aggregation_def} does not exist."))
+      rlang::abort(glue::glue(
+        "requested parameter R file {arglist$aggregation$aggregation_def} does not exist."
+      ))
     }
 
     # check others
     if (!is.null(arglist$aggregation$aggsequence)) {
-      rlang::warn("Aggregation sequence defined in both an R file and yml. R file supersedes, but best to only use one.")
+      rlang::warn(
+        "Aggregation sequence defined in both an R file and yml. R file supersedes, but best to only use one."
+      )
     }
     if (!is.null(arglist$aggregation$funsequence)) {
-      rlang::warn("Aggregation funsequence defined in both an R file and yml. R file supersedes, but best to only use one.")
+      rlang::warn(
+        "Aggregation funsequence defined in both an R file and yml. R file supersedes, but best to only use one."
+      )
     }
   }
 
@@ -202,14 +246,18 @@ clean_sequences <- function(arglist) {
       if (length(funseq) == length(aggseq)) {
         funseq <- as.list(aggseq)
       } else {
-        rlang::abort("Function sequence is not a list and cannot obviously be translated into a list of the same length as the aggregation steps. Try to re-specify. The yaml is often easier to enforce a list using names.")
+        rlang::abort(
+          "Function sequence is not a list and cannot obviously be translated into a list of the same length as the aggregation steps. Try to re-specify. The yaml is often easier to enforce a list using names."
+        )
       }
     }
   }
 
   # catch edges
   if (is.null(aggseq) | is.null(funseq)) {
-    rlang::abort("aggregation sequence or funsequence not defined in either the aggregation_def slot or the aggregation_sequence and aggregation_funsequence")
+    rlang::abort(
+      "aggregation sequence or funsequence not defined in either the aggregation_def slot or the aggregation_sequence and aggregation_funsequence"
+    )
   }
 
   arglist$aggregation$aggsequence <- aggseq

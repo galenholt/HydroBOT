@@ -54,22 +54,27 @@
 #' @return causal network in DiagrammeR format
 #' @export
 #'
-make_causal_plot <- function(nodes, edges,
-                             focalnodes = unique(nodes$Name),
-                             drop_unused_nodes = TRUE,
-                             edge_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
-                             edge_colorgroups = NULL,
-                             edge_colorset = "fromtype",
-                             edge_pal_direction = rep(1, length(edge_pal)),
-                             node_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
-                             node_colorgroups = NULL,
-                             node_colorset = "NodeType",
-                             node_pal_direction = rep(1, length(node_pal)),
-                             setLimits = NULL,
-                             wrap_names = TRUE,
-                             render = TRUE,
-                             returnnetwork = TRUE,
-                             save = FALSE, savedir, savename = NULL) {
+make_causal_plot <- function(
+  nodes,
+  edges,
+  focalnodes = unique(nodes$Name),
+  drop_unused_nodes = TRUE,
+  edge_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
+  edge_colorgroups = NULL,
+  edge_colorset = "fromtype",
+  edge_pal_direction = rep(1, length(edge_pal)),
+  node_pal = list(fromtype = "nationalparkcolors::GeneralGrant"),
+  node_colorgroups = NULL,
+  node_colorset = "NodeType",
+  node_pal_direction = rep(1, length(node_pal)),
+  setLimits = NULL,
+  wrap_names = TRUE,
+  render = TRUE,
+  returnnetwork = TRUE,
+  save = FALSE,
+  savedir,
+  savename = NULL
+) {
   # Function to make plots assuming standard WERP column names. Could allow name
   # passing I guess? But then what's the point of a function if it ends up just
   # looking like the call
@@ -97,8 +102,7 @@ make_causal_plot <- function(nodes, edges,
     dplyr::filter(.data$Name %in% relevantnodes)
 
   edges <- edges |>
-    dplyr::filter(.data$from %in% relevantnodes |
-                    .data$to %in% relevantnodes)
+    dplyr::filter(.data$from %in% relevantnodes | .data$to %in% relevantnodes)
 
   # drop nodes with no edges?
   if (drop_unused_nodes) {
@@ -127,7 +131,6 @@ make_causal_plot <- function(nodes, edges,
 
   # deal with names, position, shape etc
   nodes <- node_plot_atts(nodes)
-
 
   # Syntax for diagrammer is confusing.
   # table and node are env variables (dfs)
@@ -160,23 +163,34 @@ make_causal_plot <- function(nodes, edges,
     )
 
   if (render) {
-    print(causalnetwork |>
-      DiagrammeR::render_graph())
+    print(
+      causalnetwork |>
+        DiagrammeR::render_graph()
+    )
   }
 
   if (save) {
     causalnetwork |>
-      DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(
-        savename,
-        ".png"
-      )))
-
+      DiagrammeR::export_graph(
+        file_name = file.path(
+          savedir,
+          stringr::str_c(
+            savename,
+            ".png"
+          )
+        )
+      )
 
     causalnetwork |>
-      DiagrammeR::export_graph(file_name = file.path(savedir, stringr::str_c(
-        savename,
-        ".pdf"
-      )))
+      DiagrammeR::export_graph(
+        file_name = file.path(
+          savedir,
+          stringr::str_c(
+            savename,
+            ".pdf"
+          )
+        )
+      )
   }
 
   if (returnnetwork) {

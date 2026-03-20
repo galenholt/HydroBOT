@@ -21,15 +21,15 @@
 #'
 read_and_geo <- function(datapath, type, geopath, whichcrs = 4283, ...) {
   # Dots pass gaugefilter and scenariofilter
-    dat <- get_module_output(datapath, type, ...)
+  dat <- get_module_output(datapath, type, ...)
 
   # deal with a single dataframe vs list of dfs
   if (is.data.frame(dat)) {
     dat <- join_to_geo(dat, geopath, whichcrs)
   } else {
     dat <- dat |>
-      purrr::map(~join_to_geo(.x, geopath, whichcrs))
+      purrr::map(~ join_to_geo(.x, geopath, whichcrs))
   }
 
-    return(dat)
+  return(dat)
 }

@@ -13,14 +13,18 @@
 #'
 #' @return A `tibble` with columns for `LTWPShortName`, `ewr_code`, `ewr_code_timing`, and `env_obj` (if `gaugescale = FALSE`), and including `PlanningUnitID` and `gauge` if `gaugescale = TRUE`)
 #' @export
-clean_ewr_obj <- function(ewrobjpath = 'ewrcausal',
-                          gaugescale = TRUE,
-                          saveout = FALSE,
-                          outdir, savename) {
-
-  rlang::warn(c('i' = "The new pattern is to obtain from py-ewr with `get_causal_ewr()`, which then cleans with `clean_ewr_causal()`.",
-                '!' = "MODIFY NETWORKS IN CLEAN_EWR_CAUSAL()",
-                "clean_ewr_obj()` is provided for certain handbuilding situations (typically beta-versions of causal networks)."))
+clean_ewr_obj <- function(
+  ewrobjpath = 'ewrcausal',
+  gaugescale = TRUE,
+  saveout = FALSE,
+  outdir,
+  savename
+) {
+  rlang::warn(c(
+    'i' = "The new pattern is to obtain from py-ewr with `get_causal_ewr()`, which then cleans with `clean_ewr_causal()`.",
+    '!' = "MODIFY NETWORKS IN CLEAN_EWR_CAUSAL()",
+    "clean_ewr_obj()` is provided for certain handbuilding situations (typically beta-versions of causal networks)."
+  ))
 
   if (ewrobjpath == 'ewrtool') {
     # the python in the EWR tool that gives `get_ewr_table` drops the columns we need, so get the sheet directly
@@ -29,32 +33,51 @@ clean_ewr_obj <- function(ewrobjpath = 'ewrcausal',
 
     objective_mapping <- objective_mapping |>
       cleanewrs() |>
-      dplyr::select("planning_unit_name", "gauge", "ewr_code", "ewr_code_timing",
-                    "env_obj", "high_level", "state",
-                    LTWPShortName = "l_t_w_p_short_name")
+      dplyr::select(
+        "planning_unit_name",
+        "gauge",
+        "ewr_code",
+        "ewr_code_timing",
+        "env_obj",
+        "high_level",
+        "state",
+        LTWPShortName = "l_t_w_p_short_name"
+      )
 
     # we can't do a good job linking these yet, so make a few versions that will do the best we can.
     ewr2obj_embedded <- objective_mapping |>
       dplyr::select(-"high_level") |>
       dplyr::mutate(env_obj = strsplit(.data$env_obj, split = '_')) |>
       tidyr::unnest_longer(col = "env_obj") |>
-      dplyr::distinct(.data$planning_unit_name, .data$gauge, .data$ewr_code,
-                      .data$ewr_code_timing, .data$state, .data$l_t_w_p_short_name, .data$SWSDLName)
-
+      dplyr::distinct(
+        .data$planning_unit_name,
+        .data$gauge,
+        .data$ewr_code,
+        .data$ewr_code_timing,
+        .data$state,
+        .data$l_t_w_p_short_name,
+        .data$SWSDLName
+      )
 
     ewr2obj <- ewr2obj_embedded |>
-      dplyr::mutate(Target = dplyr::case_when(grepl('^NF', .data$env_obj) ~ "Native fish",
-                                       grepl('^NV', .data$env_obj) ~ "Native vegetation",
-                                       grepl('^OS', .data$env_obj) ~ "Other species",
-                                       grepl('^EF', .data$env_obj) ~ "Priority ecosystem function",
-                                       grepl('^WB', .data$env_obj) ~ "Waterbird",
-                                       .default = NA))
+      dplyr::mutate(
+        Target = dplyr::case_when(
+          grepl('^NF', .data$env_obj) ~ "Native fish",
+          grepl('^NV', .data$env_obj) ~ "Native vegetation",
+          grepl('^OS', .data$env_obj) ~ "Other species",
+          grepl('^EF', .data$env_obj) ~ "Priority ecosystem function",
+          grepl('^WB', .data$env_obj) ~ "Waterbird",
+          .default = NA
+        )
+      )
   } else {
     # read in and minor cleanup
-    ewr2obj <- readr::read_csv(ewrobjpath, show_col_types = FALSE)  |>
-      dplyr::rename(ewr_code = "EWR",
-                    # These are nearly sdl units, but the name 'LTWPShortName' comes from the EWR tool itself
-                    LTWPShortName = "Planning_area") |>
+    ewr2obj <- readr::read_csv(ewrobjpath, show_col_types = FALSE) |>
+      dplyr::rename(
+        ewr_code = "EWR",
+        # These are nearly sdl units, but the name 'LTWPShortName' comes from the EWR tool itself
+        LTWPShortName = "Planning_area"
+      ) |>
       dplyr::distinct()
 
     # separate out the Objectives into rows- we want a row for each Planning_area, EWR, Objective combo.
@@ -72,12 +95,20 @@ clean_ewr_obj <- function(ewrobjpath = 'ewrcausal',
       # Expand out to gauge scale- give the relevant LTWP area and ewr_code to each gauge and PlanningUnit
       # This may not be needed here, but it retains maximal information, including some that got lost in the switch to NSW ewr-obj mapping
       ewrs_in_pyewr <- get_ewr_table() |>
-        dplyr::select("PlanningUnitID", planning_unit_name = "PlanningUnitName",
-                      "LTWPShortName", gauge = "Gauge", ewr_code = "Code") |>
+        dplyr::select(
+          "PlanningUnitID",
+          planning_unit_name = "PlanningUnitName",
+          "LTWPShortName",
+          gauge = "Gauge",
+          ewr_code = "Code"
+        ) |>
         separate_ewr_codes()
 
-      ewr2obj <- dplyr::left_join(ewrs_in_pyewr, ewr2obj, by = c('LTWPShortName', 'ewr_code', 'ewr_code_timing'))
-
+      ewr2obj <- dplyr::left_join(
+        ewrs_in_pyewr,
+        ewr2obj,
+        by = c('LTWPShortName', 'ewr_code', 'ewr_code_timing')
+      )
     }
 
     # don't save NAs and make it a tibble
@@ -88,26 +119,20 @@ clean_ewr_obj <- function(ewrobjpath = 'ewrcausal',
     attr(ewr2obj, "pandas.index") <- NULL
   }
 
-
-
-
   # save
   if (saveout == 'r') {
-
     # Rdata for package structure
     saveRDS(ewr2obj, file = file.path(outdir, 'ewr2obj.rds'))
-
   } else if (saveout == 'csv') {
-
     # csv for other
-    readr::write_csv(ewr2obj,
-              file.path(outdir,
-                        paste0(savename,
-                               format(Sys.time(),
-                                      "%Y%m%d%H%M"),
-                               ".csv")))
+    readr::write_csv(
+      ewr2obj,
+      file.path(
+        outdir,
+        paste0(savename, format(Sys.time(), "%Y%m%d%H%M"), ".csv")
+      )
+    )
   }
 
   return(ewr2obj)
-
 }

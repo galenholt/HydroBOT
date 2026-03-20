@@ -10,7 +10,6 @@ test_that("group_until parser", {
     mdb = basin
   )
 
-
   gv <- parse_group_until(
     c(NA, "sdl_units"),
     c("scenario", "planning_unit_name"),

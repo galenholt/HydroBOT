@@ -23,30 +23,39 @@
 #' named color vectors.
 #' @export
 #'
-make_pal <- function(levels, palette,
-                     refvals = NULL, refcols = NULL,
-                     includeRef = FALSE, returnUnref = FALSE,
-                     direction = 1) {
+make_pal <- function(
+  levels,
+  palette,
+  refvals = NULL,
+  refcols = NULL,
+  includeRef = FALSE,
+  returnUnref = FALSE,
+  direction = 1
+) {
   # only use unique levels. I can't think of a reason to give the same value
   # different colors if it appears more than once
   levels <- unique(levels)
 
   # need some name references to know what function to use
   cnames <- paletteer::palettes_c_names |>
-    dplyr::mutate(formatted = stringr::str_c(.data$package,
-                                             palette, sep = "::")) |>
+    dplyr::mutate(
+      formatted = stringr::str_c(.data$package, palette, sep = "::")
+    ) |>
     dplyr::select("formatted") |>
     dplyr::pull()
 
   dnames <- paletteer::palettes_d_names |>
-    dplyr::mutate(formatted = stringr::str_c(.data$package,
-                                             palette, sep = "::")) |>
+    dplyr::mutate(
+      formatted = stringr::str_c(.data$package, palette, sep = "::")
+    ) |>
     dplyr::select("formatted") |>
     dplyr::pull()
 
   if (returnUnref) {
     if (!includeRef) {
-      rlang::abort("does not make sense to return a reffed and unreffed palette that don't match")
+      rlang::abort(
+        "does not make sense to return a reffed and unreffed palette that don't match"
+      )
     }
   }
 
@@ -58,23 +67,31 @@ make_pal <- function(levels, palette,
     levels <- levels[!(levels %in% refvals)]
   }
 
-
-
   if (palette %in% cnames) {
-    cols <- paletteer::paletteer_c(palette, length(levels),
-                                   direction = direction)
+    cols <- paletteer::paletteer_c(
+      palette,
+      length(levels),
+      direction = direction
+    )
   } else if (palette %in% dnames) {
-    cols <- paletteer::paletteer_d(palette, length(levels),
-                                   direction = direction)
+    cols <- paletteer::paletteer_d(
+      palette,
+      length(levels),
+      direction = direction
+    )
   } else {
     # try to inform a bit- I could auto-set palettes this way, but I'd rather
     # make the user do it right
     paltest <- grepl(palette, c(cnames, dnames), ignore.case = TRUE)
     if (any(paltest)) {
-      rlang::abort(glue::glue("Requested palette {palette} not present, likely because wrong case or missing letters.
-                   Try `{c(cnames, dnames)[which(paltest)]}`"))
+      rlang::abort(glue::glue(
+        "Requested palette {palette} not present, likely because wrong case or missing letters.
+                   Try `{c(cnames, dnames)[which(paltest)]}`"
+      ))
     } else {
-      rlang::abort(glue::glue("Requested palette {palette} not available in paletteer"))
+      rlang::abort(glue::glue(
+        "Requested palette {palette} not available in paletteer"
+      ))
     }
   }
 

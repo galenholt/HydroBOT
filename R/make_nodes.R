@@ -23,9 +23,14 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = "werp") {
   # they should appear on the graph if they exist
   if (length(typeorder) == 1 && typeorder == "werp") {
     typeorder <- c(
-      "ewr_code", "ewr_code_main", "eco_objective",
-      "objective_text", "theme",
-      "target_5_year_2024", "target_10_year_2029", "target_20_year_2039"
+      "ewr_code",
+      "ewr_code_main",
+      "eco_objective",
+      "objective_text",
+      "theme",
+      "target_5_year_2024",
+      "target_10_year_2029",
+      "target_20_year_2039"
     )
   }
 
@@ -39,16 +44,20 @@ make_nodes <- function(edgedf, groupers = NULL, typeorder = "werp") {
     stop("typeorder not a df or character vector")
   }
 
-
-
   fromnodes <- edgedf |>
-    dplyr::select(tidyselect::any_of(groupers),
-                  Name = "from", NodeType = "fromtype")
+    dplyr::select(
+      tidyselect::any_of(groupers),
+      Name = "from",
+      NodeType = "fromtype"
+    )
 
   tonodes <- edgedf |>
     dplyr::mutate(nodeorder = .data$edgeorder + 1) |>
-    dplyr::select(tidyselect::any_of(groupers),
-                  Name = "to", NodeType = "totype")
+    dplyr::select(
+      tidyselect::any_of(groupers),
+      Name = "to",
+      NodeType = "totype"
+    )
 
   allnodes <- dplyr::bind_rows(fromnodes, tonodes) |>
     dplyr::group_by(dplyr::across(tidyselect::any_of(groupers))) |>

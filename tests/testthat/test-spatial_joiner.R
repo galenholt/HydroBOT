@@ -29,5 +29,4 @@ test_that("intersecting works correctly, including area", {
   #   sf::st_as_sf() |>
   #   ggplot2::ggplot() +
   #   ggplot2::geom_sf(mapping = ggplot2::aes(fill = SWSDLName.y))
-
 })

@@ -7,13 +7,14 @@
 #' @keywords internal
 #'
 functionlister <- function(funs, forcenames = NULL) {
-
   # if this is nested, there's no good way to get names for the cases with bare
   # functions, so allow forcing.
   if (is.null(forcenames)) {
     funnames <- as.character(substitute(funs))
     # if bare names are c(name, name), the c gets included, so cut it
-    if(funnames[1] == "c") {funnames <- funnames[2:length(funnames)]}
+    if (funnames[1] == "c") {
+      funnames <- funnames[2:length(funnames)]
+    }
   } else {
     funnames <- forcenames
   }
@@ -25,7 +26,6 @@ functionlister <- function(funs, forcenames = NULL) {
     funs <- rlang::eval_tidy(rlang::parse_expr(funs))
   }
 
-
   # the list specification of ~ functions
   if (is.list(funs)) {
     funlist <- funs
@@ -33,7 +33,6 @@ functionlister <- function(funs, forcenames = NULL) {
     if (is.function(funs[[1]])) {
       names(funlist) <- funnames
     }
-
   } else if (is.character(funs)) {
     funlist <- try(mget(funs, inherits = TRUE), silent = TRUE)
     # Handle the situation of nothing to mget- try just returning the character and hope it works in an `eval` in `general_aggregate`
@@ -46,8 +45,6 @@ functionlister <- function(funs, forcenames = NULL) {
   } else {
     rlang::abort("funs is of unsupported type (bare names, character, or list")
   }
-
-
 
   return(funlist)
 }

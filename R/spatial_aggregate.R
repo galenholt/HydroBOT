@@ -38,18 +38,20 @@
 #'   polygons in `to_geo` and retaining desired theme-level information
 #' @export
 #'
-spatial_aggregate <- function(dat,
-                              to_geo,
-                              groupers,
-                              aggCols,
-                              funlist,
-                              ...,
-                              whichcrs = sf::st_crs(to_geo),
-                              keepAllPolys = FALSE,
-                              failmissing = TRUE,
-                              prefix = "spatial_",
-                              joinby = "spatial",
-                              auto_ewr_PU = FALSE) {
+spatial_aggregate <- function(
+  dat,
+  to_geo,
+  groupers,
+  aggCols,
+  funlist,
+  ...,
+  whichcrs = sf::st_crs(to_geo),
+  keepAllPolys = FALSE,
+  failmissing = TRUE,
+  prefix = "spatial_",
+  joinby = "spatial",
+  auto_ewr_PU = FALSE
+) {
   # making valid and adding polyID here and not inside spatial_joiner because
   # need to be valid with IDs later too. I should really do these with the input
   # polygons, not here. I need the to_geo again later, but not the dat. And
@@ -71,16 +73,19 @@ spatial_aggregate <- function(dat,
 
   if (isewrgaugepu & joinby != "nonspatial") {
     if (!auto_ewr_PU) {
-      rlang::warn(c("!", "EWR gauge to sdl units or planning units detected without `pseudo_spatial`!",
+      rlang::warn(c(
+        "!",
+        "EWR gauge to sdl units or planning units detected without `pseudo_spatial`!",
         "i" = "Gauges inform multiple SDLs and PUs; this will be lost.",
         "i" = "EWR outputs should be joined to `sdl_units` (or `planning_units`) pseudo-spatially (by column names), not with a spatial join",
         "i" = "Best to explicitly use `pseudo_spatial = 'sdl_units'` in `multi_aggregate()` or `read_and_agg()`.",
         "i" = "Lower-level processing should include as `joinby = 'nonspatial'` in `spatial_aggregate()`\n"
       ))
     } else {
-      rlang::inform(c("i" = "EWR gauges joined to larger units pseudo-spatially.",
-                      "*" = "Done automatically because `auto_ewr_PU = TRUE`",
-                      "*" = "Non-spatial join needed because gauges may inform areas they are not within",
+      rlang::inform(c(
+        "i" = "EWR gauges joined to larger units pseudo-spatially.",
+        "*" = "Done automatically because `auto_ewr_PU = TRUE`",
+        "*" = "Non-spatial join needed because gauges may inform areas they are not within",
         # "*" = "EWR outputs should be joined to `sdl_units` (or `planning_units`) pseudo-spatially (by column names), not with a spatial join",
         "*" = "Best to explicitly use `pseudo_spatial = 'sdl_units'` in `multi_aggregate()` or `read_and_agg()`.\n"
       ))
@@ -89,11 +94,21 @@ spatial_aggregate <- function(dat,
   }
 
   if (joinby == "spatial") {
-    fromto_pair <- spatial_joiner(from_geo = dat, to_geo = to_geo, whichcrs = whichcrs)
+    fromto_pair <- spatial_joiner(
+      from_geo = dat,
+      to_geo = to_geo,
+      whichcrs = whichcrs
+    )
   } else if (joinby == "nonspatial") {
-    fromto_pair <- pseudo_spatial_joiner(from_geo = dat, to_geo = to_geo, prefix = prefix)
+    fromto_pair <- pseudo_spatial_joiner(
+      from_geo = dat,
+      to_geo = to_geo,
+      prefix = prefix
+    )
   } else {
-    rlang::abort("code set up to pass column names with joinby, but not fully. If needed, write the last bits to make it work generally.")
+    rlang::abort(
+      "code set up to pass column names with joinby, but not fully. If needed, write the last bits to make it work generally."
+    )
     # fromto_pair <- dplyr::left_join(sf::st_drop_geometry(dat),
     #                                 sf::st_drop_geometry(to_geo),
     #                                 by = joinby)
@@ -105,7 +120,9 @@ spatial_aggregate <- function(dat,
   aggCols <- selectcreator(rlang::enquo(aggCols), fromto_pair, failmissing)
 
   # check time- this should come in from outside, but check here too
-  timecols <- purrr::map_lgl(dat, \(x) lubridate::is.Date(x) | lubridate::is.POSIXt(x))
+  timecols <- purrr::map_lgl(dat, \(x) {
+    lubridate::is.Date(x) | lubridate::is.POSIXt(x)
+  })
   if (any(timecols)) {
     timegroup <- names(dat)[which(timecols)]
   } else {
@@ -115,11 +132,12 @@ spatial_aggregate <- function(dat,
   # Force time-aggregation to be explicit
   if (!is.null(timegroup) && !timegroup %in% groupers) {
     rlang::abort(c(
-      glue::glue("The time column {timegroup} is not included as a grouper for spatial aggregation"),
+      glue::glue(
+        "The time column {timegroup} is not included as a grouper for spatial aggregation"
+      ),
       "Aggregation must explicitly specify dimensions"
     ))
   }
-
 
   # the code typically drops polygons that have no data. but we might want to keep them for plotting.
 
@@ -144,24 +162,26 @@ spatial_aggregate <- function(dat,
   # Bare names get lost as we go down into further functions, so use characters
   # and throw an ugly conditional on to do that. It's extra ugly with multiple bare names.
   # Have to specifically exclude quosures to avoid rlang warning, but this conditional is a mess.
-  if (!rlang::is_quosure(funlist) &&
-    (is.function(funlist) ||
-      (is.list(funlist) &
-        is.function(funlist[[1]])))) {
+  if (
+    !rlang::is_quosure(funlist) &&
+      (is.function(funlist) ||
+        (is.list(funlist) &
+          is.function(funlist[[1]])))
+  ) {
     funlist <- as.character(substitute(funlist))
     if (funlist[1] == "c") {
       funlist <- funlist[2:length(funlist)]
     }
   }
 
-  agged <- general_aggregate(fromto_pair,
+  agged <- general_aggregate(
+    fromto_pair,
     groupers = groupers,
     aggCols = tidyselect::ends_with(!!aggCols),
     funlist = funlist,
     failmissing = failmissing,
     prefix = prefix
   )
-
 
   # glue back onto the polygons. sf is lost because the x doesn't have the
   # geometry.
@@ -178,7 +198,6 @@ spatial_aggregate <- function(dat,
   if (keepAllPolys) {
     aggPoly <- dplyr::bind_rows(aggPoly, unusedPolys)
   }
-
 
   return(aggPoly)
 }

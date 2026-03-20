@@ -52,7 +52,6 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
   to_data <- sf::st_drop_geometry(to_geo) |>
     dplyr::rename(polyID_t = "polyID")
 
-
   # This conditional is annoying, and st_intersection works for points, but
   # it's much slower. And this also lets us auto-calculate area only when needed
   # (e.g. when the input scale *has* area)
@@ -71,11 +70,15 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
 
     # Need to test more vertices, 100k is a rough guess based on limited testing.
     if (fromverts > 100000) {
-      warning(glue::glue("from_geo has {fromverts} vertices. Consider simplifying (see `st_simplify` dTolerance) for faster performance"))
+      warning(glue::glue(
+        "from_geo has {fromverts} vertices. Consider simplifying (see `st_simplify` dTolerance) for faster performance"
+      ))
     }
 
     if (toverts > 100000) {
-      warning(glue::glue("to_geo has {toverts} vertices. Consider simplifying (see `st_simplify` dTolerance) for faster performance"))
+      warning(glue::glue(
+        "to_geo has {toverts} vertices. Consider simplifying (see `st_simplify` dTolerance) for faster performance"
+      ))
     }
 
     # st_intersection leaves only the intersection, NOT the full area of either
@@ -94,7 +97,12 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
     if (toverts <= fromverts) {
       fromto_pair <- withCallingHandlers(
         warning = function(cnd) {
-          if ((grepl('attribute variables are assumed to be spatially constant', cnd$message))) {
+          if (
+            (grepl(
+              'attribute variables are assumed to be spatially constant',
+              cnd$message
+            ))
+          ) {
             rlang::cnd_muffle(cnd)
           }
         },
@@ -103,7 +111,12 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
     } else {
       fromto_pair <- withCallingHandlers(
         warning = function(cnd) {
-          if ((grepl('attribute variables are assumed to be spatially constant', cnd$message))) {
+          if (
+            (grepl(
+              'attribute variables are assumed to be spatially constant',
+              cnd$message
+            ))
+          ) {
             rlang::cnd_muffle(cnd)
           }
         },
@@ -118,7 +131,11 @@ spatial_joiner <- function(from_geo, to_geo, whichcrs) {
 
   # join the data back on from the relevant polyIDs
   fromto_data <- from_data |>
-    dplyr::left_join(fromto_pair, by = "polyID_f", relationship = "many-to-many")|>
+    dplyr::left_join(
+      fromto_pair,
+      by = "polyID_f",
+      relationship = "many-to-many"
+    ) |>
     dplyr::left_join(to_data, by = "polyID_t", relationship = "many-to-many") |>
     dplyr::select(tidyselect::everything(), polyID = "polyID_t", -"polyID_f")
 
@@ -167,7 +184,9 @@ pseudo_spatial_joiner <- function(from_geo, to_geo, prefix) {
     if (length(missing_to) > 0) {
       rlang::warn(c(
         "Missing matches in join",
-        "!" = glue::glue("{missing_to} is present in {commonnames} of the input from_geo, but is not present in the to_geo being joined (likely {prefix})"),
+        "!" = glue::glue(
+          "{missing_to} is present in {commonnames} of the input from_geo, but is not present in the to_geo being joined (likely {prefix})"
+        ),
         "i" = "This will yield NA for joined columns (as it should), but because the from_geo is spatial, this can cause later issues due to lacking geometry.",
         "i" = "Because this is expected behaviour from a join, we leave it to the user to decide to pre-drop this from_geo, expand the joining from_geo set to include the needed links, or otherwise address it."
       ))

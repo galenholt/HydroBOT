@@ -5,6 +5,8 @@
 
 skip_if_no_file <- function(path) {
   if (!file.exists(path)) {
-    skip(glue::glue("File '{path}' not available- normal to not have 'data-raw/' if building the package"))
+    skip(glue::glue(
+      "File '{path}' not available- normal to not have 'data-raw/' if building the package"
+    ))
   }
 }

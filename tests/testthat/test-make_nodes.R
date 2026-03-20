@@ -4,9 +4,11 @@ test_that("nodeorder", {
     # dplyr::select(-ewr_code_timing, -state, -LTWPShortName, -env_obj) |>
     dplyr::distinct()
 
-  testedges <- make_edges(dflist = list(testset),
-                          fromtos = list(theme = c('ewr_code_main', 'theme')),
-                          gaugefilter = '421019')
+  testedges <- make_edges(
+    dflist = list(testset),
+    fromtos = list(theme = c('ewr_code_main', 'theme')),
+    gaugefilter = '421019'
+  )
 
   testnodes <- make_nodes(testedges)
 

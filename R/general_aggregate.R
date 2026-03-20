@@ -46,13 +46,15 @@
 #'   named according to the function applied and original name.
 #' @export
 #'
-general_aggregate <- function(data, groupers,
-                              aggCols, funlist,
-                              prefix = 'agg_',
-                              failmissing = TRUE,
-                              ...) {
-
-
+general_aggregate <- function(
+  data,
+  groupers,
+  aggCols,
+  funlist,
+  prefix = 'agg_',
+  failmissing = TRUE,
+  ...
+) {
   # Clean up groupers and aggCols from various formats and ensure only present
   # columns are included as character vectors. We're in this mess because some
   # of the rlang breaks with depth
@@ -60,7 +62,9 @@ general_aggregate <- function(data, groupers,
   aggCols <- selectcreator(rlang::enquo(aggCols), data, failmissing)
 
   if (!is.character(groupers) || !is.character(aggCols)) {
-    rlang::abort('the new way of enforcing characters is not working, we have tidyselect still. back to `{{}}` in the `across`')
+    rlang::abort(
+      'the new way of enforcing characters is not working, we have tidyselect still. back to `{{}}` in the `across`'
+    )
   }
 
   # typical name parsing
@@ -70,8 +74,12 @@ general_aggregate <- function(data, groupers,
   if (rlang::is_quosure(funlist)) {
     data_agg <- data |>
       dplyr::group_by(dplyr::across(tidyselect::all_of(groupers))) |>
-      dplyr::summarise(dplyr::across(tidyselect::all_of(aggCols), !!funlist, ...,
-                                     .names = nameparser)) |>
+      dplyr::summarise(dplyr::across(
+        tidyselect::all_of(aggCols),
+        !!funlist,
+        ...,
+        .names = nameparser
+      )) |>
       dplyr::ungroup()
 
     return(data_agg)
@@ -82,29 +90,35 @@ general_aggregate <- function(data, groupers,
     # make funlist a named list whether it comes in that way or as a character vector
     if (is.null(names(funlist))) {
       funnam <- as.character(substitute(funlist))
-      if(funnam[1] == "c") {funnam <- funnam[2:length(funnam)]}
+      if (funnam[1] == "c") {
+        funnam <- funnam[2:length(funnam)]
+      }
     } else {
       funnam <- names(funlist)
     }
 
-    funlist <- functionlister({{funlist}}, forcenames = funnam)
-
+    funlist <- functionlister({{ funlist }}, forcenames = funnam)
   } else {
     # if funlist is a bare function, leave it alone but get its name
     # https://stackoverflow.com/questions/1567718/getting-a-function-name-as-a-string
     funname <- as.character(substitute(funlist))
     # https://cran.r-project.org/web/packages/dplyr/vignettes/programming.html
-    nameparser <- paste0(prefix, funname,'_{.col}')
+    nameparser <- paste0(prefix, funname, '_{.col}')
   }
 
-
   # Try, and if fail, force with characters. Should I just go straight for characters? It seems so clunky I'd rather not.
-  data_agg <- try(data |>
-    dplyr::group_by(dplyr::across(tidyselect::all_of(groupers))) |>
-    dplyr::summarise(dplyr::across(tidyselect::all_of(aggCols), {{funlist}}, ...,
-                                   .names = nameparser)) |>
-    dplyr::ungroup(),
-    silent = TRUE)
+  data_agg <- try(
+    data |>
+      dplyr::group_by(dplyr::across(tidyselect::all_of(groupers))) |>
+      dplyr::summarise(dplyr::across(
+        tidyselect::all_of(aggCols),
+        {{ funlist }},
+        ...,
+        .names = nameparser
+      )) |>
+      dplyr::ungroup(),
+    silent = TRUE
+  )
 
   if (inherits(data_agg, 'try-error')) {
     # turn the list into characters. Eval can't handle `return`, so make an
@@ -127,12 +141,14 @@ general_aggregate <- function(data, groupers,
     # go again
     data_agg <- data |>
       dplyr::group_by(dplyr::across(tidyselect::all_of(groupers))) |>
-      dplyr::summarise(dplyr::across(tidyselect::all_of(aggCols), {{FUNS_quo}}, ...,
-                                     .names = nameparser)) |>
+      dplyr::summarise(dplyr::across(
+        tidyselect::all_of(aggCols),
+        {{ FUNS_quo }},
+        ...,
+        .names = nameparser
+      )) |>
       dplyr::ungroup()
   }
 
-
   return(data_agg)
 }
-

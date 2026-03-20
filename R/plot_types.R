@@ -8,8 +8,14 @@
 #'
 #' @return ggplot object
 #' @keywords internal
-plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
-                     position, transoutcome) {
+plot_bar <- function(
+  prepped,
+  x_col,
+  x_lab,
+  outcome_lab,
+  position,
+  transoutcome
+) {
   outcome_plot <- prepped$data |>
     ggplot2::ggplot(ggplot2::aes(
       x = .data[[x_col]],
@@ -20,8 +26,8 @@ plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
     ggplot2::scale_y_continuous(trans = transoutcome) +
     ggplot2::scale_x_discrete(guide = ggplot2::guide_axis())
 
-
-  outcome_plot <- handle_palettes(outcome_plot,
+  outcome_plot <- handle_palettes(
+    outcome_plot,
     aes_type = "fill",
     prepped$pal_list,
     prepped$color_type,
@@ -47,15 +53,22 @@ plot_bar <- function(prepped, x_col, x_lab, outcome_lab,
 #'
 #' @return ggplot object
 #' @keywords internal
-plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
-                         position, transoutcome, transx,
-                         smooth_arglist, xtype = "numeric") {
+plot_numeric <- function(
+  prepped,
+  x_col,
+  x_lab,
+  outcome_lab,
+  position,
+  transoutcome,
+  transx,
+  smooth_arglist,
+  xtype = "numeric"
+) {
   if (!inherits(position, "gg")) {
     if (is.null(position) || position == "stack") {
       position <- "identity"
     }
   }
-
 
   outcome_plot <- prepped$data |>
     ggplot2::ggplot(ggplot2::aes(
@@ -72,7 +85,6 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
       ggplot2::scale_x_continuous(trans = transx)
   }
 
-
   # THESE CONDITIONALS ARE A MESS. MAYBE JUST is.logical, is.list, is.null...
 
   # There must be a slick way to do this, but the rlang::exec and do.call
@@ -85,7 +97,6 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
     linewidth = NULL, # Odd that I have to set this.
     alpha = 0.4
   )
-
 
   # Deal with logical carryover
   if (is.logical(smooth_arglist)) {
@@ -113,9 +124,9 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
       )
   }
 
-
   # do I need to do this for fill as well when I have smooth?
-  outcome_plot <- handle_palettes(outcome_plot,
+  outcome_plot <- handle_palettes(
+    outcome_plot,
     aes_type = "color",
     pal_list = prepped$pal_list,
     color_type = prepped$color_type,
@@ -123,7 +134,8 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
   )
 
   if (!is.null(smooth_arglist)) {
-    outcome_plot <- handle_palettes(outcome_plot,
+    outcome_plot <- handle_palettes(
+      outcome_plot,
       aes_type = "fill",
       pal_list = prepped$pal_list,
       color_type = prepped$color_type,
@@ -148,9 +160,20 @@ plot_numeric <- function(prepped, x_col, x_lab, outcome_lab,
 #'
 #' @return ggplot object
 #' @keywords internal
-plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "grey35", outcome_lab,
-                     facet_wrapper, facet_row, facet_col,
-                     sceneorder, transoutcome, setLimits, base_list) {
+plot_map <- function(
+  prepped,
+  underlay_list,
+  overlay_list,
+  map_outlinecolor = "grey35",
+  outcome_lab,
+  facet_wrapper,
+  facet_row,
+  facet_col,
+  sceneorder,
+  transoutcome,
+  setLimits,
+  base_list
+) {
   # Check whether we're accidentally overplotting. This either completes
   # silently or aborts with a message
   test_overplotting(data = prepped$data, facet_wrapper, facet_row, facet_col)
@@ -160,7 +183,9 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "g
   # the plot piece by piece
   if (all(sf::st_is(prepped$data, c("POLYGON", "MULTIPOLYGON")))) {
     maindatatype <- "areal"
-  } else if (all(sf::st_is(prepped$data, c("POINT", "LINESTRING", "MULTIPOINT")))) {
+  } else if (
+    all(sf::st_is(prepped$data, c("POINT", "LINESTRING", "MULTIPOINT")))
+  ) {
     maindatatype <- "point"
   }
 
@@ -174,7 +199,11 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "g
       underlay_list <- list(underlay = get(underlay_list), underlay_pal = NA)
     }
     # if flat put it as the first list in a length-one list for generality
-    if ("underlay" %in% names(underlay_list) | "underover" %in% names(underlay_list)) {
+    if (
+      "underlay" %in%
+        names(underlay_list) |
+        "underover" %in% names(underlay_list)
+    ) {
       underlay_list <- list(underlay_list)
     }
   }
@@ -187,11 +216,12 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "g
       overlay_list <- list(overlay = get(overlay_list), overlay_pal = "black")
     }
     # if flat put it as the first list in a length-one list for generality
-    if ("overlay" %in% names(overlay_list) | "underover" %in% names(overlay_list)) {
+    if (
+      "overlay" %in% names(overlay_list) | "underover" %in% names(overlay_list)
+    ) {
       overlay_list <- list(overlay_list)
     }
   }
-
 
   # Initialise the plot
   outcome_plot <- ggplot2::ggplot()
@@ -207,7 +237,8 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "g
     maincolorpal = prepped$pal_list,
     transoutcome = transoutcome,
     setLimits = setLimits,
-    base_list = base_list, uotype = "underlay"
+    base_list = base_list,
+    uotype = "underlay"
   )
 
   # Make the 'main' level. This is sort of silly in some ways, since we could
@@ -219,7 +250,8 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "g
         data = prepped$data,
         ggplot2::aes(color = .data$color)
       )
-    outcome_plot <- handle_palettes(outcome_plot,
+    outcome_plot <- handle_palettes(
+      outcome_plot,
       aes_type = "color",
       pal_list = prepped$pal_list,
       color_type = prepped$color_type,
@@ -229,15 +261,19 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "g
       base_list = base_list
     )
 
-    outcome_plot <- outcome_plot + ggplot2::labs(color = paste0(outcome_lab, prepped$ylab_append))
+    outcome_plot <- outcome_plot +
+      ggplot2::labs(color = paste0(outcome_lab, prepped$ylab_append))
   }
   if (maindatatype == "areal") {
     outcome_plot <- outcome_plot +
       ggplot2::geom_sf(
         data = prepped$data,
-        ggplot2::aes(fill = .data$color), color = map_outlinecolor
-      ) + ggplot2::theme_bw()
-    outcome_plot <- handle_palettes(outcome_plot,
+        ggplot2::aes(fill = .data$color),
+        color = map_outlinecolor
+      ) +
+      ggplot2::theme_bw()
+    outcome_plot <- handle_palettes(
+      outcome_plot,
       aes_type = "fill",
       pal_list = prepped$pal_list,
       color_type = prepped$color_type,
@@ -247,10 +283,9 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "g
       base_list = base_list
     )
 
-
-    outcome_plot <- outcome_plot + ggplot2::labs(fill = paste0(outcome_lab, prepped$ylab_append))
+    outcome_plot <- outcome_plot +
+      ggplot2::labs(fill = paste0(outcome_lab, prepped$ylab_append))
   }
-
 
   # I'm not sure this still has to happen here, but it works so leave it for
   # now. Would be better to do the facet smash for all plots at the end
@@ -267,7 +302,6 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "g
       ggplot2::facet_grid(stats::reformulate(facet_col, facet_row))
   }
 
-
   # layer up the overlays
   outcome_plot <- make_underover(
     underover_list = overlay_list,
@@ -279,7 +313,8 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "g
     maincolorpal = prepped$pal_list,
     transoutcome = transoutcome,
     setLimits = setLimits,
-    base_list = base_list, uotype = "overlay"
+    base_list = base_list,
+    uotype = "overlay"
   )
 
   return(outcome_plot)
@@ -308,26 +343,30 @@ plot_map <- function(prepped, underlay_list, overlay_list, map_outlinecolor = "g
 #'
 #' @return ggplot object composed of stacked maps according to underover_list
 #' @keywords internal
-make_underover <- function(underover_list,
-                           outcome_plot,
-                           sceneorder,
-                           outcome_lab,
-                           maindata,
-                           maindatatype,
-                           maincolorpal,
-                           transoutcome,
-                           setLimits,
-                           base_list,
-                           uotype = "internal") {
+make_underover <- function(
+  underover_list,
+  outcome_plot,
+  sceneorder,
+  outcome_lab,
+  maindata,
+  maindatatype,
+  maincolorpal,
+  transoutcome,
+  setLimits,
+  base_list,
+  uotype = "internal"
+) {
   # A full list to allow partial specification with null-filling
   full_list <- list(
-    underover = NULL, outcome_col = NULL,
+    underover = NULL,
+    outcome_col = NULL,
     pal_list = NA, # NA will show something, NULL just fails
     pal_direction = 1,
     colorgroups = NULL,
     map_outlinecolor = "grey35",
     outcome_lab = outcome_lab, # inherit from outer, but can be overwritten
-    base_list = NULL, zero_adjust = 0,
+    base_list = NULL,
+    zero_adjust = 0,
     onlyzeros = FALSE,
     transoutcome = transoutcome,
     transx = NULL,
@@ -354,23 +393,28 @@ make_underover <- function(underover_list,
     return(x)
   }
 
-
-
   if (uotype == "underlay") {
-    underover_list <- purrr::map(underover_list, \(x) settype(x, typename = "underlay"))
+    underover_list <- purrr::map(underover_list, \(x) {
+      settype(x, typename = "underlay")
+    })
   }
 
   if (uotype == "overlay") {
-    underover_list <- purrr::map(underover_list, \(x) settype(x, typename = "overlay"))
+    underover_list <- purrr::map(underover_list, \(x) {
+      settype(x, typename = "overlay")
+    })
   }
 
   if (uotype == "internal") {
-    typeexists <- all(purrr::map_lgl(underover_list, \(x) "uotype" %in% names(x)))
+    typeexists <- all(purrr::map_lgl(underover_list, \(x) {
+      "uotype" %in% names(x)
+    }))
     if (!typeexists) {
-      rlang::abort("asking for underlay or overlay, but have not specified a uotype. Do this either with separate underlay_list and overlay_list or a single list with a specified outype item")
+      rlang::abort(
+        "asking for underlay or overlay, but have not specified a uotype. Do this either with separate underlay_list and overlay_list or a single list with a specified outype item"
+      )
     }
   }
-
 
   # there might be several layers, so loop
   for (uo in underover_list) {
@@ -390,22 +434,32 @@ make_underover <- function(underover_list,
     # get the type of this underover
     if (all(sf::st_is(uo$underover, c("POLYGON", "MULTIPOLYGON")))) {
       uo_datatype <- "areal"
-    } else if (all(sf::st_is(uo$underover, c("POINT", "LINESTRING", "MULTIPOINT", "MULTILINESTRING")))) {
+    } else if (
+      all(sf::st_is(
+        uo$underover,
+        c("POINT", "LINESTRING", "MULTIPOINT", "MULTILINESTRING")
+      ))
+    ) {
       uo_datatype <- "point"
     }
 
     # are we trying to have meaningful color or fill in two places (here and main plot?)
     # is there a better way to do this than to look for the paletteer value?
-    if (maindatatype == uo_datatype &
-      grepl("::", uo$pal_list) &
-      (uo$pal_list != maincolorpal[[1]])) {
-      rlang::warn("Trying to have meaningful fill or color scale with different palettes for underover and main data. Removing from underover")
+    if (
+      maindatatype == uo_datatype &
+        grepl("::", uo$pal_list) &
+        (uo$pal_list != maincolorpal[[1]])
+    ) {
+      rlang::warn(
+        "Trying to have meaningful fill or color scale with different palettes for underover and main data. Removing from underover"
+      )
       uo$pal_list <- NA
     }
 
     # data and plot prep
     uprep <- plot_data_prep(
-      data = uo$underover, outcome_col = uo$outcome_col,
+      data = uo$underover,
+      outcome_col = uo$outcome_col,
       sceneorder = sceneorder,
       base_list = uo$base_list,
       zero_adjust = uo$zero_adjust,
@@ -423,7 +477,6 @@ make_underover <- function(underover_list,
       point_group = uo$point_group
     )
 
-
     if (uo_datatype == "point") {
       # fixed color gets its own call
       if (uprep$color_type == "fixed") {
@@ -435,7 +488,8 @@ make_underover <- function(underover_list,
             data = uprep$data,
             ggplot2::aes(color = .data$color)
           )
-        outcome_plot <- handle_palettes(outcome_plot,
+        outcome_plot <- handle_palettes(
+          outcome_plot,
           aes_type = "color",
           pal_list = uprep$pal_list,
           color_type = uprep$color_type,
@@ -453,7 +507,8 @@ make_underover <- function(underover_list,
       if (uprep$color_type == "fixed") {
         outcome_plot <- outcome_plot +
           ggplot2::geom_sf(
-            data = uprep$data, fill = uprep$pal_list,
+            data = uprep$data,
+            fill = uprep$pal_list,
             color = uo$map_outlinecolor
           )
       } else {
@@ -463,7 +518,8 @@ make_underover <- function(underover_list,
             ggplot2::aes(fill = .data$color),
             color = uo$map_outlinecolor
           )
-        outcome_plot <- handle_palettes(outcome_plot,
+        outcome_plot <- handle_palettes(
+          outcome_plot,
           aes_type = "fill",
           pal_list = uprep$pal_list,
           color_type = uprep$color_type,
@@ -494,14 +550,22 @@ make_underover <- function(underover_list,
 #'
 #' @return ggplot object
 #' @keywords internal
-plot_heatmap <- function(prepped,
-                         x_col, x_lab,
-                         y_col, y_lab,
-                         outcome_lab,
-                         transoutcome, transx, transy,
-                         contour_arglist,
-                         xtype, ytype,
-                         setLimits, base_list) {
+plot_heatmap <- function(
+  prepped,
+  x_col,
+  x_lab,
+  y_col,
+  y_lab,
+  outcome_lab,
+  transoutcome,
+  transx,
+  transy,
+  contour_arglist,
+  xtype,
+  ytype,
+  setLimits,
+  base_list
+) {
   # build the base plot with x and y (z/fill depend on whether tiles or contours)
   outcome_plot <- prepped$data |>
     ggplot2::ggplot(ggplot2::aes(
@@ -521,15 +585,23 @@ plot_heatmap <- function(prepped,
   }
 
   # tiled heatmap if no contours
-  if (is.null(contour_arglist) | (!is.null(contour_arglist$interpolate) && contour_arglist$interpolate)) {
+  if (
+    is.null(contour_arglist) |
+      (!is.null(contour_arglist$interpolate) && contour_arglist$interpolate)
+  ) {
     heat_aes <- "fill"
 
     if (!is.null(contour_arglist$interpolate) && contour_arglist$interpolate) {
       outcome_plot <- outcome_plot +
-        ggplot2::geom_raster(mapping = ggplot2::aes(fill = .data[[prepped$outcome_col]]), interpolate = TRUE)
+        ggplot2::geom_raster(
+          mapping = ggplot2::aes(fill = .data[[prepped$outcome_col]]),
+          interpolate = TRUE
+        )
     } else {
       outcome_plot <- outcome_plot +
-        ggplot2::geom_tile(mapping = ggplot2::aes(fill = .data[[prepped$outcome_col]]))
+        ggplot2::geom_tile(
+          mapping = ggplot2::aes(fill = .data[[prepped$outcome_col]])
+        )
     }
   }
   # if there are contour args, make contours
@@ -545,20 +617,27 @@ plot_heatmap <- function(prepped,
       na.rm = FALSE
     )
 
-    contour_arglist <- utils::modifyList(default_contour_arglist, contour_arglist)
+    contour_arglist <- utils::modifyList(
+      default_contour_arglist,
+      contour_arglist
+    )
 
     # We need to do the trans to the data itself for contours because of the way
     # they're binned.
     if (!rlang::is_function(get(transoutcome))) {
-      rlang::abort(glue::glue("`transoutcome` ({transoutcome}) is not a named function and so cannot be applied to this data.
-                              If it is an acceptable trans for ggplot/scales, it should work for anything other than contour plots.\n"))
+      rlang::abort(glue::glue(
+        "`transoutcome` ({transoutcome}) is not a named function and so cannot be applied to this data.
+                              If it is an acceptable trans for ggplot/scales, it should work for anything other than contour plots.\n"
+      ))
     }
     outcome_plot <- outcome_plot +
       ggplot2::geom_contour_filled(
-        mapping = ggplot2::aes(z = rlang::exec(
-          get(transoutcome),
-          .data[[prepped$outcome_col]]
-        )),
+        mapping = ggplot2::aes(
+          z = rlang::exec(
+            get(transoutcome),
+            .data[[prepped$outcome_col]]
+          )
+        ),
         bins = contour_arglist$bins,
         binwidth = contour_arglist$binwidth,
         breaks = contour_arglist$breaks,
@@ -585,12 +664,15 @@ plot_heatmap <- function(prepped,
     } else if (is.numeric(contour_arglist$breaks)) {
       nbins <- length(contour_arglist$breaks)
     } else if (is.function(contour_arglist$breaks)) {
-      rlang::inform("breaks for contours is a function, cannot infer number bins, ignoring palette")
+      rlang::inform(
+        "breaks for contours is a function, cannot infer number bins, ignoring palette"
+      )
       nbins <- NULL
     }
   }
 
-  outcome_plot <- handle_palettes(outcome_plot,
+  outcome_plot <- handle_palettes(
+    outcome_plot,
     aes_type = heat_aes,
     pal_list = prepped$pal_list,
     color_type = prepped$color_type,

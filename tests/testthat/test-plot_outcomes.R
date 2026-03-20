@@ -6,23 +6,34 @@ skip_on_os(c('linux', 'mac'))
 ewr_to_agg <- make_test_ewr_prepped()
 
 # Sets up the earlier approach with time-means that most tests were built for
-ewr_to_agg_timemean <- temporal_aggregate(ewr_to_agg,
-                                          breaks = 'all_time',
-                                          groupers = c('scenario', 'gauge',
-                                                       'planning_unit_name',
-                                                       'SWSDLName', 'ewr_code',
-                                                       'ewr_code_main'),
-                                          aggCols = 'ewr_achieved',
-                                          funlist = 'ArithmeticMean',
-                                          prefix = '') |>
+ewr_to_agg_timemean <- temporal_aggregate(
+  ewr_to_agg,
+  breaks = 'all_time',
+  groupers = c(
+    'scenario',
+    'gauge',
+    'planning_unit_name',
+    'SWSDLName',
+    'ewr_code',
+    'ewr_code_main'
+  ),
+  aggCols = 'ewr_achieved',
+  funlist = 'ArithmeticMean',
+  prefix = ''
+) |>
   dplyr::rename(ewr_achieved = ArithmeticMean_ewr_achieved)
 
 # use the noPU style that ignores planning units because it yields better tests
 # (gauges as points over polygons, etc). Throws a warning though.
-expect_warning(agg_theme_space <- make_test_agg(namehistory = FALSE, style = 'noPU'))
+expect_warning(
+  agg_theme_space <- make_test_agg(namehistory = FALSE, style = 'noPU')
+)
 
 # create a quant description of scenarios
-scenarios <- tibble::tibble(scenario = c("base", "down4", "up4", 'MAX'), delta = c(1, 0.25, 4, Inf))
+scenarios <- tibble::tibble(
+  scenario = c("base", "down4", "up4", 'MAX'),
+  delta = c(1, 0.25, 4, Inf)
+)
 
 obj_sdl_to_plot <- agg_theme_space$sdl_units |>
   dplyr::mutate(env_group = stringr::str_extract(eco_objective, "^[A-Z]+")) |>
@@ -44,7 +55,8 @@ eco_objective_to_plot <- agg_theme_space$eco_objective |>
 
 
 # palettes
-SDL_pal <- make_pal(unique(agg_theme_space$sdl_units$SWSDLName),
+SDL_pal <- make_pal(
+  unique(agg_theme_space$sdl_units$SWSDLName),
   palette = "ggsci::nrc_npg"
 )
 
@@ -59,8 +71,8 @@ obj_pal <- make_pal(
 )
 
 test_that("basin works with single color palette", {
-
-  basin_plot <- plot_outcomes(basin_to_plot,
+  basin_plot <- plot_outcomes(
+    basin_to_plot,
     outcome_col = "ewr_achieved",
     colorset = "theme",
     pal_list = list("scico::oslo"),
@@ -71,12 +83,13 @@ test_that("basin works with single color palette", {
   vdiffr::expect_doppelganger("stacked bar simple", basin_plot)
 
   # flipping the pal_direction
-  basin_plot_pd <- plot_outcomes(basin_to_plot,
-                              outcome_col = "ewr_achieved",
-                              colorset = "theme",
-                              pal_list = list("scico::oslo"),
-                              pal_direction = -1,
-                              sceneorder = c("down4", "base", "up4")
+  basin_plot_pd <- plot_outcomes(
+    basin_to_plot,
+    outcome_col = "ewr_achieved",
+    colorset = "theme",
+    pal_list = list("scico::oslo"),
+    pal_direction = -1,
+    sceneorder = c("down4", "base", "up4")
   ) +
     ggplot2::theme(legend.position = "none")
 
@@ -84,8 +97,8 @@ test_that("basin works with single color palette", {
 })
 
 test_that("a fixed color works (contrived)", {
-
-  basin_plotred <- plot_outcomes(basin_to_plot,
+  basin_plotred <- plot_outcomes(
+    basin_to_plot,
     outcome_col = "ewr_achieved",
     colorset = "theme",
     pal_list = "firebrick",
@@ -127,7 +140,7 @@ test_that("multi-palette and facetting", {
       colorgroups = "env_group",
       colorset = "eco_objective",
       pal_list = grouplist,
-      pal_direction = c(1,-1,1,-1,1,-1),
+      pal_direction = c(1, -1, 1, -1, 1, -1),
       facet_wrapper = "SWSDLName",
       sceneorder = c("down4", "base", "up4")
     )
@@ -164,7 +177,6 @@ test_that("multi-palette and facetting", {
 })
 
 test_that("flipped", {
-
   # What I want to do is just swap the x and fill arguments and pass in the
   # scenario palette. Can I do that easily?
 
@@ -182,7 +194,6 @@ test_that("flipped", {
     )
 
   vdiffr::expect_doppelganger("scenario stack", sdl_plot)
-
 
   # outcome groups
   sdl_plot_g <- obj_sdl_to_plot |>
@@ -247,12 +258,14 @@ test_that("flipped", {
 })
 
 test_that("quant x", {
-
   # What I want to do is just use a quantitative x and have it automatically use
   # a line. Can I do that easily?
 
   # create a quant description of scenarios
-  scenarios <- tibble::tibble(scenario = c("base", "down4", "up4"), delta = c(1, 0.25, 4))
+  scenarios <- tibble::tibble(
+    scenario = c("base", "down4", "up4"),
+    delta = c(1, 0.25, 4)
+  )
 
   # need to facet by space sdl unit and create a group col to take multiple palettes
   sdl_line <- obj_sdl_to_plot |>
@@ -282,7 +295,8 @@ test_that("quant x", {
       facet_row = "SWSDLName",
       facet_col = ".",
       base_list = list(
-        base_lev = "base", comp_fun = "difference",
+        base_lev = "base",
+        comp_fun = "difference",
         group_cols = c("eco_objective", "polyID")
       )
     )
@@ -305,16 +319,20 @@ test_that("quant x", {
       facet_row = "env_group",
       facet_col = ".",
       base_list = list(
-        base_lev = "base", comp_fun = "difference",
+        base_lev = "base",
+        comp_fun = "difference",
         group_cols = c("eco_objective", "polyID")
       )
     )
-  vdiffr::expect_doppelganger("line by catchment with obj groups", sdl_line_catchment)
+  vdiffr::expect_doppelganger(
+    "line by catchment with obj groups",
+    sdl_line_catchment
+  )
 
   # jittering- set the seed each time or the jitters differ
   set.seed(18)
   sdl_smooth_mean_jf <- obj_sdl_to_plot |>
-    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
     plot_outcomes(
       outcome_col = "ewr_achieved",
       x_col = "delta",
@@ -340,7 +358,7 @@ test_that("quant x", {
   # jittering- default
   set.seed(18)
   sdl_smooth_mean_jc <- obj_sdl_to_plot |>
-    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
     plot_outcomes(
       outcome_col = "ewr_achieved",
       x_col = "delta",
@@ -381,7 +399,8 @@ test_that("quant x", {
       facet_col = ".",
       sceneorder = c("down4", "base", "up4"),
       base_list = list(
-        base_lev = "base", comp_fun = "difference",
+        base_lev = "base",
+        comp_fun = "difference",
         group_cols = c("eco_objective", "polyID")
       ),
       smooth = TRUE
@@ -395,9 +414,6 @@ test_that("quant x", {
 })
 
 test_that("maps", {
-
-
-
   # Make a minimal map
   sdl_map <- obj_sdl_to_plot |>
     dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
@@ -446,7 +462,6 @@ test_that("maps", {
 
   vdiffr::expect_doppelganger("sdl_map_colorlabel", sdl_map)
 
-
   # put the basin in the background
   sdl_basin_background <- obj_sdl_to_plot |>
     dplyr::filter(env_group == "WB") |> # Need to reduce dimensionality
@@ -466,25 +481,30 @@ test_that("maps", {
 
   # If I try to put a palette on the background with a palette in the foreground, it should warn and swap to NA
   # Using cewo valleys because then it makes sense to have a fill sometimes.
-  expect_warning(sdl_valley_background_warn <- obj_sdl_to_plot |>
-    dplyr::filter(env_group == "WB") |> # Need to reduce dimensionality
-    plot_outcomes(
-      outcome_col = "ewr_achieved",
-      plot_type = "map",
-      colorgroups = NULL,
-      colorset = "ewr_achieved",
-      pal_list = list("scico::berlin"),
-      facet_col = "eco_objective",
-      facet_row = "scenario",
-      sceneorder = c("down4", "base", "up4"),
-      underlay_list = list(
-        underlay = cewo_valleys,
-        underlay_ycol = "ValleyName",
-        underlay_pal = "scico::hawaii"
+  expect_warning(
+    sdl_valley_background_warn <- obj_sdl_to_plot |>
+      dplyr::filter(env_group == "WB") |> # Need to reduce dimensionality
+      plot_outcomes(
+        outcome_col = "ewr_achieved",
+        plot_type = "map",
+        colorgroups = NULL,
+        colorset = "ewr_achieved",
+        pal_list = list("scico::berlin"),
+        facet_col = "eco_objective",
+        facet_row = "scenario",
+        sceneorder = c("down4", "base", "up4"),
+        underlay_list = list(
+          underlay = cewo_valleys,
+          underlay_ycol = "ValleyName",
+          underlay_pal = "scico::hawaii"
+        )
       )
-    ))
+  )
 
-  vdiffr::expect_doppelganger("sdl_valley_background_warn", sdl_valley_background_warn)
+  vdiffr::expect_doppelganger(
+    "sdl_valley_background_warn",
+    sdl_valley_background_warn
+  )
 
   # gauges as main focus
   gauges_map <- eco_objective_to_plot |>
@@ -673,7 +693,6 @@ test_that("maps", {
 
   vdiffr::expect_doppelganger("sdl_gauges_quant", sdl_gauges_quant)
 
-
   # Does it work for the basin?
   basin_map <- agg_theme_space$mdb |>
     plot_outcomes(
@@ -705,7 +724,10 @@ test_that("maps", {
       overlay_list = list(
         list(overlay = "sdl_units", overlay_pal = NA),
         list(
-          overlay = dplyr::filter(eco_objective_to_plot, eco_objective == "NF1"),
+          overlay = dplyr::filter(
+            eco_objective_to_plot,
+            eco_objective == "NF1"
+          ),
           overlay_pal = "scico::oslo",
           overlay_ycol = "ewr_achieved"
         )
@@ -714,7 +736,6 @@ test_that("maps", {
     ggplot2::theme(legend.position = "bottom")
 
   vdiffr::expect_doppelganger("basin_map_multi", basin_map_multi)
-
 
   # How under- and overlays. nearly identical to above, but make sure palettes work with under
   sdl_gauges_quant_basinpal <- obj_sdl_to_plot |>
@@ -738,22 +759,32 @@ test_that("maps", {
     ) +
     ggplot2::theme(legend.position = "bottom")
 
-  vdiffr::expect_doppelganger("sdl_gauges_quant_basinpal", sdl_gauges_quant_basinpal)
+  vdiffr::expect_doppelganger(
+    "sdl_gauges_quant_basinpal",
+    sdl_gauges_quant_basinpal
+  )
 
   # Underlay and overlay with standard syntax. This is how it should usually be
   # done, but I don't want to change all the old tests (and they also check
   # backwards compatibility) check under and over, so make an over
-  nonml <- dplyr::filter(sdl_units, !SWSDLName %in% unique(agg_theme_space$sdl_units$SWSDLName))
+  nonml <- dplyr::filter(
+    sdl_units,
+    !SWSDLName %in% unique(agg_theme_space$sdl_units$SWSDLName)
+  )
   # muffle the spatial warnings
   bbother <- withCallingHandlers(
     warning = function(cnd) {
-      if ((grepl('attribute variables are assumed to be spatially constant', cnd$message))) {
+      if (
+        (grepl(
+          'attribute variables are assumed to be spatially constant',
+          cnd$message
+        ))
+      ) {
         rlang::cnd_muffle(cnd)
       }
     },
     sf::st_intersection(bom_basin_gauges, nonml)
   )
-
 
   gauges_map_common_syntax <- eco_objective_to_plot |>
     dplyr::filter(eco_objective == "NF1") |> # Need to reduce dimensionality
@@ -784,7 +815,10 @@ test_that("maps", {
     ) +
     ggplot2::theme(legend.position = "bottom")
 
-  vdiffr::expect_doppelganger("gauges_map_common_syntax", gauges_map_common_syntax)
+  vdiffr::expect_doppelganger(
+    "gauges_map_common_syntax",
+    gauges_map_common_syntax
+  )
 
   # Difference from baseline
   # put the basin in the background
@@ -801,13 +835,17 @@ test_that("maps", {
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       base_list = list(
-        base_lev = "base", comp_fun = "difference",
+        base_lev = "base",
+        comp_fun = "difference",
         group_cols = c("eco_objective", "polyID")
       ), # Do I need to group_by polyID for the maps? Yes. should probably automate that.
       underlay_list = list(underlay = basin, underlay_pal = "azure")
     )
 
-  vdiffr::expect_doppelganger("sdl_basin_background_difference", sdl_basin_background_difference)
+  vdiffr::expect_doppelganger(
+    "sdl_basin_background_difference",
+    sdl_basin_background_difference
+  )
 
   # Relative to baseline
   sdl_basin_background_rel <- obj_sdl_to_plot |>
@@ -822,7 +860,8 @@ test_that("maps", {
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
       base_list = list(
-        base_lev = "base", comp_fun = "relative",
+        base_lev = "base",
+        comp_fun = "relative",
         group_cols = c("eco_objective", "polyID")
       ),
       zero_adjust = "auto",
@@ -830,7 +869,9 @@ test_that("maps", {
       underlay_list = list(underlay = basin, underlay_pal = "azure")
     )
 
-  skip("strange bug introduces NaN and Inf, but only when printed to vdiffr. Inspect manually")
+  skip(
+    "strange bug introduces NaN and Inf, but only when printed to vdiffr. Inspect manually"
+  )
   # It's unclear why, but just plotting the plot does *not* throw warnings, and
   # does *not* have NaNs. But when it prints, it does. This seems to be a bug in vdiffr, so
   # for the moment checking that it works right in normal use by just having a
@@ -841,13 +882,13 @@ test_that("maps", {
   # but *is* when it's not. So I'm just going to skip it until I can figure out
   # what's going on, I think. And leave the bare call here just to make sure it doesn't start throwing a warning in normal use.
   sdl_basin_background_rel
-  vdiffr::expect_doppelganger("sdl_basin_background_rel", sdl_basin_background_rel)
+  vdiffr::expect_doppelganger(
+    "sdl_basin_background_rel",
+    sdl_basin_background_rel
+  )
 })
 
 test_that("adding color to filled maps", {
-
-
-
   # Make a minimal map
   sdl_map_outline <- obj_sdl_to_plot |>
     dplyr::filter(env_group == "EF") |> # Need to reduce dimensionality
@@ -879,18 +920,20 @@ test_that("adding color to filled maps", {
       facet_col = "eco_objective",
       facet_row = "scenario",
       sceneorder = c("down4", "base", "up4"),
-      underlay_list = list(underlay = basin, pal_list = 'azure', map_outlinecolor = 'red')
+      underlay_list = list(
+        underlay = basin,
+        pal_list = 'azure',
+        map_outlinecolor = 'red'
+      )
     )
 
   vdiffr::expect_doppelganger("sdl_map_outline2", sdl_map_outline2)
 })
 
 test_that("setLimits works", {
-
-
-
   # Y-LIMITS
-  basin_plot20 <- plot_outcomes(basin_to_plot,
+  basin_plot20 <- plot_outcomes(
+    basin_to_plot,
     outcome_col = "ewr_achieved",
     colorset = "theme",
     pal_list = list("scico::oslo"),
@@ -901,7 +944,8 @@ test_that("setLimits works", {
 
   vdiffr::expect_doppelganger("stacked bar 20", basin_plot20)
 
-  basin_plot10 <- plot_outcomes(basin_to_plot,
+  basin_plot10 <- plot_outcomes(
+    basin_to_plot,
     outcome_col = "ewr_achieved",
     colorset = "theme",
     pal_list = list("scico::oslo"),
@@ -1145,20 +1189,20 @@ test_that("setLimits works", {
 })
 
 test_that("ewr works as in `plot_outcomes_bar`", {
-
-
-
   ewr_to_bar_data <- ewr_to_agg_timemean |>
     # just grab the first code_timing
     dplyr::group_by(ewr_code_main, gauge, scenario) |>
     dplyr::slice(1) |>
     dplyr::ungroup() |>
-    dplyr::filter(ewr_code_main %in% c("BF1", "LF1", "OB5") &
-      gauge %in% c("412002", "412005", "412038")) |>
+    dplyr::filter(
+      ewr_code_main %in%
+        c("BF1", "LF1", "OB5") &
+        gauge %in% c("412002", "412005", "412038")
+    ) |>
     dplyr::mutate(ewr_achieved = as.numeric(ewr_achieved)) # logicals fail
 
-
-  ewr_plot <- plot_outcomes(ewr_to_bar_data,
+  ewr_plot <- plot_outcomes(
+    ewr_to_bar_data,
     outcome_col = "ewr_achieved",
     x_col = "scenario",
     facet_row = "gauge",
@@ -1172,7 +1216,8 @@ test_that("ewr works as in `plot_outcomes_bar`", {
 })
 
 test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better aggregated)", {
-  basin_plot <- plot_outcomes(basin_to_plot,
+  basin_plot <- plot_outcomes(
+    basin_to_plot,
     outcome_col = "ewr_achieved",
     x_col = "scenario",
     colorset = "scenario",
@@ -1183,7 +1228,8 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
 
   vdiffr::expect_doppelganger("bar_basin", basin_plot)
 
-  basin_plot_L <- plot_outcomes(basin_to_plot,
+  basin_plot_L <- plot_outcomes(
+    basin_to_plot,
     outcome_col = "ewr_achieved",
     outcome_lab = "Aggregated outcome",
     facet_wrapper = "theme",
@@ -1197,9 +1243,6 @@ test_that("basin works as in `plot_outcomes_bar` (facet_wrap, no gauge, better a
 
 
 test_that("facet addition works", {
-
-
-
   sdl_colors_row <- obj_sdl_to_plot |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
@@ -1229,16 +1272,26 @@ test_that("facet addition works", {
 })
 
 test_that("hydrographs", {
-  hydro_to_plot <- read_hydro(hydropath = system.file("extdata/testsmall/hydrographs", package = "HydroBOT"))
+  hydro_to_plot <- read_hydro(
+    hydropath = system.file(
+      "extdata/testsmall/hydrographs",
+      package = "HydroBOT"
+    )
+  )
 
   hydro_to_plot <- hydro_to_plot |>
-    dplyr::mutate(scenario = dplyr::case_when(grepl('down', scenario) ~ 'down4',
-                                       grepl('base', scenario) ~ 'base',
-                                       grepl('up4', scenario) ~ 'up4')) |>
+    dplyr::mutate(
+      scenario = dplyr::case_when(
+        grepl('down', scenario) ~ 'down4',
+        grepl('base', scenario) ~ 'base',
+        grepl('up4', scenario) ~ 'up4'
+      )
+    ) |>
     dplyr::filter(!grepl('_level', gauge))
 
   # This one sums the flows
-  hydplot_bar <- plot_outcomes(hydro_to_plot,
+  hydplot_bar <- plot_outcomes(
+    hydro_to_plot,
     outcome_col = "flow",
     colorset = "scenario",
     pal_list = scene_pal,
@@ -1250,7 +1303,8 @@ test_that("hydrographs", {
   vdiffr::expect_doppelganger("hydroplot_bar", hydplot_bar)
 
   # basic plot
-  hydplot <- plot_outcomes(hydro_to_plot,
+  hydplot <- plot_outcomes(
+    hydro_to_plot,
     outcome_col = "flow",
     x_col = "Date",
     colorset = "scenario",
@@ -1263,9 +1317,17 @@ test_that("hydrographs", {
   vdiffr::expect_doppelganger("hydroplot", hydplot)
 
   # basic plot, ncdf, swap color and facetting
-  hydcdf <- read_hydro(hydropath = system.file("extdata/ncdfexample/nchydros", package = "HydroBOT"), format = "nc", gaugemap = "iqqm")
+  hydcdf <- read_hydro(
+    hydropath = system.file(
+      "extdata/ncdfexample/nchydros",
+      package = "HydroBOT"
+    ),
+    format = "nc",
+    gaugemap = "iqqm"
+  )
 
-  hydplot_nc <- plot_outcomes(hydcdf,
+  hydplot_nc <- plot_outcomes(
+    hydcdf,
     outcome_col = "flow",
     x_col = "Date",
     colorset = "gauge",
@@ -1276,7 +1338,8 @@ test_that("hydrographs", {
   vdiffr::expect_doppelganger("hydroplot", hydplot)
 
   # trans and freey
-  hydplot_st <- plot_outcomes(hydro_to_plot |> dplyr::mutate(flow = flow + 1),
+  hydplot_st <- plot_outcomes(
+    hydro_to_plot |> dplyr::mutate(flow = flow + 1),
     outcome_col = "flow",
     x_col = "Date",
     colorset = "scenario",
@@ -1291,7 +1354,8 @@ test_that("hydrographs", {
   vdiffr::expect_doppelganger("hydroplot_st", hydplot_st)
 
   # baselined diff
-  hydplot_baseD <- plot_outcomes(hydro_to_plot,
+  hydplot_baseD <- plot_outcomes(
+    hydro_to_plot,
     outcome_col = "flow",
     x_col = "Date",
     colorset = "scenario",
@@ -1309,7 +1373,8 @@ test_that("hydrographs", {
   vdiffr::expect_doppelganger("hydplot_baseD", hydplot_baseD)
 
   # baseline rel
-  hydplot_baseR <- plot_outcomes(hydro_to_plot,
+  hydplot_baseR <- plot_outcomes(
+    hydro_to_plot,
     outcome_col = "flow",
     x_col = "Date",
     colorset = "scenario",
@@ -1352,7 +1417,6 @@ test_that("scenarios aren't special", {
 })
 
 
-
 test_that("heatmaps", {
   # create a quant description of scenarios
   # scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
@@ -1379,14 +1443,14 @@ test_that("heatmaps", {
     ) |>
     dplyr::bind_rows(ostp05, ostp2)
 
-
-
-
   # need to facet by space sdl unit and create a group col to take multiple palettes
   # first, make sure things are unique- later, will need to check they are as in maps. At least for heatmaps. Contours should? be OK?
   sdl_heat <- ostp |>
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(
+      ewr_achieved = mean(ewr_achieved),
+      .by = c(env_group, scenario, SWSDLName, delta, adelta)
+    ) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1402,7 +1466,10 @@ test_that("heatmaps", {
 
   sdl_heat_tx <- ostp |>
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(
+      ewr_achieved = mean(ewr_achieved),
+      .by = c(env_group, scenario, SWSDLName, delta, adelta)
+    ) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1419,9 +1486,12 @@ test_that("heatmaps", {
 
   # same, contour defaults
   sdl_contour <- ostp |>
-    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved), .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(
+      ewr_achieved = mean(ewr_achieved),
+      .by = c(env_group, scenario, SWSDLName, delta, adelta)
+    ) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1437,14 +1507,16 @@ test_that("heatmaps", {
   vdiffr::expect_doppelganger("sdl_contour", sdl_contour)
 
   # baseline, specify breaks
-    # NaNs, so expect a warning
+  # NaNs, so expect a warning
   # some of the values are really just relative to 0, so the random number flips things around very dramatically.
   set.seed(19)
   sdl_contour_base_breaks <- ostp |>
-    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
-                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(
+      ewr_achieved = mean(ewr_achieved),
+      .by = c(env_group, scenario, SWSDLName, delta, adelta)
+    ) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1457,20 +1529,26 @@ test_that("heatmaps", {
       contour_arglist = list(breaks = c(-300, -200, -100, 0, 100, 200, 300)),
       zero_adjust = "auto",
       base_list = list(
-        base_lev = "basezero", comp_fun = "relative",
+        base_lev = "basezero",
+        comp_fun = "relative",
         group_cols = c("env_group", "SWSDLName")
       )
     )
 
-  vdiffr::expect_doppelganger("sdl_contour_base_breaks", sdl_contour_base_breaks)
+  vdiffr::expect_doppelganger(
+    "sdl_contour_base_breaks",
+    sdl_contour_base_breaks
+  )
 
   # specify bins, use transx, transoutcome. Using a difference from lowest to avoid negative numbers so the trnas works
   # and check the auto-drop of geometry
   sdl_contour_base_bin <- ostp |>
-    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
-                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(
+      ewr_achieved = mean(ewr_achieved),
+      .by = c(env_group, scenario, SWSDLName, delta, adelta)
+    ) |>
     dplyr::filter(!env_group %in% c('EB', 'WB')) |> # ONLY because for some reason there are imperceptible differences for these two between `test` and `build` that trigger an error every time.
     plot_outcomes(
       outcome_col = "ewr_achieved",
@@ -1486,39 +1564,44 @@ test_that("heatmaps", {
       transx = "log10",
       transoutcome = "sqrt",
       base_list = list(
-        base_lev = "down4minus1", comp_fun = "difference",
+        base_lev = "down4minus1",
+        comp_fun = "difference",
         group_cols = c("env_group", "SWSDLName")
       )
     )
 
   vdiffr::expect_doppelganger("sdl_contour_base_bin", sdl_contour_base_bin)
 
-
   # catch an overplot by not facetting in one dimension
-  expect_error(sdl_heat_overplot <- ostp |>
-    sf::st_drop_geometry() |>
-    # don't do the grouping correctly
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
-                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
-    plot_outcomes(
-      outcome_col = "ewr_achieved",
-      plot_type = "heatmap",
-      x_col = "delta",
-      y_col = "adelta",
-      colorset = "ewr_achieved",
-      pal_list = list("scico::turku"),
-      facet_row = "SWSDLName",
-      facet_col = "."
-    ))
-
+  expect_error(
+    sdl_heat_overplot <- ostp |>
+      sf::st_drop_geometry() |>
+      # don't do the grouping correctly
+      dplyr::summarise(
+        ewr_achieved = mean(ewr_achieved),
+        .by = c(env_group, scenario, SWSDLName, delta, adelta)
+      ) |>
+      plot_outcomes(
+        outcome_col = "ewr_achieved",
+        plot_type = "heatmap",
+        x_col = "delta",
+        y_col = "adelta",
+        colorset = "ewr_achieved",
+        pal_list = list("scico::turku"),
+        facet_row = "SWSDLName",
+        facet_col = "."
+      )
+  )
 
   # check sceneorder is transferring where needed. This is contrived and looks terrible, but that's not the point.
   sdl_heat_so <- ostp |>
-    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
     sf::st_drop_geometry() |>
     dplyr::filter(SWSDLName == "Lachlan") |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
-                     .by = c(env_group, scenario, delta, adelta)) |>
+    dplyr::summarise(
+      ewr_achieved = mean(ewr_achieved),
+      .by = c(env_group, scenario, delta, adelta)
+    ) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1528,9 +1611,15 @@ test_that("heatmaps", {
       colorset = "ewr_achieved",
       pal_list = list("scico::turku"),
       sceneorder = c(
-        "down4minus1", "down4zero", "down4plus1",
-        "baseminus1", "basezero", "baseplus1",
-        "up4minus1", "up4zero", "up4plus1"
+        "down4minus1",
+        "down4zero",
+        "down4plus1",
+        "baseminus1",
+        "basezero",
+        "baseplus1",
+        "up4minus1",
+        "up4zero",
+        "up4plus1"
       ),
       facet_row = "scenario",
       facet_col = "env_group"
@@ -1540,10 +1629,12 @@ test_that("heatmaps", {
 
   # interpolated raster
   sdl_heat_interp <- ostp |>
-    dplyr::filter(!is.infinite(delta)) |>  # messes up the delta axis
+    dplyr::filter(!is.infinite(delta)) |> # messes up the delta axis
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
-                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(
+      ewr_achieved = mean(ewr_achieved),
+      .by = c(env_group, scenario, SWSDLName, delta, adelta)
+    ) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       plot_type = "heatmap",
@@ -1562,8 +1653,10 @@ test_that("heatmaps", {
   # Qualitative x-y (e.g. named scenario types)
   sdl_heat_char <- ostp |>
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
-                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(
+      ewr_achieved = mean(ewr_achieved),
+      .by = c(env_group, scenario, SWSDLName, delta, adelta)
+    ) |>
     dplyr::mutate(
       delta = as.character(delta),
       adelta = as.character(adelta)
@@ -1583,8 +1676,10 @@ test_that("heatmaps", {
 
   sdl_heat_fact <- ostp |>
     sf::st_drop_geometry() |>
-    dplyr::summarise(ewr_achieved = mean(ewr_achieved),
-                     .by = c(env_group, scenario, SWSDLName, delta, adelta)) |>
+    dplyr::summarise(
+      ewr_achieved = mean(ewr_achieved),
+      .by = c(env_group, scenario, SWSDLName, delta, adelta)
+    ) |>
     dplyr::mutate(
       delta = as.factor(delta),
       adelta = as.factor(adelta)
@@ -1620,17 +1715,20 @@ test_that("post-hoc label changes work", {
       sceneorder = c("down4", "base", "up4"),
       setLimits = c(0, 2),
       overlay_list = list(
-        overlay = dplyr::filter(eco_objective_to_plot, grepl("^EF", eco_objective)),
+        overlay = dplyr::filter(
+          eco_objective_to_plot,
+          grepl("^EF", eco_objective)
+        ),
         overlay_pal = "scico::oslo",
         overlay_ycol = "ewr_achieved",
         clip = TRUE
       )
     )
 
-  sdl_mapLabels <- sdl_mapLabels + ggplot2::labs(x = "LONG", y = "LAT", fill = "TESTFILL", color = "TESTCOL")
+  sdl_mapLabels <- sdl_mapLabels +
+    ggplot2::labs(x = "LONG", y = "LAT", fill = "TESTFILL", color = "TESTCOL")
 
   vdiffr::expect_doppelganger("sdl_map_limits_labels", sdl_mapLabels)
-
 })
 
 test_that("discrete but non-named colors", {
@@ -1650,12 +1748,16 @@ test_that("discrete but non-named colors", {
 
   # This one translates to integers, very silly, but a test that the reordering holds.
   sdl_plot_groupblock_dcn <- obj_sdl_to_plot |>
-    dplyr::mutate(env_group = dplyr::case_when(env_group == 'WB' ~ 1,
-                                               env_group == "NV" ~ 2,
-                                               env_group == "EB" ~ 3,
-                                               env_group == "EF" ~ 4,
-                                               env_group == "OS" ~ 5,
-                                               env_group == 'NF' ~ 6)) |>
+    dplyr::mutate(
+      env_group = dplyr::case_when(
+        env_group == 'WB' ~ 1,
+        env_group == "NV" ~ 2,
+        env_group == "EB" ~ 3,
+        env_group == "EF" ~ 4,
+        env_group == "OS" ~ 5,
+        env_group == 'NF' ~ 6
+      )
+    ) |>
     plot_outcomes(
       outcome_col = "ewr_achieved",
       x_col = "scenario",
@@ -1669,26 +1771,38 @@ test_that("discrete but non-named colors", {
   # throw another lab-change test in too.
   sdl_plot_groupblock_dcn <- sdl_plot_groupblock_dcn +
     ggplot2::labs(x = "SCENARIO", y = "EWR", fill = "GROUP")
-  vdiffr::expect_doppelganger("sdl_plot_groupblock_dcn", sdl_plot_groupblock_dcn)
-
+  vdiffr::expect_doppelganger(
+    "sdl_plot_groupblock_dcn",
+    sdl_plot_groupblock_dcn
+  )
 })
 
 test_that("non-ewr works", {
+  sdl_economic <- data.frame(
+    names_climate_scenario = c(
+      'SR1.2_SE1.07',
+      'SR1.2_SE1.07',
+      'SR0.8_SE1.07',
+      'SR0.8_SE1.07',
+      'SR0.0_SE1.07',
+      'SR0.8_SE1.07'
+    ),
+    Economic_outcomes = c(51.9, 23.6, -68.2, -42, -15.6, -10.9)
+  )
 
-  sdl_economic <- data.frame(names_climate_scenario = c('SR1.2_SE1.07', 'SR1.2_SE1.07', 'SR0.8_SE1.07', 'SR0.8_SE1.07', 'SR0.0_SE1.07', 'SR0.8_SE1.07'),
-                                 Economic_outcomes = c(51.9,23.6,-68.2,-42,-15.6,-10.9))
-
-  econ_plot <- plot_outcomes(outdf = sdl_economic,
-                plot_type = "2d",
-                outcome_col = 'Economic_outcomes',
-                outcome_lab = 'Economic_outcomes achieved',
-                x_col = 'names_climate_scenario',
-                x_lab = 'Climate scenario',
-                colorset = 'Economic_outcomes',
-                color_lab = 'Economic_outcomes achieved',
-                pal_list = "grDevices::Viridis",
-                position = 'dodge',
-                setLimits = c(-100,100))
+  econ_plot <- plot_outcomes(
+    outdf = sdl_economic,
+    plot_type = "2d",
+    outcome_col = 'Economic_outcomes',
+    outcome_lab = 'Economic_outcomes achieved',
+    x_col = 'names_climate_scenario',
+    x_lab = 'Climate scenario',
+    colorset = 'Economic_outcomes',
+    color_lab = 'Economic_outcomes achieved',
+    pal_list = "grDevices::Viridis",
+    position = 'dodge',
+    setLimits = c(-100, 100)
+  )
 
   vdiffr::expect_doppelganger("econ_plot", econ_plot)
 })

@@ -71,7 +71,7 @@ ArithmeticMean <- function(x, na.rm = TRUE) {
 #' @export
 #'
 HarmonicMean <- function(x, na.rm = TRUE) {
-  y <- 1/mean(1/x, na.rm = na.rm)
+  y <- 1 / mean(1 / x, na.rm = na.rm)
   return(y)
 }
 
@@ -115,10 +115,11 @@ Median <- function(x, na.rm = TRUE) {
 #'
 
 NumberOfValues <- function(x, na.rm = TRUE) {
-  if(na.rm == TRUE){
-    y <- length(x[!is.na(x)])}
-  else if(na.rm == FALSE){
-    y <- length(x)}
+  if (na.rm == TRUE) {
+    y <- length(x[!is.na(x)])
+  } else if (na.rm == FALSE) {
+    y <- length(x)
+  }
   return(y)
 }
 

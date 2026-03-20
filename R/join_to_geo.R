@@ -14,10 +14,16 @@ join_to_geo <- function(data_df, spatial_locs, whichcrs = 4283) {
   # the parsing failure warnings are because of the undefineds that i then remove
 
   # Get filetype if needed to read-in
-  if(!inherits(spatial_locs, 'sf')) {
-    if (grepl('*.csv', spatial_locs)) {filetype <- 'csv'}
-    if (grepl('*.shp', spatial_locs)) {filetype <- 'shp'}
-    if (!grepl('\\.', spatial_locs)) {filetype <- 'object'}
+  if (!inherits(spatial_locs, 'sf')) {
+    if (grepl('*.csv', spatial_locs)) {
+      filetype <- 'csv'
+    }
+    if (grepl('*.shp', spatial_locs)) {
+      filetype <- 'shp'
+    }
+    if (!grepl('\\.', spatial_locs)) {
+      filetype <- 'object'
+    }
 
     if (filetype == 'csv') {
       spatial_locs <- readr::read_csv(spatial_locs)
@@ -28,11 +34,12 @@ join_to_geo <- function(data_df, spatial_locs, whichcrs = 4283) {
           dplyr::rename(site = 'site name', gauge = 'gauge number') |>
           # lat an long come in as chr because there is a line for 'undefined'
           dplyr::filter(.data$site != 'undefined') |>
-          dplyr::mutate(lat = as.numeric(.data$lat),
-                        lon = as.numeric(.data$lon)) |>
+          dplyr::mutate(
+            lat = as.numeric(.data$lat),
+            lon = as.numeric(.data$lon)
+          ) |>
           sf::st_as_sf(coords = c('lon', 'lat'), crs = 4326)
-        }
-
+      }
     }
 
     if (filetype == 'shp') {
@@ -42,7 +49,6 @@ join_to_geo <- function(data_df, spatial_locs, whichcrs = 4283) {
     if (filetype == 'object') {
       spatial_locs <- get(spatial_locs)
     }
-
   }
 
   commonnames <- names(data_df)[names(data_df) %in% names(spatial_locs)]
@@ -52,4 +58,3 @@ join_to_geo <- function(data_df, spatial_locs, whichcrs = 4283) {
 
   return(data_df)
 }
-

@@ -11,13 +11,19 @@
 #'
 make_ewrformat <- function(gaugedata) {
   gaugedata <- gaugedata |>
-    dplyr::mutate(gauge = dplyr::case_when(
-      grepl('ml/d', units, ignore.case = TRUE) ~ paste0(gauge, '_flow'),
-      units %in% c('m', 'Res. Level AHD', 'Metres') ~ paste0(gauge, '_level'),
-      .default = paste0(gauge, '_FAIL'))
+    dplyr::mutate(
+      gauge = dplyr::case_when(
+        grepl('ml/d', units, ignore.case = TRUE) ~ paste0(gauge, '_flow'),
+        units %in% c('m', 'Res. Level AHD', 'Metres') ~ paste0(gauge, '_level'),
+        .default = paste0(gauge, '_FAIL')
+      )
     ) |>
     dplyr::select(Date = time, gauge, value) |>
-    tidyr::pivot_wider(id_cols = Date, names_from = gauge, values_from = value) |>
+    tidyr::pivot_wider(
+      id_cols = Date,
+      names_from = gauge,
+      values_from = value
+    ) |>
     dplyr::mutate(Date = as.Date(Date))
   return(gaugedata)
 }

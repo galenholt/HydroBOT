@@ -33,19 +33,23 @@
 #'   variables aggregated into the time periods specified by `breaks`
 #' @export
 #'
-temporal_aggregate <- function(dat,
-                               breaks = "all_time",
-                               timecol = "infer",
-                               groupers,
-                               aggCols,
-                               funlist,
-                               geonames = NULL,
-                               prefix = "temporal_",
-                               failmissing = TRUE,
-                               auto_ewr_PU = FALSE,
-                               ...) {
+temporal_aggregate <- function(
+  dat,
+  breaks = "all_time",
+  timecol = "infer",
+  groupers,
+  aggCols,
+  funlist,
+  geonames = NULL,
+  prefix = "temporal_",
+  failmissing = TRUE,
+  auto_ewr_PU = FALSE,
+  ...
+) {
   if (timecol == "infer") {
-    timecol <- purrr::map_lgl(dat, \(x) lubridate::is.Date(x) | lubridate::is.POSIXt(x)) |>
+    timecol <- purrr::map_lgl(dat, \(x) {
+      lubridate::is.Date(x) | lubridate::is.POSIXt(x)
+    }) |>
       which() |>
       names()
   }
@@ -99,7 +103,9 @@ temporal_aggregate <- function(dat,
     ewrnames <- purrr::map(HydroBOT::causal_ewr, names) |> unlist()
     isewr <- any(groupers %in% ewrnames)
     # If ewr, we need to be grouping by both planning unit and SWSDLname until we're into polygons
-    if (isewr & !("planning_unit_name" %in% groupers & "SWSDLName" %in% groupers)) {
+    if (
+      isewr & !("planning_unit_name" %in% groupers & "SWSDLName" %in% groupers)
+    ) {
       if (!auto_ewr_PU) {
         rlang::warn(c(
           "!" = "EWR outputs detected without `group_until`!",
@@ -108,18 +114,21 @@ temporal_aggregate <- function(dat,
           "i" = "Lower-level processing should include as `grouper` in `temporal_aggregate()`\n"
         ))
       } else {
-        rlang::inform(c("i" = "EWR outputs auto-grouped",
-                        "*" = "Done automatically because `auto_ewr_PU = TRUE`",
+        rlang::inform(c(
+          "i" = "EWR outputs auto-grouped",
+          "*" = "Done automatically because `auto_ewr_PU = TRUE`",
           "*" = "EWRs should be grouped by `SWSDLName`, `planning_unit_name`, and `gauge` until aggregated to larger spatial areas.",
           "*" = "Rows will collapse otherwise, silently aggregating over the wrong dimension",
           "*" = "Best to explicitly use `group_until` in `multi_aggregate()` or `read_and_agg()`.\n"
         ))
         # add gauge, planning unit, and SWSDL if available to prevent premature collapse.
-        groupers <- unique(c(groupers, c("gauge", "planning_unit_name", "SWSDLName")))
+        groupers <- unique(c(
+          groupers,
+          c("gauge", "planning_unit_name", "SWSDLName")
+        ))
       }
     }
   }
-
 
   # make the groupings for the time dimension
   if (is.character(breaks) && grepl("all", breaks)) {
@@ -133,14 +142,14 @@ temporal_aggregate <- function(dat,
 
   groupers <- c(groupers, "time_group")
 
-  agged <- general_aggregate(dat,
+  agged <- general_aggregate(
+    dat,
     groupers = groupers,
     aggCols = tidyselect::ends_with(!!aggCols),
     funlist = funlist,
     failmissing = failmissing,
     prefix = prefix
   )
-
 
   # Drop the time group if we only have one.
   if (!retime) {

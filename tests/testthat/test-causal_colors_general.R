@@ -1,34 +1,47 @@
 # Some simple edges and nodes
-edges <- make_edges(dflist = causal_ewr,
-                    fromtos = list(c('ewr_code', 'ewr_code_main'),
-                                   c('ewr_code_main', 'eco_objective'),
-                                   c('eco_objective', 'objective_text'),
-                                   c('objective_text', 'theme')),
-                    gaugefilter = '409025')
+edges <- make_edges(
+  dflist = causal_ewr,
+  fromtos = list(
+    c('ewr_code', 'ewr_code_main'),
+    c('ewr_code_main', 'eco_objective'),
+    c('eco_objective', 'objective_text'),
+    c('objective_text', 'theme')
+  ),
+  gaugefilter = '409025'
+)
 nodes <- make_nodes(edges)
 
 
 test_that("defaults work", {
-
   skip_on_os('linux')
 
-  edgecols <- causal_colors_general(edges,
-                                   pal_list = list(fromtype = "nationalparkcolors::GeneralGrant"),
-                                   colorgroups = NULL, colorset = 'fromtype')
+  edgecols <- causal_colors_general(
+    edges,
+    pal_list = list(fromtype = "nationalparkcolors::GeneralGrant"),
+    colorgroups = NULL,
+    colorset = 'fromtype'
+  )
 
-  nodecols <- causal_colors_general(nodes,
-                                    pal_list = list(fromtype = "nationalparkcolors::GeneralGrant"),
-                                    colorgroups = NULL, colorset = 'NodeType')
+  nodecols <- causal_colors_general(
+    nodes,
+    pal_list = list(fromtype = "nationalparkcolors::GeneralGrant"),
+    colorgroups = NULL,
+    colorset = 'NodeType'
+  )
   # Looking at it will be the easiest check
-  edgeplot <- ggplot2::ggplot(edgecols,
-                              ggplot2::aes(x = fromtype,
-                                           y = colordef, fill = color)) +
-    ggplot2::geom_tile() + ggplot2::scale_fill_identity()
+  edgeplot <- ggplot2::ggplot(
+    edgecols,
+    ggplot2::aes(x = fromtype, y = colordef, fill = color)
+  ) +
+    ggplot2::geom_tile() +
+    ggplot2::scale_fill_identity()
 
-  nodeplot <- ggplot2::ggplot(nodecols,
-                              ggplot2::aes(x = NodeType,
-                                           y = colordef, fill = fillcolor)) +
-    ggplot2::geom_tile() + ggplot2::scale_fill_identity() +
+  nodeplot <- ggplot2::ggplot(
+    nodecols,
+    ggplot2::aes(x = NodeType, y = colordef, fill = fillcolor)
+  ) +
+    ggplot2::geom_tile() +
+    ggplot2::scale_fill_identity() +
     ggplot2::geom_text(ggplot2::aes(color = fontcolor, label = fontcolor)) +
     ggplot2::scale_color_identity()
 
@@ -42,23 +55,29 @@ test_that("defaults work", {
   # has to be json-able
   expect_snapshot_value(as.list(edgen))
   expect_snapshot_value(as.list(noden))
-
 })
 
 
 test_that("scalar colors work and font switching", {
+  edgecols <- causal_colors_general(
+    edges,
+    pal_list = "forestgreen",
+    colorgroups = NULL,
+    colorset = 'fromtype'
+  )
 
-
-  edgecols <- causal_colors_general(edges,
-                                    pal_list = "forestgreen",
-                                    colorgroups = NULL, colorset = 'fromtype')
-
-  nodecols <- causal_colors_general(nodes,
-                                    pal_list = "cornflowerblue",
-                                    colorgroups = NULL, colorset = 'NodeType')
-  nodecolsdark <- causal_colors_general(nodes,
-                                    pal_list = "navy",
-                                    colorgroups = NULL, colorset = 'NodeType')
+  nodecols <- causal_colors_general(
+    nodes,
+    pal_list = "cornflowerblue",
+    colorgroups = NULL,
+    colorset = 'NodeType'
+  )
+  nodecolsdark <- causal_colors_general(
+    nodes,
+    pal_list = "navy",
+    colorgroups = NULL,
+    colorset = 'NodeType'
+  )
 
   # Don't need to plot this
   expect_true(all(edgecols$color == 'forestgreen'))
@@ -67,7 +86,6 @@ test_that("scalar colors work and font switching", {
   expect_true(all(nodecolsdark$fillcolor == 'navy'))
   expect_true(all(nodecolsdark$fontcolor == 'white'))
 
-
   # and test groupsizes, since N doesn't come across in the plot
   edgen <- table(edgecols$color)
   noden <- table(nodecols$fillcolor)
@@ -75,11 +93,9 @@ test_that("scalar colors work and font switching", {
   # has to be json-able
   expect_snapshot_value(as.list(edgen))
   expect_snapshot_value(as.list(noden))
-
 })
 
 test_that("values work for nodes and edges", {
-
   skip_on_os('linux')
 
   edges <- edges |>
@@ -87,71 +103,90 @@ test_that("values work for nodes and edges", {
   nodes <- nodes |>
     dplyr::mutate(value = dplyr::row_number())
 
-  edgecols <- causal_colors_general(edges,
-                                    pal_list = list(value = 'scico::oslo'),
-                                    colorgroups = NULL, colorset = 'value')
+  edgecols <- causal_colors_general(
+    edges,
+    pal_list = list(value = 'scico::oslo'),
+    colorgroups = NULL,
+    colorset = 'value'
+  )
 
-  nodecols <- causal_colors_general(nodes,
-                                    pal_list = list(value = 'scico::berlin'),
-                                    colorgroups = NULL, colorset = 'value')
+  nodecols <- causal_colors_general(
+    nodes,
+    pal_list = list(value = 'scico::berlin'),
+    colorgroups = NULL,
+    colorset = 'value'
+  )
 
   # Looking at it will be the easiest check
-  edgeplot <- ggplot2::ggplot(edgecols,
-                              ggplot2::aes(x = value,
-                                           y = colordef, color = color)) +
-    ggplot2::geom_point(size = 5) + ggplot2::scale_color_identity()
+  edgeplot <- ggplot2::ggplot(
+    edgecols,
+    ggplot2::aes(x = value, y = colordef, color = color)
+  ) +
+    ggplot2::geom_point(size = 5) +
+    ggplot2::scale_color_identity()
 
   # super ugly, but shows the font color too
-  nodeplot <- ggplot2::ggplot(nodecols,
-                              ggplot2::aes(x = value,
-                                           y = colordef, color = fillcolor)) +
-    ggplot2::geom_point(size = 5) + ggplot2::scale_color_identity() +
-    ggplot2::geom_text(ggplot2::aes(color = fontcolor, label = fontcolor),
-                       position = ggplot2::position_nudge(20)) +
+  nodeplot <- ggplot2::ggplot(
+    nodecols,
+    ggplot2::aes(x = value, y = colordef, color = fillcolor)
+  ) +
+    ggplot2::geom_point(size = 5) +
+    ggplot2::scale_color_identity() +
+    ggplot2::geom_text(
+      ggplot2::aes(color = fontcolor, label = fontcolor),
+      position = ggplot2::position_nudge(20)
+    ) +
     ggplot2::scale_color_identity()
 
   vdiffr::expect_doppelganger("value edges", edgeplot)
   vdiffr::expect_doppelganger("value nodes", nodeplot)
-
 })
 
 test_that("different palette per group", {
-
   skip_on_os('linux')
 
-  pal_list_c <- list(ewr_code_main = 'viridis::mako',
-                     eco_objective = 'viridis::plasma',
-                     objective_text = 'scico::oslo',
-                     theme = 'scico::hawaii',
-                     ewr_code = 'scico::lisbon')
+  pal_list_c <- list(
+    ewr_code_main = 'viridis::mako',
+    eco_objective = 'viridis::plasma',
+    objective_text = 'scico::oslo',
+    theme = 'scico::hawaii',
+    ewr_code = 'scico::lisbon'
+  )
 
-  edgecols <- causal_colors_general(edges,
-                                    pal_list = pal_list_c,
-                                    colorgroups = 'fromtype',
-                                    colorset = 'from')
+  edgecols <- causal_colors_general(
+    edges,
+    pal_list = pal_list_c,
+    colorgroups = 'fromtype',
+    colorset = 'from'
+  )
 
-  nodecols <- causal_colors_general(nodes,
-                                    pal_list = pal_list_c,
-                                    colorgroups = 'NodeType',
-                                    colorset = 'Name')
+  nodecols <- causal_colors_general(
+    nodes,
+    pal_list = pal_list_c,
+    colorgroups = 'NodeType',
+    colorset = 'Name'
+  )
 
   # This is a silly plot that doesn't mean anything, but it works OK to see that
   # each group uses its own palette to label items within it.
-  edgeplot <- ggplot2::ggplot(edgecols,
-                              ggplot2::aes(x = fromtype,
-                                           y = stringr::str_trunc(from, 5),
-                                           color = color)) +
+  edgeplot <- ggplot2::ggplot(
+    edgecols,
+    ggplot2::aes(x = fromtype, y = stringr::str_trunc(from, 5), color = color)
+  ) +
     ggplot2::geom_point(size = 5) +
     ggplot2::scale_color_identity()
 
-  nodeplot <- ggplot2::ggplot(nodecols,
-                              ggplot2::aes(x = NodeType,
-                                           y = stringr::str_trunc(Name, 5),
-                                           color = fillcolor)) +
-    ggplot2::geom_point(size = 5) + ggplot2::scale_color_identity()
+  nodeplot <- ggplot2::ggplot(
+    nodecols,
+    ggplot2::aes(
+      x = NodeType,
+      y = stringr::str_trunc(Name, 5),
+      color = fillcolor
+    )
+  ) +
+    ggplot2::geom_point(size = 5) +
+    ggplot2::scale_color_identity()
 
   vdiffr::expect_doppelganger("colors within edge groups", edgeplot)
   vdiffr::expect_doppelganger("colors within node groups", nodeplot)
-
 })
-

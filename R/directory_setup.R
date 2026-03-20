@@ -11,16 +11,23 @@
 #' @export
 #'
 
-find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'directory', file_search = NULL) {
-
-
+find_scenario_paths <- function(
+  hydro_dir,
+  type = 'csv',
+  scenarios_from = 'directory',
+  file_search = NULL
+) {
   # get the paths relative to hydro_dir
   if (grepl('.zip', hydro_dir)) {
     # rlang::inform("data in zip is assumed to be 'Straight Node (Gauge).nc'. If that is not the case, will need to allow an argument to specify.")
     hydro_paths <- utils::unzip(hydro_dir, list = TRUE)$Name
     # hydro_paths <- hydro_paths[grepl('Straight Node \\(Gauge\\)\\.nc', hydro_paths)]
   } else {
-    hydro_paths <- list.files(hydro_dir, pattern = paste0('.', type, '$'), recursive = TRUE)
+    hydro_paths <- list.files(
+      hydro_dir,
+      pattern = paste0('.', type, '$'),
+      recursive = TRUE
+    )
   }
 
   # at this point, hydro_paths has *all* files with extension `type`. Allow additional grep
@@ -31,7 +38,7 @@ find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'direc
   # This removes the extension and turns / into _, since paths must be unique
   if (scenarios_from == 'directory') {
     # Remove the final file, leaving only the directory
-    scenario_names <- gsub("/[^/]+$",'', hydro_paths) |>
+    scenario_names <- gsub("/[^/]+$", '', hydro_paths) |>
       stringr::str_remove_all(paste0('\\.', type)) |>
       stringr::str_replace_all("/", "_")
   } else {
@@ -39,7 +46,6 @@ find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'direc
       stringr::str_remove_all(paste0('\\.', type)) |>
       stringr::str_replace_all("/", "_")
   }
-
 
   # no need for a scenarios_from == 'file', since that's what scenario_names is originally.
 
@@ -75,12 +81,13 @@ find_scenario_paths <- function(hydro_dir, type = 'csv', scenarios_from = 'direc
 #' @export
 #'
 
-make_output_dir <- function(parent_dir,
-                            scenarios,
-                            module_name = 'EWR',
-                            subdir = "",
-                            ewr_outtypes = c('summary', 'yearly')) {
-
+make_output_dir <- function(
+  parent_dir,
+  scenarios,
+  module_name = 'EWR',
+  subdir = "",
+  ewr_outtypes = c('summary', 'yearly')
+) {
   output_path <- file.path(parent_dir, 'module_output', module_name, subdir)
 
   # if parent_dir is the scenario dir (we're in a single run), use `scenarios = ''` to not make a subdir
@@ -91,7 +98,9 @@ make_output_dir <- function(parent_dir,
 
   # make the scenario directory if needed
   for (i in sceneout) {
-    if (!dir.exists(i)) {dir.create(i, recursive = TRUE)}
+    if (!dir.exists(i)) {
+      dir.create(i, recursive = TRUE)
+    }
   }
 
   # make the internal directories if the module returns different sorts of output
@@ -99,7 +108,9 @@ make_output_dir <- function(parent_dir,
   # We could do this in the loop above, but that will just get hard to read.
   if (module_name == 'EWR') {
     for (i in sceneout) {
-      if (!dir.exists(file.path(i))) {dir.create(file.path(i), recursive = TRUE)}
+      if (!dir.exists(file.path(i))) {
+        dir.create(file.path(i), recursive = TRUE)
+      }
       # for (j in ewr_outtypes) {
       #   if (!dir.exists(file.path(i, j))) {dir.create(file.path(i,j), recursive = TRUE)}
       # }
@@ -108,7 +119,6 @@ make_output_dir <- function(parent_dir,
 
   return(output_path)
 }
-
 
 
 #' Used to auto-acquire scenario names from the hydrograph directory
@@ -121,7 +131,6 @@ make_output_dir <- function(parent_dir,
 #'
 #' @keywords internal
 scenario_names_from_hydro <- function(hydro_dir) {
-
   # Remove files with extensions- we only want directories
   scenarios <- list.files(hydro_dir)
   only_dirs <- stringr::str_which(scenarios, '\\.', negate = TRUE)
@@ -132,7 +141,9 @@ scenario_names_from_hydro <- function(hydro_dir) {
   scenarios <- scenarios[only_dirs[which(only_dirs %in% no_modules)]]
 
   if (length(scenarios) == 0) {
-    rlang::inform(glue::glue("no internal directories in hydro_dir. Assuming this is a single scenario and using the last directory of hydro_dir ({basename(hydro_dir)}) as the scenario name. If this is not correct, manually specify `scenarios`"))
+    rlang::inform(glue::glue(
+      "no internal directories in hydro_dir. Assuming this is a single scenario and using the last directory of hydro_dir ({basename(hydro_dir)}) as the scenario name. If this is not correct, manually specify `scenarios`"
+    ))
     scenarios <- basename(hydro_dir)
   }
   return(scenarios)
@@ -160,33 +171,41 @@ scenario_names_from_hydro <- function(hydro_dir) {
 fix_file_scenarios <- function(hydro_paths, scenarios) {
   # Do the split exactly like the ewr tool to make sure the scenarios will work
   split_path <- sapply(hydro_paths, strsplit, '/')
-  ewr_scenario_name <- sapply(split_path, \(x) stringr::str_remove(x[length(x)], '\\.[A-z]+'))
+  ewr_scenario_name <- sapply(split_path, \(x) {
+    stringr::str_remove(x[length(x)], '\\.[A-z]+')
+  })
   if (any(duplicated(ewr_scenario_name))) {
-    path_scenarios <- sapply(split_path, \(x) x[length(x)-1]) |> unique()
+    path_scenarios <- sapply(split_path, \(x) x[length(x) - 1]) |> unique()
 
     if (all(path_scenarios %in% scenarios)) {
-     rename_path <- lapply(split_path, \(x) end_paster(x, npastes = 2))
-     rlang::inform("files not uniquely named and so EWR tool would return
+      rename_path <- lapply(split_path, \(x) end_paster(x, npastes = 2))
+      rlang::inform(
+        "files not uniquely named and so EWR tool would return
                    duplicate scenario names for different scenarios.
                    Since file structure appears to be structured around scenarios,
                    scenario names are being appended.
-                   A better solution would be unique scenario names to start with")
+                   A better solution would be unique scenario names to start with"
+      )
     } else {
       rename_path <- lapply(split_path, \(x) end_paster(x, npastes = length(x)))
-      rlang::warn("files not uniquely named and so EWR tool would return
+      rlang::warn(
+        "files not uniquely named and so EWR tool would return
                   duplicate scenario names for different scenarios.
                   File structure does not appear to be structured around scenarios,
                   so the scenario name is being given the full path.
-                  A better solution would be unique scenario names to start with")
+                  A better solution would be unique scenario names to start with"
+      )
     }
     new_paths <- lapply(rename_path, \(x) paste0(x, collapse = '/'))
     file.rename(from = unlist(hydro_paths), to = unlist(new_paths))
 
-    rlang::inform("Due to duplicate input files across scenario directories,
+    rlang::inform(
+      "Due to duplicate input files across scenario directories,
                   they have been made unique. The resulting `scenario` column
                   in the EWR tool will include both `scenario` and `filename`,
                   separated by '_DIRECTORYAPPEND_'. You will likely need to adjust by splitting
-                  on '_DIRECTORYAPPEND_' and only keeping the scenario.")
+                  on '_DIRECTORYAPPEND_' and only keeping the scenario."
+    )
 
     hydro_paths <- new_paths
   }
@@ -204,11 +223,17 @@ fix_file_scenarios <- function(hydro_paths, scenarios) {
 #' @return character vector of expected filepaths
 #' @export
 #'
-find_expected_files <- function(hydro_paths, output_path, outputType, scenarios_from) {
-
+find_expected_files <- function(
+  hydro_paths,
+  output_path,
+  outputType,
+  scenarios_from
+) {
   # output path should be length 1, but output Type may not be.
-  if (length(output_path) > 1 ) {
-    rlang::abort('More than one output path, unclear where to look for expected outputs.')
+  if (length(output_path) > 1) {
+    rlang::abort(
+      'More than one output path, unclear where to look for expected outputs.'
+    )
   }
 
   filepart <- ''
@@ -219,13 +244,12 @@ find_expected_files <- function(hydro_paths, output_path, outputType, scenarios_
   }
   # make CHECK happy
   ot <- NULL
-  expected_files <- foreach::foreach(ot = outputType,
-                              .combine = c) %do% {
-    file.path(names(hydro_paths), paste0(ot, filepart, '.csv'))
-                              }
+  expected_files <- foreach::foreach(ot = outputType, .combine = c) %do%
+    {
+      file.path(names(hydro_paths), paste0(ot, filepart, '.csv'))
+    }
 
   return(expected_files)
-
 }
 
 #' Figure out missing expected outputs
@@ -235,12 +259,22 @@ find_expected_files <- function(hydro_paths, output_path, outputType, scenarios_
 #' @return character vector of missing paths
 #' @export
 #'
-find_missing_runs <- function(hydro_paths, output_path, outputType, scenarios_from) {
+find_missing_runs <- function(
+  hydro_paths,
+  output_path,
+  outputType,
+  scenarios_from
+) {
   # Get the files that exist
   existing_files <- file.path(list.files(output_path, recursive = TRUE))
 
   # Get expected
-  expected_files <- find_expected_files(hydro_paths, output_path, outputType, scenarios_from)
+  expected_files <- find_expected_files(
+    hydro_paths,
+    output_path,
+    outputType,
+    scenarios_from
+  )
 
   # get the expected files that aren't existing
   missing_files <- expected_files[!expected_files %in% existing_files]
@@ -265,41 +299,58 @@ find_missing_runs <- function(hydro_paths, output_path, outputType, scenarios_fr
 #' @export
 #'
 
-check_missing_runs <- function(hydro_dir,
-                               output_parent_dir,
-                               output_subdir = '',
-                               scenarios = NULL,
-                               file_search = NULL,
-                               model_format = "Standard time-series",
-                               outputType = "none",
-                               scenarios_from = 'directory') {
-
+check_missing_runs <- function(
+  hydro_dir,
+  output_parent_dir,
+  output_subdir = '',
+  scenarios = NULL,
+  file_search = NULL,
+  model_format = "Standard time-series",
+  outputType = "none",
+  scenarios_from = 'directory'
+) {
   if (is.null(scenarios)) {
-    if (model_format %in% c("IQQM - NSW 10,000 years", 'Standard time-series', "Bigmod - MDBA")) {
+    if (
+      model_format %in%
+        c("IQQM - NSW 10,000 years", 'Standard time-series', "Bigmod - MDBA")
+    ) {
       filetype <- "csv"
     }
     if (grepl("netcdf", model_format)) {
       filetype <- "nc"
     }
-    hydro_paths <- find_scenario_paths(hydro_dir, type = filetype, file_search = file_search)
+    hydro_paths <- find_scenario_paths(
+      hydro_dir,
+      type = filetype,
+      file_search = file_search
+    )
   } else {
     hydro_paths <- purrr::map(scenarios, \(x) file.path(hydro_dir, x))
   }
 
-  output_path <- make_output_dir(output_parent_dir,
-                                 scenarios = names(hydro_paths),
-                                 module_name = "EWR",
-                                 subdir = output_subdir,
-                                 ewr_outtypes = unlist(outputType)
+  output_path <- make_output_dir(
+    output_parent_dir,
+    scenarios = names(hydro_paths),
+    module_name = "EWR",
+    subdir = output_subdir,
+    ewr_outtypes = unlist(outputType)
   )
 
-  missing_scenarios <- find_missing_runs(hydro_paths, output_path, outputType, scenarios_from)
+  missing_scenarios <- find_missing_runs(
+    hydro_paths,
+    output_path,
+    outputType,
+    scenarios_from
+  )
 
   return(missing_scenarios)
 }
 
 # silly helper
 end_paster <- function(x, npastes) {
-  x[length(x)] <- paste0(x[(length(x)-(npastes-1)):length(x)], collapse = '_DIRECTORYAPPEND_')
+  x[length(x)] <- paste0(
+    x[(length(x) - (npastes - 1)):length(x)],
+    collapse = '_DIRECTORYAPPEND_'
+  )
   return(x)
 }

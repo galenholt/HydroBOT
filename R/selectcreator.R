@@ -24,7 +24,6 @@
 #' @keywords internal
 #'
 selectcreator <- function(selectvals, data, failmissing = TRUE) {
-
   # Simple if they're characters
   if (is.character(selectvals)) {
     if (failmissing) {
@@ -32,12 +31,10 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
     } else {
       s1g <- rlang::expr(tidyselect::any_of(selectvals))
     }
-
   }
 
   # Deal with quosures and tidyselect
   if (is.language(selectvals)) {
-
     # If it directly evaluates as a character vector, just get it and wrap as above
     if (is.character(rlang::get_expr(selectvals))) {
       charvec <- rlang::get_expr(selectvals)
@@ -64,7 +61,9 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
       #   tidyselect::eval_select(data, strict = failmissing) |>
       #   names()
 
-      charvec <- tryCatch(rlang::eval_tidy(selectvals), error = function(c) FALSE)
+      charvec <- tryCatch(rlang::eval_tidy(selectvals), error = function(c) {
+        FALSE
+      })
 
       # if it's a character, we have it now, process as above.
       if (is.character(charvec)) {
@@ -75,7 +74,6 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
         }
       }
     }
-
   }
 
   # a secondary check in case s1g evals to just a character vector. This
@@ -105,15 +103,18 @@ selectcreator <- function(selectvals, data, failmissing = TRUE) {
   s1g <- withCallingHandlers(
     warning = function(cnd) {
       # rlang::inform(cnd$message)
-      if ((grepl('restarting interrupted promise evaluation|Using an external vector', cnd$message[1]))) {
+      if (
+        (grepl(
+          'restarting interrupted promise evaluation|Using an external vector',
+          cnd$message[1]
+        ))
+      ) {
         rlang::cnd_muffle(cnd)
       }
     },
-    tidyselect::eval_select(s1g,
-                            data, strict = failmissing) |>
+    tidyselect::eval_select(s1g, data, strict = failmissing) |>
       names()
   )
 
   return(s1g)
 }
-

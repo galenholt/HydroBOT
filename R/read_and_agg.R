@@ -48,35 +48,37 @@
 #'
 #' @export
 #'
-read_and_agg <- function(datpath,
-                         type,
-                         geopath,
-                         causalpath,
-                         groupers = "scenario",
-                         group_until = rep(NA, length(groupers)),
-                         prepfun = 'prep_ewr_output',
-                         prepargs = list(),
-                         aggCols,
-                         aggsequence,
-                         funsequence,
-                         saveintermediate = FALSE,
-                         namehistory = TRUE,
-                         keepAllPolys = FALSE,
-                         failmissing = TRUE,
-                         auto_ewr_PU = FALSE,
-                         pseudo_spatial = NULL,
-                         returnList = TRUE,
-                         savepath = NULL,
-                         extrameta = NULL,
-                         rparallel = FALSE,
-                         par_recursive = TRUE,
-                         savepar = "combine",
-                         ...) {
+read_and_agg <- function(
+  datpath,
+  type,
+  geopath,
+  causalpath,
+  groupers = "scenario",
+  group_until = rep(NA, length(groupers)),
+  prepfun = 'prep_ewr_output',
+  prepargs = list(),
+  aggCols,
+  aggsequence,
+  funsequence,
+  saveintermediate = FALSE,
+  namehistory = TRUE,
+  keepAllPolys = FALSE,
+  failmissing = TRUE,
+  auto_ewr_PU = FALSE,
+  pseudo_spatial = NULL,
+  returnList = TRUE,
+  savepath = NULL,
+  extrameta = NULL,
+  rparallel = FALSE,
+  par_recursive = TRUE,
+  savepar = "combine",
+  ...
+) {
   if (!returnList && is.null(savepath)) {
     rlang::abort(
       message = "not returning output to disk or session.
       aborting to not use the resources."
-      )
+    )
   }
 
   # allow passing the causal network by name or path
@@ -98,16 +100,20 @@ read_and_agg <- function(datpath,
       agg_status = FALSE,
       time = format(Sys.time(), digits = 0, usetz = TRUE)
     )
-    yaml::write_yaml(init_params,
+    yaml::write_yaml(
+      init_params,
       file = file.path(savepath, "agg_metadata.yml")
     )
     if (rlang::is_installed("jsonlite")) {
-      jsonlite::write_json(init_params,
+      jsonlite::write_json(
+        init_params,
         path = file.path(savepath, "agg_metadata.json")
       )
     } else {
-      rlang::inform("json metadata not saved. If desired, install `jsonlite`",
-        .frequency = "regularly", .frequency_id = "jsoncheck"
+      rlang::inform(
+        "json metadata not saved. If desired, install `jsonlite`",
+        .frequency = "regularly",
+        .frequency_id = "jsoncheck"
       )
     }
   }
@@ -117,8 +123,12 @@ read_and_agg <- function(datpath,
   if (rparallel) {
     if (par_recursive) {
       # Go all the way in (i.e. loop over every folder with a csv)
-      gfiles <- list.files(datpath, pattern = ".csv",
-                           full.names = TRUE, recursive = TRUE)
+      gfiles <- list.files(
+        datpath,
+        pattern = ".csv",
+        full.names = TRUE,
+        recursive = TRUE
+      )
       dps <- gsub("/[^/]+$", "", gfiles) |> unique()
     } else {
       # only first level
@@ -139,31 +149,36 @@ read_and_agg <- function(datpath,
       rlang::abort("Unacceptable value for savepar")
     }
 
-    aggout <- safe_imap(dps, \(x, y) read_and_agg(x,
-      type = type,
-      geopath = geopath,
-      causalpath = causalpath,
-      groupers = groupers,
-      group_until = group_until,
-      prepfun = prepfun,
-      prepargs = prepargs,
-      aggCols = aggCols,
-      aggsequence = aggsequence,
-      funsequence = funsequence,
-      saveintermediate = saveintermediate,
-      namehistory = namehistory,
-      keepAllPolys = keepAllPolys,
-      failmissing = failmissing,
-      auto_ewr_PU = auto_ewr_PU,
-      pseudo_spatial = pseudo_spatial,
-      returnList = returnList,
-      savepath = eval(spath),
-      extrameta = extrameta,
-      rparallel = FALSE,
-      par_iter = which(y == names(dps)), # so I can not write safe_map and helps manage add_max
-      ...
-    ),
-    parallel = TRUE
+    aggout <- safe_imap(
+      dps,
+      \(x, y) {
+        read_and_agg(
+          x,
+          type = type,
+          geopath = geopath,
+          causalpath = causalpath,
+          groupers = groupers,
+          group_until = group_until,
+          prepfun = prepfun,
+          prepargs = prepargs,
+          aggCols = aggCols,
+          aggsequence = aggsequence,
+          funsequence = funsequence,
+          saveintermediate = saveintermediate,
+          namehistory = namehistory,
+          keepAllPolys = keepAllPolys,
+          failmissing = failmissing,
+          auto_ewr_PU = auto_ewr_PU,
+          pseudo_spatial = pseudo_spatial,
+          returnList = returnList,
+          savepath = eval(spath),
+          extrameta = extrameta,
+          rparallel = FALSE,
+          par_iter = which(y == names(dps)), # so I can not write safe_map and helps manage add_max
+          ...
+        )
+      },
+      parallel = TRUE
     )
 
     aggout <- purrr::list_transpose(aggout) |>
@@ -195,22 +210,27 @@ read_and_agg <- function(datpath,
       pull_type <- type
     }
 
-    data <- read_and_geo(datpath, type = pull_type,
-                         geopath = geopath, whichcrs = 4283, ...)
+    data <- read_and_geo(
+      datpath,
+      type = pull_type,
+      geopath = geopath,
+      whichcrs = 4283,
+      ...
+    )
 
     # Run any data cleaning on input (including mutates)
     # rlang::exec could handle bare functions or names, but I need to know the first arg
     prepfun <- functionlister(prepfun)
     if (length(prepfun) > 1) {
-      rlang::abort('Only one prep function possible.
-                   If need iterative prep, write a wrapper and pass that.')
+      rlang::abort(
+        'Only one prep function possible.
+                   If need iterative prep, write a wrapper and pass that.'
+      )
     }
     firstarg <- names(formals(prepfun[[1]])[1])
     prepargs <- utils::modifyList(prepargs, list(f1 = data))
     names(prepargs)[names(prepargs) == 'f1'] <- firstarg
-    data <- rlang::exec(prepfun[[1]],
-                        !!!prepargs)
-
+    data <- rlang::exec(prepfun[[1]], !!!prepargs)
 
     # parse any character names for the spatial data, then character will be the
     # themes
@@ -244,7 +264,8 @@ read_and_agg <- function(datpath,
 
     # Annoying how much of this is just pass-through arguments. Could use dots,
     # but then would need to specify the read_and_geo dots.
-    aggout <- multi_aggregate(data,
+    aggout <- multi_aggregate(
+      data,
       edges,
       groupers = groupers,
       group_until = group_until,
@@ -269,7 +290,6 @@ read_and_agg <- function(datpath,
     if (!rparallel || savepar == "combine") {
       saveRDS(aggout, file.path(savepath, paste0(type, "_aggregated.rds")))
     }
-
 
     char_aggsequence <- purrr::imap(aggsequence, parse_char)
     char_funsequence <- purrr::map(funsequence, parse_char_funs)
@@ -308,7 +328,8 @@ read_and_agg <- function(datpath,
       ymlmods <- list()
     }
 
-    yaml::write_yaml(utils::modifyList(ymlmods, list(aggregation = agg_params)),
+    yaml::write_yaml(
+      utils::modifyList(ymlmods, list(aggregation = agg_params)),
       file = file.path(savepath, "agg_metadata.yml")
     )
 
@@ -320,12 +341,15 @@ read_and_agg <- function(datpath,
       } else {
         jsonmods <- NULL
       }
-      jsonlite::write_json(list(jsonmods$ewr, aggregation = agg_params),
+      jsonlite::write_json(
+        list(jsonmods$ewr, aggregation = agg_params),
         path = file.path(savepath, "agg_metadata.json")
       )
     } else {
-      rlang::inform("json metadata not saved. If desired, install `jsonlite`",
-        .frequency = "regularly", .frequency_id = "jsoncheck"
+      rlang::inform(
+        "json metadata not saved. If desired, install `jsonlite`",
+        .frequency = "regularly",
+        .frequency_id = "jsoncheck"
       )
     }
   }

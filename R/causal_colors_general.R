@@ -28,17 +28,21 @@
 #'   `fillcolor` and `fontcolor`
 #' @export
 #'
-causal_colors_general <- function(df, pal_list,
-                                  pal_direction = rep(1, length(pal_list)),
-                                  colorgroups = NULL,
-                                  colorset = NULL,
-                                  setLimits = NULL) {
+causal_colors_general <- function(
+  df,
+  pal_list,
+  pal_direction = rep(1, length(pal_list)),
+  colorgroups = NULL,
+  colorset = NULL,
+  setLimits = NULL
+) {
   # Auto-create some colordefs in specific ways for causal networks
   df <- make_colorcol(df, colorset)
   # and change the colorset to 'colordef' since we just auto-set
 
   # Then call the general `grouped_colors`
-  dfcolor <- grouped_colors(df,
+  dfcolor <- grouped_colors(
+    df,
     pal_list = pal_list,
     pal_direction = pal_direction,
     colorgroups = colorgroups,
@@ -79,21 +83,26 @@ make_colorcol <- function(df, colorset) {
   } else if (colorset == "werp") {
     # Set up a default set of groupings for werp
     dfgroup <- df |>
-      dplyr::mutate(colordef = dplyr::case_when(
-        .data[[typecol]] == "ewr_code" ~
-          stringr::str_extract(.data[[namecol]], "^[A-Z]+"),
-        .data[[typecol]] == "env_obj" ~
-          stringr::str_extract(.data[[namecol]], "^[A-Z]+"),
-        .data[[typecol]] == "Specific_goal" ~ .data[[namecol]],
-        .data[[typecol]] == "Target" ~ .data[[namecol]],
-        stringr::str_detect(.data[[typecol]], "target_") ~
-          stringr::str_extract(.data[[typecol]], "[0-9]_year")
-      ))
+      dplyr::mutate(
+        colordef = dplyr::case_when(
+          .data[[typecol]] == "ewr_code" ~
+            stringr::str_extract(.data[[namecol]], "^[A-Z]+"),
+          .data[[typecol]] == "env_obj" ~
+            stringr::str_extract(.data[[namecol]], "^[A-Z]+"),
+          .data[[typecol]] == "Specific_goal" ~ .data[[namecol]],
+          .data[[typecol]] == "Target" ~ .data[[namecol]],
+          stringr::str_detect(.data[[typecol]], "target_") ~
+            stringr::str_extract(.data[[typecol]], "[0-9]_year")
+        )
+      )
   } else {
     # This is silly to dplyr::rename the col, but safer
     dfgroup <- df |>
-      dplyr::mutate(dplyr::across(tidyselect::all_of(colorset),
-                                  identity, .names = "colordef"))
+      dplyr::mutate(dplyr::across(
+        tidyselect::all_of(colorset),
+        identity,
+        .names = "colordef"
+      ))
   }
 
   return(dfgroup)
@@ -103,8 +112,11 @@ make_colorcol <- function(df, colorset) {
 fontcol <- function(boxcol) {
   # replace failures with white
   boxcol[boxcol == "character(0)"] <- "#FFFFFFFF"
-  pl <- grDevices::convertColor(t(grDevices::col2rgb(boxcol)) / 255,
-                                from = "sRGB", to = "Luv")
+  pl <- grDevices::convertColor(
+    t(grDevices::col2rgb(boxcol)) / 255,
+    from = "sRGB",
+    to = "Luv"
+  )
   l <- pl[, 1]
   fc <- ifelse(l > 50, "black", "white")
   return(fc)

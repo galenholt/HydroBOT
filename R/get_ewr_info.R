@@ -7,7 +7,13 @@
 get_ewr_gauges <- function() {
   ewrs_in_pyewr <- get_ewr_table()
   gauges_in_pyewr <- ewrs_in_pyewr |>
-    dplyr::select("Gauge", "PlanningUnitName", "LTWPShortName", "SWSDLName", "GaugeType") |>
+    dplyr::select(
+      "Gauge",
+      "PlanningUnitName",
+      "LTWPShortName",
+      "SWSDLName",
+      "GaugeType"
+    ) |>
     dplyr::distinct() |>
     tibble::tibble()
 
@@ -34,7 +40,7 @@ get_ewr_table <- function(type = "good") {
 
   # in older versions of the ewr tool, this was a list of 'good' and 'bad' ewr
   # tables. Now it's just a table.
-  if (length(ewrs_in_pyewr)==2) {
+  if (length(ewrs_in_pyewr) == 2) {
     if (type == "good") {
       ewrs_in_pyewr <- ewrs_in_pyewr[[1]]
     }
@@ -138,24 +144,34 @@ get_causal_ewr <- function(struct = 'list') {
   gce <- separate_ewr_codes(gce)
 
   if (struct == 'list') {
-    refcols <- c('planning_unit_name', 'LTWPShortName', 'SWSDLName', 'state', 'gauge')
+    refcols <- c(
+      'planning_unit_name',
+      'LTWPShortName',
+      'SWSDLName',
+      'state',
+      'gauge'
+    )
     # just return all pairwise combinations. Otherwise return flat.
     causal_steps <- names(gce)[!names(gce) %in% refcols]
 
     causal_list <- vector(mode = 'list')
-    for (i in seq_along(causal_steps[1:(length(causal_steps)-1)])) {
+    for (i in seq_along(causal_steps[1:(length(causal_steps) - 1)])) {
       for (j in (i + 1):length(causal_steps)) {
-
-        causal_list[[paste0(causal_steps[i], '_to_', causal_steps[j])]] <- dplyr::distinct(gce[, c(refcols, causal_steps[i], causal_steps[j])])
-
+        causal_list[[paste0(
+          causal_steps[i],
+          '_to_',
+          causal_steps[j]
+        )]] <- dplyr::distinct(gce[, c(
+          refcols,
+          causal_steps[i],
+          causal_steps[j]
+        )])
       }
     }
 
     # for common return val
     gce <- causal_list
   }
-
-
 
   return(gce)
 }

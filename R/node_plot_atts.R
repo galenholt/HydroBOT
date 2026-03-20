@@ -24,7 +24,8 @@ node_plot_atts <- function(nodedf) {
       fontsize = 25,
       # width = 5, #stringr::str_length(Name)/2,
       # 1/5 is *approximately* one letter size
-      width = ifelse(stringr::str_length(.data$Name) < 40,
+      width = ifelse(
+        stringr::str_length(.data$Name) < 40,
         stringr::str_length(.data$Name) / 5 + 0.4,
         40 / 5
       ),
@@ -60,7 +61,6 @@ node_plot_atts <- function(nodedf) {
     ) |>
     dplyr::ungroup() |>
     dplyr::select(-"num", -"mid", -"rown", "basex", "devx", "plusminus")
-
 
   return(nodedf)
 }

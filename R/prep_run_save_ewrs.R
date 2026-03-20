@@ -3,10 +3,9 @@
 ## NOTE: this imports from system.file, and so while developing won't pick up
 ## new versions without `install`ing the package. The `future` uses seem most
 ## sensitive to this- I think maybe test shims don't work right?
-controller_functions <- reticulate::import_from_path("controller_functions",
-  path = system.file("python",
-    package = "HydroBOT"
-  ),
+controller_functions <- reticulate::import_from_path(
+  "controller_functions",
+  path = system.file("python", package = "HydroBOT"),
   delay_load = TRUE
 )
 
@@ -84,22 +83,23 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 #'
 #' @return a list of dataframe(s) if `returnType` is not 'none', otherwise, NULL
 #' @export
-prep_run_save_ewrs <- function(hydro_dir,
-                               output_parent_dir,
-                               output_subdir = '',
-                               scenarios = NULL,
-                               model_format = "Standard time-series",
-                               outputType = "none",
-                               returnType = "none",
-                               scenarios_from = 'directory',
-                               file_search = NULL,
-                               fill_missing = FALSE,
-                               extrameta = NULL,
-                               rparallel = FALSE,
-                               retries = 2,
-                               print_runs = FALSE,
-                               url = FALSE) {
-
+prep_run_save_ewrs <- function(
+  hydro_dir,
+  output_parent_dir,
+  output_subdir = '',
+  scenarios = NULL,
+  model_format = "Standard time-series",
+  outputType = "none",
+  returnType = "none",
+  scenarios_from = 'directory',
+  file_search = NULL,
+  fill_missing = FALSE,
+  extrameta = NULL,
+  rparallel = FALSE,
+  retries = 2,
+  print_runs = FALSE,
+  url = FALSE
+) {
   # allow sloppy outputTypes and returnTypes
   if (!is.list(outputType)) {
     outputType <- as.list(outputType)
@@ -124,19 +124,27 @@ prep_run_save_ewrs <- function(hydro_dir,
   # that's no longer true, it makes the now-required loops easier to use one in
   # R
   if (is.null(scenarios)) {
-    if (model_format %in% c("IQQM - NSW 10,000 years",
-                            "All Bigmod",
-                            "ten thousand year",
-                            "Standard time-series",
-                            "Bigmod - MDBA")) {
+    if (
+      model_format %in%
+        c(
+          "IQQM - NSW 10,000 years",
+          "All Bigmod",
+          "ten thousand year",
+          "Standard time-series",
+          "Bigmod - MDBA"
+        )
+    ) {
       filetype <- "csv"
     }
     if (grepl("netcdf", model_format)) {
       filetype <- "nc"
     }
-    hydro_paths <- find_scenario_paths(hydro_dir, type = filetype,
-                                       scenarios_from = scenarios_from,
-                                       file_search = file_search)
+    hydro_paths <- find_scenario_paths(
+      hydro_dir,
+      type = filetype,
+      scenarios_from = scenarios_from,
+      file_search = file_search
+    )
   } else {
     # if files are from URL (blob), we have to pre-create the paths
     if (url) {
@@ -149,13 +157,17 @@ prep_run_save_ewrs <- function(hydro_dir,
 
   # catch entirely missing hydrographs
   if (length(hydro_paths) == 0) {
-    rlang::abort(glue::glue("no hydrograph files detected in hydro_dir ({hydro_dir})."))
+    rlang::abort(glue::glue(
+      "no hydrograph files detected in hydro_dir ({hydro_dir})."
+    ))
   }
   # We need to check the files have unique names (and fix if not), since the EWR
   # tool makes them the 'scenario' column.
   # hydro_paths <- fix_file_scenarios(hydro_paths, scenarios)
   if (any(duplicated(hydro_paths))) {
-    rlang::abort(glue::glue("The {hydro_paths[duplicated(hydro_paths)]} are duplicated. Fix your directory structure."))
+    rlang::abort(glue::glue(
+      "The {hydro_paths[duplicated(hydro_paths)]} are duplicated. Fix your directory structure."
+    ))
   }
 
   # output_path doesn't get used for outputType == 'none', but we don't really
@@ -163,7 +175,8 @@ prep_run_save_ewrs <- function(hydro_dir,
   if (length(outputType) == 1 && outputType == "none") {
     output_path <- "" # This shouldn't do anything
   } else {
-    output_path <- make_output_dir(output_parent_dir,
+    output_path <- make_output_dir(
+      output_parent_dir,
       scenarios = names(hydro_paths),
       module_name = "EWR",
       subdir = output_subdir,
@@ -172,11 +185,15 @@ prep_run_save_ewrs <- function(hydro_dir,
 
     # Adjust if filling missing
     if (fill_missing) {
-      missing_scenarios <- find_missing_runs(hydro_paths, output_path, outputType, scenarios_from)
+      missing_scenarios <- find_missing_runs(
+        hydro_paths,
+        output_path,
+        outputType,
+        scenarios_from
+      )
 
       hydro_paths <- hydro_paths[names(hydro_paths) %in% missing_scenarios]
     }
-
 
     # set up flags for the metadata in case the ewr fails partway
     init_params <- list(
@@ -184,22 +201,28 @@ prep_run_save_ewrs <- function(hydro_dir,
       ewr_status = FALSE,
       time = format(Sys.time(), digits = 0, usetz = TRUE)
     )
-    yaml::write_yaml(init_params,
+    yaml::write_yaml(
+      init_params,
       file = file.path(output_path, "ewr_metadata.yml")
     )
     if (rlang::is_installed("jsonlite")) {
-      jsonlite::write_json(init_params,
+      jsonlite::write_json(
+        init_params,
         path = file.path(output_path, "ewr_metadata.json")
       )
     } else {
-      rlang::inform("json metadata not saved. If desired, install `jsonlite`",
-        .frequency = "regularly", .frequency_id = "jsoncheck"
+      rlang::inform(
+        "json metadata not saved. If desired, install `jsonlite`",
+        .frequency = "regularly",
+        .frequency_id = "jsoncheck"
       )
     }
   }
 
   if (rparallel && !rlang::is_installed("furrr")) {
-    rlang::warn("parallel processing over hydro_paths requires furrr. Please install it. Setting `parallel = FALSE` and proceeding")
+    rlang::warn(
+      "parallel processing over hydro_paths requires furrr. Please install it. Setting `parallel = FALSE` and proceeding"
+    )
     rparallel <- FALSE
   }
 
@@ -207,7 +230,8 @@ prep_run_save_ewrs <- function(hydro_dir,
   # is simpler in furrr and purrr
   ewrfun <- function(x, y) {
     # x <- file.path(hydro_dir, x)
-    controller_functions$run_save_ewrs(x,
+    controller_functions$run_save_ewrs(
+      x,
       output_path,
       model_format,
       outputType = outputType,
@@ -217,28 +241,40 @@ prep_run_save_ewrs <- function(hydro_dir,
     )
   }
 
-
   # There's an approximately 260 character path limit on windows for python. Try to detect here (I do it there too)
   unout <- unlist(outputType)
   unout <- unout[which(nchar(unout) == max(nchar(unout)))]
-  approx_py_path <- paste0(output_path, '\\', names(hydro_paths[1]),'\\', unout, '\\', names(hydro_paths[1]), '.csv')
+  approx_py_path <- paste0(
+    output_path,
+    '\\',
+    names(hydro_paths[1]),
+    '\\',
+    unout,
+    '\\',
+    names(hydro_paths[1]),
+    '.csv'
+  )
   if (nchar(approx_py_path) >= 260 & .Platform$OS.type == 'windows') {
-    rlang::warn(glue::glue('Output path is {nchar(approx_py_path)}, windows has about a 260 limit. If files are not saving, try a shorter path.'))
+    rlang::warn(glue::glue(
+      'Output path is {nchar(approx_py_path)}, windows has about a 260 limit. If files are not saving, try a shorter path.'
+    ))
   }
 
   # Spit out info if requested
   if (print_runs) {
-
     if (length(hydro_paths) < 10) {
       runprint <- names(hydro_paths)
     } else {
-      runprint <- c(glue::glue("{names(hydro_paths)[1:10]}"),
-                    glue::glue("and {length(hydro_paths) - 10} more"))
+      runprint <- c(
+        glue::glue("{names(hydro_paths)[1:10]}"),
+        glue::glue("and {length(hydro_paths) - 10} more")
+      )
     }
-    rlang::inform(c(glue::glue("{length(hydro_paths)} scenarios to run:"),
-                    runprint))
+    rlang::inform(c(
+      glue::glue("{length(hydro_paths)} scenarios to run:"),
+      runprint
+    ))
   }
-
 
   # Run the EWR tool over all hydro_paths
   # This is abandoned for now, could put an auto cluster looper in here.
@@ -246,13 +282,17 @@ prep_run_save_ewrs <- function(hydro_dir,
   # if (outer_parallel > 1) {
   #   nodeloops <- split(fulloop, cut(1:length(fulloop), nodes_wanted, labels = FALSE))
   # }
-  ewr_out <- safe_imap(hydro_paths, ewrfun, retries = retries, parallel = rparallel)
+  ewr_out <- safe_imap(
+    hydro_paths,
+    ewrfun,
+    retries = retries,
+    parallel = rparallel
+  )
 
   # save metadata immediately after processing so any errors in the returning don't prevent its creation.
   # auto-build metadata- this builds the data needed to run from params
   # And do it *after* the ewrs get processed so it only happens if the run works
   if (output_path != "") {
-
     ewr_params <- list(
       output_parent_dir = output_parent_dir,
       hydro_dir = hydro_dir,
@@ -280,8 +320,9 @@ prep_run_save_ewrs <- function(hydro_dir,
       ymlscenes <- NULL
     }
 
-    yaml::write_yaml(list(scenarios = ymlscenes, ewr = ewr_params),
-                     file = file.path(output_path, "ewr_metadata.yml")
+    yaml::write_yaml(
+      list(scenarios = ymlscenes, ewr = ewr_params),
+      file = file.path(output_path, "ewr_metadata.yml")
     )
 
     if (rlang::is_installed("jsonlite")) {
@@ -292,12 +333,15 @@ prep_run_save_ewrs <- function(hydro_dir,
       } else {
         jsonscenes <- NULL
       }
-      jsonlite::write_json(c(jsonscenes, ewr_params),
-                           path = file.path(output_path, "ewr_metadata.json")
+      jsonlite::write_json(
+        c(jsonscenes, ewr_params),
+        path = file.path(output_path, "ewr_metadata.json")
       )
     } else {
-      rlang::inform("json metadata not saved. If desired, install `jsonlite`",
-                    .frequency = "regularly", .frequency_id = "jsoncheck"
+      rlang::inform(
+        "json metadata not saved. If desired, install `jsonlite`",
+        .frequency = "regularly",
+        .frequency_id = "jsoncheck"
       )
     }
   }
@@ -362,7 +406,9 @@ clean_ewr_in_R <- function(ewr_out) {
     # check that the unlisting hasn't changed the data- could happen if the list-cols have multiple numbers per cell
     unlistrows <- nrow(df)
     if (unlistrows != listrows) {
-      rlang::inform(glue::glue("Unlisting list-columns in EWR output {dfn} has caused rows to change from {listrows} to {unlistrows}. Check that this is expected behaviour."))
+      rlang::inform(glue::glue(
+        "Unlisting list-columns in EWR output {dfn} has caused rows to change from {listrows} to {unlistrows}. Check that this is expected behaviour."
+      ))
     }
 
     return(df)
@@ -382,16 +428,19 @@ clean_ewr_in_R <- function(ewr_out) {
 #' @keywords internal
 make_ewr_consistent <- function(typearg) {
   if (length(typearg) == 1 && typearg[[1]] == 'everything') {
-    typearg <- list('summary',
-                    'yearly',
-                    'all_events',
-                    'all_successful_events',
-                    'all_interEvents',
-                    'all_successful_interEvents')
+    typearg <- list(
+      'summary',
+      'yearly',
+      'all_events',
+      'all_successful_events',
+      'all_interEvents',
+      'all_successful_interEvents'
+    )
   }
 
   typearg <- unlist(typearg)
-  typearg <- dplyr::case_when(typearg == "all" ~ "all_events",
+  typearg <- dplyr::case_when(
+    typearg == "all" ~ "all_events",
     typearg == "annual" ~ "yearly",
     typearg == "successful" ~ "all_successful_events",
     typearg == "all_interevents" ~ "all_interEvents",
@@ -400,5 +449,3 @@ make_ewr_consistent <- function(typearg) {
   )
   typearg <- as.list(typearg)
 }
-
-

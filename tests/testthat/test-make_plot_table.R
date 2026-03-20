@@ -1,6 +1,9 @@
 agg_theme_space <- make_test_agg(namehistory = FALSE)
 # create a quant description of scenarios
-scenarios <- tibble::tibble(scenario = c("base", "down4", "up4"), delta = c(1, 0.25, 4))
+scenarios <- tibble::tibble(
+  scenario = c("base", "down4", "up4"),
+  delta = c(1, 0.25, 4)
+)
 
 obj_sdl_to_plot <- agg_theme_space$sdl_units |>
   dplyr::mutate(env_group = stringr::str_extract(eco_objective, "^[A-Z]+")) |>
@@ -18,12 +21,12 @@ scene_pal <- make_pal(
 )
 
 test_that("werp plots work", {
-
-  basin_plot <- plot_outcomes(basin_to_plot,
-                              outcome_col = "ewr_achieved",
-                              colorset = "theme",
-                              pal_list = list("scico::oslo"),
-                              sceneorder = c("down4", "base", "up4")
+  basin_plot <- plot_outcomes(
+    basin_to_plot,
+    outcome_col = "ewr_achieved",
+    colorset = "theme",
+    pal_list = list("scico::oslo"),
+    sceneorder = c("down4", "base", "up4")
   ) +
     ggplot2::theme(legend.position = "none")
 
@@ -46,12 +49,13 @@ test_that("werp plots work", {
   sdl_table <- make_plot_table(sdl_plot)
 
   expect_snapshot(sdl_table)
-  })
+})
 
 test_that("non-werp fails", {
-  iris_plot <- ggplot2::ggplot(iris,
-                               ggplot2::aes(x = Sepal.Length, y = Petal.Width,
-                                            color = Species)) +
+  iris_plot <- ggplot2::ggplot(
+    iris,
+    ggplot2::aes(x = Sepal.Length, y = Petal.Width, color = Species)
+  ) +
     ggplot2::geom_point()
 
   expect_error(make_plot_table(iris_plot))

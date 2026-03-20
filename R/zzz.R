@@ -7,6 +7,4 @@
   if (!interactive()) {
     Sys.setenv('TQDM_DISABLE' = '1')
   }
-
 }
-

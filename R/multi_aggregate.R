@@ -88,22 +88,26 @@
 #'   values at each step (`saveintermediate = TRUE`)
 #' @export
 #'
-multi_aggregate <- function(dat,
-                            causal_edges = NULL,
-                            groupers = "scenario",
-                            group_until = rep(NA, length(groupers)),
-                            aggCols,
-                            aggsequence,
-                            funsequence,
-                            saveintermediate = FALSE,
-                            namehistory = TRUE,
-                            keepAllPolys = FALSE,
-                            failmissing = TRUE,
-                            auto_ewr_PU = FALSE,
-                            pseudo_spatial = NULL) {
+multi_aggregate <- function(
+  dat,
+  causal_edges = NULL,
+  groupers = "scenario",
+  group_until = rep(NA, length(groupers)),
+  aggCols,
+  aggsequence,
+  funsequence,
+  saveintermediate = FALSE,
+  namehistory = TRUE,
+  keepAllPolys = FALSE,
+  failmissing = TRUE,
+  auto_ewr_PU = FALSE,
+  pseudo_spatial = NULL
+) {
   # Check for common sources of errors
   if (!inherits(aggsequence, "list") || !inherits(funsequence, "list")) {
-    rlang::abort("aggsequence and funsequence should both be lists, even if there is only one item. Otherwise iterating over their length causes unexpected behaviour.")
+    rlang::abort(
+      "aggsequence and funsequence should both be lists, even if there is only one item. Otherwise iterating over their length causes unexpected behaviour."
+    )
   }
 
   # start with the input data
@@ -120,7 +124,9 @@ multi_aggregate <- function(dat,
   # the causal network. Will want to implement that at some point, probably.
   causalsteps <- aggsequence[purrr::map_lgl(aggsequence, is.character)]
   if (any(duplicated(purrr::map_chr(causalsteps, \(x) x[1])))) {
-    thedups <- causalsteps[duplicated(purrr::map_chr(causalsteps, \(x) x[1]))] |>
+    thedups <- causalsteps[duplicated(purrr::map_chr(causalsteps, \(x) {
+      x[1]
+    }))] |>
       purrr::map_chr(\(x) x[1])
     dupfind <- function(x) {
       if (x[1] %in% thedups) {
@@ -131,15 +137,16 @@ multi_aggregate <- function(dat,
     }
     dupped <- purrr::map(causalsteps, \(x) dupfind(x))
     rlang::abort(
-      glue::glue("Aggregating multiple times from the same causal level(s):
+      glue::glue(
+        "Aggregating multiple times from the same causal level(s):
                             {glue::glue_collapse(dupped[!purrr::map_lgl(dupped, is.null)], sep = ',\n')}.
                             This non-nested causal aggregation is currently not supported.
                             Until it is, do multiple aggregations to get to the
                             multiple outcome levels.
-                            And please raise an issue on github.")
+                            And please raise an issue on github."
+      )
     )
   }
-
 
   # Bare names get lost as we go down into further functions, so use characters
   # and throw an ugly conditional on to do that. It's extra ugly with multiple
@@ -148,12 +155,16 @@ multi_aggregate <- function(dat,
   namefunsequence <- vector(mode = "list", length = length(funsequence))
   for (i in 1:length(funsequence)) {
     funlist <- funsequence[[i]]
-    if (!rlang::is_quosure(funlist) &&
-      (is.function(funlist) ||
-        (is.list(funlist) &
-          is.function(funlist[[1]])))) {
+    if (
+      !rlang::is_quosure(funlist) &&
+        (is.function(funlist) ||
+          (is.list(funlist) &
+            is.function(funlist[[1]])))
+    ) {
       if (length(substitute(funsequence)) == 1) {
-        rlang::abort("Cannot infer names of funsequence, likely because it's a named object. Use something other than a pre-built list of bare function names.")
+        rlang::abort(
+          "Cannot infer names of funsequence, likely because it's a named object. Use something other than a pre-built list of bare function names."
+        )
       }
       # The +1 is because the first item is 'list'.
       funlist <- as.character(substitute(funsequence)[[i + 1]])
@@ -171,7 +182,6 @@ multi_aggregate <- function(dat,
     funsequence[notnull] <- namefunsequence[notnull]
   }
 
-
   # I *think* this is safe, because dat should never GROW groups, only lose
   # them. So turning this to characters here will be the superset of what's ever
   # encountered. I've left a tidyselect parsing version commented out in case
@@ -188,12 +198,16 @@ multi_aggregate <- function(dat,
   # groupers is fancy
   # If groupers is a character, we can just add the missing
   if (is.character(groupers) && !(all(names(group_indices) %in% groupers))) {
-    groupers <- c(groupers, names(group_indices)[!(names(group_indices) %in% groupers)])
+    groupers <- c(
+      groupers,
+      names(group_indices)[!(names(group_indices) %in% groupers)]
+    )
   }
 
   # get the index for any pseudo-spatial joins and aggs
-  pseudo_indices <- purrr::map_int(pseudo_spatial, \(x) parse_aggnum(x, aggsequence = aggsequence))
-
+  pseudo_indices <- purrr::map_int(pseudo_spatial, \(x) {
+    parse_aggnum(x, aggsequence = aggsequence)
+  })
 
   # Get the dimension we're moving across at each step
   stepdim <- identify_dimension(
@@ -257,7 +271,8 @@ multi_aggregate <- function(dat,
     thisgroup <- selectcreator(rlang::enquo(groupers), dat, failmissing)
     thisagg <- selectcreator(
       rlang::expr(tidyselect::ends_with(!!aggCols)),
-      dat, failmissing
+      dat,
+      failmissing
     )
 
     # Deal with the group_until
@@ -269,14 +284,15 @@ multi_aggregate <- function(dat,
     }
     thisgroup <- thisgroup[!thisgroup %in% dropgroups]
 
-
     if (stepdim[i] == "theme") {
       # If the aggsequence isn't named, name it. This is less obviously doable
       # for sf. deal with that later. There three different ways unnamed lists
       # can end up here, and so need to deal with them all
-      if (is.null(names(aggsequence[i])) ||
-        is.na(names(aggsequence[i])) ||
-        names(aggsequence[i]) == "") {
+      if (
+        is.null(names(aggsequence[i])) ||
+          is.na(names(aggsequence[i])) ||
+          names(aggsequence[i]) == ""
+      ) {
         names(aggsequence)[[i]] <- aggsequence[[i]][2]
       }
 
@@ -312,7 +328,9 @@ multi_aggregate <- function(dat,
         auto_ewr_PU = auto_ewr_PU
       )
 
-      spatial_to_info <- names(aggsequence[[i]])[names(aggsequence[[i]]) != "geometry"]
+      spatial_to_info <- names(aggsequence[[i]])[
+        names(aggsequence[[i]]) != "geometry"
+      ]
     } else if (stepdim[i] == "temporal") {
       dat <- temporal_aggregate(
         dat = dat,
@@ -340,14 +358,13 @@ multi_aggregate <- function(dat,
       }
     }
 
-
-
     # add each level to a list if saving
     if (saveintermediate) {
       # namehistory saves history in the names, otherwise in a set of columns
       # The assignment for namehistory fails
       if (!namehistory) {
-        datlist[[names(aggsequence)[i]]] <- agg_names_to_cols(dat,
+        datlist[[names(aggsequence)[i]]] <- agg_names_to_cols(
+          dat,
           aggsequence = names(aggsequence[1:i]),
           funsequence = funsequence[1:i],
           aggCols = aggCols
@@ -368,7 +385,8 @@ multi_aggregate <- function(dat,
   } else {
     # history in columns if namehistory is FALSE
     if (!namehistory) {
-      dat <- agg_names_to_cols(dat,
+      dat <- agg_names_to_cols(
+        dat,
         aggsequence = names(aggsequence),
         funsequence = funsequence,
         aggCols = aggCols

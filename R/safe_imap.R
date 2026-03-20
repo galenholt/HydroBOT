@@ -32,8 +32,11 @@ safe_imap <- function(.x, .f, ..., retries = 0, parallel = FALSE) {
       im_out <- purrr::imap(.x, purrr::safely(.f))
     }
     if (parallel) {
-      im_out <- furrr::future_imap(.x, purrr::safely(.f),
-                               .options = furrr::furrr_options(seed = TRUE))
+      im_out <- furrr::future_imap(
+        .x,
+        purrr::safely(.f),
+        .options = furrr::furrr_options(seed = TRUE)
+      )
     }
     # get the results, dropping the NULLs
     results_out <- purrr::map(im_out, purrr::pluck('result'))
@@ -45,8 +48,7 @@ safe_imap <- function(.x, .f, ..., retries = 0, parallel = FALSE) {
     full_results[orig_indices] <- results_out
 
     # where are the errors
-    whicherrors <- purrr::map(im_out,
-                              \(x) rlang::is_error(x$error)) |>
+    whicherrors <- purrr::map(im_out, \(x) rlang::is_error(x$error)) |>
       unlist() |>
       which()
 
@@ -57,7 +59,6 @@ safe_imap <- function(.x, .f, ..., retries = 0, parallel = FALSE) {
     orig_indices <- orig_indices[whicherrors]
 
     counter <- counter + 1
-
   }
 
   if (length(whicherrors) > 0) {
@@ -66,10 +67,12 @@ safe_imap <- function(.x, .f, ..., retries = 0, parallel = FALSE) {
     }
 
     rlang::inform(c(
-      glue::glue("The function {deparse(rlang::trace_back()$call[[1]][1])} has run, but the scenario(s) {names(whicherrors)} have failed and have been bypassed after {retries} retries."),
-                    "The first error is:",
-                  glue::glue("{error_out[[1]]}")
-      ))
+      glue::glue(
+        "The function {deparse(rlang::trace_back()$call[[1]][1])} has run, but the scenario(s) {names(whicherrors)} have failed and have been bypassed after {retries} retries."
+      ),
+      "The first error is:",
+      glue::glue("{error_out[[1]]}")
+    ))
     full_results <- full_results[-orig_indices]
   }
 

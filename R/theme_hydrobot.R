@@ -12,10 +12,10 @@
 #'   ggplot2::geom_point() +
 #'   theme_hydrobot()
 theme_hydrobot <- function(base_size = 10, ...) {
-
   ggplot2::theme_bw(base_size = base_size) +
-    ggplot2::theme(strip.background = ggplot2::element_blank(),
-                   panel.grid = ggplot2::element_blank(),
-                   ...)
-
+    ggplot2::theme(
+      strip.background = ggplot2::element_blank(),
+      panel.grid = ggplot2::element_blank(),
+      ...
+    )
 }

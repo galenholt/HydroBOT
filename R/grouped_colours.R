@@ -16,11 +16,14 @@
 #' @return a dataframe with new column `color` with hex colors
 #' @export
 #'
-grouped_colors <- function(df, pal_list,
-                           pal_direction = rep(1, length(pal_list)),
-                           colorgroups = NULL,
-                           colorset = NULL,
-                           setLimits = NULL) {
+grouped_colors <- function(
+  df,
+  pal_list,
+  pal_direction = rep(1, length(pal_list)),
+  colorgroups = NULL,
+  colorset = NULL,
+  setLimits = NULL
+) {
   # short-circuit if pal_list is just a color name or a named color object-
   # accepts single values, a named object of class color or a vector of length
 
@@ -34,12 +37,22 @@ grouped_colors <- function(df, pal_list,
       if (any(colnames %in% df$scenario)) {
         namematch <- "scenario"
       }
-      if (!is.null(colorgroups) && any(colnames %in%
-        dplyr::pull(df, colorgroups))) {
+      if (
+        !is.null(colorgroups) &&
+          any(
+            colnames %in%
+              dplyr::pull(df, colorgroups)
+          )
+      ) {
         namematch <- colorgroups
       }
-      if (!is.null(colorset) && any(colnames %in%
-        dplyr::pull(df, colorset))) {
+      if (
+        !is.null(colorset) &&
+          any(
+            colnames %in%
+              dplyr::pull(df, colorset)
+          )
+      ) {
         namematch <- colorset
       }
       names(coltib)[1] <- namematch
@@ -47,8 +60,10 @@ grouped_colors <- function(df, pal_list,
         dplyr::mutate(colordef = .data[[namematch]])
       return(df)
     }
-    if (is.character(pal_list) &
-        (length(pal_list) == 1 | length(pal_list == nrow(df)))) {
+    if (
+      is.character(pal_list) &
+        (length(pal_list) == 1 | length(pal_list == nrow(df)))
+    ) {
       # expects a colordef col later, just make one
       df$colordef <- NA
       df$color <- pal_list
@@ -59,21 +74,26 @@ grouped_colors <- function(df, pal_list,
 
   # need some name references to know what function to use
   cnames <- paletteer::palettes_c_names |>
-    dplyr::mutate(formatted = stringr::str_c(.data$package,
-                                             .data$palette, sep = "::")) |>
+    dplyr::mutate(
+      formatted = stringr::str_c(.data$package, .data$palette, sep = "::")
+    ) |>
     dplyr::select("formatted") |>
     dplyr::pull()
 
   dnames <- paletteer::palettes_d_names |>
-    dplyr::mutate(formatted = stringr::str_c(.data$package,
-                                             .data$palette, sep = "::")) |>
+    dplyr::mutate(
+      formatted = stringr::str_c(.data$package, .data$palette, sep = "::")
+    ) |>
     dplyr::select("formatted") |>
     dplyr::pull()
 
   # For consistency, rename the column to a fixed name `colordef`
   df <- df |>
-    dplyr::mutate(dplyr::across(tidyselect::all_of(colorset),
-                                identity, .names = "colordef"))
+    dplyr::mutate(dplyr::across(
+      tidyselect::all_of(colorset),
+      identity,
+      .names = "colordef"
+    ))
 
   # pal_direction needs to be named as pal_list
   if (!is.null(pal_direction) && is.null(names(pal_direction))) {
@@ -84,14 +104,20 @@ grouped_colors <- function(df, pal_list,
   dfcols <- df |>
     dplyr::group_by(dplyr::across(tidyselect::any_of(colorgroups))) |>
     dplyr::distinct(.data$colordef) |>
-    dplyr::mutate(palname = ifelse(is.null(colorgroups),
-      unlist(pal_list),
-      pal_list[[.data[[colorgroups]][1]]]
-    )) |>
-    dplyr::mutate(paldir = ifelse(is.null(colorgroups),
-      pal_direction,
-      pal_direction[.data[[colorgroups]][1]]
-    ))
+    dplyr::mutate(
+      palname = ifelse(
+        is.null(colorgroups),
+        unlist(pal_list),
+        pal_list[[.data[[colorgroups]][1]]]
+      )
+    ) |>
+    dplyr::mutate(
+      paldir = ifelse(
+        is.null(colorgroups),
+        pal_direction,
+        pal_direction[.data[[colorgroups]][1]]
+      )
+    )
 
   # We get the color value by telling the palette how many colors and then
   # grabbing an index. If colordef is a non-numeric, we should choose as many
@@ -111,10 +137,11 @@ grouped_colors <- function(df, pal_list,
       dfcols <- dfcols |>
         dplyr::mutate(
           pallength = 1000,
-          palindex = round(propor(.data$colordef,
-                                  minx = setLimits[1],
-                                  maxx = setLimits[2]) *
-                             (.data$pallength - 1)) + 1
+          palindex = round(
+            propor(.data$colordef, minx = setLimits[1], maxx = setLimits[2]) *
+              (.data$pallength - 1)
+          ) +
+            1
         )
     } else if (length(setLimits) == 3) {
       dfcols <- dfcols |>
@@ -122,14 +149,17 @@ grouped_colors <- function(df, pal_list,
           pallength = 1000,
           palindex = dplyr::case_when(
             colordef == setLimits[2] ~ pallength / 2,
-            colordef < setLimits[2] ~ round(propor(colordef,
-              minx = setLimits[1],
-              maxx = setLimits[2]
-            ) * ((pallength / 2) - 1)) + 1,
-            colordef > setLimits[2] ~ round(propor(colordef,
-              minx = setLimits[2],
-              maxx = setLimits[3]
-            ) * ((pallength / 2) - 1)) + (pallength / 2) + 1
+            colordef < setLimits[2] ~ round(
+              propor(colordef, minx = setLimits[1], maxx = setLimits[2]) *
+                ((pallength / 2) - 1)
+            ) +
+              1,
+            colordef > setLimits[2] ~ round(
+              propor(colordef, minx = setLimits[2], maxx = setLimits[3]) *
+                ((pallength / 2) - 1)
+            ) +
+              (pallength / 2) +
+              1
           )
         )
     }
@@ -141,7 +171,6 @@ grouped_colors <- function(df, pal_list,
       )
   }
 
-
   # Need to determine `paletteer_c` vs `paletteer_d` dependent on the name. This
   # should be doable with case_when but it won't run in a dplyr::mutate. Loop
   # over rows, getting the correct color index for the correct palette. this is
@@ -150,31 +179,37 @@ grouped_colors <- function(df, pal_list,
 
   # Make CHECK happy
   i <- NULL
-  colmap <- foreach::foreach(i = 1:nrow(dfcols)) %do% {
-    thispal <- dfcols$palname[i]
-    if (thispal %in% cnames) {
-      thiscol <- paletteer::paletteer_c(thispal,
-        n = dfcols$pallength[i],
-        direction = dfcols$paldir[i]
-      )[dfcols$palindex[i]]
-    } else if (thispal %in% dnames) {
-      thiscol <- paletteer::paletteer_d(thispal,
-        n = dfcols$pallength[i],
-        direction = dfcols$paldir[i]
-      )[dfcols$palindex[i]]
-    } else {
-      # try to inform a bit- I could auto-set palettes this way, but I'd rather
-      # make the user do it right
-      paltest <- grepl(thispal, c(cnames, dnames), ignore.case = TRUE)
-      if (any(paltest)) {
-        rlang::abort(glue::glue("Requested palette {palette} not present, likely because wrong case or missing letters.
-                   Try `{c(cnames, dnames)[which(paltest)]}`"))
+  colmap <- foreach::foreach(i = 1:nrow(dfcols)) %do%
+    {
+      thispal <- dfcols$palname[i]
+      if (thispal %in% cnames) {
+        thiscol <- paletteer::paletteer_c(
+          thispal,
+          n = dfcols$pallength[i],
+          direction = dfcols$paldir[i]
+        )[dfcols$palindex[i]]
+      } else if (thispal %in% dnames) {
+        thiscol <- paletteer::paletteer_d(
+          thispal,
+          n = dfcols$pallength[i],
+          direction = dfcols$paldir[i]
+        )[dfcols$palindex[i]]
       } else {
-        rlang::abort(glue::glue("Requested palette {palette} not available in paletteer"))
+        # try to inform a bit- I could auto-set palettes this way, but I'd rather
+        # make the user do it right
+        paltest <- grepl(thispal, c(cnames, dnames), ignore.case = TRUE)
+        if (any(paltest)) {
+          rlang::abort(glue::glue(
+            "Requested palette {palette} not present, likely because wrong case or missing letters.
+                   Try `{c(cnames, dnames)[which(paltest)]}`"
+          ))
+        } else {
+          rlang::abort(glue::glue(
+            "Requested palette {palette} not available in paletteer"
+          ))
+        }
       }
     }
-  }
-
 
   # column arrangement
   dfcols <- dplyr::bind_cols(dfcols, color = as.character(colmap)) |>

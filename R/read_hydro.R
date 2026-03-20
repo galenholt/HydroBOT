@@ -9,7 +9,13 @@
 #' @return tibble of hydrographs
 #' @export
 #'
-read_hydro <- function(hydropath, scenariofilter = NULL, long = TRUE, format = "csv", gaugemap = "iqqm") {
+read_hydro <- function(
+  hydropath,
+  scenariofilter = NULL,
+  long = TRUE,
+  format = "csv",
+  gaugemap = "iqqm"
+) {
   if (format == "csv") {
     return(read_hydro_csv(hydropath, scenariofilter, long))
   }
@@ -34,15 +40,18 @@ read_hydro_csv <- function(hydropath, scenariofilter, long) {
     hll <- length(hydro_paths)
     hydro_paths <- hydro_paths[names(hydro_paths) %in% scenariofilter]
     if (hll > 0 & length(hydro_paths) == 0) {
-      rlang::abort(c("No hydrographs read.",
-        "i" = glue::glue("{hll} hydrographs found in {hydropath}, but none meet scenariofilter."),
+      rlang::abort(c(
+        "No hydrographs read.",
+        "i" = glue::glue(
+          "{hll} hydrographs found in {hydropath}, but none meet scenariofilter."
+        ),
         "i" = "Are the scenariofilter values full scenario names?",
-        "i" = glue::glue("A common issue is that HydroBOT will read these in as 'scenarioname_scenarioname' when they are files in folders with the same name. Try `scenariofilter = {stringr::str_c(scenariofilter, '_', scenariofilter)}`")
+        "i" = glue::glue(
+          "A common issue is that HydroBOT will read these in as 'scenarioname_scenarioname' when they are files in folders with the same name. Try `scenariofilter = {stringr::str_c(scenariofilter, '_', scenariofilter)}`"
+        )
       ))
     }
   }
-
-
 
   # read-in and extract the names
   hydros <- purrr::imap(
@@ -55,11 +64,12 @@ read_hydro_csv <- function(hydropath, scenariofilter, long) {
   ) |>
     dplyr::bind_rows()
 
-
   if (long) {
-    hydros <- tidyr::pivot_longer(hydros,
+    hydros <- tidyr::pivot_longer(
+      hydros,
       cols = -c("scenario", "Date"),
-      names_to = "gauge", values_to = "flow"
+      names_to = "gauge",
+      values_to = "flow"
     )
   }
 
@@ -103,9 +113,12 @@ read_hydro_nc <- function(hydropath, scenariofilter, long, gaugemap) {
       # A major downside of `metR` is that it grabs the closest value. So if we
       # ask for nodes that aren't there, it just grabs something that *is*.
       truenodes <- metR::GlanceNetCDF(x)$dims$node$vals
-      sh <- metR::ReadNetCDF(x,
+      sh <- metR::ReadNetCDF(
+        x,
         vars = "Simulated flow",
-        subset = list(node = as.list(gaugemap$node[gaugemap$node %in% truenodes]))
+        subset = list(
+          node = as.list(gaugemap$node[gaugemap$node %in% truenodes])
+        )
       ) |>
         dplyr::left_join(gaugemap, by = "node") |>
         dplyr::select("gauge", tidyselect::everything())
@@ -128,12 +141,20 @@ read_hydro_nc <- function(hydropath, scenariofilter, long, gaugemap) {
   # make the same as the csv version, but retain the node column
   # The any_of there is if we aren't mapping to gauge
   hydros <- hydros |>
-    dplyr::select("scenario", Date = "time", tidyselect::any_of("gauge"), "flow", "node")
+    dplyr::select(
+      "scenario",
+      Date = "time",
+      tidyselect::any_of("gauge"),
+      "flow",
+      "node"
+    )
 
   if (!long) {
-    hydros <- tidyr::pivot_wider(hydros,
+    hydros <- tidyr::pivot_wider(
+      hydros,
       id_cols = c("scenario", "Date"),
-      names_from = "gauge", values_from = "flow"
+      names_from = "gauge",
+      values_from = "flow"
     )
   }
 
