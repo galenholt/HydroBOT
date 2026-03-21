@@ -62,12 +62,13 @@ jobs:
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: rcmdcheck
+          extra-packages: rcmdcheck rcmdcheck local::.
 
       # # as per https://rstudio.github.io/reticulate/articles/package.html
-      # - run: |
-      #     library(HydroBOT)      # <-- declare requirements in .onLoad()
-      #     reticulate::py_config() # <-- resolves the ephemeral python environment
+      # Theoretically, this should be enough, and we won't need to do python separately
+      - run: |
+          library(HydroBOT)      
+          reticulate::py_config() 
 
 
       - name: Run R CMD check

@@ -1,6 +1,6 @@
 Package: HydroBOT
 Title: Toolkit For Flow-Dependent outcomes in the Murray-Darling Basin
-Version: 0.2.4.9042
+Version: 0.2.4.9043
 Authors@R: 
     c(person("Galen", "Holt", , "g.holt@deakin.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7455-9275")),
@@ -10,7 +10,7 @@ Description: Provides tools to assess responses to flows in the MDB. Wraps the E
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports: 
     DiagrammeR,
     dplyr,
