@@ -66,9 +66,10 @@ jobs:
 
       # # as per https://rstudio.github.io/reticulate/articles/package.html
       # Theoretically, this should be enough, and we won't need to do python separately
-      - run: |
-          library(HydroBOT)      
-          reticulate::py_config() 
+      # Needed modification per the github AI
+      - name: Python config with reticulate
+        run: |
+          Rscript -e "library(HydroBOT); reticulate::py_config()"
 
 
       - name: Run R CMD check
