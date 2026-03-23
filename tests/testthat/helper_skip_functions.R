@@ -10,3 +10,17 @@ skip_if_no_file <- function(path) {
     ))
   }
 }
+
+# Vdiffr often throws failures on external systems. Skip those tests
+
+# *Highly* modified with inspiration from https://github.com/tidyverse/ggplot2/blob/main/tests/testthat/helper-vdiffr.R
+
+if (testthat:::on_ci() || testthat:::on_cran()) {
+  # assign a dummy function
+
+  expect_doppelganger <- function(...) cat('\nSkipping exteral vdiffr\n')
+
+} else {
+  expect_doppelganger <- vdiffr::expect_doppelganger
+
+}
